@@ -895,7 +895,6 @@ const pcols = [];   // polygon colliders: { rings, x0, x1, z0, z1, top, bot }
 const ROOF_TILE = '#9a5442', ROOF_SLATE = '#6b6e72', ROOF_COPPER = '#5aa58e';
 const NAMED = {   // [wall colour, roof colour, height]
   'Thorvaldsens Museum': ['#d9a347', '#d8cdb8', 16],
-  'Børsen': ['#b4533a', ROOF_COPPER, 14],
   'Den Sorte Diamant': ['#26292f', '#3a3f48', 24],
   'Krigsmuseet': ['#b4573f', ROOF_TILE, 15],
   'Proviantgården': ['#b85d42', ROOF_TILE, 13],
@@ -923,8 +922,9 @@ for (const b of DATA.B) {
   const nm = NAMED[b.n];
   let h = nm ? nm[2] : b.h || (b.lv ? (b.lv > 8 ? b.lv : b.lv * 3.2 + 2) : (areaOf(b.rings[0]) > 1500 ? 17 : 14));
   const wall = nm ? nm[0] : pick(WALLS), roof = nm ? nm[1] : pick(ROOFS);
-  if (b.n === 'Christiansborg Slot' || b.n === 'Christiansborg Slotskirke') {   // drawn from parts below; the outline only stops her and the camera
-    pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: b.n === 'Christiansborg Slot' ? 40 : 33, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: b.n === 'Christiansborg Slot' ? '#8a6152' : '#7a7d86', line: true }); continue;
+  const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7a7d86'], 'Børsen': [22, '#5aa58e'] }[b.n];
+  if (own) {   // drawn by hand further down; the outline only stops her and the camera
+    pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: own[0], bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: own[1], line: true }); continue;
   }
   building(b.rings, h, wall, roof);
 }
@@ -1359,6 +1359,82 @@ TX.frieze = ctex(1024, 128, (g, w, h) => {
   mesh(new THREE.TorusGeometry(0.28, 0.06, 6, 14), bronze, 0.62, 4.05, -1.45, { parent: top });
 }
 
+// ======================================================================== BØRSEN, as it looked before the fire in April 2024
+// 128 m long and 21 m wide (Christian IV, 1619-1640): red brick with sandstone bands, a green copper roof, tall Dutch
+// gables at both ends, small gables along both long sides, and the dragon spire (56 m): four dragons whose tails
+// twist together up to three crowns. Built in a group along the footprint from OpenStreetMap.
+function brickTex(brick, mortar) {
+  return ctex(256, 256, (g, w, h) => {
+    g.fillStyle = mortar; g.fillRect(0, 0, w, h);
+    const rows = 16, cols = 8, bh = h / rows, bw = w / cols;
+    for (let r = 0; r < rows; r++) { const off = (r % 2) * bw / 2; for (let c = -1; c <= cols; c++) { g.fillStyle = jit(brick, 0.09); g.fillRect(c * bw + off + 1.5, r * bh + 1.5, bw - 3, bh - 3); } }
+    speckle(g, w, h, 500, 0.05);
+  }, { rep: 0.5 });
+}
+function crownAt(parent, x, y, z, r) {   // a small gold crown
+  mesh(new THREE.CylinderGeometry(r, r * 0.82, r * 0.8, 12, 1, true), GOLD, x, y, z, { parent });
+  mesh(new THREE.TorusGeometry(r * 0.83, r * 0.12, 6, 16), GOLD, x, y - r * 0.4, z, { parent, rx: Math.PI / 2 });
+  for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; mesh(new THREE.ConeGeometry(r * 0.16, r * 0.5, 5), GOLD, x + Math.cos(a) * r, y + r * 0.6, z + Math.sin(a) * r, { parent }); }
+  for (let k = 0; k < 2; k++) mesh(new THREE.TorusGeometry(r * 0.95, r * 0.07, 5, 14, Math.PI), GOLD, x, y + r * 0.35, z, { parent, ry: k * Math.PI / 2 });
+}
+{
+  const C = [253, 65], ry = Math.atan2(-0.383, 0.923), L = 127.8, W = 20.6, WALL = 9.5, RISE = 9, RIDGE = WALL + 0.25 + RISE;
+  const g = new THREE.Group(); g.position.set(C[0], 0, C[1]); g.rotation.y = ry; world.add(g);
+  const cs = Math.cos(ry), sn = Math.sin(ry);
+  const wp = (lx, lz) => [C[0] + lx * cs + lz * sn, C[1] - lx * sn + lz * cs];   // local → world
+  const win = (kind, lx, y, lz, face, w, h) => { const [x, z] = wp(lx, lz); addWin(kind, x, y, z, ry + face, w, h, 0.55); };
+  const brick = toon('#ffffff', { map: brickTex('#b5553b', '#7d3a2b') }), sand = tm('#e6d6b0'), cop = tm('#5aa58e'), copD = tm('#468a75');
+  box(L, WALL, W, brick, 0, 0, 0, { parent: g, edges: true });
+  box(L + 0.3, 0.9, W + 0.3, sand, 0, 0, 0, { parent: g, cast: false });                     // plinth
+  box(L + 0.2, 0.35, W + 0.2, sand, 0, 4.7, 0, { parent: g, cast: false });                  // band between the floors
+  box(L + 0.5, 0.5, W + 0.5, sand, 0, WALL - 0.25, 0, { parent: g, edges: true });           // cornice
+  gableRoof(L, W, RISE, cop, 0, WALL + 0.25, 0, { parent: g, over: 0.3, capMat: copD });
+  // a Dutch gable: steps that get narrower toward the top (half width hw, height h, thickness th)
+  const R = [[1, 0], [1, 0.07], [0.87, 0.13], [0.87, 0.26], [0.73, 0.31], [0.73, 0.44], [0.58, 0.49], [0.58, 0.62], [0.42, 0.67], [0.42, 0.8], [0.25, 0.85], [0.25, 0.94], [0.1, 0.97], [0, 1]];
+  const dutch = (hw, h, th) => prismGeo([...R.map(([u, v]) => [u * hw, v * h]), ...R.slice(0, -1).reverse().map(([u, v]) => [-u * hw, v * h])], th);
+  for (const s of [-1, 1]) {   // the two big end gables
+    const ge = dutch(W / 2, 12.5, 1.0); ge.rotateY(Math.PI / 2);
+    mesh(ge, brick, s * (L / 2 - 0.2), WALL, 0, { parent: g, edges: 30 });
+    mesh(new THREE.ConeGeometry(0.35, 1.6, 8), sand, s * (L / 2 - 0.2), WALL + 13.3, 0, { parent: g });
+    for (const [y, xs] of [[WALL + 2.2, [-6, -2, 2, 6]], [WALL + 5.8, [-3.5, 0, 3.5]], [WALL + 9.0, [0]]]) for (const lz of xs) win('rect', s * (L / 2 + 0.38), y, lz, s * Math.PI / 2, 1.2, 1.9);
+    for (const lz of [-7.5, -4.5, -1.5, 1.5, 4.5, 7.5]) for (const y of [2.7, 6.9]) if (!(s < 0 && Math.abs(lz) < 2 && y < 4)) win('rect', s * (L / 2 + WOFF), y, lz, s * Math.PI / 2, 1.3, 2.2);
+  }
+  win('doorArch', -(L / 2 + WOFF), 1.75, 0, -Math.PI / 2, 2.4, 3.5);   // the main door, toward Christiansborg
+  // windows on the long sides, two floors
+  const N = 34;
+  for (let i = 0; i < N; i++) { const lx = -L / 2 + 2 + (i + 0.5) * (L - 4) / N; for (const s of [-1, 1]) for (const y of [2.7, 6.9]) win('rect', lx, y, s * (W / 2 + WOFF), s > 0 ? 0 : Math.PI, 1.3, 2.2); }
+  // ten small gables along each long side, each with a window
+  for (let i = 0; i < 10; i++) {
+    const lx = -L / 2 + 9 + i * (L - 18) / 9;
+    for (const s of [-1, 1]) {
+      mesh(dutch(2.3, 5.4, 0.7), brick, lx, WALL - 0.05, s * (W / 2 - 0.35), { parent: g, edges: 30 });
+      box(4.4, 3.6, 4.4, brick, lx, WALL, s * (W / 2 - 2.6), { parent: g });
+      mesh(new THREE.ConeGeometry(0.18, 0.8, 6), sand, lx, WALL + 5.7, s * (W / 2 - 0.35), { parent: g });
+      win('rect', lx, WALL + 2.1, s * (W / 2 + WOFF), s > 0 ? 0 : Math.PI, 1.1, 1.8);
+    }
+  }
+  // the dragon spire in the middle of the roof
+  box(4.6, 4.6, 4.6, cop, 0, RIDGE - 2.6, 0, { parent: g, edges: true });
+  box(5.2, 0.45, 5.2, copD, 0, RIDGE + 2.0, 0, { parent: g, edges: true });
+  const Y0 = RIDGE + 2.45;
+  for (let k = 0; k < 4; k++) {   // four dragons with their heads out to the corners
+    const a = Math.PI / 4 + k * Math.PI / 2, d = new THREE.Group(); d.position.set(Math.sin(a) * 1.0, Y0 + 0.45, Math.cos(a) * 1.0); d.rotation.y = a; g.add(d);
+    mesh(new THREE.CapsuleGeometry(0.42, 2.0, 4, 8), cop, 0, 0, 1.1, { parent: d, rx: Math.PI / 2 + 0.2 });
+    mesh(new THREE.BoxGeometry(0.62, 0.55, 1.0), cop, 0, -0.25, 2.55, { parent: d, edges: 30 });
+    mesh(new THREE.BoxGeometry(0.52, 0.16, 0.8), copD, 0, -0.62, 2.62, { parent: d });
+    for (const s of [-1, 1]) { mesh(new THREE.ConeGeometry(0.1, 0.45, 5), GOLD, s * 0.2, 0.15, 2.3, { parent: d, rx: -0.5 }); mesh(new THREE.SphereGeometry(0.07, 6, 5), GOLD, s * 0.25, -0.1, 2.95, { parent: d }); }
+  }
+  for (let k = 0; k < 4; k++) {   // their tails twist together up the spire
+    const pts = [];
+    for (let i = 0; i <= 80; i++) { const t = i / 80, a = Math.PI / 4 + k * Math.PI / 2 + t * Math.PI * 9, r = 1.15 * (1 - t) + 0.14; pts.push(new THREE.Vector3(Math.sin(a) * r, Y0 + 0.3 + t * 28, Math.cos(a) * r)); }
+    mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.3, 6), cop, 0, 0, 0, { parent: g });
+  }
+  const T = Y0 + 28.3;
+  crownAt(g, 0, T + 0.4, 0, 0.85); crownAt(g, 0, T + 2.1, 0, 0.68); crownAt(g, 0, T + 3.6, 0, 0.52);
+  mesh(new THREE.CylinderGeometry(0.06, 0.12, 2.2, 6), copD, 0, T + 5.0, 0, { parent: g });
+  mesh(new THREE.SphereGeometry(0.22, 8, 6), GOLD, 0, T + 6.1, 0, { parent: g });
+}
+
 // ---------------- trees in the library garden
 {
   const park = DATA.A.find(a => a.n === 'Det Kongelige Biblioteks Have');
@@ -1395,7 +1471,7 @@ const POIS = [
   { n: 'Christian den Niende', t: 'Kong Christian den Niende sidder på sin hest foran slottet. Han var konge for over hundrede år siden.', x: -73, z: 50, r: 14 },
   { n: 'Slotskirken', t: 'Slottets egen kirke. Den har seks hvide søjler foran og en rund kuppel på taget. Engang brændte den, men nu er den bygget smuk igen.', x: -30, z: -105, r: 30 },
   { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer, som Thorvaldsen lavede for længe siden. Rundt om huset er der malet mennesker, der byder ham velkommen hjem fra en lang rejse med skib. På taget kører en gudinde med fire heste.', x: -100, z: -72, r: 32 },
-  { n: 'Børsen', t: 'Et meget gammelt hus. Her købte og solgte man varer i gamle dage. På taget står et spir med fire drager.', x: 250, z: 65, r: 50 },
+  { n: 'Børsen', t: 'Et meget gammelt hus, som kong Christian den Fjerde byggede. Her købte og solgte man varer. Spiret er fire drager, der snor halerne sammen, og øverst sidder tre kroner. Her ser Børsen ud, som den gjorde før branden i 2024. Nu bliver den bygget op igen.', x: 250, z: 65, r: 50 },
   { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten. Sømændene gik i kirke her.', x: 215, z: -45, r: 32 },
   { n: 'Proviantgården', t: 'Gamle huse omkring en gård. Her gemte man mad til kongens skibe.', x: 138, z: 128, r: 28 },
   { n: 'Bibliotekshaven', t: 'En hyggelig have med træer, bænke og en dam med et springvand.', x: 85, z: 160, r: 40 },
