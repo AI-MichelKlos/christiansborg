@@ -12,6 +12,7 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 - Motoren er kopieret fra `skolen-paa-duevej`: pigen, kameraet bag hende, styring på computer og telefon, kortet i hjørnet, læs op, knapperne og sammenlægningen af statiske ting ("freeze static world").
 - Nye ting kan bruge `HOOKS` (frame, ride, key, start), `FX` og handlingsknappen `offerAction({ id, label, run, prio })`.
 - Commit som "Michel Klos". Når et trin er færdigt: opdater tjeklisten herunder med korte noter.
+- Artefakt med spillet: https://claude.ai/artifact/RxC5FdxMhs3NH9xdf7zzej (opdater den ved at give url'en til Artifact-værktøjet). Artefaktens kopi af `index.html` skal være uden `<!doctype>`, `<html>`, `<head>` og `<body>`.
 
 ## Koordinater og data
 - 1 enhed = 1 meter. x går mod øst, z går mod syd. (0, 0) er 55.6761 N, 12.5800 E, midt i Christiansborg.
