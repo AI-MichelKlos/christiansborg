@@ -133,7 +133,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
       <span>Læs op-knappen</span><span>Teksterne bliver læst højt</span>
     </div>
     <button class="go" id="goBtn" type="button" disabled>Henter Slotsholmen …</button>
-    <p class="foot">Kortdata: © OpenStreetMap-bidragydere (ODbL). Husene er enkle klodser i den første udgave. Placeringer og detaljer er forenklede.</p>
+    <p class="foot">Kortdata: © OpenStreetMap-bidragydere (ODbL). Mange huse er stadig enkle klodser. Placeringer og detaljer er forenklede.</p>
   </div>
 </div>
 
@@ -292,6 +292,54 @@ TX.cobble = ctex(128, 128, (g, w, h) => { g.fillStyle = '#a39b8d'; g.fillRect(0,
 TX.water = ctex(256, 256, (g, w, h) => { g.fillStyle = '#4f93c4'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(255,255,255,.3)'; g.lineWidth = 3; g.lineCap = 'round'; for (let i = 0; i < 28; i++) { const x = rand() * (w - 40), y = 6 + rand() * (h - 12), l = rr(14, 34); g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + l / 2, y - 5, x + l, y); g.stroke(); } }, { rep: 1 / 12 });
 TX.asph = ctex(256, 256, (g, w, h) => { g.fillStyle = '#a19f9b'; g.fillRect(0, 0, w, h); speckle(g, w, h, 2400, 0.07, 2); }, { rep: 1 / 8 });
 const nightMats = [];
+// window textures
+function drawWin(g, w, h, kind, mask) {
+  const arch = kind === 'arch' || kind === 'doorArch';
+  const frameCol = mask ? '#000' : ({ modern: '#3a3e45', doorModern: '#3a3e45', doorArch: '#5b3a26', doorGreen: '#3f6b4f', green: '#2e4a37' }[kind] || '#f6f3ec');
+  const shape = (i) => { g.beginPath(); const x0 = i, x1 = w - i, y1 = h - i; if (arch) { const r = (x1 - x0) / 2, cy = i + r; g.moveTo(x0, y1); g.lineTo(x0, cy); g.arc(w / 2, cy, r, Math.PI, 0, false); g.lineTo(x1, y1); g.closePath(); } else g.rect(x0, i, x1 - x0, y1 - i); };
+  const glass = () => { if (mask) return '#fff'; const gr = g.createLinearGradient(0, 0, w * 0.6, h); gr.addColorStop(0, '#8aa8c0'); gr.addColorStop(1, '#3b536c'); return gr; };
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = frameCol; shape(0); g.fill();
+  const fw = (kind === 'modern' || kind === 'doorModern') ? 4 : 6;
+  if (kind === 'doorArch' || kind === 'doorGreen') {
+    g.save(); shape(fw); g.clip();
+    const split = kind === 'doorArch' ? w / 2 + fw : h * 0.45;
+    g.fillStyle = glass(); g.fillRect(0, 0, w, split);
+    g.fillStyle = mask ? '#000' : (kind === 'doorArch' ? '#8d5b36' : '#4f8562'); g.fillRect(0, split, w, h);
+    if (!mask) { g.strokeStyle = 'rgba(0,0,0,.22)'; g.lineWidth = 2; g.strokeRect(fw + 5, split + 8, w / 2 - fw - 9, h - split - 20); g.strokeRect(w / 2 + 4, split + 8, w / 2 - fw - 9, h - split - 20); g.fillStyle = '#e0b85a'; g.fillRect(w / 2 - 8, split + (h - split) * 0.4, 3, 8); g.fillRect(w / 2 + 5, split + (h - split) * 0.4, 3, 8); }
+    g.fillStyle = frameCol; g.fillRect(0, split - 3, w, 4); g.fillRect(w / 2 - 1.5, 0, 3, h);
+    g.restore(); return;
+  }
+  g.fillStyle = glass(); shape(fw); g.fill();
+  g.save(); shape(0); g.clip(); g.fillStyle = frameCol;
+  if (kind === 'rect' || kind === 'green') { g.fillRect(w / 2 - 2, 0, 4, h); g.fillRect(0, h * 0.36, w, 4); }
+  else if (kind === 'arch') { g.fillRect(w / 2 - 2, 0, 4, h); const cy = w / 2; g.fillRect(0, cy, w, 4); g.strokeStyle = frameCol; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, cy); g.lineTo(w / 2 - w * 0.4, cy - w * 0.4); g.moveTo(w / 2, cy); g.lineTo(w / 2 + w * 0.4, cy - w * 0.4); g.stroke(); }
+  else if (kind === 'yellow') { g.fillRect(w / 2 - 2, h * 0.28, 4, h); g.fillRect(0, h * 0.28, w, 4); }
+  else if (kind === 'doorModern') { g.fillRect(w / 2 - 2, 0, 4, h); }
+  else if (kind === 'french') { g.fillRect(w / 2 - 3, 0, 6, h); g.fillRect(0, h * 0.64, w, 3); if (!mask) { g.fillStyle = '#5a5e66'; g.fillRect(w / 2 - 8, h * 0.52, 3, 8); g.fillRect(w / 2 + 5, h * 0.52, 3, 8); } }
+  if (!mask) { g.fillStyle = 'rgba(255,255,255,.22)'; g.beginPath(); g.moveTo(w * 0.2, h); g.lineTo(w * 0.45, h); g.lineTo(w * 0.95, h * 0.25); g.lineTo(w * 0.7, h * 0.25); g.closePath(); g.fill(); }
+  g.restore();
+}
+const WINKINDS = ['rect', 'arch', 'yellow', 'modern', 'doorArch', 'doorGreen', 'doorModern', 'green', 'french'];
+const WINMAT = {};
+for (const k of WINKINDS) {
+  const map = ctex(64, 96, (g, w, h) => drawWin(g, w, h, k, false), { wrap: false });
+  const mask = ctex(64, 96, (g, w, h) => drawWin(g, w, h, k, true), { wrap: false, srgb: false });
+  const lit = toon('#ffffff', { map, alphaTest: 0.5, emissiveMap: mask, emissive: '#ffcf7a', emissiveIntensity: 0 });
+  WINMAT[k] = { dark: toon('#ffffff', { map, alphaTest: 0.5 }), lit };
+  nightMats.push(lit);
+}
+// ---------------------------------------------------------------- windows (instanced)
+const WIN = {};
+const _q = new THREE.Quaternion(), _e = new THREE.Euler();
+function addWinE(kind, x, y, z, ex, ey, w, h, litP = 0.5) {
+  _e.set(ex, ey, 0, 'YXZ'); _q.setFromEuler(_e);
+  const m = new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), _q.clone(), new THREE.Vector3(w, h, 1));
+  WIN[kind] = WIN[kind] || { lit: [], dark: [] };
+  (rand() < litP ? WIN[kind].lit : WIN[kind].dark).push(m);
+}
+function addWin(kind, x, y, z, ry, w, h, litP) { addWinE(kind, x, y, z, 0, ry, w, h, litP); }
+const WOFF = 0.075;
 const M = {
   ground: toon('#fff', { map: TX.cobble }),
   square: gmat(TX.sidewalk, 1), grass: gmat(TX.grass, 2), sand: gmat(TX.sand, 2), road: gmat(TX.asph, 3), water: gmat(TX.water, 4),
@@ -775,14 +823,6 @@ function inRings(rings, x, z) { if (!ptIn(rings[0], x, z)) return false; for (le
 function bboxOf(ring) { let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9; for (const [x, z] of ring) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z); } return { x0, x1, z0, z1 }; }
 function areaOf(ring) { let s = 0; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) s += ring[j][0] * ring[i][1] - ring[i][0] * ring[j][1]; return Math.abs(s / 2); }
 function segDist(x, z, ax, az, bx, bz) { const ex = bx - ax, ez = bz - az, l2 = ex * ex + ez * ez || 1e-9; let t = ((x - ax) * ex + (z - az) * ez) / l2; t = t < 0 ? 0 : t > 1 ? 1 : t; return Math.hypot(x - ax - ex * t, z - az - ez * t); }
-// keeps the part of a ring on one side of the line a-b (sign 1: left, -1: right)
-function clipHalf(ring, ax, az, bx, bz, sign) {
-  const side = p => sign * ((bx - ax) * (p[1] - az) - (bz - az) * (p[0] - ax));
-  const cut = (s, e, ss, se) => { const t = ss / (ss - se); return [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t]; };
-  const out = []; let s = ring[ring.length - 1];
-  for (const e of ring) { const se = side(e), ss = side(s); if (se >= 0) { if (ss < 0) out.push(cut(s, e, ss, se)); out.push(e); } else if (ss >= 0) out.push(cut(s, e, ss, se)); s = e; }
-  return out;
-}
 function shapeOf(rings) { const sh = new THREE.Shape(rings[0].map(([x, z]) => new THREE.Vector2(x, -z))); for (const h of rings.slice(1)) sh.holes.push(new THREE.Path(h.map(([x, z]) => new THREE.Vector2(x, -z)))); return sh; }
 function flatPoly(rings, mat, y, fill, cast = false) {
   const g = new THREE.ShapeGeometry(shapeOf(rings)); g.rotateX(-Math.PI / 2); worldUV(g, 0, 0);
@@ -853,7 +893,6 @@ for (const b of BRIDGES) {
 const pcols = [];   // polygon colliders: { rings, x0, x1, z0, z1, top, bot }
 const ROOF_TILE = '#9a5442', ROOF_SLATE = '#6b6e72', ROOF_COPPER = '#5aa58e';
 const NAMED = {   // [wall colour, roof colour, height]
-  'Christiansborg Slot': ['#ddd6c6', '#5f706a', 12],
   'Christiansborg Slotskirke': ['#efe8d8', ROOF_COPPER, 18],
   'Thorvaldsens Museum': ['#d9a347', '#d8cdb8', 14],
   'Børsen': ['#b4533a', ROOF_COPPER, 14],
@@ -884,13 +923,177 @@ for (const b of DATA.B) {
   const nm = NAMED[b.n];
   let h = nm ? nm[2] : b.h || (b.lv ? (b.lv > 8 ? b.lv : b.lv * 3.2 + 2) : (areaOf(b.rings[0]) > 1500 ? 17 : 14));
   const wall = nm ? nm[0] : pick(WALLS), roof = nm ? nm[1] : pick(ROOFS);
-  building(b.rings, h, wall, roof);
-  if (b.n === 'Christiansborg Slot') {
-    // The footprint holds both the low wings around the riding ground (west) and the tall palace (east).
-    // The palace part is cut off along its west facade and stacked on top of the low block, up to 26 m.
-    const top = clipHalf(b.rings[0], -82, -46, -107, 173, -1);
-    building([top], 26, '#ddd6c6', '#5f706a', { y0: h, noMap: true });
+  if (b.n === 'Christiansborg Slot') {   // drawn from its parts below; the outline only stops her and the camera
+    pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 40, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: '#8a6152', line: true }); continue;
   }
+  building(b.rings, h, wall, roof);
+}
+
+// ======================================================================== CHRISTIANSBORG SLOT
+// The palace and the wings around the riding ground are drawn from the 3D parts in OpenStreetMap
+// (height, roof shape and colours), fetched 5 Oct 2026. The tower is built by hand (see below).
+// Rows: height;min_height;roof shape;roof height;wall/roof colour;ring in decimetres
+// (first point absolute, then steps) or Cx,z,r for small round parts (chimneys, posts, figures on the roofs).
+const OSM_PARTS = `6.6;;flat;;ded8d3/ded8d3;-848,-217 -104,-158 -990,633 -65,54 -56,65 -48,85 -21,96 10,148 59,148 -39,25 206,320 51,-32 -42,-80 63,-45 -126,-200 71,-46 -49,-106 -13,-60 9,-64 21,-54 22,-19 30,-7 26,7 21,21 609,-390 -24,-60 17,-41
+6.6;;flat;;ded8d3/ded8d3;-141,904 -356,224 -51,-2 -34,-45 -611,395 17,38 -8,19 -34,32 -28,7 -78,-15 -70,-34 -83,-105 -68,44 -125,-193 -70,42 -55,-72 -51,33 202,316 42,-28 104,119 115,59 133,24 119,-15 114,-51 980,-637
+8;;hipped;1;ded8d3/a5bab5;-2083,893 139,216 80,-56 -142,-208
+8;;hipped;1;ded8d3/a5bab5;-1704,1305 -80,50 140,216 80,-54
+11.3;;pyramidal;3.7;ded8d3/ded8d3;-1846,1272 34,55 52,-36 -35,-52
+11.3;;pyramidal;3.7;ded8d3/ded8d3;-1930,1146 34,53 51,-32 -34,-55
+13.5;;hipped;2.9;ded8d3/a5bab5;-866,-248 -369,241 -30,55 2,42 12,18 -552,362 -41,-20 -76,18 -46,76 -11,65 13,102 39,74 -130,79 -35,-59 -32,-99 -10,-148 21,-96 48,-85 56,-65 65,-54 990,-633
+13.5;;hipped;2.9;ded8d3/a5bab5;-120,931 -357,234 -43,9 -31,-7 -39,-33 -552,358 -5,60 -42,47 -76,11 -98,-25 -77,-59 -42,-56 -126,82 85,106 59,43 81,37 133,24 119,-15 59,-22 1035,-666
+13.5;;gabled;2.9;ded8d3/a5bab5;-120,931 -357,234 81,127 359,-233
+13.5;;gabled;2.9;ded8d3/a5bab5;-952,-375 86,127 -369,241 -87,-132
+25.3;;mansard;11.8;ded8d3/a5bab5;-1142,1492 125,204 559,-363 -132,-199
+25.3;;mansard;11.8;ded8d3/a5bab5;-1934,253 131,217 552,-362 -132,-208
+25.3;;flat;;a5bab5/a5bab5;C-1431,79,10
+15.4;;flat;;ded8d3/a5bab5;C-995,-257,6
+15.4;;flat;;ded8d3/a5bab5;C-1275,-76,10
+15.4;;flat;;ded8d3/a5bab5;C-2049,668,11
+12.6;;saltbox;2.1;ded8d3/ded8d3;C-1803,1282,17
+25.3;;flat;;a5bab5/a5bab5;C-1770,299,11
+25.3;;flat;;a5bab5/a5bab5;C-654,1316,11
+15.4;;flat;;ded8d3/a5bab5;C-1192,-130,10
+15.4;;flat;;ded8d3/a5bab5;C-1956,391,7
+12.6;;saltbox;2.1;ded8d3/ded8d3;C-1888,1156,16
+15.4;;flat;;ded8d3/a5bab5;C-144,1038,9
+14;;pyramidal;0.5;ded8d3/62535c;-866,-248 62,104 104,-62 -62,-105
+15.5;;gabled;2;ded8d3/62535c;-754,-350 17,-12 -61,-92 -112,73 60,93
+7.7;;flat;;ded8d3/ded8d3;-1948,1104 53,88 43,-27 -38,-61 -2,-19 61,-44 -125,-200 70,-47 -47,-103 -13,-61 9,-65 22,-57 24,-20 32,-7 29,8 19,18 601,-385 -22,-58 18,-45 363,-241 -359,245 -17,41 24,60 -609,390 -21,-21 -26,-7 -30,7 -22,19 -21,54 -9,64 13,60 49,106 -71,46 126,200 -63,45 42,80 -51,32 -59,-91
+7.7;;flat;;ded8d3/ded8d3;-1784,1354 -5,9 -57,-91 51,-33 55,72 70,-42 125,193 68,-44 40,60 79,66 72,23 68,-2 24,-16 18,-35 -17,-38 611,-395 34,45 51,2 359,-220 -356,225 -20,6 -37,-9 -33,-42 -602,389 15,37 -19,38 -26,18 -71,2 -74,-23 -80,-68 -38,-56 -68,44 -125,-193 -69,40 -55,-70 -43,28
+16.4;;mansard;2.9;ded8d3/62535c;-952,-375 86,127 126,-75 -81,-137
+13.5;;flat;;ded8d3/5a5963;-184,833 215,331 73,-47 -215,-333
+13.5;;flat;;ded8d3/5a5963;624,310 214,332 110,-70 -214,-333
+38.6;;mansard;12.6;9d908f/46323c;-862,-105 163,251 134,-86 -37,-56 658,-423 370,577 -650,424 -30,-46 -138,85 158,244 1015,-656 -28,-43 -30,-84 -68,-69 -369,-573 -32,-91 -69,-66 -29,-46
+25.9;;flat;;9d908f/9d908f;-602,4 84,127 157,-103 -85,-128
+25.9;;flat;;9d908f/9d908f;-151,354 83,126 -156,102 -83,-127
+39.6;;;0.3;46323c/46323c;C108,518,15
+39.6;;;0.3;46323c/46323c;C215,447,15
+39.6;;;0.3;46323c/46323c;C-69,-491,16
+39.6;;;0.3;46323c/46323c;C-232,690,16
+39.6;;;0.3;46323c/46323c;C-514,-202,19
+39.6;;;0.3;46323c/46323c;C-179,-419,18
+39.6;;;0.3;46323c/46323c;C528,242,17
+39.6;;;0.3;46323c/46323c;C417,-168,17
+39.6;;;0.3;46323c/46323c;C482,-66,16
+39.6;;;0.3;46323c/46323c;C206,-492,16
+39.6;;;0.3;46323c/46323c;C-702,-34,15
+39.6;;;0.3;46323c/46323c;C-107,655,15
+39.6;;;0.3;46323c/46323c;C147,-585,17
+39.6;;;0.3;46323c/46323c;C324,375,16
+39.6;;;0.3;46323c/46323c;C-291,-347,17
+39.6;;;0.3;46323c/46323c;C-621,-138,15
+39.6;;;0.3;46323c/46323c;C1,587,16
+39.6;;;0.3;46323c/46323c;C39,-561,17
+39.6;;;0.3;46323c/46323c;C431,308,15
+39.6;;;0.3;46323c/46323c;C-407,-274,16
+39.6;;;0.3;46323c/46323c;C615,138,16
+39.6;;;0.3;46323c/46323c;C347,-274,17
+39.6;;;0.3;46323c/46323c;C552,40,16
+39.6;;;0.3;46323c/46323c;C278,-381,17`;
+const PARTS = OSM_PARTS.split('\n').map(ln => {
+  const f = ln.split(';'), [wc, rc] = f[4].split('/');
+  const p = { h: +f[0], mh: +f[1] || 0, roof: f[2], rh: +f[3] || 0, wall: '#' + wc, rcol: '#' + rc };
+  if (f[5][0] === 'C') { const [x, z, r] = f[5].slice(1).split(',').map(v => v / 10); Object.assign(p, { x, z, r }); }
+  else p.ring = decRing(f[5]).map(([x, z]) => [x / 10, z / 10]);
+  return p;
+});
+const COPPER = '#7a5040', GOLD = toon('#efbf45', { emissive: '#6a4a00', emissiveIntensity: 0.3 });
+function lit(c, l = 0.06) { _c.set(c); _c.offsetHSL(0, 0, l); return '#' + _c.getHexString(); }
+function perimOf(r) { let s = 0; for (let i = 0, j = r.length - 1; i < r.length; j = i++) s += Math.hypot(r[i][0] - r[j][0], r[i][1] - r[j][1]); return s; }
+function minWidth(r) { let best = 1e9; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const ex = r[i][0] - r[j][0], ez = r[i][1] - r[j][1], l = Math.hypot(ex, ez); if (l < 0.5) continue; let lo = 1e9, hi = -1e9; for (const p of r) { const d = (-p[0] * ez + p[1] * ex) / l; lo = Math.min(lo, d); hi = Math.max(hi, d); } best = Math.min(best, hi - lo); } return best; }
+// a sloped roof: the outline at the eaves, moved in by `inset` at the top (a bevel on a thin extrusion)
+function bevelRoof(ring, y, rise, inset, mat) {
+  const g = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: 0.02, bevelEnabled: true, bevelThickness: rise, bevelSize: inset, bevelOffset: -inset, bevelSegments: 1, curveSegments: 1 });
+  g.rotateX(-Math.PI / 2);
+  return mesh(g, mat, 0, y, 0, { edges: 30 });
+}
+function partBlock(p) {
+  const rc = p.rcol === '#46323c' ? COPPER : lit(p.rcol, 0.05);
+  const wallM = tm(p.wall === '#9d908f' ? '#bdb5ac' : lit(p.wall)), roofM = tm(rc);
+  if (!p.ring) { const y0 = Math.max(p.mh, p.h - 4), r = Math.max(0.5, p.r * 0.8); mesh(new THREE.CylinderGeometry(r, r, p.h - y0, 8), p.wall === '#46323c' ? tm(COPPER) : wallM, p.x, (p.h + y0) / 2, p.z, { edges: 40 }); return; }
+  const sloped = p.roof && p.roof !== 'flat' && p.rh > 0.2, eave = sloped ? p.h - p.rh : p.h;
+  const g = new THREE.ExtrudeGeometry(shapeOf([p.ring]), { depth: eave - p.mh, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
+  mesh(g, wallM, 0, p.mh, 0, { edges: 25 });
+  if (sloped) {
+    const w2 = 2 * areaOf(p.ring) / perimOf(p.ring);
+    const inset = p.roof === 'pyramidal' ? minWidth(p.ring) / 2 * 0.97 : Math.min(p.roof === 'mansard' ? p.rh * 0.45 : p.rh * 1.3, w2 * 0.45);
+    bevelRoof(p.ring, eave, p.rh, inset, roofM);
+  } else { const rg = new THREE.ShapeGeometry(shapeOf([p.ring])); rg.rotateX(-Math.PI / 2); mesh(rg, tm(rc, true), 0, p.h + 0.04, 0, { cast: false }); }
+}
+for (const p of PARTS) partBlock(p);
+
+// ---------------- windows on the palace (the big block, 26 m to the eaves): one row per floor, a bay every 4.8 m
+{
+  const main = PARTS.find(p => p.h === 38.6), r = main.ring;
+  const GATE = [47, -28];   // Kongeporten, the King's Gate under the tower
+  const ROWS = [[3.6, 2.4, 'rect'], [9.8, 3.8, 'arch'], [15.6, 3.0, 'rect'], [20.8, 2.3, 'rect']];
+  for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+    const [ax, az] = r[j], [bx, bz] = r[i], len = Math.hypot(bx - ax, bz - az); if (len < 6) continue;
+    let nx = -(bz - az) / len, nz = (bx - ax) / len; const mx = (ax + bx) / 2, mz = (az + bz) / 2;
+    if (ptIn(r, mx + nx * 0.6, mz + nz * 0.6)) { nx = -nx; nz = -nz; }
+    const n = Math.max(1, Math.floor((len - 3) / 4.8)), ry = Math.atan2(nx, nz);
+    for (let k = 0; k < n; k++) {
+      const t = (k + 0.5) / n, x = ax + (bx - ax) * t + nx * WOFF, z = az + (bz - az) * t + nz * WOFF;
+      const nearGate = Math.hypot(x - GATE[0], z - GATE[1]) < 4.5;
+      for (const [y, h, kind] of ROWS) if (!(nearGate && y < 12)) addWin(kind, x, y, z, ry, kind === 'arch' ? 1.8 : 1.6, h, 0.6);
+    }
+  }
+  // the gate itself: a tall arched door on the east facade
+  const ry = Math.atan2(0.84, -0.54);
+  addWin('doorArch', GATE[0] + 0.84 * 0.1, 3.9, GATE[1] - 0.54 * 0.1, ry, 4.2, 7.8, 0.3);
+}
+
+// ---------------- the tower (106 m): stone tower, copper spire and three gold crowns
+{
+  const TX0 = 25.5, TZ0 = -14.1, ry = 0.6, stone = tm('#bdb5ac'), cop = tm(COPPER);
+  const sq = (side, y0, y1, mat) => box(side, y1 - y0, side, mat, TX0, y0, TZ0, { ry, edges: true });
+  const frustum = (s0, s1, y0, y1, mat, seg = 4) => { const k = 0.5 / Math.cos(Math.PI / seg); mesh(new THREE.CylinderGeometry(s1 * k, s0 * k, y1 - y0, seg), mat, TX0, (y0 + y1) / 2, TZ0, { ry: ry + Math.PI / seg, edges: 30 }); };
+  sq(18, 0, 40, stone);                     // the stone tower
+  sq(18.8, 38.8, 40.2, tm('#c9bfb7'));      // cornice
+  frustum(18.6, 12.6, 40.2, 46, cop);       // copper roof around the upper tower
+  sq(12.4, 46, 60.3, cop);                  // the copper-clad upper tower with big openings
+  frustum(12.6, 5.6, 60.3, 72.5, cop);      // the spire starts
+  frustum(6.2, 6.2, 66, 79, cop, 8);        // octagonal lantern
+  frustum(7.0, 7.0, 78.6, 79.4, tm('#9b6a52'), 8);
+  mesh(new THREE.SphereGeometry(3.3, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), cop, TX0, 79.4, TZ0, { edges: 40 });
+  mesh(new THREE.CylinderGeometry(0.18, 1.0, 26, 8), cop, TX0, 81 + 13, TZ0);   // the thin spire up to 106 m
+  mesh(new THREE.SphereGeometry(0.4, 10, 8), GOLD, TX0, 106, TZ0);
+  // three gold crowns, smaller and smaller
+  for (const [y, r] of [[85.2, 2.1], [91.6, 1.65], [98.0, 1.25]]) {
+    mesh(new THREE.CylinderGeometry(r, r * 0.82, r * 0.8, 14, 1, true), GOLD, TX0, y, TZ0, { edges: 50 });
+    mesh(new THREE.TorusGeometry(r * 0.83, r * 0.12, 6, 18), GOLD, TX0, y - r * 0.4, TZ0, { rx: Math.PI / 2 });
+    for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2, px = TX0 + Math.cos(a) * r, pz = TZ0 + Math.sin(a) * r; mesh(new THREE.ConeGeometry(r * 0.16, r * 0.55, 6), GOLD, px, y + r * 0.65, pz); mesh(new THREE.SphereGeometry(r * 0.09, 6, 5), GOLD, px, y + r * 0.95, pz); }
+    // arches over the crown
+    for (let k = 0; k < 2; k++) mesh(new THREE.TorusGeometry(r * 0.95, r * 0.07, 5, 16, Math.PI), GOLD, TX0, y + r * 0.35, TZ0, { ry: k * Math.PI / 2 });
+  }
+  // openings: arched windows on the stone tower and big dark arches in the copper tower
+  for (let f = 0; f < 4; f++) {
+    const a = ry + f * Math.PI / 2, nx = Math.sin(a), nz = Math.cos(a), tx = Math.cos(a), tz = -Math.sin(a);
+    for (const s of [-3.6, 3.6]) addWin('arch', TX0 + nx * (9 + WOFF) + tx * s, 31, TZ0 + nz * (9 + WOFF) + tz * s, a, 2.4, 5.5, 0.7);
+    addWin('arch', TX0 + nx * (6.2 + WOFF), 53, TZ0 + nz * (6.2 + WOFF), a, 4.2, 7.5, 0.8);
+    for (const s of [-1.3, 1.3]) addWin('arch', TX0 + nx * (3.1 + WOFF) + tx * s, 73.5, TZ0 + nz * (3.1 + WOFF) + tz * s, a, 0.9, 2.6, 0.8);
+  }
+}
+
+// ---------------- Frederik VII on his horse, on Slotspladsen
+{
+  const g = new THREE.Group(); g.position.set(81, 0, -51); g.rotation.y = Math.atan2(34, -23); world.add(g);
+  const bronze = tm('#4d7a69'), granite = tm('#9e968e');
+  box(3.6, 0.8, 7.0, granite, 0, 0, 0, { parent: g, edges: true });
+  box(3.0, 4.6, 6.2, granite, 0, 0.8, 0, { parent: g, edges: true });
+  box(3.5, 0.5, 6.8, granite, 0, 5.4, 0, { parent: g, edges: true });
+  const Y = 0, hr = new THREE.Group(); hr.position.y = 5.9; hr.scale.setScalar(1.6); g.add(hr);   // horse and king, a bit bigger than life
+  mesh(new THREE.CapsuleGeometry(0.62, 1.6, 4, 10), bronze, 0, Y + 1.7, 0, { parent: hr, rx: Math.PI / 2 });         // body
+  mesh(new THREE.CapsuleGeometry(0.28, 0.9, 4, 8), bronze, 0, Y + 2.45, 1.25, { parent: hr, rx: 0.6 });               // neck
+  mesh(new THREE.CapsuleGeometry(0.22, 0.55, 4, 8), bronze, 0, Y + 2.85, 1.75, { parent: hr, rx: 1.2 });              // head
+  for (const [lx, lz] of [[-0.35, 0.95], [0.35, 0.95], [-0.35, -0.95], [0.35, -0.95]]) mesh(new THREE.CylinderGeometry(0.13, 0.11, 1.4, 6), bronze, lx, Y + 0.7, lz, { parent: hr });
+  mesh(new THREE.CapsuleGeometry(0.1, 0.9, 3, 6), bronze, 0, Y + 1.5, -1.4, { parent: hr, rx: -0.5 });                // tail
+  mesh(new THREE.CapsuleGeometry(0.3, 0.6, 4, 8), bronze, 0, Y + 2.75, -0.1, { parent: hr });                         // the king
+  mesh(new THREE.SphereGeometry(0.22, 10, 8), bronze, 0, Y + 3.45, -0.05, { parent: hr });
+  mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.3, 10), bronze, 0, Y + 3.7, -0.05, { parent: hr });
+  for (const s of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.1, 0.6, 3, 6), bronze, s * 0.38, Y + 2.15, 0.1, { parent: hr, rx: 0.4 });
+  colCirc(81, -51, 3.8, 6.4);
 }
 
 // ---------------- trees in the library garden
@@ -921,8 +1124,9 @@ function rayPoly(a, b, best) {
 // ======================================================================== POIs: the names are shown and read aloud when she comes near
 const POIS = [
   { n: 'Christiansborg Slot', t: 'Et kæmpe slot midt i byen. Her mødes Folketinget, som bestemmer over Danmark. Kongen holder også fest her.', x: 0, z: 40, r: 80 },
+  { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt. Det er det højeste tårn i København. På toppen sidder tre kroner af guld. Man kan køre op i tårnet med en elevator og kigge ud over byen.', x: 44, z: -27, r: 16 },
   { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her går politikerne ind og ud.', x: 36, z: 72, r: 26 },
-  { n: 'Slotspladsen', t: 'En stor plads foran slottet. Her står en statue af en konge på en hest.', x: 100, z: -20, r: 28 },
+  { n: 'Slotspladsen', t: 'En stor plads foran slottet. Her rider kong Frederik den Syvende på sin hest. Han gav Danmark grundloven.', x: 100, z: -20, r: 28 },
   { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste.', x: -140, z: 85, r: 42 },
   { n: 'Slotskirken', t: 'Slottets egen kirke. Den har et rundt tag, der ligner en stor hat.', x: -30, z: -105, r: 30 },
   { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer. En mand ved navn Thorvaldsen lavede dem for længe siden.', x: -100, z: -72, r: 32 },
@@ -1043,6 +1247,16 @@ function buildKid() {
   return { root, g, head, legs, arms, coat, hair, leggings };
 }
 const kid = buildKid(); dyn.add(kid.root);
+
+// ---------------- windows → instanced meshes
+const winPlane = new THREE.PlaneGeometry(1, 1);
+for (const k in WIN) {
+  for (const which of ['lit', 'dark']) {
+    const arr = WIN[k][which]; if (!arr.length) continue;
+    const im = new THREE.InstancedMesh(winPlane, which === 'lit' ? WINMAT[k].lit : WINMAT[k].dark, arr.length);
+    arr.forEach((m, i) => im.setMatrixAt(i, m)); im.receiveShadow = true; im.frustumCulled = false; world.add(im);
+  }
+}
 
 // ======================================================================== freeze static world
 world.traverse(o => { o.updateMatrix(); o.matrixAutoUpdate = false; });
@@ -1462,6 +1676,7 @@ function frame(now) {
   ev += ((evening ? 1 : 0) - ev) * Math.min(1, dt * 1.6); applyEvening();
   if (started) updPlayer(dt);
   updCamera(dt, clockT);
+  if (window.__camFix) { camera.position.fromArray(window.__camFix[0]); camera.lookAt(...window.__camFix[1]); }   // for testing only
   updVoice();
   for (const h of HOOKS.frame) h(dt, clockT);
   updActions();

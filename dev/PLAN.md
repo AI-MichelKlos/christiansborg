@@ -30,9 +30,15 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - 26 steder med navn og tekst. 16 træer i Bibliotekshaven.
   - Christiansborg er én grundplan i OpenStreetMap med både Ridebanens fløje og selve slottet. Lige nu er det hele 12 m højt, og slottet (øst for linjen fra (-82, -46) til (-107, 173)) er bygget ovenpå op til 26 m. Trin 2 og 3 skal erstatte det.
   - Tagene er flade, og broerne har ingen buer endnu. Absalon på Højbro Plads og kongen på Slotspladsen står i teksterne, men er ikke bygget.
-- [ ] 2. Christiansborg Slot med tårnet
-- [ ] 3. Ridebanen og staldene
-- [ ] 4. Slotskirken og Thorvaldsens Museum
+- [x] 2. Christiansborg Slot med tårnet (5. okt. 2026)
+  - Slottet og Ridebanens fløje tegnes nu fra 3D-delene i OpenStreetMap (`OSM_PARTS`: højde, tagform, farver) med `partBlock`. Skrå tage laves med `bevelRoof` (en skrå kant på en tynd klods). Slottets grundplan bruges kun som usynlig mur (`pcols`) og på kortet.
+  - Vinduer fra skolespillet (`addWin`, lyser om aftenen) på den store blok, fire rækker. Kongeporten er en høj buet port på østsiden (47, -28).
+  - Tårnet er bygget i hånden ved (25.5, -14.1), drejet 0.6: stentårn til 40 m, kobber til 72 m, lanterne, spir til 106 m og tre kroner af guld. Kobber er brunt (`COPPER`), sådan som taget ser ud efter renoveringen.
+  - Frederik 7. til hest på Slotspladsen (81, -51). Nyt sted: Tårnet.
+  - Hvis Overpass er optaget: hent rå data med `https://api.openstreetmap.org/api/0.6/map?bbox=...` i browseren (lille område) og find `building:part`.
+  - Til test: `window.__camFix = [[x, y, z], [x, y, z]]` låser kameraet.
+- [ ] 3. Ridebanen og staldene (fløjene står allerede som OSM-dele uden vinduer; Christian 9. til hest står ved (-73, 50) i OSM)
+- [ ] 4. Slotskirken og Thorvaldsens Museum (OSM har 3D-dele til Slotskirkens kuppel omkring (-38, -109))
 - [ ] 5. Børsen med dragespiret (som den så ud før branden i 2024)
 - [ ] 6. Det Kongelige Bibliotek (Den Sorte Diamant) og Tøjhusmuseet
 - [ ] 7. Kanalerne med både, broerne og Holmens Kirke
