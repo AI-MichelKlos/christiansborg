@@ -52,6 +52,11 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Bygget i hånden i en gruppe langs grundplanen (midte (253, 65), drejet -0.393, 127.8 x 20.6 m): røde mursten (`brickTex` fra skolespillet), sandstensbånd, grønt kobbertag til 18.75 m, høje hollandske gavle i begge ender (`dutch` med trin), 10 små gavle på hver langside og vinduer i to etager. Hoveddøren vender mod Christiansborg.
   - Dragespiret midt på taget: fire drager med hovederne ud mod hjørnerne, halerne snor sig op (`TubeGeometry`), tre guldkroner (`crownAt`) og en kugle i 56 m.
   - Børsens grundplan bruges kun som usynlig mur (listen `own` i bygningsløkken).
+- [x] Ekstra: Højbro, den første bro (5. okt. 2026)
+  - Bygget i hånden i sin egen ramme (`HB`: midte (-3.5, -165.25), retning over kanalen (-0.16, 0.987), 18.7 x 18.25 m). Kørebanen hæver sig 1.2 m på midten (`hbH`), og `archH` løfter pigen, når hun går over (lagt ind i `groundAt`). Grønne stålsider, fortove, jerngelænder (`TX.rail`), granitblokke med en lygte på hvert hjørne.
+  - Den almindelige flade bro og vejstykket over Højbro tegnes ikke længere.
+  - Et klart sted i vandet (`POOL` ved (-21, -167), radius 4: hul i jorden og i vandet, gennemsigtig overflade) viser havmanden og hans syv sønner af bronze på bunden (Suste Bonnén, 1992). De rækker armene op. På broen kommer knappen "Kig efter havmanden", som drejer kameraet ned mod dem, og de vinker.
+  - Samme metode kan bruges til de andre broer i trin 7.
 - [ ] 6. Det Kongelige Bibliotek (Den Sorte Diamant) og Tøjhusmuseet
 - [ ] 7. Kanalerne med både, broerne og Holmens Kirke
 - [ ] 8. Noget sjovt at finde og lave for en 5-årig
