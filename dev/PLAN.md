@@ -37,6 +37,7 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Frederik 7. til hest på Slotspladsen (81, -51). Nyt sted: Tårnet.
   - Hvis Overpass er optaget: hent rå data med `https://api.openstreetmap.org/api/0.6/map?bbox=...` i browseren (lille område) og find `building:part`.
   - Til test: `window.__camFix = [[x, y, z], [x, y, z]]` låser kameraet.
+- [x] Ekstra: styring på telefon (5. okt. 2026). Touch-knapperne vises nu (venstre tommel går, højre tommel kigger, Hop-knap), og tekstkortene blokerer ikke fingrene (`pointer-events:none`). Testet med rigtige touch-events (Chrome DevTools `Input.dispatchTouchEvent`).
 - [ ] 3. Ridebanen og staldene (fløjene står allerede som OSM-dele uden vinduer; Christian 9. til hest står ved (-73, 50) i OSM)
 - [ ] 4. Slotskirken og Thorvaldsens Museum (OSM har 3D-dele til Slotskirkens kuppel omkring (-38, -109))
 - [ ] 5. Børsen med dragespiret (som den så ud før branden i 2024)
