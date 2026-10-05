@@ -1,0 +1,16 @@
+# Christiansborg
+
+En hyggelig 3D-gåtur i tegnefilmsstil på Christiansborg og Slotsholmen i København. Lavet til børn på omkring 5 år. Teksterne bliver læst højt på dansk.
+
+Spil det her: https://ai-michelklos.github.io/christiansborg/
+
+## Styring
+- Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe. Træk med musen for at kigge. N skifter mellem dag og aften, M viser eller skjuler kortet.
+- Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap.
+
+## Om spillet
+- Én fil (`index.html`) med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
+- Husene er enkle klodser med den rigtige grundplan. Spillet bygges op lidt efter lidt. Planen står i `dev/PLAN.md`.
+- Kortdata: © OpenStreetMap-bidragydere, ODbL (https://www.openstreetmap.org/copyright).
+
+Udarbejdet med AI (Claude) og med begrænset mennesketjek.
