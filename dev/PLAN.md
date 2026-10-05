@@ -57,6 +57,9 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Den almindelige flade bro og vejstykket over Højbro tegnes ikke længere.
   - Et klart sted i vandet (`POOL` ved (-21, -167), radius 4: hul i jorden og i vandet, gennemsigtig overflade) viser havmanden og hans syv sønner af bronze på bunden (Suste Bonnén, 1992). De rækker armene op. På broen kommer knappen "Kig efter havmanden", som drejer kameraet ned mod dem, og de vinker.
   - Samme metode kan bruges til de andre broer i trin 7.
-- [ ] 6. Det Kongelige Bibliotek (Den Sorte Diamant) og Tøjhusmuseet
+- [x] 6. Det Kongelige Bibliotek (Den Sorte Diamant) og Tøjhusmuseet (5. okt. 2026)
+  - Det gamle bibliotek (huset med gårde, første punkt (154, 264) i OSM): røde mursten, buede vinduer i to rækker, rødt tegltag (skrå kant med huller til gårdene).
+  - Den Sorte Diamant: to sorte, blanke blokke (`TX.diamond`, vinduesbånd der lyser om aftenen), som læner sig 4 m ud mod havnen, og en glasvæg i midten (midte (164, 297.5), drejet 0.585). Glasbro over Christians Brygge til det gamle bibliotek. Den lave østlige del er en mørk klods på 12 m.
+  - Tøjhusmuseet (Krigsmuseet i OSM): bygget i hånden i en gruppe (midte (18.5, 204.5), drejet -0.985, 164.5 x 24.7 m), røde mursten, højt tegltag, hollandske gavle og vinduer i to rækker. To kanoner ved døren på havesiden skyder med konfetti (knappen "Skyd med konfetti").
 - [ ] 7. Kanalerne med både, broerne og Holmens Kirke
 - [ ] 8. Noget sjovt at finde og lave for en 5-årig

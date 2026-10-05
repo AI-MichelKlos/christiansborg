@@ -982,8 +982,6 @@ const pcols = [];   // polygon colliders: { rings, x0, x1, z0, z1, top, bot }
 const ROOF_TILE = '#9a5442', ROOF_SLATE = '#6b6e72', ROOF_COPPER = '#5aa58e';
 const NAMED = {   // [wall colour, roof colour, height]
   'Thorvaldsens Museum': ['#d9a347', '#d8cdb8', 16],
-  'Den Sorte Diamant': ['#26292f', '#3a3f48', 24],
-  'Krigsmuseet': ['#b4573f', ROOF_TILE, 15],
   'Proviantgården': ['#b85d42', ROOF_TILE, 13],
   'Christian 4.s Bryghus': ['#b25a40', ROOF_TILE, 14],
   'Holmens Kirke': ['#ad513a', ROOF_COPPER, 18],
@@ -1009,7 +1007,8 @@ for (const b of DATA.B) {
   const nm = NAMED[b.n];
   let h = nm ? nm[2] : b.h || (b.lv ? (b.lv > 8 ? b.lv : b.lv * 3.2 + 2) : (areaOf(b.rings[0]) > 1500 ? 17 : 14));
   const wall = nm ? nm[0] : pick(WALLS), roof = nm ? nm[1] : pick(ROOFS);
-  const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7a7d86'], 'Børsen': [22, '#5aa58e'] }[b.n];
+  const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7a7d86'], 'Børsen': [22, '#5aa58e'], 'Den Sorte Diamant': [26, '#26292f'], 'Krigsmuseet': [22, '#9a5442'] }[b.n];
+  if (!b.n && b.rings[0][0][0] === 154 && b.rings[0][0][1] === 264) continue;   // the old library, drawn further down
   if (own) {   // drawn by hand further down; the outline only stops her and the camera
     pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: own[0], bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: own[1], line: true }); continue;
   }
@@ -1522,6 +1521,101 @@ function crownAt(parent, x, y, z, r) {   // a small gold crown
   mesh(new THREE.SphereGeometry(0.22, 8, 6), GOLD, 0, T + 6.1, 0, { parent: g });
 }
 
+// ======================================================================== DET KONGELIGE BIBLIOTEK, DEN SORTE DIAMANT OG TØJHUSMUSEET
+// ---------------- the old library (Hans J. Holm, 1906): red brick, arched windows, a red tile roof
+{
+  const old = DATA.B.find(b => !b.n && b.rings[0][0][0] === 154 && b.rings[0][0][1] === 264);
+  if (old) {
+    const H = 16, brick = toon('#ffffff', { map: brickTex('#b8563c', '#7d3a2b') });
+    const g = new THREE.ExtrudeGeometry(shapeOf(old.rings), { depth: H, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
+    mesh(g, brick, 0, 0, 0, { edges: 25 });
+    const rg = new THREE.ExtrudeGeometry(shapeOf(old.rings), { depth: 0.02, bevelEnabled: true, bevelThickness: 4.5, bevelSize: 3.6, bevelOffset: -3.6, bevelSegments: 1, curveSegments: 1 }); rg.rotateX(-Math.PI / 2);
+    mesh(rg, tm(ROOF_TILE), 0, H, 0, { edges: 30 });
+    pcols.push({ rings: old.rings, ...bboxOf(old.rings[0]), top: H + 4.5, bot: 0 }); mapItems.push({ k: 'p', pts: old.rings[0], fill: ROOF_TILE, line: true });
+    for (const e of edgesOf(old.rings[0])) {
+      if (e.len < 8) continue;
+      const n = Math.floor(e.len / 4.5);
+      for (let k = 0; k < n; k++) { const t = (k + 0.5) / n, x = e.a[0] + (e.b[0] - e.a[0]) * t + e.nx * WOFF, z = e.a[1] + (e.b[1] - e.a[1]) * t + e.nz * WOFF; addWin('arch', x, 4.2, z, e.ry, 1.7, 3.2, 0.5); addWin('arch', x, 10.4, z, e.ry, 1.7, 3.4, 0.5); }
+    }
+  }
+}
+
+// ---------------- Den Sorte Diamant (1999): two black, shiny blocks that lean out over the harbour, a big glass cut between them
+TX.diamond = ctex(256, 256, (g, w, h) => drawDiamond(g, w, h, false), { rep: 1 / 12 });
+TX.diamondMask = ctex(256, 256, (g, w, h) => drawDiamond(g, w, h, true), { rep: 1 / 12, srgb: false });
+function drawDiamond(g, w, h, mask) {
+  g.fillStyle = mask ? '#000' : '#16181d'; g.fillRect(0, 0, w, h);
+  for (let y = 18; y < h; y += 64) { g.fillStyle = mask ? '#fff' : '#2c3442'; g.fillRect(0, y, w, 22); if (!mask) { g.fillStyle = 'rgba(160,190,220,.18)'; g.fillRect(0, y, w, 3); } }
+  if (!mask) { g.fillStyle = 'rgba(255,255,255,.07)'; for (const x0 of [20, 120, 190]) { g.beginPath(); g.moveTo(x0, h); g.lineTo(x0 + 30, h); g.lineTo(x0 + 90, 0); g.lineTo(x0 + 60, 0); g.closePath(); g.fill(); } }
+}
+TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#a9cce0'); gr.addColorStop(1, '#5f8aa6'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = '#e8eef2'; g.fillRect(0, 0, w, 3); g.fillRect(0, 0, 3, h); }, { rep: 1 / 3 });
+{
+  const black = toon('#ffffff', { map: TX.diamond, emissiveMap: TX.diamondMask, emissive: '#ffd59a', emissiveIntensity: 0 });
+  const glass = toon('#ffffff', { map: TX.glassGrid, emissive: '#ffe2b0', emissiveIntensity: 0 });
+  nightMats.push(black, glass);
+  const C = [164, 297.5], ry = 0.585, LEAN = 4, H = 24, D = 39.7;
+  const g = new THREE.Group(); g.position.set(C[0], 0, C[1]); g.rotation.y = ry; world.add(g);
+  const leaning = (w, h, d, mat, x, z) => {   // a box whose top is pushed toward the harbour
+    const geo = boxGeo(w, h, d); geo.translate(0, h / 2, 0); const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) p.setZ(i, p.getZ(i) + LEAN * p.getY(i) / H);
+    geo.computeVertexNormals(); return mesh(geo, mat, x, 0, z, { parent: g, edges: 25 });
+  };
+  leaning(35.2, H, D, black, -23.1, 0); leaning(35.2, H, D, black, 23.1, 0);
+  leaning(11.2, H - 1, D - 10, glass, 0, 0);   // the glass cut in the middle
+  // a glass bridge over Christians Brygge to the old library
+  box(4, 3, 15.4, glass, 137.2, 8, 283, { ry: Math.atan2(0.553, 0.833), edges: true });
+  // the low part to the east of the black blocks
+  const dia = DATA.B.find(b => b.n === 'Den Sorte Diamant');
+  if (dia) {
+    const r = dia.rings[0], iB = r.findIndex(p => p[0] === 187 && p[1] === 258), iC = r.findIndex(p => p[0] === 209 && p[1] === 292);
+    if (iB >= 0 && iC >= 0) { const rest = []; for (let i = iB; ; i = (i + 1) % r.length) { rest.push(r[i]); if (i === iC) break; } building([rest, ...dia.rings.slice(1)], 12, '#2b2e35', '#3a3f48'); }
+  }
+}
+
+// ---------------- Tøjhusmuseet (Christian IV, about 1600): a very long red brick house with a high red tile roof
+{
+  const C = [18.5, 204.5], ry = -0.985, L = 164.5, W = 24.7, WALL = 11, RISE = 10;
+  const g = new THREE.Group(); g.position.set(C[0], 0, C[1]); g.rotation.y = ry; world.add(g);
+  const cs = Math.cos(ry), sn = Math.sin(ry), wp = (lx, lz) => [C[0] + lx * cs + lz * sn, C[1] - lx * sn + lz * cs];
+  const win = (kind, lx, y, lz, face, w, h) => { const [x, z] = wp(lx, lz); addWin(kind, x, y, z, ry + face, w, h, 0.5); };
+  const brick = toon('#ffffff', { map: brickTex('#b45a40', '#7d3a2b') }), sand = tm('#e6d6b0');
+  box(L, WALL, W, brick, 0, 0, 0, { parent: g, edges: true });
+  box(L + 0.3, 0.8, W + 0.3, sand, 0, 0, 0, { parent: g, cast: false });
+  box(L + 0.5, 0.45, W + 0.5, sand, 0, WALL - 0.2, 0, { parent: g, edges: true });
+  gableRoof(L, W, RISE, tm(ROOF_TILE), 0, WALL + 0.25, 0, { parent: g, over: 0.3, capMat: tm('#7d3a2b') });
+  const R = [[1, 0], [1, 0.07], [0.87, 0.13], [0.87, 0.26], [0.73, 0.31], [0.73, 0.44], [0.58, 0.49], [0.58, 0.62], [0.42, 0.67], [0.42, 0.8], [0.25, 0.85], [0.25, 0.94], [0.1, 0.97], [0, 1]];
+  const dutch = (hw, h, th) => prismGeo([...R.map(([u, v]) => [u * hw, v * h]), ...R.slice(0, -1).reverse().map(([u, v]) => [-u * hw, v * h])], th);
+  for (const s of [-1, 1]) {
+    const ge = dutch(W / 2, 13.5, 1.0); ge.rotateY(Math.PI / 2); mesh(ge, brick, s * (L / 2 - 0.2), WALL, 0, { parent: g, edges: 30 });
+    for (const [y, zs] of [[WALL + 2.4, [-6, -2, 2, 6]], [WALL + 6.2, [-3.5, 0, 3.5]], [WALL + 9.6, [0]]]) for (const lz of zs) win('rect', s * (L / 2 + 0.38), y, lz, s * Math.PI / 2, 1.2, 1.9);
+  }
+  const N = 40;
+  for (let i = 0; i < N; i++) { const lx = -L / 2 + 3 + (i + 0.5) * (L - 6) / N; for (const sd of [-1, 1]) { win('rect', lx, 3.2, sd * (W / 2 + WOFF), sd > 0 ? 0 : Math.PI, 1.3, 2.4); win('rect', lx, 7.8, sd * (W / 2 + WOFF), sd > 0 ? 0 : Math.PI, 1.3, 2.4); } }
+  // doors at the end toward Tøjhusgade and in the middle of the garden side; two old cannons there shoot confetti
+  win('doorArch', -(L / 2 + WOFF), 1.9, 0, -Math.PI / 2, 2.6, 3.8); win('doorArch', 0, 1.9, -(W / 2 + WOFF), Math.PI, 2.6, 3.8);
+  const CANNONS = [];
+  for (const side of [-5, 5]) {
+    const [x, z] = wp(side, -(W / 2 + 4.5)), face = ry + Math.PI, c = new THREE.Group(); c.position.set(x, 0, z); c.rotation.y = face; world.add(c);
+    box(0.9, 0.55, 1.8, tm('#7a5232'), 0, 0.35, -0.1, { parent: c, edges: true });
+    for (const sx of [-0.55, 0.55]) mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.16, 14), tm('#5a3b22'), sx, 0.5, 0.25, { parent: c, rz: Math.PI / 2, edges: 40 });
+    mesh(new THREE.CylinderGeometry(0.2, 0.27, 2.6, 12), tm('#2f3338'), 0, 1.05, 0.35, { parent: c, rx: Math.PI / 2 - 0.18 });
+    mesh(new THREE.TorusGeometry(0.22, 0.05, 6, 12), tm('#2f3338'), 0, 1.27, 1.6, { parent: c, rx: -0.18 });
+    colCirc(x, z, 1.1, 1.3);
+    const [mx, mz] = wp(side, -(W / 2 + 6.2)); CANNONS.push({ x, z, mx, mz });
+  }
+  HOOKS.frame.push(() => {
+    if (!started || paused) return;
+    for (const c of CANNONS) if (Math.hypot(P.pos.x - c.x, P.pos.z - c.z) < 3.2) {
+      offerAction({ id: 'kanon', label: 'Skyd med konfetti', prio: 1, run: () => {
+        tone(120, 50, 0, 0.35, 0.2, 'sawtooth'); tone(900, 1400, 0.05, 0.2, 0.05, 'triangle');
+        for (let k = 0; k < 4; k++) burst(new THREE.Vector3(c.mx, 1.0 + k * 0.4, c.mz));
+        toast('Bum! Konfetti!');
+      } });
+      break;
+    }
+  });
+}
+
 // ---------------- trees in the library garden
 {
   const park = DATA.A.find(a => a.n === 'Det Kongelige Biblioteks Have');
@@ -1562,9 +1656,9 @@ const POIS = [
   { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten. Sømændene gik i kirke her.', x: 215, z: -45, r: 32 },
   { n: 'Proviantgården', t: 'Gamle huse omkring en gård. Her gemte man mad til kongens skibe.', x: 138, z: 128, r: 28 },
   { n: 'Bibliotekshaven', t: 'En hyggelig have med træer, bænke og en dam med et springvand.', x: 85, z: 160, r: 40 },
-  { n: 'Tøjhusmuseet', t: 'Et meget langt hus. Her kan man se gamle kanoner, skibe og rustninger.', x: 20, z: 205, r: 40 },
-  { n: 'Det Kongelige Bibliotek', t: 'Danmarks største bibliotek. Her er der flere bøger, end du kan tælle.', x: 125, z: 250, r: 30 },
-  { n: 'Den Sorte Diamant', t: 'Den nye del af biblioteket. Den er sort og blank og står lige ud til vandet.', x: 215, z: 255, r: 45 },
+  { n: 'Tøjhusmuseet', t: 'Et meget langt hus af røde mursten, som Christian den Fjerde byggede. Her lå kongens kanoner og våben. Nu er det et museum, hvor man kan se kanoner og rustninger. Kanonerne ved døren skyder kun med konfetti.', x: 20, z: 205, r: 40 },
+  { n: 'Det Kongelige Bibliotek', t: 'Det gamle bibliotek af røde mursten. Det er over hundrede år gammelt. Her er der flere bøger, end du kan tælle.', x: 125, z: 250, r: 30 },
+  { n: 'Den Sorte Diamant', t: 'Den nye del af biblioteket. Den er sort og blank som en diamant og læner sig ud over vandet. I midten er der en stor væg af glas, og en glasbro går over vejen til det gamle bibliotek.', x: 215, z: 255, r: 45 },
   { n: 'Inderhavnen', t: 'Den store havn. Her sejler både og havnebusser forbi.', x: 290, z: 245, r: 55 },
   { n: 'Søren Kierkegaards Plads', t: 'En plads ved havnen lige ved siden af Den Sorte Diamant.', x: 40, z: 330, r: 35 },
   { n: 'Christian den Fjerdes Bryghus', t: 'Et gammelt bryggeri med tykke mure. Kong Christian den Fjerde lod det bygge.', x: -25, z: 315, r: 30 },
