@@ -116,7 +116,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div class="card sticker">
     <div class="eyebrow">København · en gåtur i 3D</div>
     <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå rundt på Slotsholmen. Der er vand hele vejen rundt, så du skal over en bro. Gå hen til slottet, Børsen og biblioteket ved havnen. Når du kommer tæt på et sted, hører du, hvad det hedder.</p>
+    <p class="lead" id="introLead">Gå rundt på Slotsholmen. Der er vand hele vejen rundt, så du skal over en bro. Gå hen til slottet, Børsen og biblioteket ved havnen, og klap hestene på Ridebanen. Når du kommer tæt på et sted, hører du, hvad det hedder.</p>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -1009,18 +1009,31 @@ function bevelRoof(ring, y, rise, inset, mat) {
   g.rotateX(-Math.PI / 2);
   return mesh(g, mat, 0, y, 0, { edges: 30 });
 }
+// moves every edge of a ring inwards by d (small d only); used so that parts which share a wall do not flicker
+function insetRing(r, d) {
+  let a = 0; for (let i = 0, j = r.length - 1; i < r.length; j = i++) a += r[j][0] * r[i][1] - r[i][0] * r[j][1];
+  const s = a > 0 ? 1 : -1, n = r.length;
+  return r.map((p, i) => {
+    const q = r[(i + n - 1) % n], t = r[(i + 1) % n];
+    const l1 = Math.hypot(p[0] - q[0], p[1] - q[1]) || 1, l2 = Math.hypot(t[0] - p[0], t[1] - p[1]) || 1;
+    const n1 = [-(p[1] - q[1]) / l1 * s, (p[0] - q[0]) / l1 * s], n2 = [-(t[1] - p[1]) / l2 * s, (t[0] - p[0]) / l2 * s];
+    const k = Math.min(3, 1 / Math.max(0.2, 1 + n1[0] * n2[0] + n1[1] * n2[1])) * d;
+    return [p[0] + (n1[0] + n2[0]) * k, p[1] + (n1[1] + n2[1]) * k];
+  });
+}
 function partBlock(p) {
   const rc = p.rcol === '#46323c' ? COPPER : lit(p.rcol, 0.05);
   const wallM = tm(p.wall === '#9d908f' ? '#bdb5ac' : lit(p.wall)), roofM = tm(rc);
   if (!p.ring) { const y0 = Math.max(p.mh, p.h - 4), r = Math.max(0.5, p.r * 0.8); mesh(new THREE.CylinderGeometry(r, r, p.h - y0, 8), p.wall === '#46323c' ? tm(COPPER) : wallM, p.x, (p.h + y0) / 2, p.z, { edges: 40 }); return; }
   const sloped = p.roof && p.roof !== 'flat' && p.rh > 0.2, eave = sloped ? p.h - p.rh : p.h;
-  const g = new THREE.ExtrudeGeometry(shapeOf([p.ring]), { depth: eave - p.mh, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
+  const ring = insetRing(p.ring, 0.1 * (1 - p.h / 40));   // lower parts sit a few cm behind taller ones
+  const g = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: eave - p.mh, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
   mesh(g, wallM, 0, p.mh, 0, { edges: 25 });
   if (sloped) {
-    const w2 = 2 * areaOf(p.ring) / perimOf(p.ring);
-    const inset = p.roof === 'pyramidal' ? minWidth(p.ring) / 2 * 0.97 : Math.min(p.roof === 'mansard' ? p.rh * 0.45 : p.rh * 1.3, w2 * 0.45);
-    bevelRoof(p.ring, eave, p.rh, inset, roofM);
-  } else { const rg = new THREE.ShapeGeometry(shapeOf([p.ring])); rg.rotateX(-Math.PI / 2); mesh(rg, tm(rc, true), 0, p.h + 0.04, 0, { cast: false }); }
+    const w2 = 2 * areaOf(ring) / perimOf(ring);
+    const inset = p.roof === 'pyramidal' ? minWidth(ring) / 2 * 0.97 : Math.min(p.roof === 'mansard' ? p.rh * 0.45 : p.rh * 1.3, w2 * 0.45);
+    bevelRoof(ring, eave, p.rh, inset, roofM);
+  } else { const rg = new THREE.ShapeGeometry(shapeOf([ring])); rg.rotateX(-Math.PI / 2); mesh(rg, tm(rc, true), 0, p.h + 0.04, 0, { cast: false }); }
 }
 for (const p of PARTS) partBlock(p);
 
@@ -1077,25 +1090,131 @@ for (const p of PARTS) partBlock(p);
   }
 }
 
-// ---------------- Frederik VII on his horse, on Slotspladsen
-{
-  const g = new THREE.Group(); g.position.set(81, 0, -51); g.rotation.y = Math.atan2(34, -23); world.add(g);
+// ---------------- kings on horses (bronze on a granite base): Frederik VII on Slotspladsen, Christian IX on Ridebanen
+function rytter(x, z, ry) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; world.add(g);
   const bronze = tm('#4d7a69'), granite = tm('#9e968e');
   box(3.6, 0.8, 7.0, granite, 0, 0, 0, { parent: g, edges: true });
   box(3.0, 4.6, 6.2, granite, 0, 0.8, 0, { parent: g, edges: true });
   box(3.5, 0.5, 6.8, granite, 0, 5.4, 0, { parent: g, edges: true });
-  const Y = 0, hr = new THREE.Group(); hr.position.y = 5.9; hr.scale.setScalar(1.6); g.add(hr);   // horse and king, a bit bigger than life
-  mesh(new THREE.CapsuleGeometry(0.62, 1.6, 4, 10), bronze, 0, Y + 1.7, 0, { parent: hr, rx: Math.PI / 2 });         // body
-  mesh(new THREE.CapsuleGeometry(0.28, 0.9, 4, 8), bronze, 0, Y + 2.45, 1.25, { parent: hr, rx: 0.6 });               // neck
-  mesh(new THREE.CapsuleGeometry(0.22, 0.55, 4, 8), bronze, 0, Y + 2.85, 1.75, { parent: hr, rx: 1.2 });              // head
-  for (const [lx, lz] of [[-0.35, 0.95], [0.35, 0.95], [-0.35, -0.95], [0.35, -0.95]]) mesh(new THREE.CylinderGeometry(0.13, 0.11, 1.4, 6), bronze, lx, Y + 0.7, lz, { parent: hr });
-  mesh(new THREE.CapsuleGeometry(0.1, 0.9, 3, 6), bronze, 0, Y + 1.5, -1.4, { parent: hr, rx: -0.5 });                // tail
-  mesh(new THREE.CapsuleGeometry(0.3, 0.6, 4, 8), bronze, 0, Y + 2.75, -0.1, { parent: hr });                         // the king
-  mesh(new THREE.SphereGeometry(0.22, 10, 8), bronze, 0, Y + 3.45, -0.05, { parent: hr });
-  mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.3, 10), bronze, 0, Y + 3.7, -0.05, { parent: hr });
-  for (const s of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.1, 0.6, 3, 6), bronze, s * 0.38, Y + 2.15, 0.1, { parent: hr, rx: 0.4 });
-  colCirc(81, -51, 3.8, 6.4);
+  const hr = new THREE.Group(); hr.position.y = 5.9; hr.scale.setScalar(1.6); g.add(hr);   // horse and king, a bit bigger than life
+  mesh(new THREE.CapsuleGeometry(0.62, 1.6, 4, 10), bronze, 0, 1.7, 0, { parent: hr, rx: Math.PI / 2 });         // body
+  mesh(new THREE.CapsuleGeometry(0.28, 0.9, 4, 8), bronze, 0, 2.45, 1.25, { parent: hr, rx: 0.6 });               // neck
+  mesh(new THREE.CapsuleGeometry(0.22, 0.55, 4, 8), bronze, 0, 2.85, 1.75, { parent: hr, rx: 1.2 });              // head
+  for (const [lx, lz] of [[-0.35, 0.95], [0.35, 0.95], [-0.35, -0.95], [0.35, -0.95]]) mesh(new THREE.CylinderGeometry(0.13, 0.11, 1.4, 6), bronze, lx, 0.7, lz, { parent: hr });
+  mesh(new THREE.CapsuleGeometry(0.1, 0.9, 3, 6), bronze, 0, 1.5, -1.4, { parent: hr, rx: -0.5 });                // tail
+  mesh(new THREE.CapsuleGeometry(0.3, 0.6, 4, 8), bronze, 0, 2.75, -0.1, { parent: hr });                         // the king
+  mesh(new THREE.SphereGeometry(0.22, 10, 8), bronze, 0, 3.45, -0.05, { parent: hr });
+  mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.3, 10), bronze, 0, 3.7, -0.05, { parent: hr });
+  for (const s of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.1, 0.6, 3, 6), bronze, s * 0.38, 2.15, 0.1, { parent: hr, rx: 0.4 });
+  colCirc(x, z, 3.8, 6.4);
 }
+rytter(81, -51, Math.atan2(34, -23));
+rytter(-73, 50, Math.atan2(-73, 10));
+
+// ======================================================================== RIDEBANEN OG STALDENE
+// Windows on the wings around the riding ground (and the other low parts of the palace). One row per floor;
+// a wall that a neighbouring part covers gets none. On the south wing, the side facing the sand gets green
+// stable doors at the bottom, and some of kongens heste look out over the doors.
+const RIDE = DATA.A.find(a => a.n === 'Christiansborg Ridebane').ring;
+{
+  const solid = PARTS.filter(p => p.ring), seen = new Set(), doors = [];
+  const covered = (x, z, y, self) => solid.some(q => q !== self && y > q.mh && y < q.h && ptIn(q.ring, x, z));
+  for (const p of solid) {
+    if (p.h === 38.6 || p.h === 25.9) continue;   // the big block has its own windows; the courtyard blocks cannot be seen
+    const eave = p.roof && p.roof !== 'flat' && p.rh > 0.2 ? p.h - p.rh : p.h;
+    const rows = []; for (let y = 3.0; y + 1.4 < eave - 0.6; y += 4.2) rows.push(y);
+    const r = p.ring;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      const [ax, az] = r[j], [bx, bz] = r[i], len = Math.hypot(bx - ax, bz - az); if (len < 4) continue;
+      let nx = -(bz - az) / len, nz = (bx - ax) / len; const mx = (ax + bx) / 2, mz = (az + bz) / 2;
+      if (ptIn(r, mx + nx * 0.5, mz + nz * 0.5)) { nx = -nx; nz = -nz; }
+      const stable = mz > 95 && [10, 18, 26].some(d => ptIn(RIDE, mx + nx * d, mz + nz * d));
+      const n = Math.max(1, Math.floor(len / 4.2)), ry = Math.atan2(nx, nz);
+      for (let k = 0; k < n; k++) {
+        const t = (k + 0.5) / n, x = ax + (bx - ax) * t, z = az + (bz - az) * t;
+        rows.forEach((y, ri) => {
+          const key = Math.round(x * 2) + ',' + Math.round(y) + ',' + Math.round(z * 2);
+          if (seen.has(key) || covered(x + nx * 0.8, z + nz * 0.8, y, p)) return; seen.add(key);
+          if (ri === 0 && stable) { addWin('doorGreen', x + nx * WOFF, 1.45, z + nz * WOFF, ry, 1.8, 2.9, 0.3); doors.push([x, z, nx, nz]); }
+          else addWin('rect', x + nx * WOFF, y, z + nz * WOFF, ry, 1.4, 2.2, 0.5);
+        });
+      }
+    }
+  }
+  // horses looking out over every other stable door
+  const COATS = [['#8a5a3c', '#3a2a22'], ['#f1ece2', '#cfc6b8'], ['#3a2f2b', '#1f1a18'], ['#b0703f', '#5a3420']];
+  doors.filter((d, i) => i % 2 === 0).slice(0, 8).forEach(([x, z, nx, nz], i) => {
+    const [c, m] = COATS[i % COATS.length], g = new THREE.Group(); g.position.set(x + nx * 0.15, 2.05, z + nz * 0.15); g.rotation.y = Math.atan2(nx, nz); world.add(g);
+    mesh(new THREE.CapsuleGeometry(0.17, 0.42, 4, 10), tm(c), 0, -0.05, 0.3, { parent: g, rx: 2.0, edges: 40 });
+    mesh(new THREE.BoxGeometry(0.06, 0.12, 0.3), tm(m), 0, 0.2, 0.05, { parent: g });
+    for (const s of [-1, 1]) { mesh(new THREE.ConeGeometry(0.05, 0.16, 6), tm(c), s * 0.09, 0.2, 0.06, { parent: g }); mesh(new THREE.SphereGeometry(0.03, 6, 5), M.dark, s * 0.13, 0.06, 0.28, { parent: g }); }
+  });
+}
+
+// ---------------- three of kongens heste walk round and round on the sand. Go close, and they stop; press E to pat one.
+const HORSES = [];
+{
+  const outline = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide });
+  const part = (geo, mat, parent, x, y, z, ol = 1.06) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); if (ol) { const o = new THREE.Mesh(geo, outline); o.scale.setScalar(ol); m.add(o); } return m; };
+  function makeHorse(col, maneCol, rider) {
+    const g = new THREE.Group(), coat = toon(col), mane = toon(maneCol), hoof = toon('#3a302c'), eye = new THREE.MeshBasicMaterial({ color: '#231a22' });
+    part(new THREE.CapsuleGeometry(0.42, 1.2, 6, 14), coat, g, 0, 1.3, 0).rotation.x = Math.PI / 2;
+    const neck = new THREE.Group(); neck.position.set(0, 1.5, 0.72); g.add(neck);
+    part(new THREE.CapsuleGeometry(0.22, 0.6, 4, 10), coat, neck, 0, 0.3, 0.12).rotation.x = 0.55;
+    part(new THREE.BoxGeometry(0.08, 0.55, 0.5), mane, neck, 0, 0.42, -0.04, 0).rotation.x = 0.55;
+    const head = new THREE.Group(); head.position.set(0, 0.72, 0.34); neck.add(head);
+    part(new THREE.CapsuleGeometry(0.17, 0.42, 4, 10), coat, head, 0, -0.06, 0.22).rotation.x = 1.9;
+    for (const s of [-1, 1]) { part(new THREE.ConeGeometry(0.06, 0.18, 6), coat, head, s * 0.1, 0.17, 0.0, 0); part(new THREE.SphereGeometry(0.035, 8, 6), eye, head, s * 0.15, 0.05, 0.2, 0); }
+    const tail = new THREE.Group(); tail.position.set(0, 1.45, -0.95); g.add(tail);
+    part(new THREE.CapsuleGeometry(0.08, 0.6, 3, 6), mane, tail, 0, -0.35, -0.12, 0).rotation.x = -0.35;
+    const legs = [];
+    for (const [lx, lz] of [[-0.2, 0.55], [0.2, -0.55], [0.2, 0.55], [-0.2, -0.55]]) { const hip = new THREE.Group(); hip.position.set(lx, 1.05, lz); g.add(hip); part(new THREE.CylinderGeometry(0.08, 0.06, 0.95, 8), coat, hip, 0, -0.47, 0); part(new THREE.CylinderGeometry(0.075, 0.085, 0.12, 8), hoof, hip, 0, -0.98, 0, 0); legs.push(hip); }
+    if (rider) {   // a rider from the royal stables in a red jacket and a black helmet
+      const red = toon('#b8322c'), skin = toon('#f6cfb0'), black = toon('#2a2530');
+      part(new THREE.CapsuleGeometry(0.2, 0.36, 4, 10), red, g, 0, 2.08, -0.05);
+      part(new THREE.SphereGeometry(0.17, 12, 10), skin, g, 0, 2.55, -0.02, 1.05);
+      part(new THREE.SphereGeometry(0.18, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), black, g, 0, 2.6, -0.04, 1.04);
+      for (const s of [-1, 1]) { part(new THREE.CapsuleGeometry(0.08, 0.45, 3, 8), black, g, s * 0.36, 1.55, 0.05, 1.05).rotation.z = s * 0.25; part(new THREE.CapsuleGeometry(0.07, 0.3, 3, 8), red, g, s * 0.22, 2.0, 0.15, 1.05).rotation.x = -0.8; }
+    }
+    dyn.add(g);
+    return { g, neck, head, tail, legs };
+  }
+  const C = [-133, 88], R = 17;
+  [['#8a5a3c', '#3a2a22', 0, true], ['#f1ece2', '#cfc6b8', 2.1, false], ['#3a2f2b', '#1f1a18', 4.2, false]].forEach(([c, m, a, rider]) => HORSES.push({ ...makeHorse(c, m, rider), a, ph: rand() * 6, pat: 0, near: false }));
+  const PATS = ['Hesten kan godt lide dig.', 'Hesten siger tak.', 'Hesten vrinsker glad.'];
+  let patN = 0;
+  HOOKS.frame.push((dt, t) => {
+    let best = null, bd = 3.4;
+    for (const h of HORSES) {
+      const x = C[0] + Math.cos(h.a) * R, z = C[1] + Math.sin(h.a) * R;
+      const dx = P.pos.x - x, dz = P.pos.z - z, d = Math.hypot(dx, dz);
+      const near = started && !paused && d < 4.5;
+      if (near && !h.near) neigh();
+      h.near = near;
+      const walking = !near && h.pat <= 0;
+      if (walking) { h.a += dt * 1.4 / R; h.ph += dt * 6.5; }
+      h.g.position.set(x, 0, z);
+      h.g.rotation.y = Math.atan2(-Math.sin(h.a), Math.cos(h.a));   // along the circle
+      const s = walking ? Math.sin(h.ph) * 0.45 : 0;
+      h.legs[0].rotation.x = s; h.legs[1].rotation.x = s; h.legs[2].rotation.x = -s; h.legs[3].rotation.x = -s;
+      h.g.children[0].position.y = 1.3 + (walking ? Math.abs(Math.cos(h.ph)) * 0.04 : 0);
+      h.tail.rotation.z = Math.sin(t * 2.2 + h.ph) * 0.3;
+      // the head turns to look at her, and nods when she pats it
+      const look = near ? Math.max(-0.8, Math.min(0.8, angDiff(Math.atan2(dx, dz), h.g.rotation.y))) : 0;
+      h.neck.rotation.y += (look - h.neck.rotation.y) * Math.min(1, dt * 4);
+      if (h.pat > 0) h.pat -= dt;
+      h.neck.rotation.x = h.pat > 0 ? Math.sin(h.pat * 14) * 0.18 : 0;
+      // she cannot walk through a horse
+      if (started && d < 1.6 && d > 1e-4) { P.pos.x = x + dx / d * 1.6; P.pos.z = z + dz / d * 1.6; kid.root.position.copy(P.pos); }
+      if (near && d < bd) { bd = d; best = h; }
+    }
+    if (best) offerAction({ id: 'hest', label: 'Klap hesten', prio: 2, run: () => {
+      best.pat = 1.1; neigh(); best.head.getWorldPosition(tmpB); burst(tmpB); sparkleSound(); toast(PATS[patN++ % PATS.length]);
+    } });
+  });
+}
+function neigh() { for (let i = 0; i < 7; i++) { const f = 1050 - i * 75 + (i % 2) * 140; tone(f, f * 0.9, i * 0.06, 0.08, 0.05, 'triangle'); } tone(320, 230, 0.46, 0.2, 0.035, 'sawtooth'); }
 
 // ---------------- trees in the library garden
 {
@@ -1128,7 +1247,9 @@ const POIS = [
   { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt. Det er det højeste tårn i København. På toppen sidder tre kroner af guld. Man kan køre op i tårnet med en elevator og kigge ud over byen.', x: 44, z: -27, r: 16 },
   { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her går politikerne ind og ud.', x: 36, z: 72, r: 26 },
   { n: 'Slotspladsen', t: 'En stor plads foran slottet. Her rider kong Frederik den Syvende på sin hest. Han gav Danmark grundloven.', x: 100, z: -20, r: 28 },
-  { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste.', x: -140, z: 85, r: 42 },
+  { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste. Gå hen til en hest og klap den.', x: -140, z: 85, r: 42 },
+  { n: 'De Kongelige Stalde', t: 'Her bor kongens heste. Over staldene ligger et lille gammelt teater, hvor kongen så skuespil.', x: -105, z: 135, r: 20 },
+  { n: 'Christian den Niende', t: 'Kong Christian den Niende sidder på sin hest foran slottet. Han var konge for over hundrede år siden.', x: -73, z: 50, r: 14 },
   { n: 'Slotskirken', t: 'Slottets egen kirke. Den har et rundt tag, der ligner en stor hat.', x: -30, z: -105, r: 30 },
   { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer. En mand ved navn Thorvaldsen lavede dem for længe siden.', x: -100, z: -72, r: 32 },
   { n: 'Børsen', t: 'Et meget gammelt hus. Her købte og solgte man varer i gamle dage. På taget står et spir med fire drager.', x: 250, z: 65, r: 50 },
@@ -1167,7 +1288,7 @@ scene.fog = new THREE.Fog('#f6e2c6', 220, 680);
 const hemi = new THREE.HemisphereLight('#dbe9ff', '#b39b7c', 1.05); scene.add(hemi);
 const sun = new THREE.DirectionalLight('#fff0d4', 1.7); sun.castShadow = true;
 sun.shadow.mapSize.set(isTouch ? 1024 : 2048, isTouch ? 1024 : 2048);
-sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.05;
+sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.14;   // big walls at a low sun angle need more bias
 const sc = sun.shadow.camera; sc.near = 1; sc.far = 320;
 function shadowExtent(e) { sc.left = -e; sc.right = e; sc.top = e; sc.bottom = -e; sc.updateProjectionMatrix(); }
 shadowExtent(110);
@@ -1718,7 +1839,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { P, cam, kid, POIS, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { P, cam, kid, POIS, HORSES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

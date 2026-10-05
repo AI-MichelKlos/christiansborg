@@ -38,7 +38,12 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Hvis Overpass er optaget: hent rå data med `https://api.openstreetmap.org/api/0.6/map?bbox=...` i browseren (lille område) og find `building:part`.
   - Til test: `window.__camFix = [[x, y, z], [x, y, z]]` låser kameraet.
 - [x] Ekstra: styring på telefon (5. okt. 2026). Touch-knapperne vises nu (venstre tommel går, højre tommel kigger, Hop-knap), og tekstkortene blokerer ikke fingrene (`pointer-events:none`). Testet med rigtige touch-events (Chrome DevTools `Input.dispatchTouchEvent`).
-- [ ] 3. Ridebanen og staldene (fløjene står allerede som OSM-dele uden vinduer; Christian 9. til hest står ved (-73, 50) i OSM)
+- [x] 3. Ridebanen og staldene (5. okt. 2026)
+  - Vinduer på fløjene og de andre lave dele: én række pr. etage, ingen vinduer på vægge, som en nabodel dækker. Sydfløjens side mod sandet har grønne stalddøre, og der kigger heste ud over hver anden.
+  - Tre heste går rundt på sandet (`HORSES`, cirkel om (-133, 88) med radius 17), den brune med en rytter i rød jakke. Kommer pigen tæt på, stopper de, vrinsker og kigger på hende. Knappen "Klap hesten" (E) får hesten til at nikke.
+  - `rytter(x, z, retning)` laver en konge til hest. Christian 9. står ved (-73, 50), Frederik 7. ved (81, -51).
+  - Nye steder: De Kongelige Stalde (med Hofteatret ovenpå) og Christian den Niende.
+  - Dele, der deler en væg, flimrede. Nu rykkes lavere dele et par cm ind (`insetRing`), og skyggens bias er sat op, så store vægge ikke får striber.
 - [ ] 4. Slotskirken og Thorvaldsens Museum (OSM har 3D-dele til Slotskirkens kuppel omkring (-38, -109))
 - [ ] 5. Børsen med dragespiret (som den så ud før branden i 2024)
 - [ ] 6. Det Kongelige Bibliotek (Den Sorte Diamant) og Tøjhusmuseet
