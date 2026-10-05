@@ -44,7 +44,10 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - `rytter(x, z, retning)` laver en konge til hest. Christian 9. står ved (-73, 50), Frederik 7. ved (81, -51).
   - Nye steder: De Kongelige Stalde (med Hofteatret ovenpå) og Christian den Niende.
   - Dele, der deler en væg, flimrede. Nu rykkes lavere dele et par cm ind (`insetRing`), og skyggens bias er sat op, så store vægge ikke får striber.
-- [ ] 4. Slotskirken og Thorvaldsens Museum (OSM har 3D-dele til Slotskirkens kuppel omkring (-38, -109))
+- [x] 4. Slotskirken og Thorvaldsens Museum (5. okt. 2026)
+  - Slotskirken: kirkens krop fra OpenStreetMap (hipped tag), kuppel på en rund tambur med små vinduer og en lille lanterne ved (-38.3, -108.9). Søjlegangen mod kanalen er bygget i hånden: seks hvide søjler, bjælke og trekantet gavl (`gableRoof`, `prismGeo` er nu kopieret fra skolespillet).
+  - Thorvaldsens Museum: okker vægge, 16 m. Hovedfacaden (mod vest, der hvor quadrigaen står i OSM) har fem høje døre, der er smallere foroven. De andre facader har vinduer og en malet frise (`TX.frieze`) med skibet og mennesker med Dannebrog. Quadrigaen står på taget: Victoria i vognen og fire heste (`bronzeHorse`).
+  - `edgesOf(ring)` giver væggene med deres retning udad. Brug den til facader fremover.
 - [ ] 5. Børsen med dragespiret (som den så ud før branden i 2024)
 - [ ] 6. Det Kongelige Bibliotek (Den Sorte Diamant) og Tøjhusmuseet
 - [ ] 7. Kanalerne med både, broerne og Holmens Kirke
