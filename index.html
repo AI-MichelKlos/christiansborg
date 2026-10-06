@@ -1131,9 +1131,16 @@ function insetRing(r, d) {
     return [p[0] + (n1[0] + n2[0]) * k, p[1] + (n1[1] + n2[1]) * k];
   });
 }
+// granite blocks for the palace walls (one tile = 4.8 x 2.4 m) and a rough granite base (3.6 x 1.8 m)
+TX.granite = ctex(256, 256, (g, w, h) => { g.fillStyle = '#8e867c'; g.fillRect(0, 0, w, h); for (let r = 0; r < 4; r++) { let x = -rr(0, 80); while (x < w) { const bw = rr(70, 150); g.fillStyle = jit(pick(['#bdb4a7', '#b2a99c', '#c6bdb0', '#aea396']), 0.05); g.fillRect(x + 1.5, r * 64 + 1.5, bw - 3, 61); x += bw; } } speckle(g, w, h, 900, 0.06, 2); }, {});
+TX.granite.repeat.set(1 / 4.8, 1 / 2.4);
+TX.granBase = ctex(256, 128, (g, w, h) => { g.fillStyle = '#4e4943'; g.fillRect(0, 0, w, h); for (let r = 0; r < 2; r++) { const off = r * 64; for (let c = -1; c < 3; c++) { const x = c * 128 + off; g.fillStyle = jit('#958c80', 0.06); g.fillRect(x + 5, r * 64 + 5, 118, 54); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(x + 5, r * 64 + 5, 118, 5); g.fillStyle = 'rgba(0,0,0,.15)'; g.fillRect(x + 5, r * 64 + 52, 118, 7); } } speckle(g, w, h, 600, 0.08, 2); }, {});
+TX.granBase.repeat.set(1 / 3.6, 1 / 1.8);
+const GRANITE = toon('#ffffff', { map: TX.granite });
 function partBlock(p) {
   const rc = p.rcol === '#46323c' ? COPPER : lit(p.rcol, 0.05);
-  const wallM = tm(p.wall === '#9d908f' ? '#bdb5ac' : lit(p.wall)), roofM = tm(rc);
+  const wallM = p.wall === '#9d908f' ? GRANITE : tm(lit(p.wall)), roofM = tm(rc);
+  if (!p.ring && p.wall === '#46323c') { const y0 = p.h - 4.6; box(1.5, 4.6, 1.5, GRANITE, p.x, y0, p.z, { edges: true }); box(1.9, 0.3, 1.9, tm(COPPER), p.x, p.h, p.z, { cast: false }); return; }   // chimneys
   if (!p.ring) { const y0 = Math.max(p.mh, p.h - 4), r = Math.max(0.5, p.r * 0.8); mesh(new THREE.CylinderGeometry(r, r, p.h - y0, 8), p.wall === '#46323c' ? tm(COPPER) : wallM, p.x, (p.h + y0) / 2, p.z, { edges: 40 }); return; }
   const sloped = p.roof && p.roof !== 'flat' && p.rh > 0.2, eave = sloped ? p.h - p.rh : p.h;
   const ring = insetRing(p.ring, 0.1 * (1 - p.h / 40));   // lower parts sit a few cm behind taller ones
@@ -1147,25 +1154,80 @@ function partBlock(p) {
 }
 for (const p of PARTS) partBlock(p);
 
-// ---------------- windows on the palace (the big block, 26 m to the eaves): one row per floor, a bay every 4.8 m
+// ---------------- the palace facade: granite from about 700 parishes all over Denmark, a rough granite base, pilasters,
+// a heavy cornice, dormers in the copper roof, the King's Gate and the Queen's Gate with columns and a balcony,
+// faces of famous Danes over the ground floor windows, and four statues in Prins Jørgens Gård.
 {
   const main = PARTS.find(p => p.h === 38.6), r = main.ring;
-  const GATE = [47, -28];   // Kongeporten, the King's Gate under the tower
+  const GATES = [[47, -28], [-31.4, -45.7]];   // Kongeporten (east, under the tower) and Dronningeporten (north)
   const ROWS = [[3.6, 2.4, 'rect'], [9.8, 3.8, 'arch'], [15.6, 3.0, 'rect'], [20.8, 2.3, 'rect']];
-  for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
-    const [ax, az] = r[j], [bx, bz] = r[i], len = Math.hypot(bx - ax, bz - az); if (len < 6) continue;
-    let nx = -(bz - az) / len, nz = (bx - ax) / len; const mx = (ax + bx) / 2, mz = (az + bz) / 2;
-    if (ptIn(r, mx + nx * 0.6, mz + nz * 0.6)) { nx = -nx; nz = -nz; }
-    const n = Math.max(1, Math.floor((len - 3) / 4.8)), ry = Math.atan2(nx, nz);
-    for (let k = 0; k < n; k++) {
-      const t = (k + 0.5) / n, x = ax + (bx - ax) * t + nx * WOFF, z = az + (bz - az) * t + nz * WOFF;
-      const nearGate = Math.hypot(x - GATE[0], z - GATE[1]) < 4.5;
-      for (const [y, h, kind] of ROWS) if (!(nearGate && y < 12)) addWin(kind, x, y, z, ry, kind === 'arch' ? 1.8 : 1.6, h, 0.6);
+  const stoneM = tm('#cfc6b9'), faceM = tm('#d8d0c4'), roofM = tm(COPPER);
+  const ext = (ring, y0, y1, mat) => { const g = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2); return mesh(g, mat, 0, y0, 0, { edges: 25 }); };
+  ext(insetRing(r, -0.2), 0, 5.4, toon('#ffffff', { map: TX.granBase }));   // the rough base
+  ext(insetRing(r, -0.35), 5.4, 5.9, stoneM);                                // a band over the base
+  ext(insetRing(r, -0.6), 25.4, 26.2, stoneM);                               // the big cornice under the roof
+  const head = new THREE.SphereGeometry(0.33, 10, 8); head.scale(1, 1.15, 0.45);
+  const cap = prismGeo([[-1.05, 0], [1.05, 0], [0, 0.95]], 2.3);
+  for (const e of edgesOf(r)) {
+    if (e.len < 6) continue;
+    const n = Math.max(1, Math.floor((e.len - 3) / 4.8)), at = t => [e.a[0] + (e.b[0] - e.a[0]) * t, e.a[1] + (e.b[1] - e.a[1]) * t];
+    for (let k = 0; k <= n; k++) {
+      const [x, z] = at(k / n);
+      if (k > 0 && k < n) box(0.8, 19.5, 0.35, stoneM, x + e.nx * 0.12, 5.9, z + e.nz * 0.12, { ry: e.ry, cast: false });   // pilasters between the bays
+      if (k === n) continue;
+      const [cx, cz] = at((k + 0.5) / n), gate = GATES.some(([gx, gz]) => Math.hypot(cx - gx, cz - gz) < 4.5);
+      for (const [y, h, kind] of ROWS) if (!(gate && y < 12)) { const o = y < 5.4 ? 0.29 : WOFF; addWin(kind, cx + e.nx * o, y, cz + e.nz * o, e.ry, kind === 'arch' ? 1.8 : 1.6, h, 0.6); }
+      if (!gate) mesh(head, faceM, cx + e.nx * 0.24, 5.05, cz + e.nz * 0.24, { ry: e.ry, cast: false });   // a famous Dane looks down
+      if (k % 2 === 0) {   // a dormer in the roof over every other bay
+        const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = e.ry; world.add(g);
+        box(1.7, 2.6, 2.0, stoneM, 0, 26.3, -1.4, { parent: g, edges: true });
+        mesh(cap, roofM, 0, 28.9, -1.4, { parent: g, edges: 30 });
+        addWin('rect', cx - e.nx * 0.33, 27.6, cz - e.nz * 0.33, e.ry, 1.0, 1.6, 0.5);
+      }
     }
   }
-  // the gate itself: a tall arched door on the east facade
-  const ry = Math.atan2(0.84, -0.54);
-  addWin('doorArch', GATE[0] + 0.84 * 0.1, 3.9, GATE[1] - 0.54 * 0.1, ry, 4.2, 7.8, 0.3);
+  // the two gates: a tall door, two pairs of columns, a balcony with a balustrade and a gold crown
+  for (const [gx, gz] of GATES) {
+    let best = null, bd = 1e9;
+    for (const e of edgesOf(r)) { const d = segDist(gx, gz, e.a[0], e.a[1], e.b[0], e.b[1]); if (d < bd) { bd = d; best = e; } }
+    const e = best, ex = e.b[0] - e.a[0], ez = e.b[1] - e.a[1], t = Math.max(0, Math.min(1, ((gx - e.a[0]) * ex + (gz - e.a[1]) * ez) / (e.len * e.len)));
+    const px = e.a[0] + ex * t, pz = e.a[1] + ez * t;
+    addWin('doorArch', px + e.nx * 0.29, 3.9, pz + e.nz * 0.29, e.ry, 4.2, 7.8, 0.3);
+    const g = new THREE.Group(); g.position.set(px, 0, pz); g.rotation.y = e.ry; world.add(g);
+    for (const lx of [-4.6, -3.3, 3.3, 4.6]) {
+      box(1.2, 0.7, 1.2, stoneM, lx, 0, 1.0, { parent: g, edges: true });
+      mesh(new THREE.CylinderGeometry(0.42, 0.48, 8.9, 14), stoneM, lx, 0.7 + 4.45, 1.0, { parent: g });
+      box(1.1, 0.4, 1.1, stoneM, lx, 9.6, 1.0, { parent: g, cast: false });
+    }
+    box(11.2, 1.2, 1.9, stoneM, 0, 10.0, 0.85, { parent: g, edges: true });
+    box(11.8, 0.3, 2.7, stoneM, 0, 11.2, 1.25, { parent: g, edges: true });
+    const bal = toon('#cfc6b9', { map: TX.balu, alphaTest: 0.5, side: THREE.DoubleSide });
+    const fr = new THREE.Mesh(new THREE.PlaneGeometry(11.6, 0.95), bal); fr.position.set(0, 11.98, 2.5); g.add(fr);
+    for (const s of [-1, 1]) { const sd = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.95), bal); sd.position.set(s * 5.75, 11.98, 1.3); sd.rotation.y = Math.PI / 2; g.add(sd); }
+    box(11.8, 0.16, 0.3, stoneM, 0, 12.45, 2.5, { parent: g, cast: false });
+    crownAt(g, 0, 12.9, 0.35, 0.6);
+    for (const lx of [-4.6, -3.3, 3.3, 4.6]) colCirc(px + e.nz * lx + e.nx * 1.0, pz - e.nx * lx + e.nz * 1.0, 0.55, 9.6);   // she walks round the columns
+  }
+  // four statues in Prins Jørgens Gård, on granite pedestals, looking away from the palace
+  const bronze = tm('#55806f');
+  for (const [sx, sz, what] of [[-50.7, -41.3, 'staff'], [-41.5, -47.1, 'wheel'], [-29.1, -55.0, 'spear'], [-20.3, -61.0, 'club']]) {
+    let best = null, bd = 1e9;
+    for (const e of edgesOf(r)) { const d = segDist(sx, sz, e.a[0], e.a[1], e.b[0], e.b[1]); if (d < bd) { bd = d; best = e; } }
+    const g = new THREE.Group(); g.position.set(sx, 0, sz); g.rotation.y = best.ry; world.add(g);
+    box(1.5, 0.4, 1.5, stoneM, 0, 0, 0, { parent: g, edges: true });
+    box(1.2, 2.0, 1.2, tm('#9e968e'), 0, 0.4, 0, { parent: g, edges: true });
+    box(1.45, 0.3, 1.45, stoneM, 0, 2.4, 0, { parent: g, cast: false });
+    const f = new THREE.Group(); f.position.y = 2.7; f.scale.setScalar(1.35); g.add(f);
+    mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.9, 10), bronze, 0, 0.45, 0, { parent: f });   // a long robe
+    mesh(new THREE.CapsuleGeometry(0.27, 0.45, 4, 10), bronze, 0, 1.15, 0, { parent: f });
+    mesh(new THREE.SphereGeometry(0.2, 10, 8), bronze, 0, 1.75, 0, { parent: f });
+    for (const s of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.08, 0.5, 3, 6), bronze, s * 0.36, 1.15, 0.05, { parent: f, rz: s * 0.25 });
+    if (what === 'staff') { mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.9, 6), bronze, 0.5, 0.95, 0.15, { parent: f }); mesh(new THREE.TorusGeometry(0.1, 0.03, 5, 10), bronze, 0.5, 1.1, 0.15, { parent: f }); }
+    if (what === 'wheel') mesh(new THREE.TorusGeometry(0.35, 0.05, 6, 16), bronze, 0.55, 0.6, 0.1, { parent: f, ry: Math.PI / 2 });
+    if (what === 'spear') { mesh(new THREE.CylinderGeometry(0.03, 0.03, 2.4, 6), bronze, 0.48, 1.3, 0.1, { parent: f }); mesh(new THREE.ConeGeometry(0.07, 0.25, 6), bronze, 0.48, 2.6, 0.1, { parent: f }); mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.06, 16), bronze, -0.45, 0.95, 0.15, { parent: f, rz: Math.PI / 2 }); mesh(new THREE.ConeGeometry(0.22, 0.3, 8), bronze, 0, 2.0, 0, { parent: f }); }
+    if (what === 'club') mesh(new THREE.CylinderGeometry(0.12, 0.05, 1.1, 7), bronze, 0.45, 0.7, 0.15, { parent: f, rz: 0.2 });
+    colCirc(sx, sz, 0.9, 2.7);
+  }
 }
 
 // ---------------- the tower (106 m): stone tower, copper spire and three gold crowns
@@ -1794,8 +1856,9 @@ function rayPoly(a, b, best) {
 
 // ======================================================================== POIs: the names are shown and read aloud when she comes near
 const POIS = [
-  { n: 'Christiansborg Slot', t: 'Et kæmpe slot midt i byen. Her mødes Folketinget, som bestemmer over Danmark. Kongen holder også fest her.', x: 0, z: 40, r: 80 },
+  { n: 'Christiansborg Slot', t: 'Et kæmpe slot midt i byen. Her mødes Folketinget, som bestemmer over Danmark. Kongen holder også fest her. Muren er lavet af granitsten fra hele Danmark, og over vinduerne nederst sidder ansigter af kendte danskere.', x: 0, z: 40, r: 80 },
   { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt. Det er det højeste tårn i København. På toppen sidder tre kroner af guld. Man kan køre op i tårnet med en elevator og kigge ud over byen.', x: 44, z: -27, r: 16 },
+  { n: 'Prins Jørgens Gård', t: 'Gården foran Dronningeporten. Her står fire statuer på høje sokler. En af dem er Herkules med sin kølle.', x: -36, z: -62, r: 16 },
   { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her går politikerne ind og ud.', x: 36, z: 72, r: 26 },
   { n: 'Slotspladsen', t: 'En stor plads foran slottet. Her rider kong Frederik den Syvende på sin hest. Han gav Danmark grundloven.', x: 100, z: -20, r: 28 },
   { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste. Gå hen til en hest og klap den.', x: -140, z: 85, r: 42 },

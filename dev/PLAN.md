@@ -68,4 +68,10 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Holmens Kirke: kors af røde mursten med grønne kobbertage, hollandske gavle på de fire ender, spir over korsets midte til 45 m (fra OSM-delene). Kapellet langs kanalen og våbenhuset mod vest er klodser.
   - Kanalens midte og ruten er fundet med `scratchpad`-scriptet `route.py` (shapely). Kanalen og havnen mødes uden for kortets kant, derfor vender bådene.
 - [x] Ekstra: oplæsning er slået fra fra start (6. okt. 2026). Knappen "Læs op" slår den til og fra (`setVoice`). Valget gemmes under `readAloud`, så et gammelt gemt "til" ikke tænder den igen.
+- [x] Ekstra: Christiansborg Slot flottere (6. okt. 2026)
+  - Den store blok har granit på væggene (`GRANITE`, `TX.granite`: en flise er 4.8 x 2.4 m) og en grov sokkel af granit (`TX.granBase`) op til 5.4 m med et bånd over. Pilastre mellem vinduesfagene, en tung gesims under taget og kviste i kobbertaget over hvert andet fag. Skorstenene er firkantede af granit med kobberhat.
+  - Ansigter af kendte danskere (små relieffer) over vinduerne i stueetagen.
+  - Kongeporten (47, -28) og Dronningeporten (-31.4, -45.7) har en høj dør, fire søjler, en altan med balustrade og en guldkrone. Pigen går uden om søjlerne.
+  - Fire bronzestatuer på granitsokler i Prins Jørgens Gård (fra OSM-punkterne). Nyt sted: Prins Jørgens Gård.
+  - Ideer til senere: Folketingets indgang i Rigsdagsgården, figurer på taget, fløjene ved Ridebanen.
 - [ ] 8. Noget sjovt at finde og lave for en 5-årig
