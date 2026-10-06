@@ -100,7 +100,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
     <button id="bMap" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
     <button id="bNight" class="sticker btn" type="button" aria-pressed="false"><svg id="iNight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span id="tNight">Aften</span></button>
     <button id="bSound" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="iWave" d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg><span>Lyd</span></button>
-    <button id="bVoice" class="sticker btn" type="button" aria-pressed="true" title="Læs teksterne højt"><svg id="iVoice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v10H10l-4 4v-4H4z"/><path d="M8 9h8M8 12h5"/></svg><span>Læs op</span></button>
+    <button id="bVoice" class="sticker btn" type="button" aria-pressed="false" title="Læs teksterne højt"><svg id="iVoice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v10H10l-4 4v-4H4z"/><path d="M8 9h8M8 12h5"/></svg><span>Læs op</span></button>
     <button id="bHelp" class="sticker btn" type="button" aria-label="Hjælp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-1 .7-1.6 1.2-1.6 2.4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg><span>Hjælp</span></button>
   </div>
   <canvas id="map" class="sticker" aria-label="Kort over Slotsholmen"></canvas>
@@ -116,7 +116,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div class="card sticker">
     <div class="eyebrow">København · en gåtur i 3D</div>
     <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå rundt på Slotsholmen. Der er vand hele vejen rundt, så du skal over en bro. Gå hen til slottet, Børsen og biblioteket ved havnen, klap hestene på Ridebanen, og vink til bådene i kanalen. Når du kommer tæt på et sted, hører du, hvad det hedder.</p>
+    <p class="lead" id="introLead">Gå rundt på Slotsholmen. Der er vand hele vejen rundt, så du skal over en bro. Gå hen til slottet, Børsen og biblioteket ved havnen, klap hestene på Ridebanen, og vink til bådene i kanalen. Når du kommer tæt på et sted, ser du, hvad det hedder.</p>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -125,13 +125,13 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
       <span><kbd>Mellemrum</kbd></span><span>Hop</span>
       <span>Træk med musen</span><span>Kig dig omkring</span>
       <span><kbd>N</kbd> <kbd>M</kbd></span><span>Dag eller aften · vis eller skjul kortet</span>
-      <span>Læs op-knappen</span><span>Teksterne bliver læst højt (tryk for at slå fra)</span>
+      <span>Læs op-knappen</span><span>Tryk, så bliver teksterne læst højt. Tryk igen for at slå det fra.</span>
     </div>
     <div class="keys" id="keysTouch" hidden>
       <span>Venstre tommel</span><span>Skub op for at gå, til siden for at dreje</span>
       <span>Højre tommel</span><span>Træk for at kigge dig omkring</span>
       <span>Hop-knappen</span><span>Hop</span>
-      <span>Læs op-knappen</span><span>Teksterne bliver læst højt</span>
+      <span>Læs op-knappen</span><span>Tryk for at få teksterne læst højt</span>
     </div>
     <button class="go" id="goBtn" type="button" disabled>Henter Slotsholmen …</button>
     <p class="foot">Kortdata: © OpenStreetMap-bidragydere (ODbL). Mange huse er stadig enkle klodser. Placeringer og detaljer er forenklede.</p>
@@ -2185,7 +2185,7 @@ $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear();
-  if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har set ${seenPoi.size} steder. Gå hen til et nyt sted, så hører du, hvad det hedder.`; }
+  if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har set ${seenPoi.size} steder. Gå hen til et nyt sted, så ser du, hvad det hedder.`; }
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
@@ -2314,10 +2314,9 @@ function sayPoi(p) {
   lastPoiSaid.set(p.n, clockT); say(`${p.n}. ${p.t}`);
 }
 function updVoice() { if (pendingPoi && clockT - toastSaidAt >= 3.5) { const p = pendingPoi; pendingPoi = null; if (p === curPoi) sayPoi(p); } }
-function setVoice(v) {
-  voiceOn = false;
-  const b = $('bVoice'); if (b) b.hidden = true;
-  try { speechSynthesis.cancel(); } catch (e) {}
+function setVoice(v) {   // reading aloud is off from the start; the "Læs op" button turns it on and off
+  voiceOn = !!v; $('bVoice').setAttribute('aria-pressed', String(voiceOn)); $('iVoice').style.opacity = voiceOn ? 1 : 0.35;
+  if (!voiceOn) { try { speechSynthesis.cancel(); } catch (e) {} }
   save();
 }
 
@@ -2342,7 +2341,7 @@ function updActions() {
 // ======================================================================== STATE / STORAGE
 let soundOn = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'christiansborg3d';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, voice: voiceOn })); } catch (e) {} }
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, readAloud: voiceOn })); } catch (e) {} }
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 HOOKS.start.push(() => setTimeout(() => toast('Gå over broen hen til slottet.'), 1200));
 
@@ -2377,7 +2376,7 @@ function frame(now) {
 function boot(data) {
   data = data || {};
   const st = load();
-  if (typeof st.voice === 'boolean') setVoice(st.voice); else setVoice(true);
+  setVoice(st.readAloud === true);
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
   setEvening(typeof data.evening === 'boolean' ? data.evening : !!st.ev); ev = evening ? 1 : 0;

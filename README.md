@@ -1,6 +1,6 @@
 # Christiansborg
 
-En hyggelig 3D-gåtur i tegnefilmsstil på Christiansborg og Slotsholmen i København. Lavet til børn på omkring 5 år. Teksterne bliver læst højt på dansk.
+En hyggelig 3D-gåtur i tegnefilmsstil på Christiansborg og Slotsholmen i København. Lavet til børn på omkring 5 år. Teksterne kan læses højt på dansk: tryk på knappen Læs op for at slå det til og fra (det er slået fra fra start).
 
 Spil det her: https://ai-michelklos.github.io/christiansborg/
 
