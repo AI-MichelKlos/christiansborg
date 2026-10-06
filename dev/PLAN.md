@@ -61,5 +61,10 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Det gamle bibliotek (huset med gårde, første punkt (154, 264) i OSM): røde mursten, buede vinduer i to rækker, rødt tegltag (skrå kant med huller til gårdene).
   - Den Sorte Diamant: to sorte, blanke blokke (`TX.diamond`, vinduesbånd der lyser om aftenen), som læner sig 4 m ud mod havnen, og en glasvæg i midten (midte (164, 297.5), drejet 0.585). Glasbro over Christians Brygge til det gamle bibliotek. Den lave østlige del er en mørk klods på 12 m.
   - Tøjhusmuseet (Krigsmuseet i OSM): bygget i hånden i en gruppe (midte (18.5, 204.5), drejet -0.985, 164.5 x 24.7 m), røde mursten, højt tegltag, hollandske gavle og vinduer i to rækker. To kanoner ved døren på havesiden skyder med konfetti (knappen "Skyd med konfetti").
-- [ ] 7. Kanalerne med både, broerne og Holmens Kirke
+- [x] 7. Kanalerne med både, broerne og Holmens Kirke (6. okt. 2026)
+  - Vandet ligger nu 2.4 m under kajen (`WL`). Kanalerne og havnen er lagt sammen til ét omrids (`WATER_U`, regnet med shapely i Python), som er et hul i jorden. Kajmure af sten (`TX.quayWall`) går ned til vandet, og der er kantsten langs kanten. Små damme ligger stadig i jordhøjde.
+  - Alle broer er buer (`archBridge(F, look)` med `BRIDGE_LOOK`: steel, iron, stone). Rammen findes ud fra OSM-omridset (`bridgeFrame`). Dækket hæver sig (`archDeck`), og undersiden buer ned til kajmuren (`archSoffit`). `archH` løfter pigen på alle broer (`ARCHES`). Marmorbroen og Prinsens Bro er af sandsten med balustrade. Vejbåndene over broerne tegnes ikke længere.
+  - Tre kanalbåde sejler frem og tilbage ad `CANAL_ROUTE` (fra Børsgraven rundt om Slotsholmen til havnen) og vender ved enderne. Havnebussen sejler ad `HARBOUR_ROUTE`. Bådene er lagt sammen pr. materiale (`bakeGroup`), så der er færre ting at tegne. Knappen "Vink til båden" (inden for 22 m) får folkene og pigen til at vinke, og båden tuder.
+  - Holmens Kirke: kors af røde mursten med grønne kobbertage, hollandske gavle på de fire ender, spir over korsets midte til 45 m (fra OSM-delene). Kapellet langs kanalen og våbenhuset mod vest er klodser.
+  - Kanalens midte og ruten er fundet med `scratchpad`-scriptet `route.py` (shapely). Kanalen og havnen mødes uden for kortets kant, derfor vender bådene.
 - [ ] 8. Noget sjovt at finde og lave for en 5-årig

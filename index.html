@@ -116,7 +116,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div class="card sticker">
     <div class="eyebrow">København · en gåtur i 3D</div>
     <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå rundt på Slotsholmen. Der er vand hele vejen rundt, så du skal over en bro. Gå hen til slottet, Børsen og biblioteket ved havnen, og klap hestene på Ridebanen. Når du kommer tæt på et sted, hører du, hvad det hedder.</p>
+    <p class="lead" id="introLead">Gå rundt på Slotsholmen. Der er vand hele vejen rundt, så du skal over en bro. Gå hen til slottet, Børsen og biblioteket ved havnen, klap hestene på Ridebanen, og vink til bådene i kanalen. Når du kommer tæt på et sted, hører du, hvad det hedder.</p>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -844,7 +844,11 @@ function wallAlong(x0, z0, x1, z1, h, th, mat) { const len = Math.hypot(x1 - x0,
 // ---------------- ground, squares, grass
 const POOL = { x: -21, z: -167, r: 4 };   // the clear spot in the canal by Højbro (see HØJBRO below)
 function circleRing(c, n = 32) { const r = []; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; r.push([c.x + Math.cos(a) * c.r, c.z + Math.sin(a) * c.r]); } return r; }
-{ const sh = new THREE.Shape([new THREE.Vector2(-1500, -1500), new THREE.Vector2(1500, -1500), new THREE.Vector2(1500, 1500), new THREE.Vector2(-1500, 1500)]); sh.holes.push(new THREE.Path(circleRing(POOL).map(([x, z]) => new THREE.Vector2(x, -z))));
+const WL = -2.4;      // the water level in the canals and the harbour (the quays are 2.4 m high)
+const ARCHES = [];   // the arched bridges (see BRIDGES below)
+// the canals and the harbour merged into one outline (from the W rows, merged with shapely in Python)
+const WATER_U = [[-274,50],[-159,222],[-46,384],[-2,434],[210,434],[304.8,330.2],[322,345],[327,340],[311.2,324.9],[349.9,293.1],[362,296],[375,284.1],[389,297],[394,292],[381.2,278.8],[452,219],[452,111],[414,149],[369,183],[349,202],[317,213],[222,283],[226.8,293.1],[141.2,349.8],[137,344],[132,348],[134.8,352.2],[45.3,421.8],[42,417],[22.5,430.7],[22.4,430.2],[26,427],[-29,366],[-251.9,37.1],[-248,30],[-135,-93],[-80,-130],[-58,-142],[-42,-150],[-14.9,-158],[4.1,-154],[160,-44],[232,13],[283,33],[310,35],[421,79],[422.3,75.1],[452,86],[452,25],[309,6],[264,-4],[262.8,-2.2],[214,-34],[181,-63],[170.9,-58.1],[52,-153],[34,-164],[12,-174],[2,-173],[-15,-178],[-33,-174],[-64,-164],[-95,-150],[-119,-135],[-147,-112],[-267,21],[-274,37]];
+{ const sh = new THREE.Shape([new THREE.Vector2(-1500, -1500), new THREE.Vector2(1500, -1500), new THREE.Vector2(1500, 1500), new THREE.Vector2(-1500, 1500)]); sh.holes.push(new THREE.Path(WATER_U.map(([x, z]) => new THREE.Vector2(x, -z))));
   const g = new THREE.ShapeGeometry(sh); g.rotateX(-Math.PI / 2); worldUV(g, 0, 0); mesh(g, M.ground, 0, -0.02, 0, { cast: false }); }
 for (const a of DATA.A) {
   if (a.k === 'square') flatPoly([a.ring], M.square, 0, '#e8dfcb');
@@ -858,10 +862,10 @@ const BRIDGE_SEGS = [];
 for (const r of DATA.R) {
   const w = ROADW[r.k] || 7;
   if (r.bridge) { for (let i = 0; i < r.pts.length - 1; i++) BRIDGE_SEGS.push([...r.pts[i], ...r.pts[i + 1], w / 2]); }
-  if (!(r.bridge && r.n === 'Højbro Plads')) ribbon(r.pts, w, M.road, r.bridge ? 0.1 : 0, '#a3a1a0');
+  if (!r.bridge || r.k === 'service') ribbon(r.pts, w, M.road, r.bridge ? 0.1 : 0, '#a3a1a0');
 }
 
-// ---------------- water: the canals and the harbour. She cannot walk on the water, only over the bridges.
+// ---------------- water: the canals and the harbour lie 2.4 m below the quays. She cannot walk on the water, only over the bridges.
 const WATER = DATA.W.map(w => ({ n: w.n, ring: w.ring, ...bboxOf(w.ring) }));
 const BRIDGES = DATA.A.filter(a => a.k === 'bridge').map(a => ({ n: a.n, ring: a.ring, ...bboxOf(a.ring) }));
 function rawWater(x, z) { for (const w of WATER) if (x >= w.x0 && x <= w.x1 && z >= w.z0 && z <= w.z1 && ptIn(w.ring, x, z)) return true; return false; }
@@ -871,88 +875,109 @@ function onBridge(x, z) {
   return false;
 }
 function waterAt(x, z) { return rawWater(x, z) && !onBridge(x, z); }
-for (const w of WATER) {
-  flatPoly(ptIn(w.ring, POOL.x, POOL.z) ? [w.ring, circleRing(POOL)] : [w.ring], M.water, 0, '#7fb6e0');
-  // a dark stone edge (the quay) where water meets land
-  const r = w.ring;
-  for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
-    const [ax, az] = r[j], [bx, bz] = r[i], len = Math.hypot(bx - ax, bz - az); if (len < 0.5) continue;
-    const nx = -(bz - az) / len, nz = (bx - ax) / len, mx = (ax + bx) / 2, mz = (az + bz) / 2;
-    if (rawWater(mx + nx * 1.5, mz + nz * 1.5) === rawWater(mx - nx * 1.5, mz - nz * 1.5)) continue;
-    ribbon([[ax, az], [bx, bz]], 0.9, M.quay, 0.01, null);
-  }
-}
-// ---------------- bridges: a stone deck and a low wall on the sides over the water
-for (const b of BRIDGES) {
-  if (b.n === 'Højbro') { mapItems.push({ k: 'p', pts: b.ring, fill: '#b8a88f' }); continue; }   // built by hand below
-  flatPoly([b.ring], M.bridge, 0.06, '#b8a88f');
-  const r = b.ring;
-  for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
-    const [ax, az] = r[j], [bx, bz] = r[i];
-    if (!rawWater((ax + bx) / 2, (az + bz) / 2)) continue;
-    wallAlong(ax, az, bx, bz, 1.0, 0.45, M.parapet);
+TX.quayWall = ctex(128, 128, (g, w, h) => { g.fillStyle = '#5f5a52'; g.fillRect(0, 0, w, h); for (let r = 0; r < 4; r++) { const off = (r % 2) * 32; for (let c = -1; c < 3; c++) { g.fillStyle = jit('#948e83', 0.08); g.fillRect(c * 64 + off + 2, r * 32 + 2, 60, 28); } } g.fillStyle = 'rgba(40,70,60,.35)'; g.fillRect(0, h - 22, w, 22); }, { rep: 1 / 2 });
+{
+  flatPoly([WATER_U, circleRing(POOL)], M.water, WL, null); mapItems.push({ k: 'p', pts: WATER_U, fill: '#7fb6e0' });
+  for (const w of WATER) if (areaOf(w.ring) < 3000) flatPoly([w.ring], M.water, 0, '#7fb6e0');   // small ponds stay at ground level
+  // stone quay walls down to the water, and a row of capstones along the edge
+  const wallM = toon('#ffffff', { map: TX.quayWall, side: THREE.DoubleSide }), y1 = WL - 0.4;
+  let u = 0;
+  for (const e of edgesOf(WATER_U)) {
+    if (e.len < 0.2) continue;
+    const g = new THREE.BufferGeometry(), [ax, az] = e.a, [bx, bz] = e.b;
+    g.setAttribute('position', new THREE.Float32BufferAttribute([ax, 0, az, bx, 0, bz, bx, y1, bz, ax, y1, az], 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute([u, 0, u + e.len, 0, u + e.len, y1, u, y1], 2));
+    g.setIndex([0, 2, 1, 0, 3, 2]); g.computeVertexNormals(); u += e.len;
+    mesh(g, wallM, 0, 0, 0, { cast: false });
+    ribbon([[ax + e.nx * 0.4, az + e.nz * 0.4], [bx + e.nx * 0.4, bz + e.nz * 0.4]], 0.8, M.quay, 0.012, null);
   }
 }
 
-// ======================================================================== HØJBRO (Vilhelm Dahlerup, 1878): an arched steel bridge on granite
-// Built in its own frame: s runs across the canal (north to south), w runs along the canal. The deck rises 1.2 m
-// in the middle (archH also lifts her when she walks on it). Iron railings, four lamps, granite edges at both ends.
-// Next to the bridge, a clear spot in the water shows the bronze merman and his seven sons on the bottom (Suste Bonnén, 1992).
-const HB = { cx: -3.5, cz: -165.25, ux: -0.160, uz: 0.987, L: 18.7, W: 18.25, RISE: 1.2 };
-HB.vx = HB.uz; HB.vz = -HB.ux;
-function hbH(s) { return HB.RISE * (Math.cos(2 * Math.PI * s / HB.L) + 1) / 2; }
+// ======================================================================== BRIDGES
+// Every bridge is an arch in its own frame: s runs across the canal, w along it. The deck rises RISE m in the middle
+// (archH lifts her when she walks on it), and the underside curves down to the quay walls, so the boats fit under.
+function archDeck(F, s) { return F.RISE * (Math.cos(2 * Math.PI * s / F.L) + 1) / 2; }
+function archSoffit(F, s) { const t = Math.min(1, Math.abs(2 * s / F.L)), c = F.RISE - 0.6; return c + (WL + 0.2 - c) * Math.pow(t, 2.4); }
 function archH(x, z) {
-  const dx = x - HB.cx, dz = z - HB.cz, s = dx * HB.ux + dz * HB.uz, w = dx * HB.vx + dz * HB.vz;
-  return Math.abs(s) < HB.L / 2 && Math.abs(w) < HB.W / 2 + 0.4 ? hbH(s) : 0;
+  for (const F of ARCHES) { const dx = x - F.cx, dz = z - F.cz, s = dx * F.ux + dz * F.uz; if (Math.abs(s) >= F.L / 2) continue; if (Math.abs(dx * F.vx + dz * F.vz) < F.W / 2 + 0.4) return archDeck(F, s); }
+  return 0;
 }
-{
-  const g = new THREE.Group(); g.position.set(HB.cx, 0, HB.cz); g.rotation.y = Math.atan2(HB.ux, HB.uz); world.add(g);
-  const N = 24, W2 = HB.W / 2, L2 = HB.L / 2;
-  // a strip that follows the arch: for each s, from (w, y0(s)) to (w, y1(s)) (vertical) or from w0 to w1 (flat)
-  const strip = (pts, mat, uvScale = 1) => {
+function bridgeFrame(b, rise) {   // from an outline: the longest side over the water runs across the canal
+  const r = b.ring; let best = null, bl = 0;
+  for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const [ax, az] = r[j], [bx, bz] = r[i], l = Math.hypot(bx - ax, bz - az); if (l > bl && rawWater((ax + bx) / 2, (az + bz) / 2)) { bl = l; best = [(bx - ax) / l, (bz - az) / l]; } }
+  if (!best) return null;
+  const [ux, uz] = best, vx = uz, vz = -ux; let s0 = 1e9, s1 = -1e9, w0 = 1e9, w1 = -1e9;
+  for (const [x, z] of r) { const s = x * ux + z * uz, w = x * vx + z * vz; s0 = Math.min(s0, s); s1 = Math.max(s1, s); w0 = Math.min(w0, w); w1 = Math.max(w1, w); }
+  const sc = (s0 + s1) / 2, wc = (w0 + w1) / 2;
+  return { cx: sc * ux + wc * vx, cz: sc * uz + wc * vz, ux, uz, vx, vz, L: s1 - s0, W: w1 - w0, RISE: rise };
+}
+TX.rail = ctex(128, 64, (c, w, h) => { c.strokeStyle = '#2f3f37'; c.lineWidth = 5; c.strokeRect(0, 3, w, h - 6); c.lineWidth = 3; for (let x = 8; x < w; x += 16) { c.beginPath(); c.moveTo(x, 4); c.lineTo(x, h - 4); c.stroke(); } for (let x = 16; x < w; x += 32) { c.beginPath(); c.arc(x, h / 2, 10, 0, Math.PI * 2); c.stroke(); } }, {});
+TX.balu = ctex(128, 64, (c, w, h) => { c.fillStyle = '#fff'; c.fillRect(0, 0, w, 9); c.fillRect(0, h - 8, w, 8); for (let x = 8; x < w; x += 16) { c.beginPath(); c.ellipse(x, h * 0.55, 5, 13, 0, 0, Math.PI * 2); c.fill(); c.fillRect(x - 3, 9, 6, h - 17); } }, {});
+const BRIDGE_LOOK = {
+  steel: { side: '#4b6458', rail: 'iron', road: true, block: '#a8a39b' },
+  iron: { side: '#a8a39b', rail: 'iron', road: true, block: '#a8a39b' },
+  stone: { side: '#d9cba9', rail: 'stone', road: false, block: '#d9cba9' },
+};
+function archBridge(F, look) {
+  ARCHES.push(F);
+  const g = new THREE.Group(); g.position.set(F.cx, 0, F.cz); g.rotation.y = Math.atan2(F.ux, F.uz); world.add(g);
+  const N = 24, W2 = F.W / 2, L2 = F.L / 2, road = look.road && F.W > 11;
+  const strip = (pts, mat, uvScale = 1) => {   // a band along the arch: for each s, from point a to point b
     const pos = [], uv = [], idx = [];
     pts.forEach(([a, b, u], i) => { pos.push(...a, ...b); uv.push(u * uvScale, 0, u * uvScale, 1); if (i) { const k = i * 2; idx.push(k - 2, k - 1, k, k - 1, k + 1, k); } });
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx); geo.computeVertexNormals();
     return mesh(geo, mat, 0, 0, 0, { parent: g, cast: false });
   };
-  const along = (f) => { const out = []; for (let i = 0; i <= N; i++) { const s = -L2 + HB.L * i / N; out.push(f(s, hbH(s), i)); } return out; };
-  const steel = toon('#4b6458', { side: THREE.DoubleSide }), granite = tm('#a8a39b'), graniteD = toon('#a8a39b', { side: THREE.DoubleSide });
-  // deck: asphalt in the middle, raised pavements at the sides, a dark underside
-  strip(along((s, h) => [[W2 - 3.4, h + 0.03, s], [-W2 + 3.4, h + 0.03, s], s]), M.road, 1 / 8);
-  for (const sd of [-1, 1]) strip(along((s, h) => sd < 0 ? [[-W2 + 3.4, h + 0.15, s], [-W2, h + 0.15, s], s] : [[W2, h + 0.15, s], [W2 - 3.4, h + 0.15, s], s]), M.square, 1 / 2);
-  for (const sd of [-1, 1]) strip(along((s, h) => [[sd * (W2 - 3.4), h + 0.15, s], [sd * (W2 - 3.4), h + 0.03, s], s]), graniteD);   // curbs
-  strip(along((s, h) => [[-W2, h - 0.55, s], [W2, h - 0.55, s], s]), toon('#2f3a3a'));                                                  // underside
-  // the steel sides with the arch
-  for (const sd of [-1, 1]) strip(along((s, h) => [[sd * (W2 + 0.05), h + 0.16, s], [sd * (W2 + 0.05), h - 0.75, s], s]), steel, 1 / 2);
-  // cast-iron railings with posts and a top rail
-  TX.rail = TX.rail || ctex(128, 64, (c, w, h) => { c.strokeStyle = '#2f3f37'; c.lineWidth = 5; c.strokeRect(0, 3, w, h - 6); c.lineWidth = 3; for (let x = 8; x < w; x += 16) { c.beginPath(); c.moveTo(x, 4); c.lineTo(x, h - 4); c.stroke(); } c.lineWidth = 3; for (let x = 16; x < w; x += 32) { c.beginPath(); c.arc(x, h / 2, 10, 0, Math.PI * 2); c.stroke(); } }, {});
-  const railM = toon('#ffffff', { map: TX.rail, alphaTest: 0.5, side: THREE.DoubleSide });
+  const along = (f) => { const out = []; for (let i = 0; i <= N; i++) { const s = -L2 + F.L * i / N; out.push(f(s, archDeck(F, s), i)); } return out; };
+  const sideM = toon(look.side, { side: THREE.DoubleSide }), blockM = tm(look.block), curbM = toon('#a8a39b', { side: THREE.DoubleSide });
+  if (road) {   // asphalt in the middle, raised pavements at the sides
+    strip(along((s, h) => [[W2 - 3.4, h + 0.03, s], [-W2 + 3.4, h + 0.03, s], s]), M.road, 1 / 8);
+    for (const sd of [-1, 1]) strip(along((s, h) => sd < 0 ? [[-W2 + 3.4, h + 0.15, s], [-W2, h + 0.15, s], s] : [[W2, h + 0.15, s], [W2 - 3.4, h + 0.15, s], s]), M.square, 1 / 2);
+    for (const sd of [-1, 1]) strip(along((s, h) => [[sd * (W2 - 3.4), h + 0.15, s], [sd * (W2 - 3.4), h + 0.03, s], s]), curbM);
+  } else strip(along((s, h) => [[W2, h + 0.1, s], [-W2, h + 0.1, s], s]), M.square, 1 / 2);
+  strip(along((s) => [[-W2, archSoffit(F, s), s], [W2, archSoffit(F, s), s], s]), toon('#3c4444'));                     // underside
+  for (const sd of [-1, 1]) strip(along((s, h) => [[sd * (W2 + 0.05), h + 0.16, s], [sd * (W2 + 0.05), archSoffit(F, s), s], s]), sideM, 1 / 2);
   for (const sd of [-1, 1]) {
     const w = sd * (W2 - 0.25);
-    strip(along((s, h) => [[w, h + 0.2, s], [w, h + 1.15, s], s]), railM, 1 / 2);
-    const top = along((s, h) => new THREE.Vector3(w, h + 1.18, s));
-    mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(top), 48, 0.06, 6), steel, 0, 0, 0, { parent: g });
-    for (let i = 0; i <= 8; i++) { const s = -L2 + 0.6 + (HB.L - 1.2) * i / 8; box(0.2, 1.3, 0.2, steel, w, hbH(s) + 0.1, s, { parent: g }); }
+    if (look.rail === 'iron') {
+      const steel = toon('#4b6458', { side: THREE.DoubleSide });
+      strip(along((s, h) => [[w, h + 0.2, s], [w, h + 1.15, s], s]), toon('#ffffff', { map: TX.rail, alphaTest: 0.5, side: THREE.DoubleSide }), 1 / 2);
+      mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(along((s, h) => new THREE.Vector3(w, h + 1.18, s))), 48, 0.06, 6), steel, 0, 0, 0, { parent: g });
+      for (let i = 0; i <= 8; i++) { const s = -L2 + 0.6 + (F.L - 1.2) * i / 8; box(0.2, 1.3, 0.2, steel, w, archDeck(F, s) + 0.1, s, { parent: g }); }
+    } else {   // a stone balustrade with a thick top rail
+      strip(along((s, h) => [[w, h + 0.1, s], [w, h + 1.0, s], s]), toon(look.side, { map: TX.balu, alphaTest: 0.5, side: THREE.DoubleSide }), 1 / 1.2);
+      mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(along((s, h) => new THREE.Vector3(w, h + 1.05, s))), 48, 0.16, 4), sideM, 0, 0, 0, { parent: g });
+    }
   }
-  // granite blocks on the four corners, each with a lamp
-  for (const sd of [-1, 1]) for (const e of [-1, 1]) {
+  for (const sd of [-1, 1]) for (const e of [-1, 1]) {   // a stone block on every corner, with a lamp
     const lw = sd * (W2 - 0.45), ls = e * (L2 - 0.75);
-    box(1.3, 0.9, 1.3, granite, lw, 0, ls, { parent: g, edges: true });
-    lamp(HB.cx + lw * HB.vx + ls * HB.ux, HB.cz + lw * HB.vz + ls * HB.uz, 5.6);
+    box(1.3, 0.9, 1.3, blockM, lw, 0, ls, { parent: g, edges: true });
+    lamp(F.cx + lw * F.vx + ls * F.ux, F.cz + lw * F.vz + ls * F.uz, 5.6);
   }
+}
+// ---------------- HØJBRO (Vilhelm Dahlerup, 1878): an arched steel bridge on granite. The others come from their OpenStreetMap outlines.
+const HB = { cx: -3.5, cz: -165.25, ux: -0.160, uz: 0.987, L: 18.7, W: 18.25, RISE: 1.2 };
+HB.vx = HB.uz; HB.vz = -HB.ux;
+archBridge(HB, BRIDGE_LOOK.steel);
+const BRIDGE_KIND = { 'Marmorbroen': ['stone', 1.5], 'Prinsens Bro': ['stone', 0.9], 'Stormbroen': ['iron', 0.7], 'Holmens Bro': ['iron', 0.7], 'Børsbroen': ['iron', 0.7] };
+for (const b of BRIDGES) {
+  mapItems.push({ k: 'p', pts: b.ring, fill: '#b8a88f' });
+  if (b.n === 'Højbro') continue;
+  const [kind, rise] = BRIDGE_KIND[b.n] || ['iron', 0.7], F = bridgeFrame(b, rise);
+  if (F) archBridge(F, BRIDGE_LOOK[kind]);
 }
 // ---------------- the clear spot in the water and the merman with his seven sons
 const MERMAN = { g: new THREE.Group(), kids: [], wave: 0 };
 {
   const d = 3.2, P0 = POOL;
   const wallG = new THREE.CylinderGeometry(P0.r, P0.r, d, 32, 1, true);
-  mesh(wallG, toon('#4f93b4', { side: THREE.BackSide }), P0.x, -d / 2, P0.z, { cast: false });
-  const bot = new THREE.CircleGeometry(P0.r, 32); bot.rotateX(-Math.PI / 2); mesh(bot, toon('#8fae8a'), P0.x, -d, P0.z, { cast: false });
+  mesh(wallG, toon('#4f93b4', { side: THREE.BackSide }), P0.x, WL - d / 2, P0.z, { cast: false });
+  const bot = new THREE.CircleGeometry(P0.r, 32); bot.rotateX(-Math.PI / 2); mesh(bot, toon('#8fae8a'), P0.x, WL - d, P0.z, { cast: false });
   const top = new THREE.CircleGeometry(P0.r + 0.05, 32); top.rotateX(-Math.PI / 2); worldUV(top, P0.x, P0.z);
   const glass = new THREE.MeshBasicMaterial({ map: TX.water, color: '#9fcbe8', transparent: true, opacity: 0.32, depthWrite: false });
-  const gm = mesh(top, glass, P0.x, -0.03, P0.z, { cast: false }); gm.renderOrder = 2;
+  const gm = mesh(top, glass, P0.x, WL - 0.03, P0.z, { cast: false }); gm.renderOrder = 2;
   // bronze figures reaching up: the big merman with a fish tail, and seven small sons around him
-  const bronze = toon('#55806f'), G = MERMAN.g; G.position.set(P0.x, -d + 0.05, P0.z); dyn.add(G);
+  const bronze = toon('#55806f'), G = MERMAN.g; G.position.set(P0.x, WL - d + 0.05, P0.z); dyn.add(G);
   const figure = (x, z, s, tail) => {
     const f = new THREE.Group(); f.position.set(x, 0, z); f.scale.setScalar(s); G.add(f);
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.28, 0.7, 4, 10), bronze); body.position.y = 0.75; f.add(body);
@@ -984,7 +1009,6 @@ const NAMED = {   // [wall colour, roof colour, height]
   'Thorvaldsens Museum': ['#d9a347', '#d8cdb8', 16],
   'Proviantgården': ['#b85d42', ROOF_TILE, 13],
   'Christian 4.s Bryghus': ['#b25a40', ROOF_TILE, 14],
-  'Holmens Kirke': ['#ad513a', ROOF_COPPER, 18],
   'Kancellibygningen': ['#b05a41', ROOF_COPPER, 15],
   'Staldmestergården': ['#e7d9b4', ROOF_TILE, 11],
   'Færøsk Pakhus': ['#c9a27e', ROOF_TILE, 10],
@@ -1007,8 +1031,9 @@ for (const b of DATA.B) {
   const nm = NAMED[b.n];
   let h = nm ? nm[2] : b.h || (b.lv ? (b.lv > 8 ? b.lv : b.lv * 3.2 + 2) : (areaOf(b.rings[0]) > 1500 ? 17 : 14));
   const wall = nm ? nm[0] : pick(WALLS), roof = nm ? nm[1] : pick(ROOFS);
-  const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7a7d86'], 'Børsen': [22, '#5aa58e'], 'Den Sorte Diamant': [26, '#26292f'], 'Krigsmuseet': [22, '#9a5442'] }[b.n];
-  if (!b.n && b.rings[0][0][0] === 154 && b.rings[0][0][1] === 264) continue;   // the old library, drawn further down
+  const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7a7d86'], 'Børsen': [22, '#5aa58e'], 'Den Sorte Diamant': [26, '#26292f'], 'Krigsmuseet': [22, '#9a5442'], 'Holmens Kirke': [21, '#5aa58e'] }[b.n];
+  if (!b.n && b.rings[0][0][0] === 154 && b.rings[0][0][1] === 264) continue;
+  if (!b.n && b.rings[0][0][0] === 213 && b.rings[0][0][1] === -35) { building(b.rings, 9, '#ad4f37', ROOF_COPPER); continue; }   // the chapel of Holmens Kirke   // the old library, drawn further down
   if (own) {   // drawn by hand further down; the outline only stops her and the camera
     pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: own[0], bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: own[1], line: true }); continue;
   }
@@ -1616,6 +1641,132 @@ TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 
   });
 }
 
+// ======================================================================== HOLMENS KIRKE (anchor forge from 1563, a church since 1619)
+// A red brick cross with green copper roofs, Dutch gables at the four ends and a slim spire over the crossing (45 m).
+// Next to it the long chapel along the canal. Outlines and heights from the 3D parts in OpenStreetMap.
+{
+  const body = [[215.0, -58.0], [206.6, -49.7], [201.7, -44.9], [212.7, -35.4], [225.9, -47.9], [236.6, -37.3], [247.3, -47.5], [237.4, -58.2], [249.8, -71.2], [237.8, -81.2], [225.7, -69.1], [214.7, -79.7], [204.0, -68.6]];
+  const EAVE = 12.5, brick = toon('#ffffff', { map: brickTex('#ad4f37', '#7a3526') }), cop = tm('#5aa58e'), copD = tm('#468a75'), sand = tm('#e6d6b0');
+  const g = new THREE.ExtrudeGeometry(shapeOf([body]), { depth: EAVE, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
+  mesh(g, brick, 0, 0, 0, { edges: 25 });
+  for (const e of edgesOf(body)) { if (e.len < 7) continue; const n = Math.floor((e.len - 2) / 4.5); for (let k = 0; k < n; k++) { const t = (k + 0.5) / n; addWin('arch', e.a[0] + (e.b[0] - e.a[0]) * t + e.nx * WOFF, 6.2, e.a[1] + (e.b[1] - e.a[1]) * t + e.nz * WOFF, e.ry, 1.8, 4.8, 0.6); } }
+  const R = [[1, 0], [1, 0.07], [0.87, 0.13], [0.87, 0.26], [0.73, 0.31], [0.73, 0.44], [0.58, 0.49], [0.58, 0.62], [0.42, 0.67], [0.42, 0.8], [0.25, 0.85], [0.25, 0.94], [0.1, 0.97], [0, 1]];
+  const dutch = (hw, h, th) => prismGeo([...R.map(([u, v]) => [u * hw, v * h]), ...R.slice(0, -1).reverse().map(([u, v]) => [-u * hw, v * h])], th);
+  for (const [a, b, c, d] of [[[201.7, -44.9], [212.7, -35.4], [249.8, -71.2], [237.8, -81.2]], [[236.6, -37.3], [247.3, -47.5], [214.7, -79.7], [204.0, -68.6]]]) {
+    const e1 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], e2 = [(c[0] + d[0]) / 2, (c[1] + d[1]) / 2], len = Math.hypot(e2[0] - e1[0], e2[1] - e1[1]), span = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    const G = new THREE.Group(); G.position.set((e1[0] + e2[0]) / 2, 0, (e1[1] + e2[1]) / 2); G.rotation.y = Math.atan2(-(e2[1] - e1[1]), e2[0] - e1[0]); world.add(G);
+    gableRoof(len - 0.6, span, 7, cop, 0, EAVE, 0, { parent: G, over: 0.35, capMat: copD });
+    for (const s of [-1, 1]) {
+      const ge = dutch(span / 2, 9, 0.8); ge.rotateY(Math.PI / 2); mesh(ge, brick, s * (len / 2 - 0.3), EAVE, 0, { parent: G, edges: 30 });
+      mesh(new THREE.ConeGeometry(0.3, 1.4, 8), sand, s * (len / 2 - 0.3), EAVE + 9.6, 0, { parent: G });
+      box(span + 0.4, 0.4, 1.1, sand, s * (len / 2 - 0.3), EAVE - 0.2, 0, { parent: G, cast: false, ry: Math.PI / 2 });
+    }
+  }
+  // the spire over the crossing: an eight-sided lantern, a copper cap and a thin spire with a gold ball
+  const T = [223.5, -58.7];
+  mesh(new THREE.CylinderGeometry(2.4, 2.6, 7.5, 8), cop, T[0], 19.5 + 3.75, T[1], { edges: 30 });
+  for (let k = 0; k < 8; k++) { const a = (k + 0.5) / 8 * Math.PI * 2; addWin('arch', T[0] + Math.sin(a) * 2.45, 23.5, T[1] + Math.cos(a) * 2.45, a, 0.8, 2.2, 0.7); }
+  mesh(new THREE.CylinderGeometry(1.0, 2.8, 3.2, 8), copD, T[0], 27 + 1.6, T[1], { edges: 30 });
+  mesh(new THREE.ConeGeometry(0.9, 15, 8), cop, T[0], 30 + 7.5, T[1], { edges: 30 });
+  mesh(new THREE.SphereGeometry(0.35, 10, 8), GOLD, T[0], 45.2, T[1]);
+  // the porch on the west side
+  building([[[195, -59], [191, -54], [198, -48], [203, -53]]], 9, '#ad4f37', '#3a3f48');
+  building([[[203, -53], [198, -48], [202, -45], [207, -50]]], 8, '#ad4f37', '#3a3f48');
+}
+
+// ======================================================================== BOATS
+// Three canal boats sail all the way round Slotsholmen (from Børsen, past Højbro and down Frederiksholms Kanal) and turn
+// round at the ends. A harbour bus goes up and down the harbour. Near a boat she can wave (E), and the people wave back.
+const CANAL_ROUTE = [[418, 48], [340, 28], [290, 18], [240, 0], [194, -34], [147, -65], [88, -109], [46, -141], [12, -162], [-30, -164], [-54, -156], [-100, -132], [-128, -112], [-196, -42], [-238, 4], [-262, 44], [-247, 67], [-227, 97], [-191, 150], [-178, 170], [-155, 204], [-100, 284], [-68, 331], [-16, 399], [3, 421]];
+const HARBOUR_ROUTE = [[74, 419], [134, 384], [214, 329], [294, 276], [364, 229], [420, 184]];
+function routeOf(pts) { const d = [0]; for (let i = 1; i < pts.length; i++) d.push(d[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); return { pts, d, len: d[d.length - 1] }; }
+function routeAt(R, s) { let i = 1; while (i < R.d.length - 1 && R.d[i] < s) i++; const a = R.pts[i - 1], b = R.pts[i], t = (s - R.d[i - 1]) / (R.d[i] - R.d[i - 1]); return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, Math.atan2(b[0] - a[0], b[1] - a[1])]; }
+function bakeGroup(root) {   // merges the parts of a moving group by material (fewer things to draw); parts marked keep stay
+  root.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), groups = new Map();
+  root.traverse(o => {
+    if (!o.isMesh || Array.isArray(o.material) || o.material.map || o.children.length) return;
+    for (let p = o; p && p !== root; p = p.parent) if (p.userData.keep) return;
+    if (!groups.has(o.material)) groups.set(o.material, []); groups.get(o.material).push(o);
+  });
+  for (const [mat, list] of groups) {
+    if (list.length < 2) continue;
+    const gs = list.map(o => { const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld)); if (!g.attributes.normal) g.computeVertexNormals(); return g; });
+    let n = 0; for (const g of gs) n += g.attributes.position.count;
+    const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3); let v = 0;
+    for (const g of gs) { pos.set(g.attributes.position.array, v * 3); nor.set(g.attributes.normal.array, v * 3); v += g.attributes.position.count; g.dispose(); }
+    const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); bg.computeBoundingSphere();
+    const m = new THREE.Mesh(bg, mat); m.castShadow = true; root.add(m); for (const o of list) o.parent.remove(o);
+  }
+}
+function hullShape(L, B) {   // seen from above, bow at +y (turned to +z below)
+  const s = new THREE.Shape(); s.moveTo(-B / 2, -L / 2 + 0.6); s.quadraticCurveTo(-B / 2, -L / 2, -B / 2 + 0.6, -L / 2); s.lineTo(B / 2 - 0.6, -L / 2); s.quadraticCurveTo(B / 2, -L / 2, B / 2, -L / 2 + 0.6);
+  s.lineTo(B / 2, L / 2 - 3); s.quadraticCurveTo(B / 2, L / 2 - 0.4, 0, L / 2); s.quadraticCurveTo(-B / 2, L / 2 - 0.4, -B / 2, L / 2 - 3); s.closePath(); return s;
+}
+function flatExtrude(shape, depth) { const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 6 }); g.rotateX(-Math.PI / 2); g.rotateY(Math.PI); return g; }
+TX.flag = ctex(48, 32, (g, w, h) => { g.fillStyle = '#c8102e'; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.fillRect(14, 0, 5, h); g.fillRect(0, 13, w, 5); }, { wrap: false });
+const SHIRTS = ['#e0483c', '#3f7fd0', '#f2c14e', '#4fa36a', '#e98ac0', '#ffffff'], SKIN = tm('#f2c6a4');
+function person(parent, x, y, z, col, arm) {
+  const p = new THREE.Group(); p.position.set(x, y, z); parent.add(p);
+  mesh(new THREE.CapsuleGeometry(0.21, 0.32, 4, 8), tm(col), 0, 0.3, 0, { parent: p });
+  mesh(new THREE.SphereGeometry(0.17, 10, 8), SKIN, 0, 0.72, 0, { parent: p });
+  if (!arm) return null;
+  const a = new THREE.Group(); a.position.set(0.24, 0.5, 0); a.userData.keep = true; p.add(a);
+  mesh(new THREE.CapsuleGeometry(0.06, 0.3, 3, 6), tm(col), 0, -0.2, 0, { parent: a }); a.rotation.z = 0.2;
+  return a;
+}
+const BOATS = [];
+function makeBoat(kind, hullCol) {
+  const g = new THREE.Group(), arms = [];
+  if (kind === 'canal') {
+    const L = 14, B = 3.8;
+    const hull = new THREE.Mesh(flatExtrude(hullShape(L, B), 1.05), [tm('#b88a5a'), tm(hullCol)]); hull.position.y = -0.5; hull.castShadow = true; hull.userData.keep = true; edges(hull, 30); g.add(hull);
+    const rim = hullShape(L + 0.2, B + 0.2); rim.holes.push(hullShape(L - 0.5, B - 0.5)); mesh(flatExtrude(rim, 0.14), tm('#f4f1ea'), 0, 0.55, 0, { parent: g });
+    for (let r = 0; r < 5; r++) {
+      const z = 3.6 - r * 1.6; box(B - 0.9, 0.35, 0.45, tm('#7d5a3c'), 0, 0.55, z - 0.3, { parent: g, cast: false });
+      for (const sx of [-0.8, 0.8]) { const a = person(g, sx, 0.75, z - 0.25, pick(SHIRTS), r < 2 || sx > 0); if (a) arms.push(a); }
+    }
+    person(g, 0, 0.75, -L / 2 + 1.2, '#2b3f6b', false);   // the skipper with a cap
+    mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.1, 10), tm('#1f2a44'), 0, 1.68, -L / 2 + 1.2, { parent: g });
+    mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.4, 6), tm('#f4f1ea'), 0, 1.25, -L / 2 + 0.3, { parent: g });
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.46), toon('#ffffff', { map: TX.flag, side: THREE.DoubleSide })); f.position.set(0, 1.72, -L / 2 + 0.3 - 0.36); f.rotation.y = Math.PI / 2; f.userData.keep = true; g.add(f);
+  } else {   // the harbour bus: a blue hull, a white cabin with windows and a yellow stripe
+    const L = 22, B = 6.2;
+    const hull = new THREE.Mesh(flatExtrude(hullShape(L, B), 1.6), [tm('#d8d4cc'), tm('#24508a')]); hull.position.y = -0.6; hull.castShadow = true; hull.userData.keep = true; edges(hull, 30); g.add(hull);
+    box(B + 0.05, 0.3, L - 4, tm('#f2c14e'), 0, 0.55, -0.5, { parent: g, cast: false });
+    box(B - 1.0, 2.3, L - 7, tm('#f4f1ea'), 0, 1.0, -1.0, { parent: g, edges: true });
+    box(B - 0.8, 0.25, L - 6.6, tm('#24508a'), 0, 3.3, -1.0, { parent: g });
+    for (const sx of [-1, 1]) for (let k = 0; k < 6; k++) { const w = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.0), tm('#3b536c')); w.position.set(sx * ((B - 1.0) / 2 + 0.02), 2.3, -1.0 - (L - 7) / 2 + 1.5 + k * 2.4); w.rotation.y = sx * Math.PI / 2; g.add(w); }
+    for (let k = 0; k < 4; k++) { const a = person(g, -1.2 + k * 0.8, 0.85, (L - 7) / 2 + 0.3, pick(SHIRTS), true); if (a) arms.push(a); }
+  }
+  bakeGroup(g); dyn.add(g);
+  return { g, arms };
+}
+{
+  const CR = routeOf(CANAL_ROUTE), HR = routeOf(HARBOUR_ROUTE);
+  [['#24508a', 0], ['#b8322c', CR.len * 0.36], ['#2f6f4f', CR.len * 0.7]].forEach(([c, s0], i) => BOATS.push({ ...makeBoat('canal', c), R: CR, s: s0, dir: i % 2 ? -1 : 1, speed: 3.2, head: 0, wave: 0, ph: rand() * 6 }));
+  BOATS.push({ ...makeBoat('bus'), R: HR, s: HR.len * 0.3, dir: 1, speed: 4.5, head: 0, wave: 0, ph: 1 });
+  for (const b of BOATS) { const [x, z, h] = routeAt(b.R, b.s); b.head = b.dir > 0 ? h : h + Math.PI; b.g.position.set(x, WL, z); b.g.rotation.y = b.head; }
+  let kidWave = 0;
+  const horn = () => { tone(196, 190, 0, 0.45, 0.09, 'sawtooth'); tone(247, 240, 0, 0.45, 0.05, 'triangle'); tone(196, 190, 0.6, 0.6, 0.09, 'sawtooth'); tone(247, 240, 0.6, 0.6, 0.05, 'triangle'); };
+  HOOKS.frame.push((dt, t) => {
+    let near = null, nd = 22;
+    for (const b of BOATS) {
+      b.s += b.dir * b.speed * dt;
+      if (b.s > b.R.len) { b.s = b.R.len; b.dir = -1; } else if (b.s < 0) { b.s = 0; b.dir = 1; }
+      const [x, z, h] = routeAt(b.R, b.s), want = b.dir > 0 ? h : h + Math.PI;
+      b.head += angDiff(want, b.head) * Math.min(1, dt * 1.2);
+      b.g.position.set(x, WL + Math.sin(t * 1.3 + b.ph) * 0.05, z); b.g.rotation.set(0, b.head, Math.sin(t * 1.1 + b.ph) * 0.02);
+      if (b.wave > 0) b.wave -= dt;
+      b.arms.forEach((a, i) => { a.rotation.z = b.wave > 0 ? 2.6 + Math.sin(t * 12 + i) * 0.35 : 0.2; });
+      const d = Math.hypot(P.pos.x - x, P.pos.z - z); if (d < nd) { nd = d; near = b; }
+    }
+    if (kidWave > 0) { kidWave -= dt; kid.arms[1].rotation.z = 2.6 + Math.sin(t * 12) * 0.3; }
+    if (near && started && !paused) offerAction({ id: 'baad', label: 'Vink til båden', prio: 1, run: () => {
+      near.wave = 3.5; kidWave = 2.5; horn(); toast(near.R === HR ? 'Havnebussen siger tuut! Folkene vinker til dig.' : 'Folkene i båden vinker til dig!');
+    } });
+  });
+}
+
 // ---------------- trees in the library garden
 {
   const park = DATA.A.find(a => a.n === 'Det Kongelige Biblioteks Have');
@@ -1653,24 +1804,24 @@ const POIS = [
   { n: 'Slotskirken', t: 'Slottets egen kirke. Den har seks hvide søjler foran og en rund kuppel på taget. Engang brændte den, men nu er den bygget smuk igen.', x: -30, z: -105, r: 30 },
   { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer, som Thorvaldsen lavede for længe siden. Rundt om huset er der malet mennesker, der byder ham velkommen hjem fra en lang rejse med skib. På taget kører en gudinde med fire heste.', x: -100, z: -72, r: 32 },
   { n: 'Børsen', t: 'Et meget gammelt hus, som kong Christian den Fjerde byggede. Her købte og solgte man varer. Spiret er fire drager, der snor halerne sammen, og øverst sidder tre kroner. Her ser Børsen ud, som den gjorde før branden i 2024. Nu bliver den bygget op igen.', x: 250, z: 65, r: 50 },
-  { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten. Sømændene gik i kirke her.', x: 215, z: -45, r: 32 },
+  { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten med et grønt spir. Her gik sømændene i kirke, og der hænger et skib fra loftet. Dronning Margrethe blev gift her. I muren sidder en gammel kanonkugle.', x: 215, z: -45, r: 32 },
   { n: 'Proviantgården', t: 'Gamle huse omkring en gård. Her gemte man mad til kongens skibe.', x: 138, z: 128, r: 28 },
   { n: 'Bibliotekshaven', t: 'En hyggelig have med træer, bænke og en dam med et springvand.', x: 85, z: 160, r: 40 },
   { n: 'Tøjhusmuseet', t: 'Et meget langt hus af røde mursten, som Christian den Fjerde byggede. Her lå kongens kanoner og våben. Nu er det et museum, hvor man kan se kanoner og rustninger. Kanonerne ved døren skyder kun med konfetti.', x: 20, z: 205, r: 40 },
   { n: 'Det Kongelige Bibliotek', t: 'Det gamle bibliotek af røde mursten. Det er over hundrede år gammelt. Her er der flere bøger, end du kan tælle.', x: 125, z: 250, r: 30 },
   { n: 'Den Sorte Diamant', t: 'Den nye del af biblioteket. Den er sort og blank som en diamant og læner sig ud over vandet. I midten er der en stor væg af glas, og en glasbro går over vejen til det gamle bibliotek.', x: 215, z: 255, r: 45 },
-  { n: 'Inderhavnen', t: 'Den store havn. Her sejler både og havnebusser forbi.', x: 290, z: 245, r: 55 },
+  { n: 'Inderhavnen', t: 'Den store havn. Her sejler havnebussen frem og tilbage. Vink til den, så siger den tuut.', x: 290, z: 245, r: 55 },
   { n: 'Søren Kierkegaards Plads', t: 'En plads ved havnen lige ved siden af Den Sorte Diamant.', x: 40, z: 330, r: 35 },
   { n: 'Christian den Fjerdes Bryghus', t: 'Et gammelt bryggeri med tykke mure. Kong Christian den Fjerde lod det bygge.', x: -25, z: 315, r: 30 },
   { n: 'Frederiksholms Kanal', t: 'Kanalen på den anden side af slottet. Den løber ud i havnen.', x: -103, z: 280, r: 28 },
-  { n: 'Slotsholmskanalen', t: 'Vandet går hele vejen rundt om Slotsholmen. Slotsholmen er en ø.', x: 60, z: -125, r: 25 },
+  { n: 'Slotsholmskanalen', t: 'Vandet går hele vejen rundt om Slotsholmen. Slotsholmen er en ø. Kanalbådene sejler forbi. Vink til dem!', x: 60, z: -125, r: 25 },
   { n: 'Højbro Plads', t: 'En plads ved kanalen. Her står Absalon på sin hest. Han byggede den første borg her.', x: -5, z: -235, r: 30 },
   { n: 'Gammel Strand', t: 'Her solgte fiskerkonerne fisk i gamle dage. I dag sejler kanalbådene herfra.', x: -95, z: -150, r: 40 },
   { n: 'Højbro', t: 'Den første bro over til slottet. Den er lavet af stål og står på granit. Kig ned i vandet ved siden af broen. Der ligger en havmand af bronze med sine syv sønner. De savner deres mor, Agnete.', x: -5, z: -167, r: 14 },
-  { n: 'Holmens Bro', t: 'En bro over kanalen ved Holmens Kirke.', x: 150, z: -52, r: 14 },
+  { n: 'Holmens Bro', t: 'En bro over kanalen ved Holmens Kirke. Bådene sejler ind under den.', x: 150, z: -52, r: 14 },
   { n: 'Børsbroen', t: 'En bro over vandet lige ved Børsen.', x: 298, z: 22, r: 15 },
-  { n: 'Marmorbroen', t: 'En flot gammel bro af sten. Den fører hen til Ridebanen.', x: -206, z: 140, r: 15 },
-  { n: 'Prinsens Bro', t: 'En bro over Frederiksholms Kanal.', x: -152, z: 214, r: 15 },
+  { n: 'Marmorbroen', t: 'En flot gammel bro af lys sandsten med en høj bue. Den går hen til Ridebanen, og bådene sejler ind under den.', x: -206, z: 140, r: 15 },
+  { n: 'Prinsens Bro', t: 'En bro af sten over Frederiksholms Kanal.', x: -152, z: 214, r: 15 },
   { n: 'Stormbroen', t: 'En bro over kanalen ved Nationalmuseet.', x: -262, z: 57, r: 15 },
 ];
 function poiAt(x, z) { let best = null, bs = 1; for (const p of POIS) { const s = Math.hypot(x - p.x, z - p.z) / p.r; if (s < bs) { bs = s; best = p; } } return best; }
@@ -2241,7 +2392,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { P, cam, kid, POIS, HORSES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { P, cam, kid, POIS, HORSES, BOATS, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
