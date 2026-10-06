@@ -74,4 +74,8 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Kongeporten (47, -28) og Dronningeporten (-31.4, -45.7) har en høj dør, fire søjler, en altan med balustrade og en guldkrone. Pigen går uden om søjlerne.
   - Fire bronzestatuer på granitsokler i Prins Jørgens Gård (fra OSM-punkterne). Nyt sted: Prins Jørgens Gård.
   - Ideer til senere: Folketingets indgang i Rigsdagsgården, figurer på taget, fløjene ved Ridebanen.
+- [x] Ekstra: Beskæftigelsesministeriet, Ved Stranden 8 (6. okt. 2026)
+  - Hele karréen mellem Ved Stranden, Boldhusgade, Admiralgade og Holmens Kanal (OSM-huset med første punkt (113, -122) og to gårde): Nordisk Genforsikrings tidligere hovedsæde (N. P. P. Gundstrup, 1932-38) bygget sammen med hjørnehuset fra 1796. Wikipedia nævner også Forsvarsministeriet i samme hus.
+  - Lys sten (`TX.sandstone`), sokkel af granit, fem etager, gesims, grønt kobbertag med kviste. Hoveddøren midt på facaden mod kanalen med stenramme, et grønt skilt med guldbogstaver (`TX.ministrySign`) og Dannebrog på en skrå flagstang, der vajer (`MINISTRY.flag`). Facaden er gættet, da jeg ikke fandt billeder eller beskrivelser.
+  - Nyt sted: Beskæftigelsesministeriet (138, -98).
 - [ ] 8. Noget sjovt at finde og lave for en 5-årig
