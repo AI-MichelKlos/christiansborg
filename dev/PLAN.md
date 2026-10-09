@@ -84,4 +84,10 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Blokken `TRAFFIC`: 4 ruter fra vejnettet (regnet i Python, to åbne og to sløjfer). 7 biler og 6 cyklister (hver tredje er en ladcykel med et barn) kører i højre side, holder afstand og stopper og venter, når pigen står foran dem (dyt eller ring-ring og en kort besked højst hvert 20. sekund). Pigen kan ikke gå igennem dem. `__cb.VEHICLES` og `__cb.frames(n)` til test.
   - 40 parkerede biler langs de små veje og gadelygter langs de store veje.
   - De åbne ruter går lidt ud over kanten af kortet og starter forfra, når de når enden.
-- [ ] 8. Noget sjovt at finde og lave for en 5-årig
+- [x] 8. Noget sjovt at finde og lave for en 5-årig (9. okt. 2026)
+  - Kronejagt: 10 guldkroner (`CROWN_SPOTS`, `CROWNS`) ved Højbro Plads, Slotskirken, Thorvaldsens Museum, Prins Jørgens Gård, Slotspladsen, Ved Stranden, Børsen, Bibliotekshaven, Ridebanen og Marmorbroen. De drejer rundt, har et gult lys over sig og en gul prik på kortet. Hun tager en krone ved at gå ind i den. Tælleren øverst til venstre viser "3 af 10".
+  - Når alle 10 er fundet: fanfare, fyrværkeri, en lille krone på pigens hoved og et kort med "Gå videre rundt" eller "Gem kronerne igen". De fundne kroner gemmes i localStorage (`crowns` i `christiansborg3d`).
+  - Ænder: to familier (en mor og fire gule ællinger på række) i kanalen ved Gammel Strand (-70, -152) og ved Børsen (215, -15). Ved vandet kommer knappen "Giv ænderne brød". Brødet flyver ud i vandet, ænderne svømmer hen og spiser det og siger rap rap.
+  - Startbeskeden og introteksten fortæller om kronerne. Hjælp-kortet viser, hvor mange kroner hun har fundet. Fejl rettet: Lyd-knappen kaldte en lyd, der ikke fandtes.
+  - Test: `__cb.CROWNS`, `__cb.FAMILIES`, `__cb.found`, `__cb.spot(x, z)` (0 betyder fri plads) og `__cb.bigMap(1260)` (stort kort til at finde steder).
+  - Ideer til senere: flere ting at gøre (fx vagtskifte, klokkerne i tårnet), en lille opgave pr. sted, svaner ved Sorte Diamant.

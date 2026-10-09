@@ -30,6 +30,8 @@ body{margin:0;overflow:hidden;background:var(--sky);color:var(--ink);font-family
 #counter{position:fixed;left:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;padding:7px 14px 7px 9px}
 #counter svg{width:34px;height:34px;flex:none}
 #counter .lbl{display:block;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;opacity:.72}
+#counter.bump{animation:bump .45s ease-out}
+@keyframes bump{40%{transform:scale(1.18)}}
 #cnt{display:block;font-family:var(--display);font-weight:800;font-size:22px;line-height:1.05;font-variant-numeric:tabular-nums}
 #tools{position:fixed;right:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;gap:8px}
 .btn{font:600 13px var(--body);color:var(--ink);display:inline-flex;align-items:center;gap:6px;padding:7px 11px;cursor:pointer;transition:transform .08s,box-shadow .08s}
@@ -86,6 +88,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   .btn{padding:7px 8px}
   #counter{padding:5px 11px 5px 7px}
   #counter svg{width:28px;height:28px}
+  #counter .lbl{display:none}
   #cnt{font-size:19px}
   .card{padding:18px 18px 20px}
 }
@@ -96,6 +99,10 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 <canvas id="c" tabindex="0" aria-label="3D-verden: Christiansborg og Slotsholmen"></canvas>
 
 <div id="hud" hidden>
+  <div id="counter" class="sticker" role="status" aria-live="polite">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 29L4 11l9 8 7-12 7 12 9-8-2 18z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/><rect x="6" y="29" width="28" height="6" rx="1.5" fill="#e0a63a" stroke="#2a2238" stroke-width="2.4"/><circle cx="20" cy="22" r="2.8" fill="#d9534f" stroke="#2a2238" stroke-width="1.6"/></svg>
+    <div><span class="lbl">Kroner fundet</span><span id="cnt">0 af 10</span></div>
+  </div>
   <div id="tools">
     <button id="bMap" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
     <button id="bNight" class="sticker btn" type="button" aria-pressed="false"><svg id="iNight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span id="tNight">Aften</span></button>
@@ -116,7 +123,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div class="card sticker">
     <div class="eyebrow">København · en gåtur i 3D</div>
     <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå rundt på Slotsholmen. Der er vand hele vejen rundt, så du skal over en bro. Gå hen til slottet, Børsen og biblioteket ved havnen, klap hestene på Ridebanen, og vink til bådene i kanalen. Når du kommer tæt på et sted, ser du, hvad det hedder.</p>
+    <p class="lead" id="introLead">Gå rundt på Slotsholmen, og find kongens 10 guldkroner. Følg de gule lys. Der er vand hele vejen rundt, så du skal over en bro. Klap hestene på Ridebanen, giv ænderne brød, og vink til bådene i kanalen. Når du kommer tæt på et sted, ser du, hvad det hedder.</p>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -135,6 +142,16 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
     </div>
     <button class="go" id="goBtn" type="button" disabled>Henter Slotsholmen …</button>
     <p class="foot">Kortdata: © OpenStreetMap-bidragydere (ODbL). Mange huse er stadig enkle klodser. Placeringer og detaljer er forenklede.</p>
+  </div>
+</div>
+
+<div id="finale" class="overlay" hidden>
+  <div class="card sticker">
+    <div class="eyebrow">Kronejagten er slut</div>
+    <h2>Du fandt alle 10 kroner!</h2>
+    <p class="lead">Hurra! Kongen er glad, og nu har du selv en guldkrone på. Du kan gå videre rundt på Slotsholmen.</p>
+    <button class="go" id="finOk" type="button">Gå videre rundt</button>
+    <button class="go alt" id="finAgain" type="button">Gem kronerne igen</button>
   </div>
 </div>
 
@@ -2486,6 +2503,7 @@ function drawMap() {
   const g = mctx; g.drawImage(mapBase, 0, 0);
   const k = mapCv.width / (MX1 - MX0);
   const px = mpx(P.pos.x), pz = mpz(P.pos.z);
+  for (const c of CROWNS) if (!c.got) { g.fillStyle = '#ffd34d'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(c.x), mpz(c.z), Math.max(3.5, k * 3) * (1 + 0.18 * Math.sin(clockT * 5)), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the crowns that are still out there
   const cy = cam.yaw; const fx = -Math.sin(cy), fz = -Math.cos(cy); const L = 22 * k;
   g.fillStyle = 'rgba(255,250,240,.35)'; g.beginPath(); g.moveTo(px, pz);
   g.lineTo(px + (fx * Math.cos(0.5) - fz * Math.sin(0.5)) * L, pz + (fz * Math.cos(0.5) + fx * Math.sin(0.5)) * L);
@@ -2509,12 +2527,12 @@ function showPoi(p) { if (p === curPoi) return; curPoi = p; const el = $('poi');
 $('bMap').addEventListener('click', () => setMapVisible(!showMap));
 $('bVoice').addEventListener('click', () => setVoice(!voiceOn));
 $('bNight').addEventListener('click', () => setEvening(!evening));
-$('bSound').addEventListener('click', () => { setSound(!soundOn); if (soundOn) SOUNDS.kat(); });
+$('bSound').addEventListener('click', () => { setSound(!soundOn); if (soundOn) sparkleSound(); });
 $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear();
-  if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har set ${seenPoi.size} steder. Gå hen til et nyt sted, så ser du, hvad det hedder.`; }
+  if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og set ${seenPoi.size} steder. Følg de gule lys for at finde kronerne.`; }
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
@@ -2670,9 +2688,9 @@ function updActions() {
 // ======================================================================== STATE / STORAGE
 let soundOn = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'christiansborg3d';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, readAloud: voiceOn })); } catch (e) {} }
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, readAloud: voiceOn, crowns: [...found] })); } catch (e) {} }
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
-HOOKS.start.push(() => setTimeout(() => toast('Gå over broen hen til slottet.'), 1200));
+HOOKS.start.push(() => setTimeout(() => toast(found.size === 0 ? 'Kongen har tabt 10 guldkroner. Kan du finde dem?' : found.size === 9 ? 'Find den sidste krone.' : found.size < 10 ? `Find de sidste ${10 - found.size} kroner.` : 'Gå over broen hen til slottet.'), 1200));
 
 // ======================================================================== MAIN LOOP
 let last = performance.now(), clockT = 0, poiT = 0, mapT = 0;
@@ -2701,6 +2719,169 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
+// ======================================================================== THE KING'S 10 GOLD CROWNS AND THE DUCKS
+// Ten gold crowns lie around Slotsholmen, each with a soft yellow light over it that can be seen from far away
+// (and a gold dot on the map). She takes a crown by walking into it. When she has all ten, there are fireworks,
+// she gets a little crown on her head, and a card says well done. The crowns she has found are remembered.
+// Two duck families swim in the canals. Near the water she can throw bread to them, and they come and eat it.
+const CROWN_SPOTS = [[-6, -205], [-25, -148], [-120, -95], [-35, -60], [100, -30], [130, -95], [300, 50], [40, 180], [-140, 85], [-206, 140]];
+const found = new Set();
+{ const st = load(); for (const i of st.crowns || []) if (i >= 0 && i < CROWN_SPOTS.length) found.add(i); }
+const BEAM_M = (() => {
+  const cv = document.createElement('canvas'); cv.width = 4; cv.height = 128; const g = cv.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 128);
+  gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 128);
+  return new THREE.MeshBasicMaterial({ color: '#ffd34d', map: new THREE.CanvasTexture(cv), transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide });
+})();
+const CROWNS = CROWN_SPOTS.map(([x, z], i) => {
+  const y0 = archH(x, z), g = new THREE.Group(), c = new THREE.Group();
+  crownAt(c, 0, 0, 0, 0.5);
+  mesh(new THREE.SphereGeometry(0.11, 10, 8), tm('#d9534f'), 0, -0.06, 0.48, { parent: c });   // a red jewel in front
+  bakeGroup(c); g.add(c); g.position.set(x, y0 + 1.1, z);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffd34d', transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending }));
+  glow.scale.setScalar(2.4); g.add(glow); dyn.add(g);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 18, 16, 1, true), BEAM_M); beam.position.set(x, y0 + 9, z); dyn.add(beam);
+  const got = found.has(i); g.visible = beam.visible = !got;
+  return { i, x, z, y0, g, c, beam, got, fly: 0, ph: i * 0.7 };
+});
+let headCrown = null;
+function setCrownOnHead(on) {
+  if (on && !headCrown) { headCrown = new THREE.Group(); crownAt(headCrown, 0, 0, 0, 0.2); headCrown.position.set(0, 0.43, -0.02); headCrown.rotation.x = -0.15; kid.head.add(headCrown); }
+  if (headCrown) headCrown.visible = on;
+}
+function updCounter(bump) {
+  $('cnt').textContent = `${found.size} af ${CROWNS.length}`;
+  if (bump) { const el = $('counter'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+}
+updCounter(); setCrownOnHead(found.size >= CROWNS.length);
+function firework(x, y, z) {
+  const col = pick(['#ffd34d', '#ff9fb2', '#9fd3ff', '#b7f0a0', '#ffffff']);
+  for (let i = 0; i < 26; i++) {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: col, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    sp.scale.setScalar(rr(0.5, 0.85)); sp.position.set(x, y, z); dyn.add(sp);
+    const a = rand() * 6.28, b = rr(-1, 1), v = rr(3, 5.5), h = Math.sqrt(1 - b * b);
+    effects.push({ sp, t: 0, life: rr(1.1, 1.6), vx: Math.cos(a) * h * v, vz: Math.sin(a) * h * v, vy: b * v + 2 });
+  }
+  tone(200, 90, 0, 0.25, 0.08, 'triangle');
+}
+function allCrowns() {
+  toast('Hurra! Du fandt alle kongens kroner!');
+  [523, 659, 784, 1047, 784, 1047].forEach((f, k) => tone(f, f, k * 0.16, k === 5 ? 0.7 : 0.2, 0.08, 'triangle'));
+  setCrownOnHead(true);
+  let k = 0; const iv = setInterval(() => { const a = rand() * 6.28; firework(P.pos.x + Math.cos(a) * rr(3, 7), P.pos.y + rr(5, 9), P.pos.z + Math.sin(a) * rr(3, 7)); if (++k >= 9) clearInterval(iv); }, 300);
+  setTimeout(() => { if (found.size >= CROWNS.length && started) { paused = true; keys.clear(); $('finale').hidden = false; $('finOk').focus(); } }, 3300);
+}
+function takeCrown(c) {
+  c.got = true; c.fly = 0.7; c.beam.visible = false; found.add(c.i); save(); updCounter(true);
+  const n = found.size;
+  burst(new THREE.Vector3(c.x, c.y0 + 0.6, c.z)); popLabel(`${n} af ${CROWNS.length}`, kid.root.position, 1.3);
+  [784, 988, 1175, 1568].forEach((f, k) => tone(f, f, k * 0.09, 0.25, 0.06, 'triangle'));
+  if (n >= CROWNS.length) { allCrowns(); return; }
+  toast(n === 1 ? 'Du fandt en guldkrone! Følg de gule lys til de andre.' : n === CROWNS.length - 1 ? 'Kun én krone mangler!' : `Flot! Der mangler ${CROWNS.length - n} kroner.`);
+}
+const _cv = new THREE.Vector3();
+HOOKS.frame.push((dt, t) => {
+  for (const c of CROWNS) {
+    if (c.got) {
+      if (c.fly > 0) {   // the crown flies to her and gets small
+        c.fly -= dt; c.g.position.lerp(_cv.set(P.pos.x, P.pos.y + 2.0, P.pos.z), Math.min(1, dt * 8)); c.g.scale.setScalar(0.25 + 0.75 * Math.max(0, c.fly / 0.7)); c.c.rotation.y += dt * 9;
+        if (c.fly <= 0) c.g.visible = false;
+      }
+      continue;
+    }
+    c.c.rotation.y += dt * 1.6; c.g.position.y = c.y0 + 1.1 + Math.sin(t * 2.2 + c.ph) * 0.15;
+    if (started && !paused && Math.hypot(P.pos.x - c.x, P.pos.z - c.z) < 1.7 && Math.abs(P.pos.y - c.y0) < 2.4) takeCrown(c);
+  }
+});
+$('finOk').addEventListener('click', () => { $('finale').hidden = true; paused = false; canvas.focus(); });
+$('finAgain').addEventListener('click', () => {
+  found.clear(); save(); setCrownOnHead(false); updCounter();
+  for (const c of CROWNS) { c.got = false; c.fly = 0; c.g.visible = c.beam.visible = true; c.g.scale.setScalar(1); c.g.position.set(c.x, c.y0 + 1.1, c.z); }
+  $('finale').hidden = true; paused = false; canvas.focus(); toast('Kronerne er gemt igen. Kan du finde dem?');
+});
+// ---------------- the ducks: a mother duck with four yellow ducklings in a line behind her
+function makeDuck(kind) {   // 'mor' (brown) or 'baby' (yellow); the beak points to +z
+  const g = new THREE.Group(), s = kind === 'baby' ? 0.5 : 1, body = tm(kind === 'baby' ? '#f6d55c' : '#9a7350'), headM = tm(kind === 'baby' ? '#f6d55c' : '#7d5a3c');
+  mesh(new THREE.SphereGeometry(0.3 * s, 12, 10), body, 0, 0.12 * s, 0, { parent: g }).scale.set(1, 0.75, 1.45);
+  mesh(new THREE.SphereGeometry(0.17 * s, 12, 10), headM, 0, 0.42 * s, 0.3 * s, { parent: g });
+  mesh(new THREE.ConeGeometry(0.07 * s, 0.2 * s, 8), tm('#f0932b'), 0, 0.39 * s, 0.5 * s, { parent: g, rx: Math.PI / 2 });
+  for (const sx of [-1, 1]) mesh(new THREE.SphereGeometry(0.032 * s, 6, 5), tm('#231a22'), sx * 0.12 * s, 0.47 * s, 0.4 * s, { parent: g, cast: false });
+  mesh(new THREE.ConeGeometry(0.11 * s, 0.24 * s, 6), body, 0, 0.22 * s, -0.42 * s, { parent: g, rx: -1.9 });   // the tail
+  if (kind === 'mor') for (const sx of [-1, 1]) mesh(new THREE.SphereGeometry(0.12, 8, 6), tm('#3d6fa8'), sx * 0.26, 0.2, -0.05, { parent: g, cast: false }).scale.set(0.4, 0.6, 1.4);   // blue on the wings
+  bakeGroup(g); dyn.add(g); return g;
+}
+const waterOk = (x, z) => rawWater(x, z) && [[1.2, 0], [-1.2, 0], [0, 1.2], [0, -1.2]].every(([dx, dz]) => rawWater(x + dx, z + dz));
+const pathOk = (x0, z0, x1, z1) => [0.25, 0.5, 0.75, 1].every(f => waterOk(x0 + (x1 - x0) * f, z0 + (z1 - z0) * f));
+const FAMILIES = [[-70, -152], [215, -15]].map(([hx, hz]) => {
+  const mom = { g: makeDuck('mor'), x: hx, z: hz, h: 0 };
+  const kids = [1, 2, 3, 4].map(k => ({ g: makeDuck('baby'), x: hx + k * 0.05, z: hz, h: 0 }));
+  return { hx, hz, mom, kids, tx: hx, tz: hz, timer: 0, quackT: rr(3, 8) };
+});
+const CRUMBS = [], crumbGeo = new THREE.SphereGeometry(0.08, 6, 5), crumbM = tm('#d9b27a');
+const quack = () => { tone(640, 430, 0, 0.11, 0.09, 'sawtooth'); tone(620, 410, 0.16, 0.11, 0.08, 'sawtooth'); };
+const peep = () => tone(2500, 3000, 0, 0.07, 0.035);
+function throwBread() {
+  const fx = Math.sin(kid.root.rotation.y), fz = Math.cos(kid.root.rotation.y);
+  let d = 6.5; while (d > 3 && !rawWater(P.pos.x + fx * d, P.pos.z + fz * d)) d -= 0.5;
+  for (let i = 0; i < 6; i++) {
+    const m = new THREE.Mesh(crumbGeo, crumbM); m.position.set(P.pos.x + fx * 0.4, P.pos.y + 1.1, P.pos.z + fz * 0.4); dyn.add(m);
+    const tx = P.pos.x + fx * d + rr(-1.3, 1.3), tz = P.pos.z + fz * d + rr(-1.3, 1.3), T = rr(0.8, 1.0);
+    CRUMBS.push({ m, vx: (tx - m.position.x) / T, vz: (tz - m.position.z) / T, vy: (WL - m.position.y + 4.9 * T * T) / T, at: 'air', age: 0, ph: rand() * 6 });
+  }
+  tone(500, 900, 0, 0.12, 0.04, 'triangle');
+}
+let fedOnce = false;
+function eatCrumb(k, big) { const c = CRUMBS[k]; dyn.remove(c.m); CRUMBS.splice(k, 1); if (big) quack(); else peep(); }
+function swim(d, tx, tz, speed, dt) {   // turn toward the target and swim forward (only on water)
+  const want = Math.atan2(tx - d.x, tz - d.z); d.h += angDiff(want, d.h) * Math.min(1, dt * 3);
+  const nx = d.x + Math.sin(d.h) * speed * dt, nz = d.z + Math.cos(d.h) * speed * dt;
+  if (rawWater(nx, nz)) { d.x = nx; d.z = nz; return true; } return false;
+}
+HOOKS.frame.push((dt, t) => {
+  // bread in the air falls down, bread on the water floats
+  for (let k = CRUMBS.length - 1; k >= 0; k--) {
+    const c = CRUMBS[k], p = c.m.position; c.age += dt;
+    if (c.at === 'air') {
+      c.vy -= 9.8 * dt; p.x += c.vx * dt; p.y += c.vy * dt; p.z += c.vz * dt;
+      const wet = rawWater(p.x, p.z), floor = wet ? WL + 0.03 : archH(p.x, p.z) + 0.05;
+      if (p.y <= floor) { p.y = floor; c.at = wet ? 'water' : 'land'; c.age = 0; }
+    } else if (c.at === 'water') p.y = WL + 0.03 + Math.sin(t * 2 + c.ph) * 0.02;
+    if (c.age > (c.at === 'land' ? 3 : 40)) { dyn.remove(c.m); CRUMBS.splice(k, 1); }
+  }
+  const floating = CRUMBS.filter(c => c.at === 'water');
+  for (const F of FAMILIES) {
+    const m = F.mom;
+    let food = null, fd = 45;
+    for (const c of floating) { const d = Math.hypot(c.m.position.x - m.x, c.m.position.z - m.z); if (d < fd) { fd = d; food = c; } }
+    if (food) { F.tx = food.m.position.x; F.tz = food.m.position.z; F.timer = 4; }
+    else {
+      F.timer -= dt;
+      if (F.timer <= 0 || Math.hypot(F.tx - m.x, F.tz - m.z) < 0.8) {   // swim to a new spot near home
+        for (let k = 0; k < 20; k++) { const a = rand() * 6.28, r = rr(3, 16), x = F.hx + Math.cos(a) * r, z = F.hz + Math.sin(a) * r; if (waterOk(x, z) && pathOk(m.x, m.z, x, z)) { F.tx = x; F.tz = z; break; } }
+        F.timer = rr(6, 12);
+      }
+    }
+    if (!swim(m, F.tx, F.tz, food ? 2.3 : 0.8, dt)) F.timer = 0;
+    let prev = m;
+    for (const d of F.kids) {
+      const dist = Math.hypot(prev.x - d.x, prev.z - d.z);
+      if (dist > 0.75) swim(d, prev.x, prev.z, Math.min(3.2, (dist - 0.75) * 3 + 0.3), dt); else d.h += angDiff(prev.h, d.h) * Math.min(1, dt * 2);
+      prev = d;
+    }
+    for (const d of [m, ...F.kids]) {
+      d.g.position.set(d.x, WL + Math.sin(t * 2.4 + d.x) * 0.03, d.z); d.g.rotation.y = d.h;
+      for (let k = CRUMBS.length - 1; k >= 0; k--) { const c = CRUMBS[k]; if (c.at === 'water' && Math.hypot(c.m.position.x - d.x, c.m.position.z - d.z) < (d === m ? 0.7 : 0.45)) eatCrumb(k, d === m); }
+    }
+    F.quackT -= dt;   // now and then the mother says rap rap, if she is close
+    if (F.quackT <= 0) { F.quackT = rr(5, 12); if (started && Math.hypot(P.pos.x - m.x, P.pos.z - m.z) < 16) quack(); }
+  }
+  // near the water, with ducks close by: throw bread
+  if (started && !paused) {
+    const fx = Math.sin(kid.root.rotation.y), fz = Math.cos(kid.root.rotation.y), ax = P.pos.x + fx * 4, az = P.pos.z + fz * 4;
+    if (rawWater(ax, az) && floating.length < 8 && FAMILIES.some(F => Math.hypot(F.mom.x - ax, F.mom.z - az) < 45))
+      offerAction({ id: 'brod', label: 'Giv ænderne brød', prio: 1, run: () => { throwBread(); if (!fedOnce) { fedOnce = true; setTimeout(() => toast('Rap rap! Ænderne kommer svømmende.'), 700); } } });
+  }
+});
+
 // ======================================================================== BOOT
 function boot(data) {
   data = data || {};
@@ -2720,7 +2901,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { P, cam, kid, POIS, HORSES, BOATS, VEHICLES, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

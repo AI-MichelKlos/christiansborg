@@ -4,6 +4,8 @@ En hyggelig 3D-gåtur i tegnefilmsstil på Christiansborg og Slotsholmen i Købe
 
 Spil det her: https://ai-michelklos.github.io/christiansborg/
 
+Kongen har tabt 10 guldkroner rundt på Slotsholmen. Følg de gule lys og find dem alle. Ved kanalerne kan man give ænderne brød.
+
 ## Styring
 - Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe. Træk med musen for at kigge. N skifter mellem dag og aften, M viser eller skjuler kortet.
 - Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap.
