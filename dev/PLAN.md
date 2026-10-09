@@ -91,3 +91,9 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Startbeskeden og introteksten fortæller om kronerne. Hjælp-kortet viser, hvor mange kroner hun har fundet. Fejl rettet: Lyd-knappen kaldte en lyd, der ikke fandtes.
   - Test: `__cb.CROWNS`, `__cb.FAMILIES`, `__cb.found`, `__cb.spot(x, z)` (0 betyder fri plads) og `__cb.bigMap(1260)` (stort kort til at finde steder).
   - Ideer til senere: flere ting at gøre (fx vagtskifte, klokkerne i tårnet), en lille opgave pr. sted, svaner ved Sorte Diamant.
+- [x] Ekstra: sejl selv i en lille båd (9. okt. 2026)
+  - En lille rød båd (`MYBOAT`) ligger ved kajen ved Gammel Strand (-37.5, -170.6). Nyt sted: Den lille båd (stedet følger båden, og båden er en rød prik på kortet).
+  - "Sejl med båden" (E) når hun står ved den. Så styrer de samme taster og den samme tommel båden (`HOOKS.ride`), og Hop-knappen hedder Dyt og dytter. Hun sidder på bænken med hænderne på rattet og dukker sig under broerne. Motorlyd og hvidt skum bag båden.
+  - Båden kan ikke sejle på land eller under de lave ender af buebroerne (`lowAt`, under WL + 2.0) og glider langs kajen, hvis hun sejler ind i den. De store kanalbåde og havnebussen stopper og venter, når hun ligger foran dem.
+  - "Gå i land" kommer, når der er en fri plads på kajen tæt på (`landSpot`). Båden bliver liggende, hvor hun går i land. Står hun stille ude på vandet, får hun at vide, at hun skal sejle hen til kajen.
+  - Test: `__cb.MYBOAT`, `__cb.boatFits(x, z, h)`. Hele kanalruten fra Børsen til Marmorbroen passer til båden. Bemærk at `__cb.step(n)` ikke flytter de store både.

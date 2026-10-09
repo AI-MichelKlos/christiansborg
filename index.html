@@ -1892,14 +1892,19 @@ function makeBoat(kind, hullCol) {
 {
   const CR = routeOf(CANAL_ROUTE), HR = routeOf(HARBOUR_ROUTE);
   [['#24508a', 0], ['#b8322c', CR.len * 0.36], ['#2f6f4f', CR.len * 0.7]].forEach(([c, s0], i) => BOATS.push({ ...makeBoat('canal', c), R: CR, s: s0, dir: i % 2 ? -1 : 1, speed: 3.2, head: 0, wave: 0, ph: rand() * 6 }));
-  BOATS.push({ ...makeBoat('bus'), R: HR, s: HR.len * 0.3, dir: 1, speed: 4.5, head: 0, wave: 0, ph: 1 });
+  BOATS.push({ ...makeBoat('bus'), big: true, R: HR, s: HR.len * 0.3, dir: 1, speed: 4.5, head: 0, wave: 0, ph: 1 });
   for (const b of BOATS) { const [x, z, h] = routeAt(b.R, b.s); b.head = b.dir > 0 ? h : h + Math.PI; b.g.position.set(x, WL, z); b.g.rotation.y = b.head; }
   let kidWave = 0;
   const horn = () => { tone(196, 190, 0, 0.45, 0.09, 'sawtooth'); tone(247, 240, 0, 0.45, 0.05, 'triangle'); tone(196, 190, 0.6, 0.6, 0.09, 'sawtooth'); tone(247, 240, 0.6, 0.6, 0.05, 'triangle'); };
   HOOKS.frame.push((dt, t) => {
     let near = null, nd = 22;
     for (const b of BOATS) {
-      b.s += b.dir * b.speed * dt;
+      {   // the big boats stop and wait when her little boat is in front of them
+        const fx0 = Math.sin(b.head), fz0 = Math.cos(b.head), mx = MYBOAT.x - b.g.position.x, mz = MYBOAT.z - b.g.position.z, al = mx * fx0 + mz * fz0, sd = Math.abs(mx * fz0 - mz * fx0);
+        const stop = al > 0 && al < (b.big ? 22 : 16) && sd < (b.big ? 5.1 : 3.9), v0 = b.v ?? b.speed;
+        b.v = v0 + Math.max(-2.5 * dt, Math.min(0.8 * dt, (stop ? 0 : b.speed) - v0));
+      }
+      b.s += b.dir * b.v * dt;
       if (b.s > b.R.len) { b.s = b.R.len; b.dir = -1; } else if (b.s < 0) { b.s = 0; b.dir = 1; }
       const [x, z, h] = routeAt(b.R, b.s), want = b.dir > 0 ? h : h + Math.PI;
       b.head += angDiff(want, b.head) * Math.min(1, dt * 1.2);
@@ -2082,7 +2087,7 @@ const VEHICLES = [];
       // stop for her, and keep a gap to the one in front
       let target = v.max;
       const dx = P.pos.x - x, dz = P.pos.z - z, along = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
-      const waiting = started && along > 0 && along < (v.kind === 'car' ? 9 : 6) && side < (v.kind === 'car' ? 2.0 : 1.4);
+      const waiting = started && !MYBOAT.on && along > 0 && along < (v.kind === 'car' ? 9 : 6) && side < (v.kind === 'car' ? 2.0 : 1.4);
       if (waiting) {
         target = 0;
         if (v.waitT <= 0 && Math.hypot(dx, dz) < 12) { if (v.kind === 'car') beep(); else bell(); if (clockT - saidT > 20) { saidT = clockT; toast(v.kind === 'car' ? 'Bilen holder stille og venter på dig.' : 'Ring ring! Cyklen venter på dig.'); } }
@@ -2103,7 +2108,7 @@ const VEHICLES = [];
       v.g.visible = Math.hypot(nx - camera.position.x, nz - camera.position.z) < 170;
       if (v.legs) { v.crank += v.speed * dt * 2.2; v.legs[0].rotation.x = Math.sin(v.crank) * 0.6; v.legs[1].rotation.x = -Math.sin(v.crank) * 0.6; }
       // she cannot walk through a car or a bike
-      if (started) {
+      if (started && !MYBOAT.on) {
         const ex = P.pos.x - nx, ez = P.pos.z - nz, s1 = Math.sin(v.head), c1 = Math.cos(v.head), lz = ex * s1 + ez * c1, lx = ex * c1 - ez * s1, hx = v.kind === 'car' ? 1.3 : 0.6, hz = v.len / 2 + 0.3;
         if (Math.abs(lx) < hx && Math.abs(lz) < hz) { const px = hx - Math.abs(lx), pz = hz - Math.abs(lz); if (px < pz) { const d = Math.sign(lx || 1) * px; P.pos.x += d * c1; P.pos.z -= d * s1; } else { const d = Math.sign(lz || 1) * pz; P.pos.x += d * s1; P.pos.z += d * c1; } kid.root.position.copy(P.pos); }
       }
@@ -2503,6 +2508,7 @@ function drawMap() {
   const g = mctx; g.drawImage(mapBase, 0, 0);
   const k = mapCv.width / (MX1 - MX0);
   const px = mpx(P.pos.x), pz = mpz(P.pos.z);
+  if (!MYBOAT.on) { g.fillStyle = '#d9534f'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(MYBOAT.x), mpz(MYBOAT.z), Math.max(3, k * 2.4), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the little boat
   for (const c of CROWNS) if (!c.got) { g.fillStyle = '#ffd34d'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(c.x), mpz(c.z), Math.max(3.5, k * 3) * (1 + 0.18 * Math.sin(clockT * 5)), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the crowns that are still out there
   const cy = cam.yaw; const fx = -Math.sin(cy), fz = -Math.cos(cy); const L = 22 * k;
   g.fillStyle = 'rgba(255,250,240,.35)'; g.beginPath(); g.moveTo(px, pz);
@@ -2882,6 +2888,131 @@ HOOKS.frame.push((dt, t) => {
   }
 });
 
+// ======================================================================== THE LITTLE BOAT (she can sail it herself)
+// A little red boat lies at the quay at Gammel Strand. Near it she can get in (E). Then the same keys and the same
+// thumb that make her walk steer the boat, Hop (space) toots the horn, and near a quay she can go ashore again (E).
+// The boat stays where she leaves it. It cannot go on land or under the low ends of the arched bridges, and the big
+// canal boats stop and wait when it is in front of them.
+const MYBOAT = { x: -37.5, z: -170.6, h: -1.27, v: 0, on: false, duck: 0, putT: 0, bumpT: 0, foamT: 0 };
+{
+  const g = new THREE.Group(), wood = tm('#c99a68'), white = tm('#f4f1ea');
+  const hull = new THREE.Mesh(flatExtrude(hullShape(5.6, 2.3), 0.85), [wood, tm('#d9534f')]); hull.position.y = -0.35; hull.castShadow = true; hull.userData.keep = true; edges(hull, 30); g.add(hull);
+  const rim = hullShape(5.8, 2.5); rim.holes.push(hullShape(5.2, 1.9)); mesh(flatExtrude(rim, 0.12), white, 0, 0.5, 0, { parent: g });
+  box(1.5, 0.3, 1.3, white, 0, 0.5, 1.55, { parent: g, edges: true });                   // a little deck at the front
+  box(1.8, 0.28, 0.55, tm('#8a6444'), 0, 0.5, -1.55, { parent: g, edges: true });        // the seat
+  mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.75, 8), M.dark, 0, 0.88, -0.95, { parent: g, rx: 0.35 });   // the post with the steering wheel
+  mesh(new THREE.TorusGeometry(0.21, 0.035, 6, 18), M.dark, 0, 1.22, -1.08, { parent: g, rx: 0.5 });
+  box(0.36, 0.42, 0.36, tm('#2f3138'), 0, 0.2, -3.0, { parent: g, edges: true });        // the motor
+  mesh(new THREE.TorusGeometry(0.27, 0.08, 6, 14), tm('#f08a24'), 1.2, 0.85, 0.2, { parent: g, ry: Math.PI / 2 });   // a life ring
+  mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.2, 6), white, 0, 1.0, -2.55, { parent: g });
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.4), toon('#ffffff', { map: TX.flag, side: THREE.DoubleSide })); f.position.set(0, 1.4, -2.55 - 0.3); f.rotation.y = Math.PI / 2; f.userData.keep = true; g.add(f);
+  bakeGroup(g); dyn.add(g); MYBOAT.g = g;
+  // white foam behind the boat when it sails
+  MYBOAT.foam = Array.from({ length: 14 }, () => { const m = new THREE.Mesh(new THREE.CircleGeometry(0.25, 12), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.visible = false; dyn.add(m); return { m, t: 9 }; });
+}
+POIS.push({ n: 'Den lille båd', t: 'Her ligger en lille rød båd. Gå hen til den, og tryk på knappen. Så kan du selv sejle i kanalen.', x: MYBOAT.x, z: MYBOAT.z, r: 9 });
+const BOAT_POI = POIS[POIS.length - 1];
+function lowAt(x, z) {   // under the low ends of an arched bridge
+  for (const F of ARCHES) { const dx = x - F.cx, dz = z - F.cz, s = dx * F.ux + dz * F.uz; if (Math.abs(s) >= F.L / 2) continue; if (Math.abs(dx * F.vx + dz * F.vz) < F.W / 2 + 0.4 && archSoffit(F, s) < WL + 2.0) return true; }
+  return false;
+}
+const HULL_PTS = [[0, 2.8], [0, -3.0], [-1.15, 1.4], [1.15, 1.4], [-1.15, -0.6], [1.15, -0.6], [-1.1, -2.6], [1.1, -2.6]];
+function boatFits(x, z, h, boats = true) {
+  if (x < BOUNDS[0] - 40 || x > BOUNDS[1] + 40 || z < BOUNDS[2] - 40 || z > BOUNDS[3] + 40) return false;
+  const c = Math.cos(h), s = Math.sin(h);
+  for (const [lx, lz] of HULL_PTS) {
+    const px = x + lx * c + lz * s, pz = z - lx * s + lz * c;
+    if (!rawWater(px, pz) || lowAt(px, pz)) return false;
+    if (boats) for (const b of BOATS) {   // the big boats
+      const bx = px - b.g.position.x, bz = pz - b.g.position.z, fx = Math.sin(b.head), fz = Math.cos(b.head), L = b.big ? 11.6 : 7.4, W = b.big ? 3.5 : 2.3;
+      if (Math.abs(bx * fx + bz * fz) < L && Math.abs(bx * fz - bz * fx) < W) return false;
+    }
+  }
+  return true;
+}
+function seatOf(x, z, h) { return [x - Math.sin(h) * 1.55, z - Math.cos(h) * 1.55]; }
+function landSpot() {   // a free spot on the quay next to the boat
+  const B = MYBOAT, c = Math.cos(B.h), s = Math.sin(B.h);
+  for (const d of [2.4, 3.0, 3.6, 4.2]) for (const side of [1, -1]) for (const a of [-1.2, 0.4, 2.0]) {
+    const lx = side * d, x = B.x + lx * c + a * s, z = B.z - lx * s + a * c;
+    if (!rawWater(x, z) && !inBuilding(x, z) && groundAt(x, z, 99) - archH(x, z) < 0.3 && x > BOUNDS[0] && x < BOUNDS[1] && z > BOUNDS[2] && z < BOUNDS[3]) return [x, z];
+  }
+  return null;
+}
+const toot = () => { tone(392, 388, 0, 0.22, 0.08, 'triangle'); tone(523, 518, 0, 0.22, 0.05, 'sine'); tone(392, 388, 0.3, 0.4, 0.08, 'triangle'); tone(523, 518, 0.3, 0.4, 0.05, 'sine'); };
+let sailedOnce = false;
+function boardBoat() {
+  MYBOAT.on = true; MYBOAT.v = 0; MYBOAT.hinted = false; BOAT_POI.x = BOAT_POI.z = 1e6; P.vel.set(0, 0, 0); jumpReq = false;
+  cam.yaw = MYBOAT.h + Math.PI; $('jump').textContent = 'Dyt'; hop();
+  toast(sailedOnce ? 'Du sejler igen!' : `Nu sejler du! Styr båden, ligesom når du går. ${isTouch ? 'Tryk på Dyt' : 'Tryk på mellemrum'} for at dytte.`); sailedOnce = true;
+}
+function leaveBoat(spot) {
+  const B = MYBOAT; B.on = false; B.v = 0; BOAT_POI.x = B.x; BOAT_POI.z = B.z;
+  P.pos.set(spot[0], groundAt(spot[0], spot[1], 99), spot[1]); P.face = Math.atan2(spot[0] - B.x, spot[1] - B.z); P.vel.set(0, 0, 0); P.onGround = true;
+  kid.root.position.copy(P.pos); kid.root.rotation.y = P.face; kid.g.position.y = 0; $('jump').textContent = 'Hop'; hop();
+}
+// while she sails, the boat takes the input instead of her legs
+HOOKS.ride.push(dt => {
+  const B = MYBOAT; if (!B.on) return false;
+  let fwd = 0, turn = 0;
+  if (!paused) {
+    if (keys.has('KeyW') || keys.has('ArrowUp')) fwd += 1;
+    if (keys.has('KeyS') || keys.has('ArrowDown')) fwd -= 1;
+    if (keys.has('KeyA') || keys.has('ArrowLeft')) turn += 1;
+    if (keys.has('KeyD') || keys.has('ArrowRight')) turn -= 1;
+    if (joy.id !== null) { fwd += -joy.y; turn += -joy.x * 0.9; }
+  }
+  fwd = Math.max(-1, Math.min(1, fwd)); turn = Math.max(-1, Math.min(1, turn)); turnIn = turn;
+  const target = fwd > 0 ? 5.5 * fwd : 2.0 * fwd;
+  B.v += (target - B.v) * Math.min(1, dt * (Math.abs(target) > Math.abs(B.v) ? 0.9 : 0.7));
+  const boats = boatFits(B.x, B.z, B.h);   // if a big boat has come too close, she can still sail away from it
+  const nh = B.h + turn * dt * (0.6 + 0.35 * Math.min(1, Math.abs(B.v) / 3));
+  if (boatFits(B.x, B.z, nh, boats)) B.h = nh;
+  const st = B.v * dt, hx = Math.sin(B.h), hz = Math.cos(B.h);
+  if (boatFits(B.x + hx * st, B.z + hz * st, B.h, boats)) { B.x += hx * st; B.z += hz * st; }
+  else {   // slide along the quay and turn a little away from it
+    let ok = false;
+    for (const a of [0.5, -0.5, 1.0, -1.0]) {
+      const dx = Math.sin(B.h + a) * st * 0.6, dz = Math.cos(B.h + a) * st * 0.6;
+      if (boatFits(B.x + dx, B.z + dz, B.h, boats)) { B.x += dx; B.z += dz; B.v *= 0.98; const h2 = B.h + Math.sign(a) * Math.sign(B.v) * dt * 0.8; if (boatFits(B.x, B.z, h2, boats)) B.h = h2; ok = true; break; }
+    }
+    if (!ok) { if (Math.abs(B.v) > 1.2 && B.bumpT <= 0) { tone(120, 70, 0, 0.18, 0.1, 'triangle'); B.bumpT = 0.6; } B.v *= -0.25; }
+  }
+  if (B.bumpT > 0) B.bumpT -= dt;
+  if (jumpReq) { jumpReq = false; toot(); }
+  // she sits on the seat with her hands on the wheel, and ducks a little under the bridges
+  const under = onBridge(B.x, B.z) || archH(B.x, B.z) > 0;
+  B.duck += ((under ? 0.45 : 0) - B.duck) * Math.min(1, dt * 5);
+  const [sx, sz] = seatOf(B.x, B.z, B.h);
+  P.pos.set(sx, WL + 0.18 - B.duck + Math.sin(clockT * 1.6) * 0.04, sz); P.face = B.h; P.vel.set(Math.sin(B.h) * B.v, 0, Math.cos(B.h) * B.v); P.onGround = true;
+  kid.root.position.copy(P.pos); kid.root.rotation.y = B.h; kid.g.position.y = 0;
+  const L = kid.legs, A = kid.arms;
+  for (const l of L) { l.hip.rotation.x = -1.5; l.knee.rotation.x = 1.45; l.shoe.rotation.x = 0; }
+  A[0].rotation.x = -1.2 + turn * 0.2; A[1].rotation.x = -1.2 - turn * 0.2; A[0].rotation.z = -0.25; A[1].rotation.z = 0.25;
+  kid.head.rotation.z = 0;
+  return true;
+});
+HOOKS.frame.push((dt, t) => {
+  const B = MYBOAT, g = B.g;
+  g.position.set(B.x, WL + Math.sin(t * 1.6) * 0.04 - (B.on ? B.duck * 0.2 : 0), B.z);
+  g.rotation.set(Math.min(0.06, B.v * 0.012), B.h, B.on ? -turnIn * Math.min(1, Math.abs(B.v) / 3) * 0.06 : Math.sin(t * 1.2) * 0.02);
+  // a little motor sound and white foam behind while she sails
+  const sp = Math.abs(B.v);
+  if (B.on && sp > 0.4) {
+    B.putT -= dt; if (B.putT <= 0) { B.putT = 0.3 - Math.min(0.16, sp * 0.03); tone(95, 70, 0, 0.07, 0.022, 'square'); }
+    B.foamT -= dt; if (B.foamT <= 0 && sp > 1) { B.foamT = 0.14; const f = B.foam.find(q => q.t > 1.6); if (f) { f.t = 0; f.m.visible = true; f.m.position.set(B.x - Math.sin(B.h) * 3.2 * Math.sign(B.v), WL + 0.04, B.z - Math.cos(B.h) * 3.2 * Math.sign(B.v)); } }
+  }
+  for (const f of B.foam) if (f.t <= 1.6) { f.t += dt; f.m.scale.setScalar(0.6 + f.t * 0.9); f.m.material.opacity = Math.max(0, 0.6 * (1 - f.t / 1.6)); if (f.t > 1.6) f.m.visible = false; }
+  if (!started || paused) return;
+  if (!B.on) {
+    if (Math.hypot(P.pos.x - B.x, P.pos.z - B.z) < 5.5 && !rawWater(P.pos.x, P.pos.z)) offerAction({ id: 'sejl', label: 'Sejl med båden', prio: 3, run: boardBoat });
+  } else {
+    const spot = landSpot(); if (spot) offerAction({ id: 'land', label: 'Gå i land', prio: 2, run: () => leaveBoat(spot) });
+    B.stillT = !spot && Math.abs(B.v) < 0.3 ? (B.stillT || 0) + dt : 0;   // she stops out on the water: tell her how to get ashore (once each trip)
+    if (B.stillT > 3 && !B.hinted) { B.hinted = true; toast('Sejl hen til kajen, så kan du gå i land.'); }
+  }
+});
+
 // ======================================================================== BOOT
 function boot(data) {
   data = data || {};
@@ -2901,7 +3032,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
