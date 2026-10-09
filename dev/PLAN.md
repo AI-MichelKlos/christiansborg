@@ -78,4 +78,10 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Hele karréen mellem Ved Stranden, Boldhusgade, Admiralgade og Holmens Kanal (OSM-huset med første punkt (113, -122) og to gårde): Nordisk Genforsikrings tidligere hovedsæde (N. P. P. Gundstrup, 1932-38) bygget sammen med hjørnehuset fra 1796. Wikipedia nævner også Forsvarsministeriet i samme hus.
   - Lys sten (`TX.sandstone`), sokkel af granit, fem etager, gesims, grønt kobbertag med kviste. Hoveddøren midt på facaden mod kanalen med stenramme, et grønt skilt med guldbogstaver (`TX.ministrySign`) og Dannebrog på en skrå flagstang, der vajer (`MINISTRY.flag`). Facaden er gættet, da jeg ikke fandt billeder eller beskrivelser.
   - Nyt sted: Beskæftigelsesministeriet (138, -98).
+- [x] Ekstra: veje, cykler og biler (9. okt. 2026)
+  - Vejene tegnes nu i blokken `STREETS` ud fra `ROADS_TO_DRAW`: store veje med asfalt, stiplet midterlinje, kantlinjer, cykelsti med hvide cykler og fortov af fliser. Små veje har brosten (`TX.setts`), gågader lyse fliser. Fortov og cykelsti udelades, hvor de ville nå ud over vandet. 48 fodgængerfelter (`ZEBRAS`) ved kryds.
+  - Hvide linjer stopper, hvor en anden vej krydser (`crossing()` med et gitter på 16 m, `markLine()`).
+  - Blokken `TRAFFIC`: 4 ruter fra vejnettet (regnet i Python, to åbne og to sløjfer). 7 biler og 6 cyklister (hver tredje er en ladcykel med et barn) kører i højre side, holder afstand og stopper og venter, når pigen står foran dem (dyt eller ring-ring og en kort besked højst hvert 20. sekund). Pigen kan ikke gå igennem dem. `__cb.VEHICLES` og `__cb.frames(n)` til test.
+  - 40 parkerede biler langs de små veje og gadelygter langs de store veje.
+  - De åbne ruter går lidt ud over kanten af kortet og starter forfra, når de når enden.
 - [ ] 8. Noget sjovt at finde og lave for en 5-årig

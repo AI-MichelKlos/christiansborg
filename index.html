@@ -858,11 +858,11 @@ for (const a of DATA.A) {
 
 // ---------------- streets (flat ribbons), widths in metres
 const ROADW = { primary: 15, ter: 11, unc: 8, res: 7, liv: 8, ped: 7, service: 5 };
-const BRIDGE_SEGS = [];
+const BRIDGE_SEGS = [], ROADS_TO_DRAW = [];
 for (const r of DATA.R) {
   const w = ROADW[r.k] || 7;
   if (r.bridge) { for (let i = 0; i < r.pts.length - 1; i++) BRIDGE_SEGS.push([...r.pts[i], ...r.pts[i + 1], w / 2]); }
-  if (!r.bridge || r.k === 'service') ribbon(r.pts, w, M.road, r.bridge ? 0.1 : 0, '#a3a1a0');
+  if (!r.bridge || r.k === 'service') ROADS_TO_DRAW.push(r);
 }
 
 // ---------------- water: the canals and the harbour lie 2.4 m below the quays. She cannot walk on the water, only over the bridges.
@@ -1000,6 +1000,74 @@ const MERMAN = { g: new THREE.Group(), kids: [], wave: 0 };
     } });
     if (MERMAN.look > 0) { MERMAN.look -= dt; if (MERMAN.look <= 0) cam.pitch = 0.3; }
   });
+}
+
+// ======================================================================== STREETS
+// Big streets (primary, ter, unc): asphalt with a dashed middle line, white edge lines, a bike lane on each side
+// (primary and ter, as in Copenhagen, with a white bike on the asphalt now and then) and a pavement of slabs.
+// Small streets (res, liv): granite setts and a narrow pavement. Pedestrian streets: light paving.
+// Where a pavement or bike lane would reach out over the water, that part is left out. Zebra crossings near the crossings.
+const ZEBRAS = [[179.8,-78.6,-1.1,11],[194.3,-85.3,2.0,11],[183.2,-89.1,-2.7,7],[285.7,43.8,-2.0,11],[300.3,50.3,1.1,11],[-225.5,148.5,-1.0,7],[-216.5,150.5,0.6,7],[-223.6,139.6,-2.5,7],[-176.5,225.5,-1.0,7],[-167.3,227.4,0.6,7],[-174.5,216.5,-2.6,7],[226.4,-232.1,2.0,7],[211.6,-225.8,-1.2,7],[215.5,-236.2,-2.7,11],[222.2,-221.7,0.4,11],[301.9,-12.7,1.4,7],[293.2,-22.0,-3.0,11],[-130.4,203.4,0.6,7],[-128.5,194.5,2.1,8],[245.0,-105.5,1.6,11],[229.7,-101.7,-1.1,11],[283.9,-109.0,0.1,11],[275.5,-114.2,-1.2,11],[290.3,-120.2,2.0,11],[-3.3,-139.6,1.0,11],[131.3,-46.7,-2.4,11],[321.7,200.0,2.1,15],[303.4,207.8,-1.3,15],[286.3,-133.3,2.0,11],[271.8,-126.5,-1.1,11],[274.4,-136.6,-2.5,11],[324.4,61.0,1.2,11],[311.6,52.1,-2.4,11],[-267.5,74.6,0.6,7],[-278.6,72.6,-1.0,11],[-276.5,61.4,-2.5,7],[196.9,3.3,-2.0,11],[211.2,10.6,1.1,11],[151.4,-27.1,0.9,11],[154.1,47.7,-2.3,8],[238.6,-188.4,0.6,11],[241.3,-198.3,2.0,7],[226.8,-191.6,-1.1,7],[230.8,-202.3,-2.7,11],[109.8,-59.0,-2.3,11],[140.0,-13.1,-0.1,8],[286.6,55.0,-2.0,11],[301.4,61.1,1.2,11]];
+TX.setts = ctex(128, 128, (g, w, h) => { g.fillStyle = '#56575b'; g.fillRect(0, 0, w, h); for (let r = 0; r < 8; r++) { const off = (r % 2) * 8; for (let c = -1; c < 9; c++) { g.fillStyle = jit('#8d8c88', 0.08); g.fillRect(c * 16 + off + 1, r * 16 + 1, 14, 14); } } }, { rep: 1 / 2 });
+TX.bikeLane = ctex(128, 128, (g, w, h) => { g.fillStyle = '#7d7b7a'; g.fillRect(0, 0, w, h); speckle(g, w, h, 1200, 0.07, 2); }, { rep: 1 / 6 });
+TX.paving = ctex(128, 128, (g, w, h) => { g.fillStyle = '#c9c1b2'; g.fillRect(0, 0, w, h); for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) { g.fillStyle = jit('#e2dbcd', 0.04); g.fillRect(c * 32 + 1, r * 32 + 1, 30, 30); } }, { rep: 1 / 2 });
+TX.bikeIcon = ctex(64, 64, (g) => { g.strokeStyle = '#f4f2ea'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.arc(16, 42, 10, 0, Math.PI * 2); g.arc(48, 42, 10, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.moveTo(16, 42); g.lineTo(28, 24); g.lineTo(42, 24); g.lineTo(48, 42); g.moveTo(28, 24); g.lineTo(34, 42); g.lineTo(42, 24); g.moveTo(24, 20); g.lineTo(32, 20); g.moveTo(42, 24); g.lineTo(44, 16); g.stroke(); }, { wrap: false });
+const SM = {
+  road: gmat(TX.asph, 3.6), walk: gmat(TX.sidewalk, 2.4), bike: gmat(TX.bikeLane, 3.0), setts: gmat(TX.setts, 3.3), ped: gmat(TX.paving, 2.6),
+  mark: toon('#f4f2ea', { polygonOffset: true, polygonOffsetFactor: -7, polygonOffsetUnits: -14 }),
+  icon: toon('#ffffff', { map: TX.bikeIcon, transparent: true, alphaTest: 0.4, polygonOffset: true, polygonOffsetFactor: -7, polygonOffsetUnits: -14 }),
+};
+const STYLE = { primary: [SM.road, 2.0, 2.6], ter: [SM.road, 2.0, 2.4], unc: [SM.road, 0, 2.2], res: [SM.setts, 0, 1.6], liv: [SM.setts, 0, 1.6], ped: [SM.ped, 0, 0], service: [SM.road, 0, 0] };
+function flatRect(cx, cz, len, wid, ang, mat, y = 0.02) { const g = new THREE.PlaneGeometry(wid, len); g.rotateX(-Math.PI / 2); return mesh(g, mat, cx, y, cz, { ry: ang, cast: false }); }
+// the white lines stop where another street crosses (all streets, also on the bridges, in a grid of 16 m cells)
+const MGRID = new Map(), MCELL = 16;
+DATA.R.forEach((r, ri) => { const hw = (ROADW[r.k] || 7) / 2 + 0.6; for (let i = 0; i < r.pts.length - 1; i++) {
+  const [ax, az] = r.pts[i], [bx, bz] = r.pts[i + 1], l = Math.hypot(bx - ax, bz - az); if (l < 0.3) continue;
+  const s = [ax, az, bx, bz, (bx - ax) / l, (bz - az) / l, hw, ri, i];
+  for (let cx = Math.floor((Math.min(ax, bx) - hw) / MCELL); cx <= Math.floor((Math.max(ax, bx) + hw) / MCELL); cx++)
+    for (let cz = Math.floor((Math.min(az, bz) - hw) / MCELL); cz <= Math.floor((Math.max(az, bz) + hw) / MCELL); cz++) { const k = cx + ',' + cz; if (!MGRID.has(k)) MGRID.set(k, []); MGRID.get(k).push(s); }
+} });
+function crossing(x, z, ux, uz, ri, i) {
+  for (const s of MGRID.get(Math.floor(x / MCELL) + ',' + Math.floor(z / MCELL)) || []) {
+    if (s[7] === ri && Math.abs(s[8] - i) <= 1) continue;
+    if (Math.abs(ux * s[5] - uz * s[4]) > 0.35 && segDist(x, z, s[0], s[1], s[2], s[3]) < s[6]) return true;
+  }
+  return false;
+}
+function markLine(ax, az, ux, uz, len, off, wid, dash, ri, i) {   // a white line beside the middle of the street, in pieces
+  const rx = -uz, rz = ux, ang = Math.atan2(ux, uz), ok = d => !crossing(ax + ux * d + rx * off, az + uz * d + rz * off, ux, uz, ri, i);
+  const put = (d0, d1) => { if (d1 - d0 > 0.5) flatRect(ax + ux * (d0 + d1) / 2 + rx * off, az + uz * (d0 + d1) / 2 + rz * off, d1 - d0, wid, ang, SM.mark); };
+  if (dash) { for (let d = 1.5; d < len - 1.5; d += 6) { const e = Math.min(d + 3, len - 1.5); if (ok(d) && ok(e)) put(d, e); } return; }
+  const ds = []; for (let d = 0; d < len; d += 1.5) ds.push(d); ds.push(len);
+  let s = null;
+  for (let k = 0; k < ds.length - 1; k++) { const good = ok((ds[k] + ds[k + 1]) / 2); if (good && s === null) s = ds[k]; if (!good && s !== null) { put(s, ds[k]); s = null; } }
+  if (s !== null) put(s, len);
+}
+for (const r of ROADS_TO_DRAW) {
+  const w = ROADW[r.k] || 7, [mat, bike, walk] = STYLE[r.k] || STYLE.res, ri = DATA.R.indexOf(r);
+  for (let i = 0; i < r.pts.length - 1; i++) {
+    const [ax, az] = r.pts[i], [bx, bz] = r.pts[i + 1], len = Math.hypot(bx - ax, bz - az); if (len < 0.3) continue;
+    const ux = (bx - ax) / len, uz = (bz - az) / len, rx = -uz, rz = ux, ang = Math.atan2(ux, uz);
+    const dry = half => [0, 0.5, 1].every(t => { const x = ax + (bx - ax) * t, z = az + (bz - az) * t; return !rawWater(x + rx * half, z + rz * half) && !rawWater(x - rx * half, z - rz * half); });
+    let wb = bike, ww = walk;
+    if (!dry(w / 2 + wb + ww)) { ww = 0; if (!dry(w / 2 + wb)) wb = 0; }
+    if (ww) ribbon([[ax, az], [bx, bz]], w + 2 * (wb + ww), SM.walk, 0, null);
+    if (wb) {
+      ribbon([[ax, az], [bx, bz]], w + 2 * wb, SM.bike, 0, null);
+      for (const s of [-1, 1]) markLine(ax, az, ux, uz, len, s * (w / 2 + 0.08), 0.14, false, ri, i);   // the line between the cars and the bikes
+      for (let d = 12; d < len - 4; d += 40) for (const s of [-1, 1]) { const x = ax + ux * d + rx * s * (w / 2 + wb / 2), z = az + uz * d + rz * s * (w / 2 + wb / 2); if (!crossing(x, z, ux, uz, ri, i)) flatRect(x, z, 1.3, 1.3, ang - s * Math.PI / 2, SM.icon, 0.025); }
+    }
+    ribbon([[ax, az], [bx, bz]], w, mat, r.bridge ? 0.1 : 0, null);
+    mapItems.push({ k: 'l', x0: ax, z0: az, x1: bx, z1: bz, stroke: '#a3a1a0', w });
+    if (mat === SM.road && w >= 8) {   // a dashed line in the middle, and edge lines on the big streets
+      markLine(ax, az, ux, uz, len, 0, 0.16, true, ri, i);
+      if (w >= 11) for (const s of [-1, 1]) markLine(ax, az, ux, uz, len, s * (w / 2 - 0.35), 0.12, false, ri, i);
+    }
+  }
+}
+for (const [x, z, ang, w] of ZEBRAS) {   // white stripes across the road, 3 m long
+  const rx = Math.cos(ang), rz = -Math.sin(ang);
+  for (let o = -w / 2 + 0.7; o <= w / 2 - 0.6; o += 1.0) flatRect(x + rx * o, z + rz * o, 3, 0.5, ang, SM.mark, 0.03);
 }
 
 // ---------------- buildings: simple blocks with the real footprint. Heights are guesses where OpenStreetMap has none.
@@ -1889,6 +1957,143 @@ const MINISTRY = { flag: null };
   });
 }
 
+// ======================================================================== STREET LAMPS, PARKED CARS AND TRAFFIC
+const TRAFFIC = [{"loop":false,"pts":[[-355.0,126.0],[-272.0,68.0],[-266.0,63.0],[-245.0,48.0],[-238.0,43.0],[-233.0,38.0],[-203.0,-7.0],[-194.0,-20.0],[-151.0,-67.0],[-123.0,-94.0],[-64.0,-130.0],[-25.0,-145.0],[-10.0,-144.0],[17.0,-126.0],[27.0,-119.0],[35.0,-113.0],[49.0,-104.0],[84.0,-80.0],[116.0,-54.0],[121.0,-43.0],[130.0,-32.0],[141.0,-21.0],[150.0,-13.0],[184.0,9.0],[202.0,14.0],[251.0,36.0],[260.0,44.0],[294.0,58.0],[393.0,99.0]],"hw":[5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5]},{"loop":false,"pts":[[12.0,393.0],[34.0,376.0],[84.0,322.0],[114.0,300.0],[196.0,247.0],[301.0,213.0],[313.0,205.0],[355.0,181.0],[386.0,157.0]],"hw":[7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5]},{"loop":true,"pts":[[170,-74],[187,-82],[237,-105],[254,-106],[283,-117],[290,-54],[294,-14],[295,0],[296,20],[292,34],[292,40],[293,47],[222,16],[204,7],[179,-6],[145,-32],[150,-44],[149,-51],[164,-69]],"hw":[5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5,5.5]},{"loop":true,"pts":[[148,-155],[187,-82],[170,-74],[164,-69],[159,-75],[102,-122],[141,-153]],"hw":[3.5,5.5,5.5,3.5,3.5,3.5,3.5]}];   // routes along the streets (computed from the road network in Python): pts, half road widths per piece, loop or not
+function inBuilding(x, z) { for (const c of pcols) if (x > c.x0 - 0.5 && x < c.x1 + 0.5 && z > c.z0 - 0.5 && z < c.z1 + 0.5 && inRings(c.rings, x, z)) return true; return false; }
+function nearRoute(x, z, d) { for (const r of TRAFFIC) { const p = r.pts, n = r.loop ? p.length : p.length - 1; for (let i = 0; i < n; i++) { const a = p[i], b = p[(i + 1) % p.length]; if (segDist(x, z, a[0], a[1], b[0], b[1]) < d) return true; } } return false; }
+// ---------------- lamps along the big streets, at the outer edge of the pavement
+{
+  let n = 0;
+  for (const r of ROADS_TO_DRAW) {
+    if (r.k !== 'primary' && r.k !== 'ter') continue;
+    const w = ROADW[r.k], [, bike, walk] = STYLE[r.k];
+    for (let i = 0; i < r.pts.length - 1 && n < 34; i++) {
+      const [ax, az] = r.pts[i], [bx, bz] = r.pts[i + 1], len = Math.hypot(bx - ax, bz - az), ux = (bx - ax) / len, uz = (bz - az) / len;
+      for (let d = 10; d < len - 6 && n < 34; d += 34) {
+        const s = n % 2 ? 1 : -1, o = w / 2 + bike + walk - 0.5, x = ax + ux * d - uz * o * s, z = az + uz * d + ux * o * s;
+        if (rawWater(x, z) || inBuilding(x, z) || ZEBRAS.some(q => Math.hypot(q[0] - x, q[1] - z) < 5)) continue;
+        lamp(x, z, 6.2, false); n++;
+      }
+    }
+  }
+}
+// ---------------- parked cars along the small streets (only where no traffic drives)
+const CAR_COLS = ['#d9534f', '#4a7bd0', '#f2c14e', '#6aa56b', '#2f3138', '#ece7dc', '#8e5bb5', '#e8833a'];
+function carBody(g, col) {   // a little car, nose at +z (shared by parked and driving cars)
+  const body = toon(col);
+  const b1 = new THREE.Mesh(boxGeo(1.8, 0.75, 4.1), body); b1.position.y = 0.62; b1.castShadow = true; edges(b1); g.add(b1);
+  const b2 = new THREE.Mesh(boxGeo(1.6, 0.62, 2.2), tm('#55708a')); b2.position.set(0, 1.3, -0.25); b2.castShadow = true; edges(b2); g.add(b2);
+  const b3 = new THREE.Mesh(boxGeo(1.64, 0.1, 2.0), body); b3.position.set(0, 1.64, -0.25); g.add(b3);
+  for (const sx of [-0.85, 0.85]) for (const sz of [-1.3, 1.3]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.25, 14), M.dark); w.rotation.z = Math.PI / 2; w.position.set(sx, 0.34, sz); g.add(w); }
+  for (const sx of [-0.6, 0.6]) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.16, 0.05), M.bulb); l.position.set(sx, 0.75, 2.06); g.add(l); const r = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.14, 0.05), tm('#c33')); r.position.set(sx, 0.78, -2.06); g.add(r); }
+}
+{
+  let n = 0;
+  for (const r of ROADS_TO_DRAW) {
+    if (r.k !== 'res') continue;
+    const w = ROADW.res;
+    for (let i = 0; i < r.pts.length - 1 && n < 40; i++) {
+      const [ax, az] = r.pts[i], [bx, bz] = r.pts[i + 1], len = Math.hypot(bx - ax, bz - az), ux = (bx - ax) / len, uz = (bz - az) / len, rx = -uz, rz = ux;
+      for (let d = 7; d < len - 7 && n < 40; d += 8.5) {
+        const x = ax + ux * d + rx * (w / 2 - 1.1), z = az + uz * d + rz * (w / 2 - 1.1);
+        if ([[0, 0], [ux * 2.2, uz * 2.2], [-ux * 2.2, -uz * 2.2]].some(([dx, dz]) => rawWater(x + dx, z + dz) || inBuilding(x + dx, z + dz))) continue;
+        if (nearRoute(x, z, 5) || ZEBRAS.some(q => Math.hypot(q[0] - x, q[1] - z) < 7) || rand() < 0.25) continue;
+        const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = Math.atan2(ux, uz); world.add(g); carBody(g, pick(CAR_COLS));
+        colBox(x - 1.4, x + 1.4, z - 1.4, z + 1.4, 1.7); mapItems.push({ k: 'c', x, z, r: 1.2, fill: '#6f6a64' }); n++;
+      }
+    }
+  }
+}
+// ---------------- driving cars and cyclists: they keep to the right, follow each other, and stop and wait for her
+function laneOf(R, dir, off) {   // the route seen from one direction, moved sideways to the right by off(halfWidth)
+  let pts = R.pts.map(p => p.slice()), hw = R.hw.slice();
+  if (dir < 0) { pts.reverse(); if (R.loop) { pts.unshift(pts.pop()); hw.reverse(); } else hw.reverse(); }
+  const n = pts.length, seg = i => { const a = pts[i], b = pts[(i + 1) % n], l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; return [(b[0] - a[0]) / l, (b[1] - a[1]) / l]; };
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const hasPrev = R.loop || i > 0, hasNext = R.loop || i < n - 1;
+    const d1 = hasPrev ? seg((i - 1 + n) % n) : seg(i), d2 = hasNext ? seg(i) : seg(i - 1);
+    const o1 = off(hw[hasPrev ? (i - 1 + n) % n : i] ?? hw[0]), o2 = off(hw[hasNext ? i : i - 1] ?? hw[0]), o = Math.min(o1, o2);
+    let nx = -(d1[1] + d2[1]), nz = d1[0] + d2[0]; const nl = Math.hypot(nx, nz) || 1; nx /= nl; nz /= nl;
+    const k = Math.min(2, 1 / Math.max(0.5, nx * -d1[1] + nz * d1[0]));
+    out.push([pts[i][0] + nx * o * k, pts[i][1] + nz * o * k]);
+  }
+  if (R.loop) out.push(out[0].slice());
+  return routeOf(out);
+}
+function makeCyclist(i) {
+  const g = new THREE.Group(), cargo = i % 3 === 2, jacket = ['#3f7cc4', '#d9534f', '#6aa56b', '#8e5bb5', '#e8833a', '#2f3138'][i % 6], helmet = ['#f2c14e', '#ece7dc', '#d9534f', '#3f7cc4'][i % 4];
+  const frame = tm(['#2f3138', '#4a7bd0', '#d9534f', '#6aa56b', '#ece7dc'][i % 5]), skin = tm('#f2c6a4');
+  const zr = cargo ? -0.75 : -0.55, zf = cargo ? 1.15 : 0.55;
+  for (const z of [zr, zf]) mesh(new THREE.TorusGeometry(0.31, 0.045, 6, 18), M.dark, 0, 0.34, z, { parent: g, ry: Math.PI / 2 });
+  box(0.05, 0.05, zf - zr, frame, 0, 0.6, (zr + zf) / 2, { parent: g });
+  box(0.05, 0.55, 0.05, frame, 0, 0.42, -0.25, { parent: g }); box(0.05, 0.6, 0.05, frame, 0, 0.4, zf - 0.1, { parent: g });
+  box(0.56, 0.04, 0.04, M.dark, 0, 1.0, zf - 0.12, { parent: g }); box(0.16, 0.05, 0.28, M.dark, 0, 0.96, -0.3, { parent: g });
+  if (cargo) {   // a Christiania bike with a child in the box
+    box(0.8, 0.45, 0.8, M.deck || tm('#b48559'), 0, 0.42, 0.75, { parent: g, edges: true });
+    mesh(new THREE.SphereGeometry(0.14, 10, 8), skin, 0, 1.02, 0.7, { parent: g }); mesh(new THREE.SphereGeometry(0.15, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), tm('#f2c14e'), 0, 1.05, 0.7, { parent: g });
+  }
+  mesh(new THREE.CapsuleGeometry(0.2, 0.42, 4, 8), tm(jacket), 0, 1.38, -0.18, { parent: g, rx: 0.25 });
+  mesh(new THREE.SphereGeometry(0.16, 10, 8), skin, 0, 1.86, -0.05, { parent: g });
+  mesh(new THREE.SphereGeometry(0.18, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), tm(helmet), 0, 1.9, -0.05, { parent: g });
+  for (const s of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.06, 0.45, 3, 6), tm(jacket), s * 0.2, 1.38, 0.15, { parent: g, rx: 1.0 });
+  const legs = [];
+  for (const s of [-1, 1]) { const h = new THREE.Group(); h.position.set(s * 0.12, 1.0, -0.28); h.userData.keep = true; g.add(h); mesh(new THREE.CapsuleGeometry(0.075, 0.55, 3, 6), tm('#2f3e5c'), 0, -0.32, 0.12, { parent: h, rx: -0.35 }); legs.push(h); }
+  bakeGroup(g); dyn.add(g);
+  return { g, legs, kind: 'bike', len: cargo ? 2.6 : 1.8 };
+}
+function makeDrivingCar(i) { const g = new THREE.Group(); carBody(g, CAR_COLS[i % CAR_COLS.length]); bakeGroup(g); dyn.add(g); return { g, kind: 'car', len: 4.2 }; }
+const VEHICLES = [];
+{
+  const carLane = h => h * 0.5, bikeLane = h => h >= 5.5 ? h + 1.0 : h - 0.7;   // bikes use the bike lane where there is one
+  const plan = [[0, 1, 'car', 0.1], [0, -1, 'car', 0.55], [0, 1, 'bike', 0.45], [0, -1, 'bike', 0.15], [1, 1, 'car', 0.3], [1, -1, 'car', 0.75], [1, 1, 'bike', 0.7], [1, -1, 'bike', 0.35],
+    [2, 1, 'car', 0], [2, 1, 'car', 0.5], [2, 1, 'bike', 0.25], [3, 1, 'car', 0.1], [3, 1, 'bike', 0.6]];
+  const lanes = new Map();
+  plan.forEach(([ri, dir, kind, f], i) => {
+    const R = TRAFFIC[ri], key = ri + ':' + dir + ':' + kind;
+    if (!lanes.has(key)) lanes.set(key, laneOf(R, dir, kind === 'car' ? carLane : bikeLane));
+    const L = lanes.get(key), v = kind === 'car' ? makeDrivingCar(i) : makeCyclist(i);
+    Object.assign(v, { L, key, loop: R.loop, s: f * L.len, speed: 0, max: kind === 'car' ? 7 : 4.3, head: 0, waitT: 0, crank: rand() * 6 });
+    VEHICLES.push(v);
+  });
+  const beep = () => { tone(520, 510, 0, 0.12, 0.06, 'square'); tone(520, 510, 0.18, 0.12, 0.06, 'square'); };
+  const bell = () => { tone(1900, 1880, 0, 0.25, 0.05); tone(1900, 1880, 0.16, 0.3, 0.05); };
+  let saidT = -99;
+  HOOKS.frame.push((dt, t) => {
+    for (const v of VEHICLES) {
+      const [x, z, h] = routeAt(v.L, v.s), fx = Math.sin(h), fz = Math.cos(h);
+      // stop for her, and keep a gap to the one in front
+      let target = v.max;
+      const dx = P.pos.x - x, dz = P.pos.z - z, along = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
+      const waiting = started && along > 0 && along < (v.kind === 'car' ? 9 : 6) && side < (v.kind === 'car' ? 2.0 : 1.4);
+      if (waiting) {
+        target = 0;
+        if (v.waitT <= 0 && Math.hypot(dx, dz) < 12) { if (v.kind === 'car') beep(); else bell(); if (clockT - saidT > 20) { saidT = clockT; toast(v.kind === 'car' ? 'Bilen holder stille og venter på dig.' : 'Ring ring! Cyklen venter på dig.'); } }
+        v.waitT = 4;
+      } else if (v.waitT > 0) v.waitT -= dt;
+      for (const o of VEHICLES) {
+        if (o === v || o.L !== v.L) continue;
+        let gap = o.s - v.s; if (v.loop && gap < 0) gap += v.L.len;
+        if (gap > 0 && gap < (v.len + o.len) / 2 + 3) target = 0;
+      }
+      v.speed += Math.max(-8 * dt, Math.min(3.5 * dt, target - v.speed));
+      v.s += v.speed * dt;
+      if (v.s > v.L.len) v.s = v.loop ? v.s - v.L.len : 0;   // at the end of an open route it starts again at the other end of the map
+      const [nx, nz, nh] = routeAt(v.L, v.s);
+      if (Math.abs(angDiff(nh, v.head)) > 2.5 && v.s < 1) v.head = nh;
+      v.head += angDiff(nh, v.head) * Math.min(1, dt * (v.kind === 'car' ? 4 : 6));
+      v.g.position.set(nx, archH(nx, nz), nz); v.g.rotation.y = v.head;
+      v.g.visible = Math.hypot(nx - camera.position.x, nz - camera.position.z) < 170;
+      if (v.legs) { v.crank += v.speed * dt * 2.2; v.legs[0].rotation.x = Math.sin(v.crank) * 0.6; v.legs[1].rotation.x = -Math.sin(v.crank) * 0.6; }
+      // she cannot walk through a car or a bike
+      if (started) {
+        const ex = P.pos.x - nx, ez = P.pos.z - nz, s1 = Math.sin(v.head), c1 = Math.cos(v.head), lz = ex * s1 + ez * c1, lx = ex * c1 - ez * s1, hx = v.kind === 'car' ? 1.3 : 0.6, hz = v.len / 2 + 0.3;
+        if (Math.abs(lx) < hx && Math.abs(lz) < hz) { const px = hx - Math.abs(lx), pz = hz - Math.abs(lz); if (px < pz) { const d = Math.sign(lx || 1) * px; P.pos.x += d * c1; P.pos.z -= d * s1; } else { const d = Math.sign(lz || 1) * pz; P.pos.x += d * s1; P.pos.z += d * c1; } kid.root.position.copy(P.pos); }
+      }
+    }
+  });
+}
+
 // ---------------- trees in the library garden
 {
   const park = DATA.A.find(a => a.n === 'Det Kongelige Biblioteks Have');
@@ -2515,7 +2720,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { P, cam, kid, POIS, HORSES, BOATS, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { P, cam, kid, POIS, HORSES, BOATS, VEHICLES, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
