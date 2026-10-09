@@ -27,12 +27,14 @@ html,body{height:100%}
 body{margin:0;overflow:hidden;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:15px;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
 .sticker{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;box-shadow:3px 4px 0 var(--ink)}
-#counter{position:fixed;left:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;padding:7px 14px 7px 9px}
-#counter svg{width:34px;height:34px;flex:none}
-#counter .lbl{display:block;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;opacity:.72}
-#counter.bump{animation:bump .45s ease-out}
+#counters{position:fixed;left:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.ctr{display:flex;align-items:center;gap:10px;padding:7px 14px 7px 9px;color:var(--ink);font:inherit;text-align:left}
+button.ctr{cursor:pointer}
+.ctr svg{width:34px;height:34px;flex:none}
+.ctr .lbl{display:block;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;opacity:.72}
+.ctr.bump{animation:bump .45s ease-out}
 @keyframes bump{40%{transform:scale(1.18)}}
-#cnt{display:block;font-family:var(--display);font-weight:800;font-size:22px;line-height:1.05;font-variant-numeric:tabular-nums}
+.num{display:block;font-family:var(--display);font-weight:800;font-size:22px;line-height:1.05;font-variant-numeric:tabular-nums}
 #tools{position:fixed;right:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;gap:8px}
 .btn{font:600 13px var(--body);color:var(--ink);display:inline-flex;align-items:center;gap:6px;padding:7px 11px;cursor:pointer;transition:transform .08s,box-shadow .08s}
 .btn:hover{transform:translate(-1px,-1px);box-shadow:4px 5px 0 var(--ink)}
@@ -48,6 +50,13 @@ body{margin:0;overflow:hidden;background:var(--sky);color:var(--ink);font-family
 .chip.on{background:var(--leaf);opacity:1}
 #poi b{font-family:var(--display);font-size:20px;font-weight:800;display:block;margin-bottom:3px;text-wrap:balance}
 #poi p{margin:0;font-size:14px;line-height:1.5}
+#poi #poiTask{margin-top:7px;font-weight:700}
+.star{color:#e0a63a;font-size:17px}
+.qopts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:8px 0 12px}
+.qopt{font:800 30px var(--display);min-width:88px;padding:12px 16px;border:2.5px solid var(--ink);border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:3px 4px 0 var(--ink);cursor:pointer}
+.qopt:disabled{opacity:.3;cursor:default}
+.qopt.ok{outline:4px solid var(--leaf);outline-offset:3px;opacity:1}
+#qMsg{min-height:1.5em;text-align:center;font-weight:700;margin:0 0 6px}
 #toast{position:fixed;left:50%;top:24%;transform:translateX(-50%);padding:9px 16px;font-weight:600;font-size:15px;max-width:calc(100% - 32px);box-sizing:border-box;text-align:center;background:#fff1d8;animation:pop .3s ease-out}
 @keyframes pop{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .overlay{position:fixed;inset:0;display:grid;place-items:center;padding:16px;box-sizing:border-box;background:radial-gradient(ellipse at center,rgba(42,34,56,.06),rgba(42,34,56,.38))}
@@ -71,7 +80,7 @@ kbd{display:inline-block;min-width:1.6em;text-align:center;padding:1px 6px;borde
 .sw{width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);cursor:pointer;padding:0}
 .sw[aria-pressed="true"]{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--ink);transform:scale(1.08)}
 .swatches{display:flex;flex-wrap:wrap;gap:10px;margin:2px 0 16px;padding-left:3px}
-#actBtn{position:fixed;left:50%;bottom:calc(180px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);padding:10px 18px;font:800 19px var(--display);color:var(--ink);background:#ffe08a;display:flex;align-items:center;gap:10px;cursor:pointer;animation:pop .3s ease-out;max-width:calc(100% - 32px)}
+#actBtn{position:fixed;left:50%;bottom:max(calc(180px + env(safe-area-inset-bottom,0px)), calc(var(--poiH, 0px) + 14px));white-space:nowrap;transform:translateX(-50%);padding:10px 18px;font:800 19px var(--display);color:var(--ink);background:#ffe08a;display:flex;align-items:center;gap:10px;cursor:pointer;animation:pop .3s ease-out;max-width:calc(100% - 32px)}
 #actBtn kbd{display:inline-block;min-width:1.4em;padding:1px 7px;border:2px solid var(--ink);border-radius:6px;background:#fff;font:800 16px var(--body);text-align:center}
 .touch #actBtn kbd{display:none}
 #kickHint{position:fixed;left:50%;top:13%;transform:translateX(-50%);padding:8px 14px;font:700 17px var(--display);background:#fff1d8;animation:pop .3s ease-out}
@@ -86,10 +95,10 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 @media (max-width:600px){
   .btn span{display:none}
   .btn{padding:7px 8px}
-  #counter{padding:5px 11px 5px 7px}
-  #counter svg{width:28px;height:28px}
-  #counter .lbl{display:none}
-  #cnt{font-size:19px}
+  .ctr{padding:5px 11px 5px 7px}
+  .ctr svg{width:28px;height:28px}
+  .ctr .lbl{display:none}
+  .num{font-size:19px}
   .card{padding:18px 18px 20px}
 }
 @media (prefers-reduced-motion:reduce){#poi,#toast{animation:none}.btn{transition:none}}
@@ -99,9 +108,15 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 <canvas id="c" tabindex="0" aria-label="3D-verden: Christiansborg og Slotsholmen"></canvas>
 
 <div id="hud" hidden>
-  <div id="counter" class="sticker" role="status" aria-live="polite">
+  <div id="counters">
+  <div id="counter" class="sticker ctr" role="status" aria-live="polite">
     <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 29L4 11l9 8 7-12 7 12 9-8-2 18z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/><rect x="6" y="29" width="28" height="6" rx="1.5" fill="#e0a63a" stroke="#2a2238" stroke-width="2.4"/><circle cx="20" cy="22" r="2.8" fill="#d9534f" stroke="#2a2238" stroke-width="1.6"/></svg>
-    <div><span class="lbl">Kroner fundet</span><span id="cnt">0 af 10</span></div>
+    <div><span class="lbl">Kroner fundet</span><span id="cnt" class="num">0 af 10</span></div>
+  </div>
+  <button id="stars" class="sticker ctr" type="button" aria-label="Stjerner for opgaver. Tryk for at se opgaverne.">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l4.7 10.2 11.1 1.2-8.3 7.5 2.3 11L20 28.3l-9.8 5.6 2.3-11-8.3-7.5 11.1-1.2z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/></svg>
+    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 12</span></div>
+  </button>
   </div>
   <div id="tools">
     <button id="bMap" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
@@ -111,7 +126,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
     <button id="bHelp" class="sticker btn" type="button" aria-label="Hjælp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-1 .7-1.6 1.2-1.6 2.4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg><span>Hjælp</span></button>
   </div>
   <canvas id="map" class="sticker" aria-label="Kort over Slotsholmen"></canvas>
-  <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p></div>
+  <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><p id="poiTask" hidden></p></div>
   <div id="toast" class="sticker" hidden></div>
   <div id="touchHint" hidden>Træk her<br>for at gå</div>
   <div id="joy" hidden><div id="knob"></div></div>
@@ -123,7 +138,8 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div class="card sticker">
     <div class="eyebrow">København · en gåtur i 3D</div>
     <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå rundt på Slotsholmen, og find kongens 10 guldkroner. Følg de gule lys. Der er vand hele vejen rundt, så du skal over en bro. Klap hestene på Ridebanen, giv ænderne brød, og vink til bådene i kanalen. Når du kommer tæt på et sted, ser du, hvad det hedder.</p>
+    <p class="lead" id="introLead">Gå rundt på Slotsholmen, og find kongens 10 guldkroner. Følg de gule lys. Der er vand hele vejen rundt, så du skal over en bro. Klap hestene på Ridebanen, giv ænderne brød, og vink til bådene i kanalen. Når du kommer tæt på et sted, ser du, hvad det hedder, og mange steder har en lille opgave.</p>
+    <div id="taskBox" hidden><div class="chipsHead">Opgaver</div><div class="chips" id="taskChips"></div></div>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -152,6 +168,16 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
     <p class="lead">Hurra! Kongen er glad, og nu har du selv en guldkrone på. Du kan gå videre rundt på Slotsholmen.</p>
     <button class="go" id="finOk" type="button">Gå videre rundt</button>
     <button class="go alt" id="finAgain" type="button">Gem kronerne igen</button>
+  </div>
+</div>
+
+<div id="quiz" class="overlay" hidden>
+  <div class="card sticker">
+    <div class="eyebrow">Opgave</div>
+    <h2 id="qText"></h2>
+    <div class="qopts" id="qOpts"></div>
+    <p id="qMsg"></p>
+    <button class="go alt" id="qClose" type="button">Luk</button>
   </div>
 </div>
 
@@ -2528,7 +2554,7 @@ function setSound(v) { soundOn = v; $('bSound').setAttribute('aria-pressed', Str
 let toastTimer = 0;
 function toast(msg) { sayToast(msg); const t = $('toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; toastTimer = 3.4; }
 let curPoi = null;
-function showPoi(p) { if (p === curPoi) return; curPoi = p; const el = $('poi'); if (p && !seenPoi.has(p.n)) { seenPoi.add(p.n); popLabel(p.n, kid.root.position, 1.3); burst(kid.root.position); sparkleSound(); } if (!p) { el.hidden = true; return; } sayPoi(p); $('poiName').textContent = p.n; $('poiText').textContent = p.t; el.hidden = true; void el.offsetWidth; el.hidden = false; }
+function showPoi(p) { if (p === curPoi) return; curPoi = p; const el = $('poi'); if (p && !seenPoi.has(p.n)) { seenPoi.add(p.n); popLabel(p.n, kid.root.position, 1.3); burst(kid.root.position); sparkleSound(); } if (!p) { el.hidden = true; setPoiH(); return; } sayPoi(p); $('poiName').textContent = p.n; $('poiText').textContent = p.t; updTaskCard(); el.hidden = true; void el.offsetWidth; el.hidden = false; setPoiH(); }
 
 $('bMap').addEventListener('click', () => setMapVisible(!showMap));
 $('bVoice').addEventListener('click', () => setVoice(!voiceOn));
@@ -2538,7 +2564,7 @@ $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear();
-  if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og set ${seenPoi.size} steder. Følg de gule lys for at finde kronerne.`; }
+  if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
@@ -2664,7 +2690,7 @@ function sayPoi(p) {
   if (!p || !started) return;
   if (clockT - toastSaidAt < 3.5) { pendingPoi = p; return; }
   const last = lastPoiSaid.get(p.n) ?? -999; if (clockT - last < 90) return;
-  lastPoiSaid.set(p.n, clockT); say(`${p.n}. ${p.t}`);
+  lastPoiSaid.set(p.n, clockT); say(`${p.n}. ${p.t} ${taskLine(p)}`);
 }
 function updVoice() { if (pendingPoi && clockT - toastSaidAt >= 3.5) { const p = pendingPoi; pendingPoi = null; if (p === curPoi) sayPoi(p); } }
 function setVoice(v) {   // reading aloud is off from the start; the "Læs op" button turns it on and off
@@ -2678,7 +2704,7 @@ function setVoice(v) {   // reading aloud is off from the start; the "Læs op" b
 // The best offer is shown as a big button ("E  Dans") and read aloud once; E or a click runs it.
 const ACT = { offers: [], cur: null, said: new Map() };
 function offerAction(o) { ACT.offers.push(o); }
-function runAction() { if (!started || paused || !ACT.cur) return; const c = ACT.cur; c.run(); ACT.shownId = null; }
+function runAction() { if (!started || paused || !ACT.cur) return; const c = ACT.cur; c.run(); taskAct(c.id); ACT.shownId = null; }
 function updActions() {
   let best = null; for (const o of ACT.offers) if (!best || (o.prio || 0) > (best.prio || 0)) best = o;
   ACT.offers.length = 0; if (!started || paused || P.ride || P.swing) best = null;
@@ -2694,7 +2720,7 @@ function updActions() {
 // ======================================================================== STATE / STORAGE
 let soundOn = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'christiansborg3d';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, readAloud: voiceOn, crowns: [...found] })); } catch (e) {} }
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, readAloud: voiceOn, crowns: [...found], tasks: [...tasksDone] })); } catch (e) {} }
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 HOOKS.start.push(() => setTimeout(() => toast(found.size === 0 ? 'Kongen har tabt 10 guldkroner. Kan du finde dem?' : found.size === 9 ? 'Find den sidste krone.' : found.size < 10 ? `Find de sidste ${10 - found.size} kroner.` : 'Gå over broen hen til slottet.'), 1200));
 
@@ -3013,6 +3039,84 @@ HOOKS.frame.push((dt, t) => {
   }
 });
 
+// ======================================================================== SMALL TASKS (a star for each)
+// Many places have a small task: do something (the same E actions as always), go somewhere, or answer a question
+// with three big buttons. The task stands on the place's card (and is read aloud with it). A star for each; the stars
+// are counted under the crowns, and a tap on the stars shows the list. The tasks she has done are remembered.
+const TASKS = [
+  { id: 'havmand', s: 'Havmanden', at: ['Højbro', 'Højbro Plads'], t: 'Kig efter havmanden under Højbro.', act: 'havmand' },
+  { id: 'taarn', s: 'Tårnets kroner', at: ['Tårnet', 'Christiansborg Slot'], t: 'Hvor mange guldkroner sidder der på toppen af tårnet?', quiz: ['1', '2', '3'], ok: 2 },
+  { id: 'hest', s: 'Klap en hest', at: ['Ridebanen', 'De Kongelige Stalde'], t: 'Klap en af hestene.', act: 'hest' },
+  { id: 'brod', s: 'Ænderne', at: ['Gammel Strand'], t: 'Giv ænderne brød.', act: 'brod' },
+  { id: 'kanon', s: 'Konfetti', at: ['Tøjhusmuseet'], t: 'Skyd med konfetti fra kanonen.', act: 'kanon' },
+  { id: 'vink', s: 'Vink til en båd', at: ['Slotsholmskanalen', 'Frederiksholms Kanal'], t: 'Vink til en kanalbåd.', act: 'baad' },
+  { id: 'sejl', s: 'Sejl under Højbro', at: ['Den lille båd'], t: 'Sejl under Højbro med den lille båd.', test: () => MYBOAT.on && Math.hypot(MYBOAT.x + 3, MYBOAT.z + 165) < 5 },
+  { id: 'borsen', s: 'Børsens drager', at: ['Børsen'], t: 'Hvor mange drager er der på Børsens spir?', quiz: ['2', '3', '4'], ok: 2 },
+  { id: 'thorvaldsen', s: 'Heste på taget', at: ['Thorvaldsens Museum'], t: 'Hvor mange heste er der på museets tag?', quiz: ['2', '4', '6'], ok: 1 },
+  { id: 'holmen', s: 'Kirkens spir', at: ['Holmens Kirke'], t: 'Hvilken farve har kirkens spir?', quiz: ['Rød', 'Grøn', 'Blå'], cols: ['#d9534f', '#4f9a68', '#4a7bd0'], ok: 1 },
+  { id: 'marmor', s: 'Marmorbroen', at: ['Marmorbroen'], t: 'Gå op på toppen af Marmorbroen.', test: () => !MYBOAT.on && archH(P.pos.x, P.pos.z) > 1.2 && Math.hypot(P.pos.x + 203, P.pos.z - 134) < 14 },
+  { id: 'herkules', s: 'Herkules', at: ['Prins Jørgens Gård'], t: 'Find Herkules med køllen, og gå hen til ham.', test: () => Math.hypot(P.pos.x + 20.3, P.pos.z + 61) < 3.2 },
+];
+const tasksDone = new Set();
+{ const st = load(); for (const id of st.tasks || []) if (TASKS.some(t => t.id === id)) tasksDone.add(id); }
+const taskOf = p => p ? TASKS.find(t => t.at.includes(p.n)) : null;
+function taskLine(p) { const t = taskOf(p); return !t ? '' : tasksDone.has(t.id) ? 'Opgave klaret!' : 'Opgave: ' + t.t; }
+function updTaskCard() {
+  const el = $('poiTask'), line = taskLine(curPoi);
+  el.hidden = !line; if (line) el.innerHTML = '<span class="star">★</span> ' + line;
+  setPoiH();
+}
+function setPoiH() { const el = $('poi'); document.documentElement.style.setProperty('--poiH', (el.hidden ? 0 : Math.round(window.innerHeight - el.getBoundingClientRect().top)) + 'px'); }   // the E button stays above the place card
+function updStars(bump) {
+  $('scnt').textContent = `${tasksDone.size} af ${TASKS.length}`;
+  if (bump) { const el = $('stars'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+}
+function renderTasks() {
+  $('taskChips').innerHTML = TASKS.map(t => `<span class="chip${tasksDone.has(t.id) ? ' on' : ''}">${tasksDone.has(t.id) ? '✓ ' : ''}${t.s}</span>`).join('');
+}
+updStars();
+function completeTask(t) {
+  if (tasksDone.has(t.id)) return;
+  tasksDone.add(t.id); save(); updStars(true); updTaskCard();
+  burst(kid.root.position); popLabel('Godt klaret!', kid.root.position, 1.3);
+  [880, 1109, 1319, 1760].forEach((f, k) => tone(f, f, 0.1 + k * 0.08, 0.3, 0.06, 'triangle'));
+  if (tasksDone.size >= TASKS.length) setTimeout(() => {
+    toast('Du har klaret alle opgaverne! Nu kender du Slotsholmen.');
+    for (let k = 0; k < 6; k++) setTimeout(() => { const a = rand() * 6.28; firework(P.pos.x + Math.cos(a) * 5, P.pos.y + 7, P.pos.z + Math.sin(a) * 5); }, k * 300);
+  }, 1200);
+  else setTimeout(() => toast(`Du fik en stjerne! Nu har du ${tasksDone.size}.`), 2600);
+}
+function taskAct(id) { for (const t of TASKS) if (t.act === id) completeTask(t); }
+// the question card
+let quizT = null;
+function openQuiz(t) {
+  quizT = t; paused = true; keys.clear();
+  $('qText').textContent = t.t; $('qMsg').textContent = ''; const box = $('qOpts'); box.innerHTML = '';
+  t.quiz.forEach((o, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'qopt'; b.textContent = o;
+    if (t.cols) { b.style.background = t.cols[i]; b.style.color = '#ffffff'; }
+    b.addEventListener('click', () => answer(i, b)); box.appendChild(b);
+  });
+  $('quiz').hidden = false; box.firstChild.focus(); say(`${t.t} ${t.quiz.join(', ')}?`);
+}
+function closeQuiz() { $('quiz').hidden = true; quizT = null; paused = false; canvas.focus(); }
+function answer(i, b) {
+  const t = quizT; if (!t) return;
+  if (i === t.ok) {
+    b.classList.add('ok'); for (const o of $('qOpts').children) o.disabled = o !== b;
+    $('qMsg').textContent = 'Rigtigt!'; say('Rigtigt!'); sparkleSound();
+    setTimeout(() => { if (quizT === t) { closeQuiz(); completeTask(t); } }, 1200);
+  } else { b.disabled = true; $('qMsg').textContent = 'Næsten! Kig godt efter, og prøv igen.'; say('Næsten! Prøv igen.'); tone(330, 250, 0, 0.25, 0.06, 'triangle'); }
+}
+$('qClose').addEventListener('click', closeQuiz);
+$('stars').addEventListener('click', () => openIntro(true));
+HOOKS.frame.push(() => {
+  if (!started || paused) return;
+  for (const t of TASKS) if (t.test && !tasksDone.has(t.id) && t.test()) completeTask(t);
+  const t = taskOf(curPoi);
+  if (t && t.quiz && !tasksDone.has(t.id)) offerAction({ id: 'quiz', label: 'Svar på opgaven', prio: 2, run: () => openQuiz(t) });
+});
+
 // ======================================================================== BOOT
 function boot(data) {
   data = data || {};
@@ -3032,7 +3136,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

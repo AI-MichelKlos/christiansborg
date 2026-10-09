@@ -97,3 +97,9 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Båden kan ikke sejle på land eller under de lave ender af buebroerne (`lowAt`, under WL + 2.0) og glider langs kajen, hvis hun sejler ind i den. De store kanalbåde og havnebussen stopper og venter, når hun ligger foran dem.
   - "Gå i land" kommer, når der er en fri plads på kajen tæt på (`landSpot`). Båden bliver liggende, hvor hun går i land. Står hun stille ude på vandet, får hun at vide, at hun skal sejle hen til kajen.
   - Test: `__cb.MYBOAT`, `__cb.boatFits(x, z, h)`. Hele kanalruten fra Børsen til Marmorbroen passer til båden. Bemærk at `__cb.step(n)` ikke flytter de store både.
+- [x] Ekstra: små opgaver med stjerner (9. okt. 2026)
+  - 12 opgaver i `TASKS`, hver knyttet til et eller flere steder (`at` er stedernes navne). Tre slags: gør noget med E-knappen (`act`: havmand, hest, brod, kanon, baad), gå et bestemt sted hen (`test`: Herkules, toppen af Marmorbroen, sejl under Højbro) eller svar på et spørgsmål med tre store knapper (`quiz`: kronerne på tårnet, dragerne på Børsen, hestene på Thorvaldsens Museum, farven på Holmens Kirkes spir).
+  - Opgaven står nederst på stedets kort og bliver læst op med det. Ved spørgsmål kommer knappen "Svar på opgaven". Forkert svar: "Næsten! Prøv igen", og knappen bliver grå.
+  - Stjerne-tælleren står under kronerne (`#counters`, klassen `.ctr`). Tryk på den viser hjælpekortet med alle opgaverne som små mærker. De klarede opgaver gemmes (`tasks` i localStorage). Når alle 12 er klaret, kommer der fyrværkeri.
+  - E-knappen flytter sig nu op over stedets kort, når kortet er højt (`--poiH`).
+  - Test: `__cb.TASKS`, `__cb.tasksDone`, `__cb.taskAct(id)`, `__cb.openQuiz(task)`.
