@@ -2809,6 +2809,9 @@ function updPlayer(dt) {
   const acc = (P.onGround ? 12 : 5) * (PM.acc ?? 1);
   P.vel.x += (fx * speed - P.vel.x) * Math.min(1, acc * dt); P.vel.z += (fz * speed - P.vel.z) * Math.min(1, acc * dt);
   P.pos.x += P.vel.x * dt; P.pos.z += P.vel.z * dt;
+  if (FX.hojbroLight?.blocks(ox, oz, P.pos.x, P.pos.z)) {
+    P.pos.x = ox; P.pos.z = oz; P.vel.x = P.vel.z = 0;
+  }
   // the water stops her (she can still walk along the quay)
   if (waterAt(P.pos.x, P.pos.z)) {
     if (!waterAt(P.pos.x, oz)) P.pos.z = oz; else if (!waterAt(ox, P.pos.z)) P.pos.x = ox; else { P.pos.x = ox; P.pos.z = oz; }
@@ -3678,6 +3681,57 @@ HOOKS.frame.push(() => {
   if (t && t.quiz && !tasksDone.has(t.id)) offerAction({ id: 'quiz', label: 'Svar på opgaven', prio: 2, run: () => openQuiz(t) });
 });
 
+// ---------------- pedestrian lights at the Vindebrogade crossing after Højbro
+const HOJBRO_LIGHT = (() => {
+  const x = -3.3, z = -139.6, ang = 1.0, halfRoad = 11 / 2;
+  const acrossX = Math.sin(ang), acrossZ = Math.cos(ang);
+  const alongX = Math.cos(ang), alongZ = -Math.sin(ang);
+  const redOn = new THREE.MeshBasicMaterial({ color: '#ff3038' });
+  const redOff = new THREE.MeshBasicMaterial({ color: '#58272c' });
+  const greenOn = new THREE.MeshBasicMaterial({ color: '#26eb78' });
+  const greenOff = new THREE.MeshBasicMaterial({ color: '#294d3a' });
+  const faces = [];
+  for (const side of [-1, 1]) {
+    const px = x + side * alongX * (halfRoad + 1.0) - acrossX * 2.3;
+    const pz = z + side * alongZ * (halfRoad + 1.0) - acrossZ * 2.3;
+    const pole = new THREE.Group();
+    pole.position.set(px, 0, pz);
+    pole.rotation.y = Math.atan2(-side * alongX, -side * alongZ);
+    dyn.add(pole);
+    mesh(new THREE.CylinderGeometry(0.065, 0.095, 2.75, 10), M.steel, 0, 1.375, 0, { parent: pole });
+    box(0.48, 0.83, 0.24, M.dark, 0, 1.94, 0, { parent: pole, cast: false });
+    box(0.52, 0.06, 0.28, M.steel, 0, 2.77, 0, { parent: pole, cast: false });
+    const red = mesh(new THREE.CircleGeometry(0.16, 16), redOn, 0, 2.54, 0.13, { parent: pole, cast: false });
+    const green = mesh(new THREE.CircleGeometry(0.16, 16), greenOff, 0, 2.18, 0.13, { parent: pole, cast: false });
+    faces.push({ red, green });
+    colCirc(px, pz, 0.12, 99);
+  }
+  let wasGreen = false, lastNotice = -100, waiting = false;
+  const isGreen = () => clockT % 22 < 11;
+  const blocks = (ax, az, bx, bz) => {
+    if (isGreen()) return false;
+    const u0 = (ax - x) * alongX + (az - z) * alongZ;
+    const u1 = (bx - x) * alongX + (bz - z) * alongZ;
+    const v1 = (bx - x) * acrossX + (bz - z) * acrossZ;
+    const curb = halfRoad + 0.35;
+    if (Math.abs(v1) > 2.1 || Math.abs(u0) < curb || Math.abs(u1) >= curb || u0 * u1 <= 0) return false;
+    waiting = true;
+    if (clockT - lastNotice > 7) { lastNotice = clockT; toast('Rødt lys ved Højbro. Vent på grønt, før du går over.'); }
+    return true;
+  };
+  HOOKS.frame.push(() => {
+    const green = isGreen();
+    if (green !== wasGreen) {
+      for (const face of faces) { face.red.material = green ? redOff : redOn; face.green.material = green ? greenOn : greenOff; }
+      if (green && waiting && started && Math.hypot(P.pos.x - x, P.pos.z - z) < 10) toast('Grønt lys! Nu kan du gå over.');
+      if (green) waiting = false;
+      wasGreen = green;
+    }
+  });
+  return { blocks, isGreen };
+})();
+FX.hojbroLight = HOJBRO_LIGHT;
+
 // ---------------- a kick scooter to borrow on Højbro Plads
 // It uses the walking controls, but keeps the girl on land and lets her park it anywhere safe.
 const SCOOTER = (() => {
@@ -3747,6 +3801,7 @@ const SCOOTER = (() => {
     const steps = Math.max(1, Math.ceil(Math.hypot(P.vel.x, P.vel.z) * dt / 0.25));
     for (let i = 0; i < steps; i++) {
       candidate.copy(P.pos); candidate.x += P.vel.x * dt / steps; candidate.z += P.vel.z * dt / steps;
+      if (HOJBRO_LIGHT.blocks(P.pos.x, P.pos.z, candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
       if (!safe(candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
       resolve(candidate); resolvePoly(candidate);
       if (!safe(candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
