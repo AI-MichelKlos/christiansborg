@@ -1267,11 +1267,13 @@ function partBlock(p) {
     bevelRoof(ring, eave, p.rh, inset, roofM);
   } else { const rg = new THREE.ShapeGeometry(shapeOf([ring])); rg.rotateX(-Math.PI / 2); mesh(rg, tm(rc, true), 0, p.h + 0.04, 0, { cast: false }); }
 }
-// a gate through the low wing between Tøjhusgade and Rigsdagsgården, so the ministers' cars (and she) can drive and walk in.
-// The wing is cut into two parts and a bridge over the gate (see FOLKETINGETS INDGANG below). Where the real opening is, is a guess.
-const FT_GATE = { d0: 29.5, d1: 36.5, s0: 1e9, s1: -1e9 };
-{
-  const A = [-23.4, 86.5], u = [0.840, -0.543], n = [0.543, 0.840], dOf = p => (p[0] - A[0]) * n[0] + (p[1] - A[1]) * n[1], sOf = p => (p[0] - A[0]) * u[0] + (p[1] - A[1]) * u[1];
+// Rigsdagsgården: the path (OpenStreetMap: highway Rigsdagsgården) goes through two low wings in building passages,
+// from Tøjhusgade in the south-west and from Christiansborg Slotsplads in the north-east. Each wing is cut into two parts
+// and a bridge over the gate (see FOLKETINGETS INDGANG below for the vault, the stone arches and the holes in the outline).
+const GATE_A = [-23.4, 86.5], GATE_U = [0.840, -0.543], GATE_N = [0.543, 0.840];
+const gateD = p => (p[0] - GATE_A[0]) * GATE_N[0] + (p[1] - GATE_A[1]) * GATE_N[1], gateS = p => (p[0] - GATE_A[0]) * GATE_U[0] + (p[1] - GATE_A[1]) * GATE_U[1];
+const RG_GATES = [];
+function cutGate(px, pz, d0, d1) {
   const clip = (ring, keep) => {   // Sutherland-Hodgman against one straight line; keep(p) is >= 0 on the side to keep
     const out = [];
     for (let i = 0; i < ring.length; i++) {
@@ -1281,14 +1283,17 @@ const FT_GATE = { d0: 29.5, d1: 36.5, s0: 1e9, s1: -1e9 };
     }
     return out;
   };
-  const i = PARTS.findIndex(p => p.ring && p.h === 13.5 && ptIn(p.ring, -2.5, 96.8));
-  if (i >= 0) {
-    const p = PARTS[i], lo = clip(p.ring, q => FT_GATE.d0 - dOf(q)), hi = clip(p.ring, q => dOf(q) - FT_GATE.d1), mid = clip(clip(p.ring, q => dOf(q) - FT_GATE.d0), q => FT_GATE.d1 - dOf(q));
-    for (const q of mid) { FT_GATE.s0 = Math.min(FT_GATE.s0, sOf(q)); FT_GATE.s1 = Math.max(FT_GATE.s1, sOf(q)); }
-    PARTS.splice(i, 1, { ...p, ring: lo }, { ...p, ring: hi }, { ...p, ring: mid, mh: 5.5 });
-    FT_GATE.mid = mid;
-  }
+  const i = PARTS.findIndex(p => p.ring && p.h === 13.5 && ptIn(p.ring, px, pz)); if (i < 0) return;
+  const p = PARTS[i], G = { d0, d1, s0: 1e9, s1: -1e9 };
+  const lo = clip(p.ring, q => d0 - gateD(q)), hi = clip(p.ring, q => gateD(q) - d1), mid = clip(clip(p.ring, q => gateD(q) - d0), q => d1 - gateD(q));
+  for (const q of mid) { G.s0 = Math.min(G.s0, gateS(q)); G.s1 = Math.max(G.s1, gateS(q)); }
+  const cut = [d0, d1];
+  PARTS.splice(i, 1, { ...p, ring: lo, cut }, { ...p, ring: hi, cut }, { ...p, ring: mid, mh: 5.5, cut });
+  G.mid = mid; G.lo = lo; G.hi = hi; RG_GATES.push(G);
 }
+cutGate(-2.5, 96.8, 31, 38);   // toward Tøjhusgade
+cutGate(79, 45, 18, 25);       // toward Christiansborg Slotsplads
+const FT_GATE = RG_GATES[0] || {};
 for (const p of PARTS) partBlock(p);
 
 // ---------------- the palace facade: granite from about 700 parishes all over Denmark, a rough granite base, pilasters,
@@ -1445,6 +1450,7 @@ const RIDE = DATA.A.find(a => a.n === 'Christiansborg Ridebane').ring;
         rows.forEach((y, ri) => {
           const key = Math.round(x * 2) + ',' + Math.round(y) + ',' + Math.round(z * 2);
           if (seen.has(key) || covered(x + nx * 0.8, z + nz * 0.8, y, p)) return; seen.add(key);
+          if (p.cut && (y - 1.2 < p.mh || p.cut.some(d => Math.abs(gateD([ax, az]) - d) < 0.05 && Math.abs(gateD([bx, bz]) - d) < 0.05))) return;   // no windows in a gate
           if (ri === 0 && stable) { addWin('doorGreen', x + nx * WOFF, 1.45, z + nz * WOFF, ry, 1.8, 2.9, 0.3); doors.push([x, z, nx, nz]); }
           else addWin('rect', x + nx * WOFF, y, z + nz * WOFF, ry, 1.4, 2.2, 0.5);
         });
@@ -2300,17 +2306,21 @@ FT.loc = (x, z) => { const dx = x - FT.A[0], dz = z - FT.A[1]; return [dx * FT.u
   }
   for (const s of [-1, 1]) for (let lz = 0.6; lz < 5.5; lz += 0.8) { const [x, z] = FT.at(s * 6.3, lz); colCirc(x, z, 0.35, 1.5); }
 }
-// the gate from Tøjhusgade: a vault under the bridge part of the wing, stone arches on both sides, and a hole in the palace outline
-if (FT_GATE.mid) {
-  const { d0, d1, s0, s1 } = FT_GATE, R = (d1 - d0) / 2, dc = (d0 + d1) / 2, wall = tm(lit('#ded8d3')), stone = tm('#e3dccf');
+// the gates into Rigsdagsgården: a vault under the bridge part of each wing, stone arches on both sides, a base and a
+// cornice on the wing, and a hole in the palace outline so she can walk through
+for (const G of RG_GATES) {
+  const { d0, d1, s0, s1 } = G, R = (d1 - d0) / 2, dc = (d0 + d1) / 2, wall = tm(lit('#ded8d3')), stone = tm('#e3dccf'), base = tm('#cbbfa8');
   const [gx, gz] = FT.at((s0 + s1) / 2 - FT.s0, dc), g = new THREE.Group(); g.position.set(gx, 0, gz); g.rotation.y = Math.atan2(FT.u[0], FT.u[1]); world.add(g);   // local z through the wing, local x across the gate
   const sh = new THREE.Shape(); sh.moveTo(-R, 5.5 - R); sh.lineTo(-R, 5.5); sh.lineTo(R, 5.5); sh.lineTo(R, 5.5 - R); sh.absarc(0, 5.5 - R, R, 0, Math.PI, false);
   const vg = new THREE.ExtrudeGeometry(sh, { depth: s1 - s0 + 0.1, bevelEnabled: false, curveSegments: 16 }); vg.translate(0, 0, -(s1 - s0) / 2 - 0.05); mesh(vg, wall, 0, 0, 0, { parent: g, cast: false });
   const fl = new THREE.PlaneGeometry(2 * R, s1 - s0 + 0.4); fl.rotateX(-Math.PI / 2); mesh(fl, SM.setts, 0, 0.02, 0, { parent: g, cast: false });
   for (const sd of [-1, 1]) { const zf = sd * (s1 - s0) / 2; mesh(new THREE.TorusGeometry(R + 0.3, 0.3, 6, 24, Math.PI), stone, 0, 5.5 - R, zf, { parent: g, edges: 40 }); for (const s of [-1, 1]) box(0.6, 5.5 - R, 0.6, stone, s * (R + 0.3), 0, zf, { parent: g, edges: true }); box(0.8, 1.0, 0.7, stone, 0, 5.5 - 0.5, zf, { parent: g, edges: true }); }
+  const ext = (ring, y0, y1, mat) => { const eg = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); eg.rotateX(-Math.PI / 2); return mesh(eg, mat, 0, y0, 0, { edges: 25 }); };
+  for (const ring of [G.lo, G.hi]) { ext(insetRing(ring, -0.15), 0, 1.0, base); ext(insetRing(ring, -0.2), 4.6, 5.0, stone); ext(insetRing(ring, -0.45), 12.9, 13.5, stone); }
+  ext(insetRing(G.mid, -0.2), 4.6 + 1.0, 5.0 + 1.0, stone); ext(insetRing(G.mid, -0.45), 12.9, 13.5, stone);
   const hole = [FT.at(s0 - 1 - FT.s0, d0), FT.at(s1 + 1 - FT.s0, d0), FT.at(s1 + 1 - FT.s0, d1), FT.at(s0 - 1 - FT.s0, d1)];
-  for (const c of pcols) if (c.top === 40 && gx > c.x0 && gx < c.x1 && gz > c.z0 && gz < c.z1) { c.rings = [...c.rings, hole]; c.cut = hole; }
-  pcols.push({ rings: [FT_GATE.mid], ...bboxOf(FT_GATE.mid), top: 13.5, bot: 5.5 });
+  for (const c of pcols) if (c.top === 40 && gx > c.x0 && gx < c.x1 && gz > c.z0 && gz < c.z1) { c.rings = [...c.rings, hole]; c.cut = [...(c.cut || []), hole]; }
+  pcols.push({ rings: [G.mid], ...bboxOf(G.mid), top: 13.5, bot: 5.5 });
 }
 // ---------------- people who walk: the prime minister and the bodyguards
 function walker(o) {   // o: coat, legs, hair, skirt (a woman's coat), glasses (dark sunglasses)
@@ -2342,7 +2352,7 @@ const FT_CARS = [0, 1, 2].map(() => { const g = new THREE.Group(); carBody(g, '#
 {
   // the cars' way: in from Tøjhusgade through the gate, along the facade to the stairs (stop), round at the end of the yard and out again
   const W = (lx, lz) => FT.at(lx - FT.s0, lz);
-  const pts = [[-40, 138], [-3, 114], W(4, 33), W(18, 32), W(40, 14), W(FT.s0 - 12, 9.5), W(FT.s0, 9.5), W(85, 10), W(98, 17), W(88, 27), W(40, 30), W(18, 32.5), W(4, 33), [-3, 114], [-40, 138]];
+  const pts = [[-40, 138], [-3, 114], W(4, 34.5), W(18, 33.5), W(40, 14), W(FT.s0 - 12, 9.5), W(FT.s0, 9.5), W(85, 10), W(97, 15), W(90, 27), W(40, 31), W(18, 34), W(4, 34.5), [-3, 114], [-40, 138]];
   const R = routeOf(pts); let stopS = 0; for (let i = 1; i < pts.length; i++) if (pts[i][0] === W(FT.s0, 9.5)[0]) { stopS = R.d[i]; break; }
   const S = { phase: 'idle', s: 0, v: 0, t: 0, cool: 0, waved: false };
   FT.state = S; FT.route = R;
@@ -2650,7 +2660,7 @@ function resolvePoly(p) {
   for (let it = 0; it < 2; it++) for (const c of pcols) {
     if (p.x < c.x0 - RAD || p.x > c.x1 + RAD || p.z < c.z0 - RAD || p.z > c.z1 + RAD) continue;
     if (p.y >= c.top - STEP || p.y + 1.7 < c.bot) continue;
-    if (c.cut && ptIn(c.cut, p.x, p.z)) continue;   // inside the gate cut through the building
+    if (c.cut && c.cut.some(hl => ptIn(hl, p.x, p.z))) continue;   // inside a gate cut through the building
     const inside = inRings(c.rings, p.x, p.z);
     let bd = 1e18, bx = 0, bz = 0;
     for (let ri = 0; ri < c.rings.length; ri++) for (let r = c.rings[ri], i = 0, j = r.length - 1; i < r.length; j = i++) {
