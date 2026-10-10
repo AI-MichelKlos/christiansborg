@@ -145,14 +145,15 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div class="card sticker">
     <div class="eyebrow">København · en gåtur i 3D</div>
     <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå på opdagelse på Slotsholmen! Kongen har tabt 10 guldkroner. Følg de gule lys, og se, hvem du møder på vejen.</p>
+    <p class="lead" id="introLead">Gå på opdagelse på Slotsholmen! Kongen har tabt 10 guldkroner. Følg de gule lys. Du kan tage et løbehjul på startpladsen.</p>
     <div id="taskBox" hidden><div class="chipsHead">Opgaver</div><div class="chips" id="taskChips"></div></div>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
       <span><kbd>A</kbd><kbd>D</kbd> <kbd>←</kbd><kbd>→</kbd></span><span>Drej</span>
       <span><kbd>Shift</kbd></span><span>Løb</span>
-      <span><kbd>Mellemrum</kbd></span><span>Hop</span>
+      <span><kbd>Mellemrum</kbd></span><span>Hop · stig af løbehjulet</span>
+      <span><kbd>E</kbd> ved løbehjulet</span><span>Tag det eller stil det fra dig</span>
       <span>Træk med musen</span><span>Kig dig omkring</span>
       <span><kbd>N</kbd> <kbd>M</kbd></span><span>Dag eller aften · vis eller skjul kortet</span>
       <span>Læs op-knappen</span><span>Tryk, så bliver teksterne læst højt. Tryk igen for at slå det fra.</span>
@@ -160,7 +161,8 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
     <div class="keys" id="keysTouch" hidden>
       <span>Venstre tommel</span><span>Skub op for at gå, til siden for at dreje</span>
       <span>Højre tommel</span><span>Træk for at kigge dig omkring</span>
-      <span>Hop-knappen</span><span>Hop</span>
+      <span>Hop-knappen</span><span>Hop · stig af løbehjulet</span>
+      <span>Handlingsknappen</span><span>Tag løbehjulet på startpladsen</span>
       <span>Læs op-knappen</span><span>Tryk for at få teksterne læst højt</span>
     </div>
     <button class="go" id="goBtn" type="button" disabled>Henter Slotsholmen …</button>
@@ -3007,7 +3009,7 @@ const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'Arro
 window.addEventListener('keydown', e => {
   if (!started || paused) return;
   if (MOVE_KEYS.includes(e.code)) { keys.add(e.code); e.preventDefault(); }
-  if (e.code === 'Space' && !e.repeat) jumpReq = true;
+  if (e.code === 'Space' && !e.repeat) { if (FX.scooter?.active) FX.scooter.stop(); else jumpReq = true; }
   if (e.code === 'KeyN' && !e.repeat) setEvening(!evening);
   if (e.code === 'KeyM' && !e.repeat) setMapVisible(!showMap);
   if (e.code === 'KeyE' && !e.repeat) runAction();
@@ -3040,7 +3042,7 @@ canvas.addEventListener('pointermove', e => {
 const endPtr = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; $('joy').hidden = true; } if (drag.delete(e.pointerId)) lastDragEnd = clockT; };
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
 canvas.addEventListener('wheel', e => { if (!started) return; e.preventDefault(); cam.dist = Math.min(26, Math.max(3.2, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive: false });
-$('jump').addEventListener('pointerdown', e => { e.preventDefault(); jumpReq = true; });
+$('jump').addEventListener('pointerdown', e => { e.preventDefault(); if (FX.scooter?.active) FX.scooter.stop(); else jumpReq = true; });
 $('actBtn').addEventListener('click', () => { runAction(); $('c').focus(); });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -3675,6 +3677,107 @@ HOOKS.frame.push(() => {
   const t = taskOf(curPoi);
   if (t && t.quiz && !tasksDone.has(t.id)) offerAction({ id: 'quiz', label: 'Svar på opgaven', prio: 2, run: () => openQuiz(t) });
 });
+
+// ---------------- a kick scooter to borrow on Højbro Plads
+// It uses the walking controls, but keeps the girl on land and lets her park it anywhere safe.
+const SCOOTER = (() => {
+  const root = new THREE.Group(); dyn.add(root);
+  const frameMat = tm('#58a9bd'), metal = tm('#d2d7d5'), rubber = tm('#30323c'), grip = tm('#444452');
+  const wheels = [];
+  const rod = (a, b, radius, mat) => {
+    const av = new THREE.Vector3(...a), bv = new THREE.Vector3(...b), v = bv.clone().sub(av);
+    const m = mesh(new THREE.CylinderGeometry(radius, radius, v.length(), 8), mat, ...av.clone().add(bv).multiplyScalar(0.5).toArray(), { parent: root });
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.normalize());
+    return m;
+  };
+  mesh(new THREE.BoxGeometry(0.28, 0.085, 0.78), frameMat, 0, 0.16, -0.02, { parent: root });
+  mesh(new THREE.BoxGeometry(0.22, 0.012, 0.62), grip, 0, 0.21, -0.03, { parent: root });
+  for (const z of [-0.36, 0.42]) {
+    const wheel = new THREE.Group(); wheel.position.set(0, 0.11, z); root.add(wheel);
+    mesh(new THREE.TorusGeometry(0.09, 0.025, 7, 18), rubber, 0, 0, 0, { parent: wheel, ry: Math.PI / 2 });
+    mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.22, 10), metal, 0, 0, 0, { parent: wheel, rz: Math.PI / 2 });
+    wheels.push(wheel);
+  }
+  rod([0, 0.14, 0.42], [0, 0.99, 0.40], 0.025, metal);
+  rod([-0.34, 0.99, 0.40], [0.34, 0.99, 0.40], 0.024, grip);
+  mesh(new THREE.SphereGeometry(0.045, 10, 8), tm('#f1c94c'), -0.23, 1.02, 0.4, { parent: root });
+  const marker = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffe28a', transparent: true, opacity: 0.48, depthWrite: false }));
+  marker.position.set(0, 1.25, 0); marker.scale.set(1.4, 1.4, 1); root.add(marker);
+  root.position.set(-9.5, groundAt(-9.5, -225.5, 2), -225.5);
+  const R = { root, wheels, marker, active: false, phase: 0 };
+  const safe = (x, z) => x >= BOUNDS[0] && x <= BOUNDS[1] && z >= BOUNDS[2] && z <= BOUNDS[3] && !waterAt(x, z) && !inBuilding(x, z);
+  R.stop = () => {
+    if (!R.active) return;
+    R.active = false; R.marker.visible = true; root.position.copy(P.pos); root.rotation.y = P.face;
+    const sideX = Math.cos(P.face), sideZ = -Math.sin(P.face);
+    for (const side of [1, -1]) {
+      const x = P.pos.x + side * sideX * 0.9, z = P.pos.z + side * sideZ * 0.9;
+      if (safe(x, z)) { P.pos.set(x, groundAt(x, z, P.pos.y + STEP), z); break; }
+    }
+    P.vel.set(0, 0, 0); P.onGround = true; jumpReq = false;
+    kid.g.position.set(0, 0, 0); kid.g.rotation.z = 0; kid.root.position.copy(P.pos);
+    $('jump').textContent = 'Hop'; tone(440, 310, 0, 0.12, 0.035, 'triangle');
+    toast('Du parkerer løbehjulet.');
+  };
+  R.take = () => {
+    if (!started || paused || R.active || MYBOAT.on || !P.onGround || P.pos.distanceTo(root.position) > 2.8) return;
+    P.pos.set(root.position.x, groundAt(root.position.x, root.position.z, 2), root.position.z);
+    P.face = root.rotation.y; P.vel.set(0, 0, 0); P.onGround = true; jumpReq = false;
+    R.active = true; R.phase = 0; R.marker.visible = false;
+    $('jump').textContent = 'Stig af'; tone(440, 680, 0, 0.14, 0.045, 'triangle');
+    toast(isTouch ? 'Du kører på løbehjul! Skub med venstre tommel, og tryk Stig af for at parkere.' : 'Du kører på løbehjul! Brug de samme taster som når du går. Tryk E eller Mellemrum for at stige af.');
+  };
+  const candidate = new THREE.Vector3();
+  HOOKS.ride.unshift(dt => {
+    if (!R.active) return false;
+    if (MYBOAT.on) { R.stop(); return false; }
+    if (paused) { P.vel.set(0, 0, 0); return true; }
+    let forward = 0, turn = 0;
+    if (keys.has('KeyW') || keys.has('ArrowUp')) forward++;
+    if (keys.has('KeyS') || keys.has('ArrowDown')) forward--;
+    if (keys.has('KeyA') || keys.has('ArrowLeft')) turn++;
+    if (keys.has('KeyD') || keys.has('ArrowRight')) turn--;
+    if (joy.id !== null) { forward -= joy.y; turn -= joy.x * 0.9; }
+    forward = Math.max(-1, Math.min(1, forward)); turn = Math.max(-1, Math.min(1, turn)); turnIn = turn;
+    P.face += turn * 2.15 * dt;
+    const speed = forward * (forward < 0 ? 2.6 : 10.8);
+    const ease = 1 - Math.exp(-dt * (forward === 0 ? 11 : 5));
+    P.vel.x += (Math.sin(P.face) * speed - P.vel.x) * ease;
+    P.vel.z += (Math.cos(P.face) * speed - P.vel.z) * ease;
+    const steps = Math.max(1, Math.ceil(Math.hypot(P.vel.x, P.vel.z) * dt / 0.25));
+    for (let i = 0; i < steps; i++) {
+      candidate.copy(P.pos); candidate.x += P.vel.x * dt / steps; candidate.z += P.vel.z * dt / steps;
+      if (!safe(candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
+      resolve(candidate); resolvePoly(candidate);
+      if (!safe(candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
+      const h = groundAt(candidate.x, candidate.z, P.pos.y + STEP);
+      if (h > P.pos.y + STEP) { P.vel.x = P.vel.z = 0; break; }
+      P.pos.copy(candidate); P.pos.y = h;
+    }
+    P.vel.y = 0; P.onGround = true; jumpReq = false;
+    root.position.copy(P.pos); root.rotation.y = P.face;
+    const roll = P.vel.x * Math.sin(P.face) + P.vel.z * Math.cos(P.face);
+    R.phase += roll * dt / 0.11;
+    for (const wheel of wheels) wheel.rotation.x = R.phase;
+    kid.root.position.copy(P.pos); kid.root.rotation.y = P.face;
+    kid.g.position.y = 0.22; kid.g.rotation.z = -turn * 0.055;
+    kid.arms[0].rotation.set(-1.16, 0, -0.08); kid.arms[1].rotation.set(-1.16, 0, 0.08);
+    kid.legs[0].hip.rotation.x = -0.04; kid.legs[0].knee.rotation.x = 0.08;
+    kid.legs[1].hip.rotation.x = Math.sin(R.phase * 0.42) * Math.min(0.42, Math.abs(roll) * 0.045);
+    kid.legs[1].knee.rotation.x = Math.max(0, kid.legs[1].hip.rotation.x) * 0.5;
+    for (const leg of kid.legs) leg.shoe.rotation.x = -(leg.hip.rotation.x + leg.knee.rotation.x) * 0.55;
+    return true;
+  });
+  HOOKS.frame.push((dt, t) => {
+    marker.material.opacity = 0.38 + Math.sin(t * 2.2) * 0.1;
+    if (!started || paused) return;
+    if (R.active) offerAction({ id: 'scooter-stop', label: 'Stig af', prio: 10, run: R.stop });
+    else if (P.onGround && !MYBOAT.on && P.pos.distanceTo(root.position) < 2.8)
+      offerAction({ id: 'scooter-take', label: 'Tag løbehjulet', prio: 3, run: R.take });
+  });
+  return R;
+})();
+FX.scooter = SCOOTER;
 
 // ======================================================================== BOOT
 function boot(data) {
