@@ -115,7 +115,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   </div>
   <button id="stars" class="sticker ctr" type="button" aria-label="Stjerner for opgaver. Tryk for at se opgaverne.">
     <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l4.7 10.2 11.1 1.2-8.3 7.5 2.3 11L20 28.3l-9.8 5.6 2.3-11-8.3-7.5 11.1-1.2z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/></svg>
-    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 14</span></div>
+    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 15</span></div>
   </button>
   </div>
   <div id="tools">
@@ -1267,6 +1267,28 @@ function partBlock(p) {
     bevelRoof(ring, eave, p.rh, inset, roofM);
   } else { const rg = new THREE.ShapeGeometry(shapeOf([ring])); rg.rotateX(-Math.PI / 2); mesh(rg, tm(rc, true), 0, p.h + 0.04, 0, { cast: false }); }
 }
+// a gate through the low wing between Tøjhusgade and Rigsdagsgården, so the ministers' cars (and she) can drive and walk in.
+// The wing is cut into two parts and a bridge over the gate (see FOLKETINGETS INDGANG below). Where the real opening is, is a guess.
+const FT_GATE = { d0: 29.5, d1: 36.5, s0: 1e9, s1: -1e9 };
+{
+  const A = [-23.4, 86.5], u = [0.840, -0.543], n = [0.543, 0.840], dOf = p => (p[0] - A[0]) * n[0] + (p[1] - A[1]) * n[1], sOf = p => (p[0] - A[0]) * u[0] + (p[1] - A[1]) * u[1];
+  const clip = (ring, keep) => {   // Sutherland-Hodgman against one straight line; keep(p) is >= 0 on the side to keep
+    const out = [];
+    for (let i = 0; i < ring.length; i++) {
+      const a = ring[i], b = ring[(i + 1) % ring.length], ka = keep(a), kb = keep(b);
+      if (ka >= 0) out.push(a);
+      if ((ka >= 0) !== (kb >= 0)) { const t = ka / (ka - kb); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+    }
+    return out;
+  };
+  const i = PARTS.findIndex(p => p.ring && p.h === 13.5 && ptIn(p.ring, -2.5, 96.8));
+  if (i >= 0) {
+    const p = PARTS[i], lo = clip(p.ring, q => FT_GATE.d0 - dOf(q)), hi = clip(p.ring, q => dOf(q) - FT_GATE.d1), mid = clip(clip(p.ring, q => dOf(q) - FT_GATE.d0), q => FT_GATE.d1 - dOf(q));
+    for (const q of mid) { FT_GATE.s0 = Math.min(FT_GATE.s0, sOf(q)); FT_GATE.s1 = Math.max(FT_GATE.s1, sOf(q)); }
+    PARTS.splice(i, 1, { ...p, ring: lo }, { ...p, ring: hi }, { ...p, ring: mid, mh: 5.5 });
+    FT_GATE.mid = mid;
+  }
+}
 for (const p of PARTS) partBlock(p);
 
 // ---------------- the palace facade: granite from about 700 parishes all over Denmark, a rough granite base, pilasters,
@@ -1274,7 +1296,7 @@ for (const p of PARTS) partBlock(p);
 // faces of famous Danes over the ground floor windows, and four statues in Prins Jørgens Gård.
 {
   const main = PARTS.find(p => p.h === 38.6), r = main.ring;
-  const GATES = [[47, -28], [-31.4, -45.7]];   // Kongeporten (east, under the tower) and Dronningeporten (north)
+  const GATES = [[47, -28], [-31.4, -45.7]], FT_DOOR = [27.4, 53.7];   // and Folketingets indgang toward Rigsdagsgården (built further down)   // Kongeporten (east, under the tower) and Dronningeporten (north)
   const ROWS = [[3.6, 2.4, 'rect'], [9.8, 3.8, 'arch'], [15.6, 3.0, 'rect'], [20.8, 2.3, 'rect']];
   const stoneM = tm('#cfc6b9'), faceM = tm('#d8d0c4'), roofM = tm(COPPER);
   const ext = (ring, y0, y1, mat) => { const g = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2); return mesh(g, mat, 0, y0, 0, { edges: 25 }); };
@@ -1290,9 +1312,9 @@ for (const p of PARTS) partBlock(p);
       const [x, z] = at(k / n);
       if (k > 0 && k < n) box(0.8, 19.5, 0.35, stoneM, x + e.nx * 0.12, 5.9, z + e.nz * 0.12, { ry: e.ry, cast: false });   // pilasters between the bays
       if (k === n) continue;
-      const [cx, cz] = at((k + 0.5) / n), gate = GATES.some(([gx, gz]) => Math.hypot(cx - gx, cz - gz) < 4.5);
-      for (const [y, h, kind] of ROWS) if (!(gate && y < 12)) { const o = y < 5.4 ? 0.29 : WOFF; addWin(kind, cx + e.nx * o, y, cz + e.nz * o, e.ry, kind === 'arch' ? 1.8 : 1.6, h, 0.6); }
-      if (!gate) mesh(head, faceM, cx + e.nx * 0.24, 5.05, cz + e.nz * 0.24, { ry: e.ry, cast: false });   // a famous Dane looks down
+      const [cx, cz] = at((k + 0.5) / n), gate = GATES.some(([gx, gz]) => Math.hypot(cx - gx, cz - gz) < 4.5), ft = Math.hypot(cx - FT_DOOR[0], cz - FT_DOOR[1]) < 5.5;
+      for (const [y, h, kind] of ROWS) if (!(gate && y < 12) && !(ft && y < 6)) { const o = y < 5.4 ? 0.29 : WOFF; addWin(kind, cx + e.nx * o, y, cz + e.nz * o, e.ry, kind === 'arch' ? 1.8 : 1.6, h, 0.6); }
+      if (!gate && !ft) mesh(head, faceM, cx + e.nx * 0.24, 5.05, cz + e.nz * 0.24, { ry: e.ry, cast: false });   // a famous Dane looks down
       if (k % 2 === 0) {   // a dormer in the roof over every other bay
         const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = e.ry; world.add(g);
         box(1.7, 2.6, 2.0, stoneM, 0, 26.3, -1.4, { parent: g, edges: true });
@@ -2129,10 +2151,10 @@ function nearRoute(x, z, d) { for (const r of TRAFFIC) { const p = r.pts, n = r.
 }
 // ---------------- parked cars along the small streets (only where no traffic drives)
 const CAR_COLS = ['#d9534f', '#4a7bd0', '#f2c14e', '#6aa56b', '#2f3138', '#ece7dc', '#8e5bb5', '#e8833a'];
-function carBody(g, col) {   // a little car, nose at +z (shared by parked and driving cars)
+function carBody(g, col, cab = '#55708a') {   // a little car, nose at +z (shared by parked and driving cars)
   const body = toon(col);
   const b1 = new THREE.Mesh(boxGeo(1.8, 0.75, 4.1), body); b1.position.y = 0.62; b1.castShadow = true; edges(b1); g.add(b1);
-  const b2 = new THREE.Mesh(boxGeo(1.6, 0.62, 2.2), tm('#55708a')); b2.position.set(0, 1.3, -0.25); b2.castShadow = true; edges(b2); g.add(b2);
+  const b2 = new THREE.Mesh(boxGeo(1.6, 0.62, 2.2), tm(cab)); b2.position.set(0, 1.3, -0.25); b2.castShadow = true; edges(b2); g.add(b2);
   const b3 = new THREE.Mesh(boxGeo(1.64, 0.1, 2.0), body); b3.position.set(0, 1.64, -0.25); g.add(b3);
   for (const sx of [-0.85, 0.85]) for (const sz of [-1.3, 1.3]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.25, 14), M.dark); w.rotation.z = Math.PI / 2; w.position.set(sx, 0.34, sz); g.add(w); }
   for (const sx of [-0.6, 0.6]) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.16, 0.05), M.bulb); l.position.set(sx, 0.75, 2.06); g.add(l); const r = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.14, 0.05), tm('#c33')); r.position.set(sx, 0.78, -2.06); g.add(r); }
@@ -2244,6 +2266,150 @@ const VEHICLES = [];
   });
 }
 
+// ======================================================================== FOLKETINGETS INDGANG I RIGSDAGSGÅRDEN
+// The entrance people really use: in the middle of the palace's south facade, toward Rigsdagsgården, with the big
+// stairs where the politicians are filmed (ft.dk / Altinget: the ministers' cars may drive all the way in to Folketingets
+// entrance from Tøjhusgade). Three doors, a sign, two lamps, and granite stairs she can walk up. What the doors look
+// like is a guess. When she is near, three black cars come in from Tøjhusgade and stop at the stairs. Two bodyguards
+// get out, then the prime minister (a woman), who walks up the stairs and in through the door with the guards after her.
+// She can wave to the prime minister (E), who waves back.
+TX.ftSign = ctex(1024, 128, (g, w, h) => { g.fillStyle = '#1f3d33'; g.fillRect(0, 0, w, h); g.strokeStyle = '#d9b44a'; g.lineWidth = 7; g.strokeRect(7, 7, w - 14, h - 14); g.fillStyle = '#e9c45a'; g.font = '700 72px Lexend, "Trebuchet MS", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('FOLKETINGET', w / 2, h / 2 + 4, w - 80); }, { wrap: false });
+const FT = { A: [-23.4, 86.5], u: [0.840, -0.543], n: [0.543, 0.840], s0: 60.45 };
+FT.at = (lx, lz) => [FT.A[0] + FT.u[0] * (FT.s0 + lx) + FT.n[0] * lz, FT.A[1] + FT.u[1] * (FT.s0 + lx) + FT.n[1] * lz];
+FT.loc = (x, z) => { const dx = x - FT.A[0], dz = z - FT.A[1]; return [dx * FT.u[0] + dz * FT.u[1] - FT.s0, dx * FT.n[0] + dz * FT.n[1]]; };
+{
+  const [cx, cz] = FT.at(0, 0), g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = Math.atan2(FT.n[0], FT.n[1]); world.add(g);   // local x along the facade, local z out into the yard
+  const stone = tm('#e3dccf'), dark = tm('#2a2228'), wood = tm('#5b3a26');
+  box(12, 1.2, 3.0, GRANITE, 0, 0, 1.7, { parent: g, edges: true });                                   // the landing in front of the doors
+  for (let k = 1; k <= 5; k++) box(12, 1.2 - 0.2 * k, 0.45, GRANITE, 0, 0, 3.2 + 0.45 * (k - 0.5), { parent: g, edges: true });   // five steps
+  for (const s of [-1, 1]) box(0.6, 1.5, 5.4, GRANITE, s * 6.3, 0, 2.9, { parent: g, edges: true });   // low walls at the sides
+  for (const lx of [-3.4, 0, 3.4]) {   // three doors with stone frames; the middle one opens
+    for (const s of [-1, 1]) box(0.4, 4.1, 0.35, stone, lx + s * 1.3, 1.2, 0.3, { parent: g, edges: true });
+    box(3.2, 0.4, 0.5, stone, lx, 5.0, 0.3, { parent: g, edges: true });
+    if (lx) { const d = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 3.8), toon('#ffffff', { map: TX.churchDoor })); d.position.set(lx, 1.2 + 1.9, 0.24); g.add(d); }
+  }
+  const hole = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 3.8), dark); hole.position.set(0, 3.1, 0.22); g.add(hole);
+  FT.leaves = [-1, 1].map(s => { const p = new THREE.Group(); p.position.set(s * 1.1, 1.2, 0.27); g.add(p); const b = box(1.1, 3.8, 0.08, wood, -s * 0.55, 0, 0, { parent: p, edges: true }); return p; });
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(7, 0.875), toon('#ffffff', { map: TX.ftSign })); sign.position.set(0, 6.5, 0.52); g.add(sign);
+  box(7.2, 1.05, 0.18, tm('#1f3d33'), 0, 5.97, 0.42, { parent: g, cast: false });
+  for (const s of [-1, 1]) { const [x, z] = FT.at(s * 6.3, 5.0); lamp(x, z, 4.2, false); }
+  // she can walk up the steps (many small round tops, like at Slotskirken)
+  for (let lx = -5.6; lx <= 5.61; lx += 0.8) {
+    for (const lz of [0.7, 1.5, 2.3, 2.9]) { const [x, z] = FT.at(lx, lz); colCirc(x, z, 0.5, 1.2); }
+    for (let k = 1; k <= 5; k++) { const [x, z] = FT.at(lx, 3.2 + 0.45 * (k - 0.5)); colCirc(x, z, 0.3, 1.2 - 0.2 * k); }
+  }
+  for (const s of [-1, 1]) for (let lz = 0.6; lz < 5.5; lz += 0.8) { const [x, z] = FT.at(s * 6.3, lz); colCirc(x, z, 0.35, 1.5); }
+}
+// the gate from Tøjhusgade: a vault under the bridge part of the wing, stone arches on both sides, and a hole in the palace outline
+if (FT_GATE.mid) {
+  const { d0, d1, s0, s1 } = FT_GATE, R = (d1 - d0) / 2, dc = (d0 + d1) / 2, wall = tm(lit('#ded8d3')), stone = tm('#e3dccf');
+  const [gx, gz] = FT.at((s0 + s1) / 2 - FT.s0, dc), g = new THREE.Group(); g.position.set(gx, 0, gz); g.rotation.y = Math.atan2(FT.u[0], FT.u[1]); world.add(g);   // local z through the wing, local x across the gate
+  const sh = new THREE.Shape(); sh.moveTo(-R, 5.5 - R); sh.lineTo(-R, 5.5); sh.lineTo(R, 5.5); sh.lineTo(R, 5.5 - R); sh.absarc(0, 5.5 - R, R, 0, Math.PI, false);
+  const vg = new THREE.ExtrudeGeometry(sh, { depth: s1 - s0 + 0.1, bevelEnabled: false, curveSegments: 16 }); vg.translate(0, 0, -(s1 - s0) / 2 - 0.05); mesh(vg, wall, 0, 0, 0, { parent: g, cast: false });
+  const fl = new THREE.PlaneGeometry(2 * R, s1 - s0 + 0.4); fl.rotateX(-Math.PI / 2); mesh(fl, SM.setts, 0, 0.02, 0, { parent: g, cast: false });
+  for (const sd of [-1, 1]) { const zf = sd * (s1 - s0) / 2; mesh(new THREE.TorusGeometry(R + 0.3, 0.3, 6, 24, Math.PI), stone, 0, 5.5 - R, zf, { parent: g, edges: 40 }); for (const s of [-1, 1]) box(0.6, 5.5 - R, 0.6, stone, s * (R + 0.3), 0, zf, { parent: g, edges: true }); box(0.8, 1.0, 0.7, stone, 0, 5.5 - 0.5, zf, { parent: g, edges: true }); }
+  const hole = [FT.at(s0 - 1 - FT.s0, d0), FT.at(s1 + 1 - FT.s0, d0), FT.at(s1 + 1 - FT.s0, d1), FT.at(s0 - 1 - FT.s0, d1)];
+  for (const c of pcols) if (c.top === 40 && gx > c.x0 && gx < c.x1 && gz > c.z0 && gz < c.z1) { c.rings = [...c.rings, hole]; c.cut = hole; }
+  pcols.push({ rings: [FT_GATE.mid], ...bboxOf(FT_GATE.mid), top: 13.5, bot: 5.5 });
+}
+// ---------------- people who walk: the prime minister and the bodyguards
+function walker(o) {   // o: coat, legs, hair, skirt (a woman's coat), glasses (dark sunglasses)
+  const g = new THREE.Group(), legs = [], arms = [], skin = tm('#f2c6a4');
+  for (const s of [-1, 1]) {
+    const h = new THREE.Group(); h.position.set(s * 0.11, 0.85, 0); h.userData.keep = true; g.add(h);
+    mesh(new THREE.CapsuleGeometry(0.075, 0.6, 3, 8), tm(o.legs), 0, -0.42, 0, { parent: h });
+    box(0.14, 0.1, 0.28, M.dark, 0, -0.85, 0.05, { parent: h });
+    legs.push(h);
+  }
+  mesh(new THREE.CapsuleGeometry(0.21, 0.5, 4, 10), tm(o.coat), 0, 1.22, 0, { parent: g });
+  if (o.skirt) mesh(new THREE.CylinderGeometry(0.22, 0.3, 0.45, 12), tm(o.coat), 0, 0.82, 0, { parent: g });
+  mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.12, 8), skin, 0, 1.58, 0, { parent: g });
+  mesh(new THREE.SphereGeometry(0.16, 12, 10), skin, 0, 1.75, 0, { parent: g });
+  mesh(new THREE.SphereGeometry(0.175, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), tm(o.hair), 0, 1.77, -0.01, { parent: g });
+  if (o.skirt) mesh(new THREE.CylinderGeometry(0.17, 0.19, 0.22, 12), tm(o.hair), 0, 1.67, -0.03, { parent: g });   // hair to the chin
+  if (o.glasses) box(0.28, 0.06, 0.04, M.dark, 0, 1.75, 0.15, { parent: g, cast: false });
+  if (o.scarf) mesh(new THREE.TorusGeometry(0.11, 0.045, 6, 12), tm(o.scarf), 0, 1.55, 0, { parent: g, rx: Math.PI / 2 });
+  for (const s of [-1, 1]) {
+    const a = new THREE.Group(); a.position.set(s * 0.27, 1.45, 0); a.userData.keep = true; g.add(a);
+    mesh(new THREE.CapsuleGeometry(0.06, 0.48, 3, 6), tm(o.coat), 0, -0.3, 0, { parent: a }); arms.push(a);
+  }
+  bakeGroup(g); g.visible = false; dyn.add(g);
+  return { g, legs, arms, x: 0, z: 0, y: 0, h: 0, path: [], walkT: 0, wave: 0, on: false };
+}
+const PM = walker({ coat: '#2c3e66', legs: '#2c3e66', hair: '#a8794c', skirt: true, scarf: '#c8102e' });
+const GUARDS = [0, 1, 2].map(() => walker({ coat: '#202226', legs: '#202226', hair: '#3a2a20', glasses: true }));
+const FT_CARS = [0, 1, 2].map(() => { const g = new THREE.Group(); carBody(g, '#16181d', '#2a3440'); bakeGroup(g); g.visible = false; dyn.add(g); return g; });
+{
+  // the cars' way: in from Tøjhusgade through the gate, along the facade to the stairs (stop), round at the end of the yard and out again
+  const W = (lx, lz) => FT.at(lx - FT.s0, lz);
+  const pts = [[-40, 138], [-3, 114], W(4, 33), W(18, 32), W(40, 14), W(FT.s0 - 12, 9.5), W(FT.s0, 9.5), W(85, 10), W(98, 17), W(88, 27), W(40, 30), W(18, 32.5), W(4, 33), [-3, 114], [-40, 138]];
+  const R = routeOf(pts); let stopS = 0; for (let i = 1; i < pts.length; i++) if (pts[i][0] === W(FT.s0, 9.5)[0]) { stopS = R.d[i]; break; }
+  const S = { phase: 'idle', s: 0, v: 0, t: 0, cool: 0, waved: false };
+  FT.state = S; FT.route = R;
+  const spawn = (p, lx, lz) => { const [x, z] = FT.at(lx, lz); Object.assign(p, { x, z, y: 0, path: [], on: true, wave: 0 }); p.g.visible = true; };
+  const goTo = (p, ...lpts) => { p.path = lpts.map(([lx, lz]) => FT.at(lx, lz)); };
+  const carPos = (off) => { const [x, z, h] = routeAt(R, Math.max(0, Math.min(R.len, S.s + off))); return [x, z, h]; };
+  function upd(p, dt, speed = 1.3) {   // walk along the path; on the stairs she goes up
+    if (!p.on) return;
+    if (p.path.length) {
+      const [tx, tz] = p.path[0], dx = tx - p.x, dz = tz - p.z, d = Math.hypot(dx, dz);
+      if (d < 0.15) p.path.shift(); else { const st = Math.min(d, speed * dt); p.x += dx / d * st; p.z += dz / d * st; p.h += angDiff(Math.atan2(dx, dz), p.h) * Math.min(1, dt * 8); p.walkT += dt * 7; }
+    }
+    const moving = p.path.length > 0, k = moving ? 1 : 0;
+    p.legs[0].rotation.x = Math.sin(p.walkT) * 0.5 * k; p.legs[1].rotation.x = -Math.sin(p.walkT) * 0.5 * k;
+    p.arms[0].rotation.x = -Math.sin(p.walkT) * 0.4 * k;
+    if (p.wave > 0) { p.wave -= dt; p.arms[1].rotation.z = 2.6 + Math.sin(clockT * 12) * 0.35; p.arms[1].rotation.x = 0; } else { p.arms[1].rotation.z = 0; p.arms[1].rotation.x = Math.sin(p.walkT) * 0.4 * k; }
+    p.y += (groundAt(p.x, p.z, p.y + 0.6) - p.y) * Math.min(1, dt * 12);
+    p.g.position.set(p.x, p.y, p.z); p.g.rotation.y = p.h;
+  }
+  const lookAtKid = p => { p.h = Math.atan2(P.pos.x - p.x, P.pos.z - p.z); };
+  let kidWave = 0;
+  HOOKS.frame.push((dt, t) => {
+    const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && Math.hypot(P.pos.x - ex, P.pos.z - ez) < 45;
+    if (S.phase === 'idle') {
+      if (S.cool > 0) S.cool -= dt;
+      else if (near) { S.phase = 'in'; S.s = 8; S.v = 7; FT_CARS.forEach(c => { c.visible = true; c.userData.fresh = true; }); toast('Der kommer nogle sorte biler. Hvem sidder mon i dem?'); }
+    }
+    if (S.phase === 'in' || S.phase === 'out') {
+      const target = S.phase === 'in' ? Math.min(7, Math.sqrt(Math.max(0, 2 * 2.5 * (stopS - S.s)))) : 7;
+      let hold = false;   // the cars wait if she is in front of them
+      for (const off of [8, 0, -8]) { const [x, z, h] = carPos(off), dx = P.pos.x - x, dz = P.pos.z - z, al = dx * Math.sin(h) + dz * Math.cos(h); if (started && al > 0 && al < 7 && Math.abs(dx * Math.cos(h) - dz * Math.sin(h)) < 1.8) hold = true; }
+      S.v += Math.max(-6 * dt, Math.min(3 * dt, (hold ? 0 : target) - S.v)); S.s += S.v * dt;
+      if (S.phase === 'in' && S.s >= stopS - 0.05) { S.phase = 'stop'; S.t = 0; S.v = 0; S.waved = S.g = S.pm = false; }
+      if (S.phase === 'out' && S.s - 8 >= R.len) { S.phase = 'idle'; S.cool = 90; FT_CARS.forEach(c => { c.visible = false; }); }
+    }
+    FT_CARS.forEach((c, i) => {
+      if (!c.visible) return; const [x, z, h] = carPos(8 - i * 8); c.position.set(x, 0, z); c.rotation.y += angDiff(h, c.rotation.y) * Math.min(1, dt * 5);
+      if (c.userData.fresh) { c.userData.fresh = false; c.rotation.y = h; }
+      if (started && !MYBOAT.on) {   // she cannot walk through the cars
+        const exx = P.pos.x - x, ezz = P.pos.z - z, s1 = Math.sin(c.rotation.y), c1 = Math.cos(c.rotation.y), lz = exx * s1 + ezz * c1, lx = exx * c1 - ezz * s1;
+        if (Math.abs(lx) < 1.3 && Math.abs(lz) < 2.4) { const px = 1.3 - Math.abs(lx), pz = 2.4 - Math.abs(lz); if (px < pz) { const d = Math.sign(lx || 1) * px; P.pos.x += d * c1; P.pos.z -= d * s1; } else { const d = Math.sign(lz || 1) * pz; P.pos.x += d * s1; P.pos.z += d * c1; } kid.root.position.copy(P.pos); }
+      }
+    });
+    if (S.phase === 'stop') {
+      S.t += dt; const T = S.t;
+      if (T > 0.6 && !S.g) { S.g = true; const lx0 = FT.loc(FT_CARS[0].position.x, FT_CARS[0].position.z)[0], lx2 = FT.loc(FT_CARS[2].position.x, FT_CARS[2].position.z)[0]; spawn(GUARDS[0], lx0, 8.0); goTo(GUARDS[0], [Math.sign(lx0) * 3, 6.4]); spawn(GUARDS[1], lx2, 8.0); goTo(GUARDS[1], [Math.sign(lx2) * 3, 6.4]); }
+      if (T > 2.2 && !S.pm) { S.pm = true;
+        spawn(PM, 0, 8.0); spawn(GUARDS[2], 0.9, 8.6); goTo(PM, [0, 6.2]); goTo(GUARDS[2], [0.9, 6.8]);
+        const close = Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16;
+        toast(close ? 'Se! Det er statsministeren. Hun skal ind i Folketinget.' : 'Statsministeren er kommet. Hun skal ind i Folketinget.');
+      }
+      if (T > 4.5 && !S.waved) { S.waved = true; if (Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16) { lookAtKid(PM); PM.wave = 2; } }   // she waves to the girl if she is close
+      if (T > 6.5 && PM.on && !PM.path.length && PM.y < 0.5) { goTo(PM, [0, 3.0], [0, 0.9]); goTo(GUARDS[2], [0.9, 3.4], [0.6, 1.6]); goTo(GUARDS[0], [-1.2, 4.0], [-1.0, 2.0]); goTo(GUARDS[1], [1.6, 4.4], [1.4, 2.2]); }
+      const doorOpen = PM.on && Math.hypot(...FT.loc(PM.x, PM.z).map((v, i) => i ? v - 0.9 : v)) < 3.5 || (T > 8 && T < 16);
+      FT.leaves.forEach((p, i) => { const want = doorOpen ? (i ? -1.45 : 1.45) : 0; p.rotation.y += (want - p.rotation.y) * Math.min(1, dt * 4); });
+      if (PM.on && FT.loc(PM.x, PM.z)[1] < 1.2 && T > 7) { PM.on = false; PM.g.visible = false; }
+      if (!PM.on && T > 9) for (const [i, gd] of GUARDS.entries()) if (gd.on && !gd.path.length) { goTo(gd, [0, 0.9]); gd.inside = true; }
+      for (const gd of GUARDS) if (gd.on && gd.inside && FT.loc(gd.x, gd.z)[1] < 1.2) { gd.on = false; gd.inside = false; gd.g.visible = false; }
+      if (T > 9 && !PM.on && GUARDS.every(gd => !gd.on)) S.phase = 'out';
+    } else if (S.phase !== 'stop') FT.leaves.forEach(p => { p.rotation.y += (0 - p.rotation.y) * Math.min(1, dt * 4); });
+    for (const p of [PM, ...GUARDS]) upd(p, dt);
+    if (kidWave > 0) { kidWave -= dt; kid.arms[1].rotation.z = 2.6 + Math.sin(t * 12) * 0.3; }
+    if (PM.on && started && !paused && Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16)
+      offerAction({ id: 'pm', label: 'Vink til statsministeren', prio: 3, run: () => { kidWave = 2.5; lookAtKid(PM); PM.wave = 2.5; toast('Statsministeren vinker tilbage til dig!'); } });
+  });
+}
+
 // ---------------- trees in the library garden
 {
   const park = DATA.A.find(a => a.n === 'Det Kongelige Biblioteks Have');
@@ -2275,7 +2441,7 @@ const POIS = [
   { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt. Det er det højeste tårn i København. På toppen sidder tre kroner af guld. Man kan køre op i tårnet med en elevator og kigge ud over byen.', x: 44, z: -27, r: 16 },
   { n: 'Prins Jørgens Gård', t: 'Gården foran Dronningeporten. Her står fire statuer på høje sokler. En af dem er Herkules med sin kølle.', x: -36, z: -62, r: 16 },
   { n: 'Beskæftigelsesministeriet', t: 'Her arbejder et ministerium, som hjælper folk med at få et arbejde. Huset ligger lige over for slottet på den anden side af kanalen. Kig efter flaget og skiltet over døren.', x: 138, z: -98, r: 20 },
-  { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her går politikerne ind og ud.', x: 36, z: 72, r: 26 },
+  { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her kører ministrene ind i sorte biler, og politikerne går op ad den store trappe og ind i Folketinget.', x: 36, z: 72, r: 26 },
   { n: 'Slotspladsen', t: 'En stor plads foran slottet. Her rider kong Frederik den Syvende på sin hest. Han gav Danmark grundloven.', x: 100, z: -20, r: 28 },
   { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste. Gå hen til en hest og klap den.', x: -140, z: 85, r: 42 },
   { n: 'De Kongelige Stalde', t: 'Her bor kongens heste. Over staldene ligger et lille gammelt teater, hvor kongen så skuespil.', x: -105, z: 135, r: 20 },
@@ -2484,10 +2650,12 @@ function resolvePoly(p) {
   for (let it = 0; it < 2; it++) for (const c of pcols) {
     if (p.x < c.x0 - RAD || p.x > c.x1 + RAD || p.z < c.z0 - RAD || p.z > c.z1 + RAD) continue;
     if (p.y >= c.top - STEP || p.y + 1.7 < c.bot) continue;
+    if (c.cut && ptIn(c.cut, p.x, p.z)) continue;   // inside the gate cut through the building
     const inside = inRings(c.rings, p.x, p.z);
     let bd = 1e18, bx = 0, bz = 0;
-    for (const r of c.rings) for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+    for (let ri = 0; ri < c.rings.length; ri++) for (let r = c.rings[ri], i = 0, j = r.length - 1; i < r.length; j = i++) {
       const ax = r[j][0], az = r[j][1], ex = r[i][0] - ax, ez = r[i][1] - az, l2 = ex * ex + ez * ez || 1e-9;
+      if (c.cut && ri > 0 && !ptIn(c.rings[0], ax + ex / 2, az + ez / 2)) continue;   // a gate cut through a building: its ends out in the open are not walls
       let t = ((p.x - ax) * ex + (p.z - az) * ez) / l2; t = t < 0 ? 0 : t > 1 ? 1 : t;
       const qx = ax + ex * t, qz = az + ez * t, d = (p.x - qx) ** 2 + (p.z - qz) ** 2; if (d < bd) { bd = d; bx = qx; bz = qz; }
     }
@@ -3160,6 +3328,7 @@ const TASKS = [
   { id: 'marmor', s: 'Marmorbroen', at: ['Marmorbroen'], t: 'Gå op på toppen af Marmorbroen.', test: () => !MYBOAT.on && archH(P.pos.x, P.pos.z) > 1.2 && Math.hypot(P.pos.x + 203, P.pos.z - 134) < 14 },
   { id: 'kirke', s: 'Kirkens søjler', at: ['Slotskirken'], t: 'Hvor mange søjler står der foran kirken?', quiz: ['2', '4', '6'], ok: 1 },
   { id: 'port', s: 'Gennem porten', at: ['Kirkeløngangsbygningen'], t: 'Gå gennem porten i den gamle bygning.', test: () => { const { C, u, v } = LOENGANG, dx = P.pos.x - C[0], dz = P.pos.z - C[1]; return Math.abs(dx * u[0] + dz * u[1]) < 1.6 && Math.abs(dx * v[0] + dz * v[1]) < 1.5; } },
+  { id: 'pm', s: 'Statsministeren', at: ['Rigsdagsgården'], t: 'Vink til statsministeren, når hun kommer i sin sorte bil.', act: 'pm' },
   { id: 'herkules', s: 'Herkules', at: ['Prins Jørgens Gård'], t: 'Find Herkules med køllen, og gå hen til ham.', test: () => Math.hypot(P.pos.x + 20.3, P.pos.z + 61) < 3.2 },
 ];
 const tasksDone = new Set();
@@ -3241,7 +3410,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
