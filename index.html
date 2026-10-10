@@ -3111,6 +3111,75 @@ $('finAgain').addEventListener('click', () => {
   for (const c of CROWNS) { c.got = false; c.fly = 0; c.g.visible = c.beam.visible = true; c.g.scale.setScalar(1); c.g.position.set(c.x, c.y0 + 1.1, c.z); }
   $('finale').hidden = true; paused = false; canvas.focus(); toast('Kronerne er gemt igen. Kan du finde dem?');
 });
+// ---------------- pigeons on Slotspladsen, around Frederik VII's statue
+// They take off in small waves as the player approaches and settle again after she leaves.
+const PIGEONS = [];
+const pigeonGeo = new THREE.SphereGeometry(1, 10, 8);
+const pigeonBeakGeo = new THREE.ConeGeometry(0.08, 0.22, 6);
+const pigeonGray = tm('#899098'), pigeonDark = tm('#606771');
+const pigeonNeck = tm('#597c77'), pigeonEye = tm('#25272b'), pigeonOrange = tm('#d99046');
+function makePigeon(x, z, y, i) {
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rr(-Math.PI, Math.PI); g.scale.setScalar(rr(0.82, 1.12)); dyn.add(g);
+  mesh(pigeonGeo, pigeonGray, 0, 0.34, 0, { parent: g, cast: false }).scale.set(0.24, 0.18, 0.36);
+  mesh(pigeonGeo, pigeonDark, 0, 0.31, -0.29, { parent: g, cast: false }).scale.set(0.14, 0.1, 0.19);
+  mesh(pigeonGeo, pigeonNeck, 0, 0.53, 0.22, { parent: g, cast: false }).scale.set(0.14, 0.18, 0.14);
+  mesh(pigeonGeo, pigeonGray, 0, 0.66, 0.27, { parent: g, cast: false }).scale.set(0.17, 0.15, 0.17);
+  mesh(pigeonBeakGeo, pigeonOrange, 0, 0.62, 0.47, { parent: g, rx: Math.PI / 2, cast: false });
+  for (const side of [-1, 1]) {
+    mesh(pigeonGeo, pigeonEye, side * 0.14, 0.68, 0.34, { parent: g, cast: false }).scale.setScalar(0.025);
+    mesh(pigeonGeo, pigeonOrange, side * 0.11, 0.055, 0.13, { parent: g, cast: false }).scale.set(0.035, 0.055, 0.08);
+  }
+  const wings = [-1, 1].map(side => {
+    const pivot = new THREE.Group(); pivot.position.set(side * 0.19, 0.42, 0); g.add(pivot);
+    mesh(pigeonGeo, pigeonGray, side * 0.22, 0, -0.03, { parent: pivot, cast: false }).scale.set(0.27, 0.055, 0.22);
+    pivot.rotation.z = side * 0.12; return pivot;
+  });
+  return { g, wings, x, z, y, phase: i * 1.7, state: 'ground', delay: 0, time: 0, clear: 0, dx: 0, dz: 0 };
+}
+for (let attempt = 0; PIGEONS.length < (isTouch ? 20 : 32) && attempt < 500; attempt++) {
+  const a = rand() * Math.PI * 2, r = rr(8, 31), x = 81 + Math.cos(a) * r, z = -51 + Math.sin(a) * r;
+  if (rawWater(x, z) || inBuilding(x, z) || groundAt(x, z, 2) > 0.6) continue;
+  if (PIGEONS.some(p => Math.hypot(p.x - x, p.z - z) < 1.7)) continue;
+  PIGEONS.push(makePigeon(x, z, groundAt(x, z, 2), PIGEONS.length));
+}
+HOOKS.frame.push((dt, t) => {
+  if (!started || paused) return;
+  for (const p of PIGEONS) {
+    if (p.state !== 'ground' || Math.hypot(P.pos.x - p.x, P.pos.z - p.z) > 7) continue;
+    for (const q of PIGEONS) {
+      if (q.state !== 'ground') continue;
+      const d = Math.hypot(q.x - p.x, q.z - p.z);
+      if (d > 20) continue;
+      q.state = 'queued'; q.delay = d * 0.015 + rr(0, 0.18);
+      const a = Math.atan2(q.x - P.pos.x, q.z - P.pos.z) + rr(-0.5, 0.5);
+      q.dx = Math.sin(a); q.dz = Math.cos(a);
+    }
+  }
+  for (const p of PIGEONS) {
+    if (p.state === 'ground') {
+      p.g.position.y = p.y + Math.sin(t * 3 + p.phase) * 0.025;
+    } else if (p.state === 'queued') {
+      p.delay -= dt;
+      if (p.delay <= 0) { p.state = 'flying'; p.time = 0; }
+    } else if (p.state === 'flying') {
+      p.time += dt;
+      const u = Math.min(1, p.time / 3.4);
+      p.g.position.set(p.x + p.dx * 36 * u, p.y + 12 * Math.sin(u * Math.PI / 2) + 4 * u, p.z + p.dz * 36 * u);
+      p.g.rotation.y = Math.atan2(p.dx, p.dz);
+      const flap = Math.sin(p.time * 24 + p.phase) * 0.85;
+      p.wings[0].rotation.z = -0.18 - flap; p.wings[1].rotation.z = 0.18 + flap;
+      if (u >= 1) { p.state = 'away'; p.g.visible = false; p.clear = 0; }
+    } else {
+      p.clear = Math.hypot(P.pos.x - p.x, P.pos.z - p.z) > 23 ? p.clear + dt : 0;
+      if (p.clear > 5) {
+        p.state = 'ground'; p.g.visible = true; p.g.position.set(p.x, p.y, p.z);
+        p.g.rotation.y = rr(-Math.PI, Math.PI);
+        p.wings[0].rotation.z = -0.12; p.wings[1].rotation.z = 0.12;
+      }
+    }
+  }
+});
+
 // ---------------- the ducks: a mother duck with four yellow ducklings in a line behind her
 function makeDuck(kind) {   // 'mor' (brown) or 'baby' (yellow); the beak points to +z
   const g = new THREE.Group(), s = kind === 'baby' ? 0.5 : 1, body = tm(kind === 'baby' ? '#f6d55c' : '#9a7350'), headM = tm(kind === 'baby' ? '#f6d55c' : '#7d5a3c');
