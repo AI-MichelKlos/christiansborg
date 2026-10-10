@@ -115,7 +115,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   </div>
   <button id="stars" class="sticker ctr" type="button" aria-label="Stjerner for opgaver. Tryk for at se opgaverne.">
     <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l4.7 10.2 11.1 1.2-8.3 7.5 2.3 11L20 28.3l-9.8 5.6 2.3-11-8.3-7.5 11.1-1.2z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/></svg>
-    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 12</span></div>
+    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 13</span></div>
   </button>
   </div>
   <div id="tools">
@@ -340,7 +340,7 @@ const nightMats = [];
 function drawWin(g, w, h, kind, mask) {
   const arch = kind === 'arch' || kind === 'doorArch';
   const frameCol = mask ? '#000' : ({ modern: '#3a3e45', doorModern: '#3a3e45', doorArch: '#5b3a26', doorGreen: '#3f6b4f', green: '#2e4a37' }[kind] || '#f6f3ec');
-  const shape = (i) => { g.beginPath(); const x0 = i, x1 = w - i, y1 = h - i; if (arch) { const r = (x1 - x0) / 2, cy = i + r; g.moveTo(x0, y1); g.lineTo(x0, cy); g.arc(w / 2, cy, r, Math.PI, 0, false); g.lineTo(x1, y1); g.closePath(); } else g.rect(x0, i, x1 - x0, y1 - i); };
+  const shape = (i) => { g.beginPath(); const x0 = i, x1 = w - i, y1 = h - i; if (arch) { const r = (x1 - x0) / 2, cy = i + r; g.moveTo(x0, y1); g.lineTo(x0, cy); g.arc(w / 2, cy, r, Math.PI, 0, false); g.lineTo(x1, y1); g.closePath(); } else if (kind === 'lunette') { g.moveTo(x0, y1); g.ellipse(w / 2, y1, (x1 - x0) / 2, y1 - i, 0, Math.PI, 0, false); g.closePath(); } else g.rect(x0, i, x1 - x0, y1 - i); };
   const glass = () => { if (mask) return '#fff'; const gr = g.createLinearGradient(0, 0, w * 0.6, h); gr.addColorStop(0, '#8aa8c0'); gr.addColorStop(1, '#3b536c'); return gr; };
   g.clearRect(0, 0, w, h);
   g.fillStyle = frameCol; shape(0); g.fill();
@@ -357,6 +357,8 @@ function drawWin(g, w, h, kind, mask) {
   g.fillStyle = glass(); shape(fw); g.fill();
   g.save(); shape(0); g.clip(); g.fillStyle = frameCol;
   if (kind === 'rect' || kind === 'green') { g.fillRect(w / 2 - 2, 0, 4, h); g.fillRect(0, h * 0.36, w, 4); }
+  else if (kind === 'pane') { g.fillRect(w / 2 - 2.5, 0, 5, h); g.fillRect(0, h * 0.3, w, 5); for (const x of [w / 4, w * 3 / 4]) g.fillRect(x - 1, 0, 2, h); for (let k = 1; k < 7; k++) g.fillRect(0, h * k / 7 - 1, w, 2); }   // small panes
+  else if (kind === 'lunette') { g.lineWidth = 4; g.strokeStyle = frameCol; for (let k = 1; k < 6; k++) { const a = Math.PI + k * Math.PI / 6; g.beginPath(); g.moveTo(w / 2, h); g.lineTo(w / 2 + Math.cos(a) * w, h + Math.sin(a) * h * 2); g.stroke(); } g.beginPath(); g.ellipse(w / 2, h, w * 0.22, h * 0.44, 0, Math.PI, 0, false); g.stroke(); }
   else if (kind === 'arch') { g.fillRect(w / 2 - 2, 0, 4, h); const cy = w / 2; g.fillRect(0, cy, w, 4); g.strokeStyle = frameCol; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, cy); g.lineTo(w / 2 - w * 0.4, cy - w * 0.4); g.moveTo(w / 2, cy); g.lineTo(w / 2 + w * 0.4, cy - w * 0.4); g.stroke(); }
   else if (kind === 'yellow') { g.fillRect(w / 2 - 2, h * 0.28, 4, h); g.fillRect(0, h * 0.28, w, 4); }
   else if (kind === 'doorModern') { g.fillRect(w / 2 - 2, 0, 4, h); }
@@ -364,7 +366,7 @@ function drawWin(g, w, h, kind, mask) {
   if (!mask) { g.fillStyle = 'rgba(255,255,255,.22)'; g.beginPath(); g.moveTo(w * 0.2, h); g.lineTo(w * 0.45, h); g.lineTo(w * 0.95, h * 0.25); g.lineTo(w * 0.7, h * 0.25); g.closePath(); g.fill(); }
   g.restore();
 }
-const WINKINDS = ['rect', 'arch', 'yellow', 'modern', 'doorArch', 'doorGreen', 'doorModern', 'green', 'french'];
+const WINKINDS = ['rect', 'arch', 'yellow', 'modern', 'doorArch', 'doorGreen', 'doorModern', 'green', 'french', 'pane', 'lunette'];
 const WINMAT = {};
 for (const k of WINKINDS) {
   const map = ctex(64, 96, (g, w, h) => drawWin(g, w, h, k, false), { wrap: false });
@@ -1142,7 +1144,7 @@ for (const b of DATA.B) {
   const nm = NAMED[b.n];
   let h = nm ? nm[2] : b.h || (b.lv ? (b.lv > 8 ? b.lv : b.lv * 3.2 + 2) : (areaOf(b.rings[0]) > 1500 ? 17 : 14));
   const wall = nm ? nm[0] : pick(WALLS), roof = nm ? nm[1] : pick(ROOFS);
-  const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7a7d86'], 'Børsen': [22, '#5aa58e'], 'Den Sorte Diamant': [26, '#26292f'], 'Krigsmuseet': [22, '#9a5442'], 'Holmens Kirke': [21, '#5aa58e'] }[b.n];
+  const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7f9a8f'], 'Børsen': [22, '#5aa58e'], 'Den Sorte Diamant': [26, '#26292f'], 'Krigsmuseet': [22, '#9a5442'], 'Holmens Kirke': [21, '#5aa58e'] }[b.n];
   if (!b.n && b.rings[0][0][0] === 154 && b.rings[0][0][1] === 264) continue;
   if (!b.n && b.rings[0][0][0] === 113 && b.rings[0][0][1] === -122) { pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 22, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: '#5aa58e', line: true }); continue; }   // Beskæftigelsesministeriet, drawn further down
   if (!b.n && b.rings[0][0][0] === 213 && b.rings[0][0][1] === -35) { building(b.rings, 9, '#ad4f37', ROOF_COPPER); continue; }   // the chapel of Holmens Kirke   // the old library, drawn further down
@@ -1559,37 +1561,87 @@ function bronzeHorse(parent, mat, x, z) {   // a horse statue, about life size, 
   mesh(new THREE.CapsuleGeometry(0.1, 0.9, 3, 6), mat, x, 1.5, z - 1.4, { parent, rx: -0.5 });
 }
 
-// ---------------- Slotskirken (C.F. Hansen, 1826): the church body from OpenStreetMap, dome and portico by hand
+// ---------------- Slotskirken (C.F. Hansen, 1813-26, rebuilt after the fire in 1992): light plastered walls, a cordon
+// cornice 3/8 down the facade, windows with small panes in two bands, a risalit with a big half-round window on each
+// long side, a nearly flat copper roof, a flat copper dome on a drum without windows with a round window at the top,
+// and toward Højbro four Ionic columns with a gable, on steps she can walk up, in front of a striped wall and the door.
+TX.rustic = ctex(64, 64, (g, w, h) => { g.fillStyle = '#e9dfcb'; g.fillRect(0, 0, w, h); g.fillStyle = 'rgba(70,55,35,.22)'; for (let y = 0; y < h; y += 16) g.fillRect(0, y, w, 3); }, {});
+TX.rustic.repeat.set(1 / 3, 1 / 0.7);
+TX.churchDoor = ctex(64, 128, (g, w, h) => {
+  g.fillStyle = '#5b3a26'; g.fillRect(0, 0, w, h); g.fillStyle = '#4a2f1f'; g.fillRect(w / 2 - 1.5, 0, 3, h);
+  g.strokeStyle = '#7a5235'; g.lineWidth = 3; for (const x of [5, w / 2 + 4]) for (const [y, hh] of [[8, 34], [50, 34], [92, 30]]) g.strokeRect(x, y, w / 2 - 9, hh);
+  g.fillStyle = '#d9b44a'; g.fillRect(w / 2 - 7, 70, 3, 9); g.fillRect(w / 2 + 4, 70, 3, 9);
+}, { wrap: false });
 {
-  const wallC = '#ded3cf', roofC = '#656871', wm = tm(lit(wallC)), rm = tm(lit(roofC, 0.08));
+  const wallC = '#ead9ba', CU = '#6d8a7f', EAVE = 21, CORD = 13.1;
+  const wm = tm(lit(wallC)), stone = tm('#f1ebde'), plinth = tm('#cbbfa8'), cu = tm(CU);
   const body = decRing('-220,-1346 39,60 80,120 38,58 -52,34 -110,72 -357,236 -157,-237').map(([x, z]) => [x / 10, z / 10]);
-  partBlock({ h: 23.8, mh: 0, roof: 'hipped', rh: 2.7, wall: wallC, rcol: roofC, ring: body });
-  for (const e of edgesOf(body)) {   // tall arched windows on the long sides
-    if (e.len < 30) continue;
-    for (let k = 0; k < 4; k++) { const t = 0.2 + k * 0.2; addWin('arch', e.a[0] + (e.b[0] - e.a[0]) * t + e.nx * 0.15, 11, e.a[1] + (e.b[1] - e.a[1]) * t + e.nz * 0.15, e.ry, 2.2, 5.6, 0.6); }
+  partBlock({ h: EAVE + 2, mh: 0, roof: 'hipped', rh: 2, wall: wallC, rcol: CU, ring: body });
+  const ext = (ring, y0, y1, mat) => { const g = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2); return mesh(g, mat, 0, y0, 0, { edges: 25 }); };
+  ext(insetRing(body, -0.15), 0, 1.0, plinth);               // the base
+  ext(insetRing(body, -0.35), CORD - 0.3, CORD + 0.3, stone);   // the cordon cornice
+  ext(insetRing(body, -0.5), EAVE - 0.7, EAVE, stone);        // the cornice under the roof
+  // the walls: NE gable toward Højbro (0 -> 3), the long walls SE (3 -> 6) and NW (7 -> 0)
+  const CX = -40, CZ = -105.6;
+  const wall = (a, b) => {
+    const dx = b[0] - a[0], dz = b[1] - a[1], len = Math.hypot(dx, dz); let nx = dz / len, nz = -dx / len;
+    const mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2; if (Math.hypot(mx + nx - CX, mz + nz - CZ) < Math.hypot(mx - CX, mz - CZ)) { nx = -nx; nz = -nz; }
+    return { len, nx, nz, ry: Math.atan2(nx, nz), at: (d, o = 0) => [a[0] + dx / len * d + nx * o, a[1] + dz / len * d + nz * o] };
+  };
+  const NE = wall(body[0], body[3]), LONG = [wall(body[3], body[6]), wall(body[7], body[0])];
+  for (const W of LONG) {
+    const mid = W.len / 2, [rx, rz] = W.at(mid);
+    const g = new THREE.Group(); g.position.set(rx, 0, rz); g.rotation.y = W.ry; world.add(g);   // the risalit steps a little forward
+    box(18, EAVE - 0.7, 0.9, wm, 0, 0, 0, { parent: g, edges: true });
+    box(18.3, 1.0, 1.2, plinth, 0, 0, 0, { parent: g, cast: false });
+    box(18.7, 0.6, 1.6, stone, 0, CORD - 0.3, 0, { parent: g, edges: true });
+    box(19.0, 0.7, 1.9, stone, 0, EAVE - 0.7, 0, { parent: g, edges: true });
+    const [lx, lz] = W.at(mid, 0.45 + WOFF); addWin('lunette', lx, CORD + 0.3 + 1.7, lz, W.ry, 6.8, 3.4, 0.5);   // the big half-round window
+    for (let d = 4.5; d < W.len - 4; d += 5.2) {
+      const o = (Math.abs(d - mid) < 9 ? 0.45 : 0) + WOFF, [x, z] = W.at(d, o);
+      addWin('pane', x, 7.4, z, W.ry, 2.1, 5.4, 0.55);
+      if (Math.abs(d - mid) > 4.6) addWin('pane', x, 17.0, z, W.ry, 2.0, 3.8, 0.55);
+    }
   }
-  // the dome on its round drum, and a small lantern on top
-  const C = [-38.3, -108.9];
-  const cyl = (r, y0, y1, mat, seg = 32) => mesh(new THREE.CylinderGeometry(r, r, y1 - y0, seg), mat, C[0], (y0 + y1) / 2, C[1], { edges: 40 });
-  cyl(10.7, 18, 25.9, wm); cyl(11.8, 25.9, 26.4, wm); cyl(11.2, 26.4, 26.9, wm);
-  for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2; addWin('arch', C[0] + Math.sin(a) * 10.78, 24.5, C[1] + Math.cos(a) * 10.78, a, 1.3, 2.2, 0.6); }
-  const dome = mesh(new THREE.SphereGeometry(10.2, 32, 12, 0, Math.PI * 2, 0, Math.PI / 2), rm, C[0], 26.9, C[1], { edges: 40 }); dome.scale.y = 0.5;
-  cyl(1.6, 31.6, 32.3, wm, 12); mesh(new THREE.ConeGeometry(1.8, 0.7, 12), rm, C[0], 32.6, C[1]);
-  // the portico toward the canal: six white columns, a beam and a triangle gable
+  for (const d of [3.5, NE.len - 3.5]) { const [x, z] = NE.at(d, WOFF); addWin('pane', x, 7.4, z, NE.ry, 2.1, 5.4, 0.55); addWin('pane', x, 17.0, z, NE.ry, 2.0, 3.8, 0.55); }
+  // the portico: steps, four Ionic columns, a beam and a gable; behind it a striped wall and the big door
   const P4 = [[-14.4, -131.1], [-6.5, -119.0], [-10.1, -116.6], [-18.1, -128.6]];
   const cx = P4.reduce((s, p) => s + p[0], 0) / 4, cz = P4.reduce((s, p) => s + p[1], 0) / 4;
-  const ex = P4[1][0] - P4[0][0], ez = P4[1][1] - P4[0][1], L = Math.hypot(ex, ez), nx = ez / L, nz = -ex / L;
-  const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = Math.atan2(nx, nz); world.add(g);
-  const white = tm('#f3eee3');
-  for (let i = 0; i < 6; i++) {
-    const lx = -6 + i * 2.4;
-    mesh(new THREE.CylinderGeometry(0.72, 0.72, 0.5, 14), white, lx, 0.25, 1.5, { parent: g, edges: 40 });
-    mesh(new THREE.CylinderGeometry(0.47, 0.55, 10.4, 14), white, lx, 5.7, 1.5, { parent: g });
-    box(1.3, 0.5, 1.3, white, lx, 10.9, 1.5, { parent: g, edges: true });
+  const ry = NE.ry, sn = Math.sin(ry), cs = Math.cos(ry), W2 = (lx, lz) => [cx + lx * cs + lz * sn, cz - lx * sn + lz * cs];
+  const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = ry; world.add(g);
+  box(15.4, 0.6, 4.7, plinth, 0, 0, 0.2, { parent: g, edges: true });
+  box(15.4, 0.4, 0.55, plinth, 0, 0, 2.8, { parent: g, edges: true }); box(15.4, 0.2, 0.55, plinth, 0, 0, 3.35, { parent: g, edges: true });
+  const rustic = toon('#ffffff', { map: TX.rustic });
+  box(14.2, CORD - 0.3 - 0.6, 0.12, rustic, 0, 0.6, -2.12, { parent: g, cast: false });
+  const door = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 5.2), toon('#ffffff', { map: TX.churchDoor })); door.position.set(0, 0.6 + 2.6, -2.0); g.add(door);
+  for (const s of [-1, 1]) box(0.5, 5.6, 0.3, stone, s * 1.55, 0.6, -2.0, { parent: g, edges: true });
+  box(3.8, 0.45, 0.4, stone, 0, 6.2, -1.95, { parent: g, edges: true }); box(4.2, 0.25, 0.6, stone, 0, 6.65, -1.9, { parent: g, edges: true });
+  const shaft = new THREE.CylinderGeometry(0.5, 0.6, 8.8, 16), vol = new THREE.CylinderGeometry(0.27, 0.27, 1.3, 12);
+  for (const lx of [-5.4, -1.8, 1.8, 5.4]) {
+    mesh(new THREE.CylinderGeometry(0.78, 0.78, 0.25, 16), stone, lx, 0.72, 1.3, { parent: g, edges: 40 });
+    mesh(new THREE.CylinderGeometry(0.68, 0.72, 0.25, 16), stone, lx, 0.97, 1.3, { parent: g });
+    mesh(shaft, stone, lx, 1.1 + 4.4, 1.3, { parent: g });
+    mesh(new THREE.CylinderGeometry(0.66, 0.5, 0.35, 16), stone, lx, 10.07, 1.3, { parent: g });
+    for (const s of [-1, 1]) mesh(vol, stone, lx + s * 0.6, 10.05, 1.3, { parent: g, rx: Math.PI / 2, edges: 40 });   // the scrolls of the capital
+    box(1.6, 0.2, 1.5, stone, lx, 10.3, 1.3, { parent: g, cast: false });
+    const [x, z] = W2(lx, 1.3); colCirc(x, z, 0.75, 99);
   }
-  box(15.2, 1.2, 4.8, wm, 0, 11.4, -0.05, { parent: g, edges: true });
-  gableRoof(4.8, 15.2, 3.2, rm, 0, 12.6, -0.05, { ridgeZ: true, parent: g, over: 0.3, gableMat: wm });
-  box(15.2, 0.35, 3.0, tm('#c9c1b4'), 0, 0, 3.4, { parent: g, edges: true });   // the low step in front
+  box(15.0, CORD - 0.5 - 10.5, 4.6, stone, 0, 10.5, -0.05, { parent: g, edges: true });   // architrave and frieze
+  box(15.8, 0.5, 5.1, stone, 0, CORD - 0.5, -0.05, { parent: g, edges: true });            // the cornice
+  gableRoof(5.1, 15.8, 3.2, cu, 0, CORD, -0.05, { ridgeZ: true, parent: g, over: 0.3, gableMat: wm });
+  // she can walk up the steps to the door (the floor and steps are many small round tops), but not through the columns
+  for (let lx = -7.2; lx <= 7.21; lx += 0.9) { for (let lz = -1.8; lz <= 2.3; lz += 0.9) { const [x, z] = W2(lx, lz); colCirc(x, z, 0.65, 0.6); } const [a, b] = W2(lx, 2.8); colCirc(a, b, 0.4, 0.4); const [c, d] = W2(lx, 3.35); colCirc(c, d, 0.4, 0.2); }
+  // the church outline used to stop her includes the portico; use the church body only
+  for (const c of pcols) if (c.top === 33 && inRings(c.rings, cx, cz)) { c.rings = [body]; Object.assign(c, bboxOf(body)); }
+  // the drum without windows, the flat copper dome and the round window at the top
+  const C = [-38.3, -108.9];
+  const cyl = (r, y0, y1, mat, seg = 40) => mesh(new THREE.CylinderGeometry(r, r, y1 - y0, seg), mat, C[0], (y0 + y1) / 2, C[1], { edges: 40 });
+  cyl(10.7, 18, 23.4, wm); cyl(11.0, EAVE + 2 - 0.1, EAVE + 2.4, stone); cyl(11.3, 23.4, 24.0, stone);
+  for (let k = 0; k < 20; k++) { const a = k / 20 * Math.PI * 2; box(0.8, 23.4 - (EAVE + 2.4), 0.3, wm, C[0] + Math.sin(a) * 10.75, EAVE + 2.4, C[1] + Math.cos(a) * 10.75, { ry: a, cast: false }); }
+  const dome = mesh(new THREE.SphereGeometry(10.6, 40, 14, 0, Math.PI * 2, 0, Math.PI / 2), cu, C[0], 24.0, C[1], { edges: 40 }); dome.scale.y = 0.42;
+  const top = 24.0 + 10.6 * 0.42;
+  mesh(new THREE.CylinderGeometry(1.4, 1.5, 0.3, 20), tm('#a9c9d8'), C[0], top - 0.05, C[1]);
+  mesh(new THREE.TorusGeometry(1.5, 0.16, 6, 20), stone, C[0], top + 0.08, C[1], { rx: Math.PI / 2 });
 }
 
 // ---------------- Thorvaldsens Museum (Bindesbøll, 1848): ochre walls, a painted frieze, five tall doors and the quadriga
@@ -2178,7 +2230,7 @@ const POIS = [
   { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste. Gå hen til en hest og klap den.', x: -140, z: 85, r: 42 },
   { n: 'De Kongelige Stalde', t: 'Her bor kongens heste. Over staldene ligger et lille gammelt teater, hvor kongen så skuespil.', x: -105, z: 135, r: 20 },
   { n: 'Christian den Niende', t: 'Kong Christian den Niende sidder på sin hest foran slottet. Han var konge for over hundrede år siden.', x: -73, z: 50, r: 14 },
-  { n: 'Slotskirken', t: 'Slottets egen kirke. Den har seks hvide søjler foran og en rund kuppel på taget. Engang brændte den, men nu er den bygget smuk igen.', x: -30, z: -105, r: 30 },
+  { n: 'Slotskirken', t: 'Slottets egen kirke. Foran står der hvide søjler under en trekant, og på taget er der en flad kuppel af kobber. I 1992 ramte en raket taget, og kirken brændte. Nu er den bygget smuk igen.', x: -30, z: -105, r: 30 },
   { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer, som Thorvaldsen lavede for længe siden. Rundt om huset er der malet mennesker, der byder ham velkommen hjem fra en lang rejse med skib. På taget kører en gudinde med fire heste.', x: -100, z: -72, r: 32 },
   { n: 'Børsen', t: 'Et meget gammelt hus, som kong Christian den Fjerde byggede. Her købte og solgte man varer. Spiret er fire drager, der snor halerne sammen, og øverst sidder tre kroner. Her ser Børsen ud, som den gjorde før branden i 2024. Nu bliver den bygget op igen.', x: 250, z: 65, r: 50 },
   { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten med et grønt spir. Her gik sømændene i kirke, og der hænger et skib fra loftet. Dronning Margrethe blev gift her. I muren sidder en gammel kanonkugle.', x: 215, z: -45, r: 32 },
@@ -3055,6 +3107,7 @@ const TASKS = [
   { id: 'thorvaldsen', s: 'Heste på taget', at: ['Thorvaldsens Museum'], t: 'Hvor mange heste er der på museets tag?', quiz: ['2', '4', '6'], ok: 1 },
   { id: 'holmen', s: 'Kirkens spir', at: ['Holmens Kirke'], t: 'Hvilken farve har kirkens spir?', quiz: ['Rød', 'Grøn', 'Blå'], cols: ['#d9534f', '#4f9a68', '#4a7bd0'], ok: 1 },
   { id: 'marmor', s: 'Marmorbroen', at: ['Marmorbroen'], t: 'Gå op på toppen af Marmorbroen.', test: () => !MYBOAT.on && archH(P.pos.x, P.pos.z) > 1.2 && Math.hypot(P.pos.x + 203, P.pos.z - 134) < 14 },
+  { id: 'kirke', s: 'Kirkens søjler', at: ['Slotskirken'], t: 'Hvor mange søjler står der foran kirken?', quiz: ['2', '4', '6'], ok: 1 },
   { id: 'herkules', s: 'Herkules', at: ['Prins Jørgens Gård'], t: 'Find Herkules med køllen, og gå hen til ham.', test: () => Math.hypot(P.pos.x + 20.3, P.pos.z + 61) < 3.2 },
 ];
 const tasksDone = new Set();
