@@ -115,7 +115,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   </div>
   <button id="stars" class="sticker ctr" type="button" aria-label="Stjerner for opgaver. Tryk for at se opgaverne.">
     <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l4.7 10.2 11.1 1.2-8.3 7.5 2.3 11L20 28.3l-9.8 5.6 2.3-11-8.3-7.5 11.1-1.2z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/></svg>
-    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 13</span></div>
+    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 14</span></div>
   </button>
   </div>
   <div id="tools">
@@ -1146,6 +1146,7 @@ for (const b of DATA.B) {
   const wall = nm ? nm[0] : pick(WALLS), roof = nm ? nm[1] : pick(ROOFS);
   const own = { 'Christiansborg Slot': [40, '#8a6152'], 'Christiansborg Slotskirke': [33, '#7f9a8f'], 'Børsen': [22, '#5aa58e'], 'Den Sorte Diamant': [26, '#26292f'], 'Krigsmuseet': [22, '#9a5442'], 'Holmens Kirke': [21, '#5aa58e'] }[b.n];
   if (!b.n && b.rings[0][0][0] === 154 && b.rings[0][0][1] === 264) continue;
+  if (!b.n && b.rings[0][0][0] === -22 && b.rings[0][0][1] === -100) { mapItems.push({ k: 'p', pts: b.rings[0], fill: '#d9c7a6', line: true }); continue; }   // Kirkeløngangsbygningen, drawn further down
   if (!b.n && b.rings[0][0][0] === 113 && b.rings[0][0][1] === -122) { pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 22, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: '#5aa58e', line: true }); continue; }   // Beskæftigelsesministeriet, drawn further down
   if (!b.n && b.rings[0][0][0] === 213 && b.rings[0][0][1] === -35) { building(b.rings, 9, '#ad4f37', ROOF_COPPER); continue; }   // the chapel of Holmens Kirke   // the old library, drawn further down
   if (own) {   // drawn by hand further down; the outline only stops her and the camera
@@ -1598,6 +1599,7 @@ TX.churchDoor = ctex(64, 128, (g, w, h) => {
     box(19.0, 0.7, 1.9, stone, 0, EAVE - 0.7, 0, { parent: g, edges: true });
     const [lx, lz] = W.at(mid, 0.45 + WOFF); addWin('lunette', lx, CORD + 0.3 + 1.7, lz, W.ry, 6.8, 3.4, 0.5);   // the big half-round window
     for (let d = 4.5; d < W.len - 4; d += 5.2) {
+      if (W === LONG[0] && d > 5 && d < 21.5) continue;   // here Kirkeløngangsbygningen is built onto the church
       const o = (Math.abs(d - mid) < 9 ? 0.45 : 0) + WOFF, [x, z] = W.at(d, o);
       addWin('pane', x, 7.4, z, W.ry, 2.1, 5.4, 0.55);
       if (Math.abs(d - mid) > 4.6) addWin('pane', x, 17.0, z, W.ry, 2.0, 3.8, 0.55);
@@ -1642,6 +1644,54 @@ TX.churchDoor = ctex(64, 128, (g, w, h) => {
   const top = 24.0 + 10.6 * 0.42;
   mesh(new THREE.CylinderGeometry(1.4, 1.5, 0.3, 20), tm('#a9c9d8'), C[0], top - 0.05, C[1]);
   mesh(new THREE.TorusGeometry(1.5, 0.16, 6, 20), stone, C[0], top + 0.08, C[1], { rx: Math.PI / 2 });
+}
+
+// ---------------- Kirkeløngangsbygningen: the wing from the first Christiansborg (Elias David Häusser, 1733-41) that
+// joins the palace and Slotskirken on the east side of Prins Jørgens Gård. Light plaster with a striped ground floor,
+// three rows of windows, a cornice and a copper roof, and in the middle Kirkeløngangsporten: a vaulted gate she can
+// walk through, from Christiansborg Slotsplads into Prins Jørgens Gård, with a gold crown over it on the square side.
+// What the facades really look like is not described in the sources, so the details are a guess in the style of the time.
+const LOENGANG = { C: [-5.5, -86.5], u: [0.543, 0.840], v: [0.844, -0.537], L: 40.5, W: 13.04, gate: 2.2 };
+{
+  const { C, u, v, L, W } = LOENGANG, G2 = LOENGANG.gate, EAVE = 14;
+  const at = (s, w) => [C[0] + u[0] * s + v[0] * w, C[1] + u[1] * s + v[1] * w];
+  const rect = (s0, s1) => [at(s0, -W / 2), at(s1, -W / 2), at(s1, W / 2), at(s0, W / 2)];
+  const wm = tm(lit('#e6d6b8')), stone = tm('#f1ebde'), plinth = tm('#cbbfa8'), cu = tm(lit('#6d8a7f', 0.05)), rustic = toon('#ffffff', { map: TX.rustic });
+  const ext = (ring, y0, y1, mat) => { const g = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2); return mesh(g, mat, 0, y0, 0, { edges: 25 }); };
+  const A = rect(-L / 2, -G2), B = rect(G2, L / 2), M = rect(-G2, G2);
+  ext(A, 0, 5.6, wm); ext(B, 0, 5.6, wm); ext(rect(-L / 2, L / 2), 5.6, EAVE, wm);   // one piece over the gate, so no seams
+  bevelRoof(rect(-L / 2, L / 2), EAVE, 3, 3.6, cu);
+  pcols.push({ rings: [A], ...bboxOf(A), top: 17, bot: 0 }, { rings: [B], ...bboxOf(B), top: 17, bot: 0 }, { rings: [M], ...bboxOf(M), top: 17, bot: 5.6 });
+  // a group along the building: local x across the gate, local z out toward the square (east)
+  const g = new THREE.Group(), th = Math.atan2(v[0], v[1]); g.position.set(C[0], 0, C[1]); g.rotation.y = th; world.add(g);
+  const vault = new THREE.Shape(); vault.moveTo(-G2, 3.4); vault.lineTo(-G2, 5.6); vault.lineTo(G2, 5.6); vault.lineTo(G2, 3.4); vault.absarc(0, 3.4, G2, 0, Math.PI, false);
+  const vg = new THREE.ExtrudeGeometry(vault, { depth: W + 0.1, bevelEnabled: false, curveSegments: 16 }); vg.translate(0, 0, -W / 2 - 0.05);
+  mesh(vg, wm, 0, 0, 0, { parent: g, cast: false });
+  const floor = new THREE.PlaneGeometry(G2 * 2, W + 0.6); floor.rotateX(-Math.PI / 2); mesh(floor, SM.setts, 0, 0.02, 0, { parent: g, cast: false });
+  for (const sd of [-1, 1]) {
+    const zf = sd * W / 2;
+    for (const x of [-(G2 + (L / 2 - G2) / 2), G2 + (L / 2 - G2) / 2]) {
+      box(L / 2 - G2, 0.8, 0.34, plinth, x, 0, zf, { parent: g, cast: false });
+      box(L / 2 - G2, 4.8, 0.18, rustic, x, 0.8, zf, { parent: g, cast: false });
+    }
+    box(L + 0.2, 0.4, 0.5, stone, 0, 6.3, zf, { parent: g, edges: true });           // a band over the ground floor
+    box(L + 0.6, 0.6, 1.1, stone, 0, EAVE - 0.6, zf, { parent: g, edges: true });    // the cornice
+    for (const s of [-1, 1]) box(0.55, 3.4, 0.6, stone, s * (G2 + 0.28), 0, zf, { parent: g, edges: true });   // the gate: stone sides, an arch and a keystone
+    mesh(new THREE.TorusGeometry(G2 + 0.28, 0.28, 6, 24, Math.PI), stone, 0, 3.4, zf, { parent: g, edges: 40 });
+    box(0.7, 0.9, 0.7, stone, 0, 5.25, zf, { parent: g, edges: true });
+  }
+  crownAt(g, 0, 7.5, W / 2 + 0.35, 0.45);   // a gold crown over the gate on the square side
+  // windows with small panes in three rows on both long sides (the facade toward the yard faces the other way)
+  for (const sd of [-1, 1]) {
+    const ry = sd > 0 ? th : th + Math.PI;
+    for (let k = -5; k <= 5; k++) {
+      const s = k * 3.6;
+      const put = (y, h, o, kind) => { const [x, z] = at(s, sd * (W / 2 + o)); addWin(kind, x, y, z, ry, 1.6, h, 0.55); };
+      if (k !== 0) put(2.9, 2.0, 0.09 + WOFF, 'pane');
+      if (!(k === 0 && sd > 0)) put(8.0, 2.6, WOFF, 'pane');
+      put(11.4, 2.2, WOFF, 'pane');
+    }
+  }
 }
 
 // ---------------- Thorvaldsens Museum (Bindesbøll, 1848): ochre walls, a painted frieze, five tall doors and the quadriga
@@ -2231,6 +2281,7 @@ const POIS = [
   { n: 'De Kongelige Stalde', t: 'Her bor kongens heste. Over staldene ligger et lille gammelt teater, hvor kongen så skuespil.', x: -105, z: 135, r: 20 },
   { n: 'Christian den Niende', t: 'Kong Christian den Niende sidder på sin hest foran slottet. Han var konge for over hundrede år siden.', x: -73, z: 50, r: 14 },
   { n: 'Slotskirken', t: 'Slottets egen kirke. Foran står der hvide søjler under en trekant, og på taget er der en flad kuppel af kobber. I 1992 ramte en raket taget, og kirken brændte. Nu er den bygget smuk igen.', x: -30, z: -105, r: 30 },
+  { n: 'Kirkeløngangsbygningen', t: 'En gammel bygning, der forbinder slottet med Slotskirken. Den er fra det første Christiansborg for næsten 300 år siden. Gennem porten kan du gå fra Slotspladsen ind i Prins Jørgens Gård.', x: -5.5, z: -86.5, r: 14 },
   { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer, som Thorvaldsen lavede for længe siden. Rundt om huset er der malet mennesker, der byder ham velkommen hjem fra en lang rejse med skib. På taget kører en gudinde med fire heste.', x: -100, z: -72, r: 32 },
   { n: 'Børsen', t: 'Et meget gammelt hus, som kong Christian den Fjerde byggede. Her købte og solgte man varer. Spiret er fire drager, der snor halerne sammen, og øverst sidder tre kroner. Her ser Børsen ud, som den gjorde før branden i 2024. Nu bliver den bygget op igen.', x: 250, z: 65, r: 50 },
   { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten med et grønt spir. Her gik sømændene i kirke, og der hænger et skib fra loftet. Dronning Margrethe blev gift her. I muren sidder en gammel kanonkugle.', x: 215, z: -45, r: 32 },
@@ -3108,6 +3159,7 @@ const TASKS = [
   { id: 'holmen', s: 'Kirkens spir', at: ['Holmens Kirke'], t: 'Hvilken farve har kirkens spir?', quiz: ['Rød', 'Grøn', 'Blå'], cols: ['#d9534f', '#4f9a68', '#4a7bd0'], ok: 1 },
   { id: 'marmor', s: 'Marmorbroen', at: ['Marmorbroen'], t: 'Gå op på toppen af Marmorbroen.', test: () => !MYBOAT.on && archH(P.pos.x, P.pos.z) > 1.2 && Math.hypot(P.pos.x + 203, P.pos.z - 134) < 14 },
   { id: 'kirke', s: 'Kirkens søjler', at: ['Slotskirken'], t: 'Hvor mange søjler står der foran kirken?', quiz: ['2', '4', '6'], ok: 1 },
+  { id: 'port', s: 'Gennem porten', at: ['Kirkeløngangsbygningen'], t: 'Gå gennem porten i den gamle bygning.', test: () => { const { C, u, v } = LOENGANG, dx = P.pos.x - C[0], dz = P.pos.z - C[1]; return Math.abs(dx * u[0] + dz * u[1]) < 1.6 && Math.abs(dx * v[0] + dz * v[1]) < 1.5; } },
   { id: 'herkules', s: 'Herkules', at: ['Prins Jørgens Gård'], t: 'Find Herkules med køllen, og gå hen til ham.', test: () => Math.hypot(P.pos.x + 20.3, P.pos.z + 61) < 3.2 },
 ];
 const tasksDone = new Set();
