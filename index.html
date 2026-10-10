@@ -44,6 +44,11 @@ button.ctr{cursor:pointer}
 .btn[aria-pressed="true"]{background:#ffe4bd}
 #map{position:fixed;right:14px;top:calc(68px + env(safe-area-inset-top,0px));border-radius:12px;background:#a7c46f}
 #poi{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(470px,calc(100% - 32px));padding:11px 16px 13px;box-sizing:border-box;animation:pop .25s ease-out}
+#guide{position:fixed;left:14px;top:calc(134px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff1b8;font:700 13px var(--body)}
+#guideArrow{display:inline-block;font:800 25px var(--display);line-height:1;transform-origin:center}
+#poiActions{display:flex;gap:8px;margin-top:7px}
+#poiActions button{font:700 12px var(--body);border:1.5px solid var(--ink);border-radius:9px;background:var(--paper-2);color:var(--ink);padding:4px 9px;cursor:pointer;pointer-events:auto}
+#poiActions button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .chipsHead{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;opacity:.72;margin:0 0 7px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
 .chip{font:600 12.5px var(--body);padding:2px 10px;border:2px solid var(--ink);border-radius:999px;background:var(--paper-2);opacity:.6}
@@ -90,6 +95,7 @@ kbd{display:inline-block;min-width:1.6em;text-align:center;padding:1px 6px;borde
 .touch #umb{bottom:calc(116px + env(safe-area-inset-bottom,0px))}
 #jump{position:fixed;right:22px;bottom:calc(26px + env(safe-area-inset-bottom,0px));width:78px;height:78px;border-radius:50%;font:800 18px var(--display);color:var(--ink);background:var(--leaf);touch-action:none}
 #poi,#toast{pointer-events:none}   /* the text cards must not block the thumbs */
+#poiActions{pointer-events:auto}
 #touchHint{position:fixed;left:22px;bottom:calc(26px + env(safe-area-inset-bottom,0px));width:96px;height:96px;border-radius:50%;border:2.5px dashed rgba(42,34,56,.55);display:grid;place-items:center;font-size:11px;font-weight:600;text-align:center;color:var(--ink);background:rgba(255,250,240,.35);pointer-events:none;line-height:1.2}
 body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 @media (max-width:600px){
@@ -126,7 +132,8 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
     <button id="bHelp" class="sticker btn" type="button" aria-label="Hjælp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-1 .7-1.6 1.2-1.6 2.4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg><span>Hjælp</span></button>
   </div>
   <canvas id="map" class="sticker" aria-label="Kort over Slotsholmen"></canvas>
-  <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><p id="poiTask" hidden></p></div>
+  <div id="guide" class="sticker" role="status" aria-live="off" hidden><span id="guideArrow" aria-hidden="true">↑</span><span id="guideText"></span></div>
+  <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><p id="poiTask" hidden></p><div id="poiActions"><button id="poiMore" type="button">Læs mere</button><button id="poiRead" type="button">Læs op</button></div></div>
   <div id="toast" class="sticker" hidden></div>
   <div id="touchHint" hidden>Træk her<br>for at gå</div>
   <div id="joy" hidden><div id="knob"></div></div>
@@ -138,7 +145,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div class="card sticker">
     <div class="eyebrow">København · en gåtur i 3D</div>
     <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå rundt på Slotsholmen, og find kongens 10 guldkroner. Følg de gule lys. Der er vand hele vejen rundt, så du skal over en bro. Klap hestene på Ridebanen, giv ænderne brød, og vink til bådene i kanalen. Når du kommer tæt på et sted, ser du, hvad det hedder, og mange steder har en lille opgave.</p>
+    <p class="lead" id="introLead">Gå på opdagelse på Slotsholmen! Kongen har tabt 10 guldkroner. Følg de gule lys, og se, hvem du møder på vejen.</p>
     <div id="taskBox" hidden><div class="chipsHead">Opgaver</div><div class="chips" id="taskChips"></div></div>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
@@ -2779,7 +2786,7 @@ function resolvePoly(p) {
     else if (d < RAD && d > 1e-6) { p.x = bx + (p.x - bx) / d * RAD; p.z = bz + (p.z - bz) / d * RAD; }
   }
 }
-let splashT = 0;
+let splashT = 0, lastStep = 0;
 function updPlayer(dt) {
   for (const h of HOOKS.ride) if (h(dt)) return;
   const ox = P.pos.x, oz = P.pos.z;
@@ -2820,6 +2827,8 @@ function updPlayer(dt) {
   const k = Math.max(Math.min(1, hs / 5), hs < 0.6 ? Math.abs(turn) * 0.35 : 0);
   const back = (fx * P.vel.x + fz * P.vel.z) < -0.2 ? -1 : 1;
   P.walkT += dt * (2.5 + hs * 1.5) * (k > 0.02 ? 1 : 0);
+  const step = Math.floor(P.walkT / Math.PI);
+  if (!paused && P.onGround && hs > 1 && step !== lastStep) { lastStep = step; footstep(); }
   const ph = P.walkT * back;
   const L = kid.legs, A = kid.arms;
   if (P.onGround) {
@@ -2852,6 +2861,8 @@ function tone(f0, f1, start, dur, vol = 0.16, type = 'sine') {
 }
 function sparkleSound() { [1320, 1760, 2093].forEach((f, i) => tone(f, f * 1.01, 0.08 + i * 0.07, 0.3, 0.045)); }
 function hop() { tone(300, 520, 0, 0.12, 0.05, 'triangle'); }
+function footstep() { if (soundOn) tone(110, 65, 0, 0.07, 0.018, 'triangle'); }
+function flutterSound() { if (soundOn) { tone(750, 470, 0, 0.10, 0.028, 'triangle'); tone(880, 580, 0.08, 0.09, 0.022, 'triangle'); } }
 
 // ======================================================================== EFFECTS (label + sparkles when an animal is found)
 const effects = [];
@@ -2877,12 +2888,22 @@ function burst(pos) {
     effects.push({ sp, t: 0, life: rr(0.9, 1.3), vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rr(2.2, 4.2) });
   }
 }
+const rewardRingGeo = new THREE.RingGeometry(0.45, 0.62, 28).rotateX(-Math.PI / 2);
+function rewardRipple(x, y, z) {
+  const ring = new THREE.Mesh(rewardRingGeo, new THREE.MeshBasicMaterial({ color: '#ffd34d', transparent: true, opacity: 0.72, depthWrite: false, side: THREE.DoubleSide }));
+  ring.position.set(x, y + 0.08, z); dyn.add(ring); effects.push({ ring, t: 0, life: 0.8 });
+}
 function updEffects(dt) {
   for (let i = effects.length - 1; i >= 0; i--) {
     const e = effects[i]; e.t += dt; const k = e.t / e.life;
-    if (e.label) { e.sp.position.y += e.vy * dt; e.sp.material.opacity = k > 0.78 ? Math.max(0, 1 - (k - 0.78) / 0.22) : Math.min(1, k * 8); }
+    if (e.ring) { e.ring.scale.setScalar(1 + 4 * k); e.ring.material.opacity = Math.max(0, 0.72 * (1 - k)); }
+    else if (e.label) { e.sp.position.y += e.vy * dt; e.sp.material.opacity = k > 0.78 ? Math.max(0, 1 - (k - 0.78) / 0.22) : Math.min(1, k * 8); }
     else { e.vy -= 7 * dt; e.sp.position.x += e.vx * dt; e.sp.position.y += e.vy * dt; e.sp.position.z += e.vz * dt; e.sp.material.opacity = Math.max(0, 1 - k); }
-    if (e.t >= e.life) { dyn.remove(e.sp); if (e.label) e.sp.material.map.dispose(); e.sp.material.dispose(); effects.splice(i, 1); }
+    if (e.t >= e.life) {
+      if (e.ring) { dyn.remove(e.ring); e.ring.material.dispose(); }
+      else { dyn.remove(e.sp); if (e.label) e.sp.material.map.dispose(); e.sp.material.dispose(); }
+      effects.splice(i, 1);
+    }
   }
 }
 
@@ -2890,7 +2911,7 @@ const seenPoi = new Set();
 // ======================================================================== UI
 const hud = $('hud'), intro = $('intro'), goBtn = $('goBtn');
 const mapCv = $('map'), mctx = mapCv.getContext('2d');
-let mapBase = null; const MX0 = -300, MX1 = 330, MZ0 = -265, MZ1 = 345;
+let mapBase = null, guideTarget = null; const MX0 = -300, MX1 = 330, MZ0 = -265, MZ1 = 345;
 function sizeMap() {
   const cssW = window.innerWidth < 600 ? 112 : 170; const cssH = Math.round(cssW * (MZ1 - MZ0) / (MX1 - MX0));
   mapCv.style.width = cssW + 'px'; mapCv.style.height = cssH + 'px';
@@ -2922,6 +2943,7 @@ function drawMap() {
   const px = mpx(P.pos.x), pz = mpz(P.pos.z);
   if (!MYBOAT.on) { g.fillStyle = '#d9534f'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(MYBOAT.x), mpz(MYBOAT.z), Math.max(3, k * 2.4), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the little boat
   for (const c of CROWNS) if (!c.got) { g.fillStyle = '#ffd34d'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(c.x), mpz(c.z), Math.max(3.5, k * 3) * (1 + 0.18 * Math.sin(clockT * 5)), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the crowns that are still out there
+  if (guideTarget && !guideTarget.got) { g.strokeStyle = '#fffaf0'; g.lineWidth = Math.max(2, k * 1.5); g.beginPath(); g.arc(mpx(guideTarget.x), mpz(guideTarget.z), Math.max(7, k * 5), 0, Math.PI * 2); g.stroke(); }
   const cy = cam.yaw; const fx = -Math.sin(cy), fz = -Math.cos(cy); const L = 22 * k;
   g.fillStyle = 'rgba(255,250,240,.35)'; g.beginPath(); g.moveTo(px, pz);
   g.lineTo(px + (fx * Math.cos(0.5) - fz * Math.sin(0.5)) * L, pz + (fz * Math.cos(0.5) + fx * Math.sin(0.5)) * L);
@@ -2939,8 +2961,25 @@ function setEvening(v) {
 function setSound(v) { soundOn = v; $('bSound').setAttribute('aria-pressed', String(v)); $('iWave').style.display = v ? '' : 'none'; save(); }
 let toastTimer = 0;
 function toast(msg) { sayToast(msg); const t = $('toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; toastTimer = 3.4; }
-let curPoi = null;
-function showPoi(p) { if (p === curPoi) return; curPoi = p; const el = $('poi'); if (p && !seenPoi.has(p.n)) { seenPoi.add(p.n); popLabel(p.n, kid.root.position, 1.3); burst(kid.root.position); sparkleSound(); } if (!p) { el.hidden = true; setPoiH(); return; } sayPoi(p); $('poiName').textContent = p.n; $('poiText').textContent = p.t; updTaskCard(); el.hidden = true; void el.offsetWidth; el.hidden = false; setPoiH(); }
+let curPoi = null, poiExpanded = false;
+function shortPoi(text) { const end = text.search(/[.!?]\s/); return end < 0 ? text : text.slice(0, end + 1); }
+function renderPoiText() {
+  if (!curPoi) return;
+  $('poiText').textContent = poiExpanded ? curPoi.t : shortPoi(curPoi.t);
+  $('poiMore').hidden = shortPoi(curPoi.t) === curPoi.t;
+  $('poiMore').textContent = poiExpanded ? 'Vis mindre' : 'Læs mere';
+  updTaskCard(); setPoiH();
+}
+function showPoi(p) {
+  if (p === curPoi) return;
+  curPoi = p; poiExpanded = false; const el = $('poi');
+  if (p && !seenPoi.has(p.n)) { seenPoi.add(p.n); popLabel(p.n, kid.root.position, 1.3); burst(kid.root.position); sparkleSound(); }
+  if (!p) { el.hidden = true; setPoiH(); return; }
+  sayPoi(p); $('poiName').textContent = p.n; $('poiRead').hidden = !('speechSynthesis' in window);
+  el.hidden = false; renderPoiText();
+}
+$('poiMore').addEventListener('click', () => { poiExpanded = !poiExpanded; renderPoiText(); });
+$('poiRead').addEventListener('click', () => { if (curPoi) say(`${curPoi.n}. ${curPoi.t} ${taskLine(curPoi)}`, true); });
 
 $('bMap').addEventListener('click', () => setMapVisible(!showMap));
 $('bVoice').addEventListener('click', () => setVoice(!voiceOn));
@@ -3062,8 +3101,8 @@ let voiceOn = false, daVoice = null, toastSaidAt = -99, pendingPoi = null;
 const lastPoiSaid = new Map();
 function pickVoice() { try { const vs = speechSynthesis.getVoices(); daVoice = vs.find(v => /^da/i.test(v.lang)) || null; } catch (e) { daVoice = null; } }
 if ('speechSynthesis' in window) { pickVoice(); try { speechSynthesis.addEventListener('voiceschanged', pickVoice); } catch (e) {} }
-function say(text) {
-  if (!voiceOn || !('speechSynthesis' in window)) return;
+function say(text, force = false) {
+  if ((!voiceOn && !force) || !('speechSynthesis' in window)) return;
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text.replace(/·/g, ',').replace(/MÅL!/g, 'Mål!').replace(/\bS\b/g, 'S'));
@@ -3076,7 +3115,7 @@ function sayPoi(p) {
   if (!p || !started) return;
   if (clockT - toastSaidAt < 3.5) { pendingPoi = p; return; }
   const last = lastPoiSaid.get(p.n) ?? -999; if (clockT - last < 90) return;
-  lastPoiSaid.set(p.n, clockT); say(`${p.n}. ${p.t} ${taskLine(p)}`);
+  lastPoiSaid.set(p.n, clockT); say(`${p.n}. ${shortPoi(p.t)}`);
 }
 function updVoice() { if (pendingPoi && clockT - toastSaidAt >= 3.5) { const p = pendingPoi; pendingPoi = null; if (p === curPoi) sayPoi(p); } }
 function setVoice(v) {   // reading aloud is off from the start; the "Læs op" button turns it on and off
@@ -3111,7 +3150,7 @@ function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') ||
 HOOKS.start.push(() => setTimeout(() => toast(found.size === 0 ? 'Kongen har tabt 10 guldkroner. Kan du finde dem?' : found.size === 9 ? 'Find den sidste krone.' : found.size < 10 ? `Find de sidste ${10 - found.size} kroner.` : 'Gå over broen hen til slottet.'), 1200));
 
 // ======================================================================== MAIN LOOP
-let last = performance.now(), clockT = 0, poiT = 0, mapT = 0;
+let last = performance.now(), clockT = 0, poiT = 0, mapT = 0, guideT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; clockT += dt;
   ev += ((evening ? 1 : 0) - ev) * Math.min(1, dt * 1.6); applyEvening();
@@ -3131,6 +3170,7 @@ function frame(now) {
   if (started) {
     poiT -= dt; if (poiT < 0) { poiT = 0.25; showPoi(paused ? null : poiAt(P.pos.x, P.pos.z)); }
     mapT -= dt; if (mapT < 0) { mapT = 1 / 30; drawMap(); }
+    guideT -= dt; if (guideT < 0) { guideT = 0.25; updGuide(); }
     if (toastTimer > 0) { toastTimer -= dt; if (toastTimer <= 0) $('toast').hidden = true; }
   }
   renderer.render(scene, camera);
@@ -3161,6 +3201,19 @@ const CROWNS = CROWN_SPOTS.map(([x, z], i) => {
   const got = found.has(i); g.visible = beam.visible = !got;
   return { i, x, z, y0, g, c, beam, got, fly: 0, ph: i * 0.7 };
 });
+function updGuide() {
+  guideTarget = null; let best = Infinity;
+  for (const c of CROWNS) if (!c.got) {
+    const d = Math.hypot(P.pos.x - c.x, P.pos.z - c.z);
+    if (d < best) { best = d; guideTarget = c; }
+  }
+  const el = $('guide'); el.hidden = !guideTarget;
+  if (!guideTarget) return;
+  const a = Math.atan2(guideTarget.x - P.pos.x, guideTarget.z - P.pos.z) - P.face;
+  $('guideArrow').style.transform = `rotate(${a}rad)`;
+  $('guideText').textContent = `Nærmeste krone · ${Math.round(best)} m`;
+  el.setAttribute('aria-label', `Nærmeste krone, ${Math.round(best)} meter væk`);
+}
 let headCrown = null;
 function setCrownOnHead(on) {
   if (on && !headCrown) { headCrown = new THREE.Group(); crownAt(headCrown, 0, 0, 0, 0.2); headCrown.position.set(0, 0.43, -0.02); headCrown.rotation.x = -0.15; kid.head.add(headCrown); }
@@ -3191,7 +3244,7 @@ function allCrowns() {
 function takeCrown(c) {
   c.got = true; c.fly = 0.7; c.beam.visible = false; found.add(c.i); save(); updCounter(true);
   const n = found.size;
-  burst(new THREE.Vector3(c.x, c.y0 + 0.6, c.z)); popLabel(`${n} af ${CROWNS.length}`, kid.root.position, 1.3);
+  burst(new THREE.Vector3(c.x, c.y0 + 0.6, c.z)); rewardRipple(c.x, c.y0, c.z); popLabel(`${n} af ${CROWNS.length}`, kid.root.position, 1.3);
   [784, 988, 1175, 1568].forEach((f, k) => tone(f, f, k * 0.09, 0.25, 0.06, 'triangle'));
   if (n >= CROWNS.length) { allCrowns(); return; }
   toast(n === 1 ? 'Du fandt en guldkrone! Følg de gule lys til de andre.' : n === CROWNS.length - 1 ? 'Kun én krone mangler!' : `Flot! Der mangler ${CROWNS.length - n} kroner.`);
@@ -3246,20 +3299,27 @@ for (let attempt = 0; PIGEONS.length < (isTouch ? 20 : 32) && attempt < 500; att
   if (z < -63 || rawWater(x, z) || inBuilding(x, z) || groundAt(x, z, 2) > 0.6 || nearRoute(x, z, 3.5)) continue;
   if (PIGEONS.some(p => Math.hypot(p.x - x, p.z - z) < 1.7)) continue;
   PIGEONS.push(makePigeon(x, z, groundAt(x, z, 2), PIGEONS.length));
+} 
+// A few birds also make the first square feel occupied before the walk begins.
+for (const [x, z] of [[-20, -216], [11, -217], [-19, -238], [12, -238], [0, -210]]) {
+  if (!rawWater(x, z) && !inBuilding(x, z) && !nearRoute(x, z, 3) && groundAt(x, z, 2) < 0.6)
+    PIGEONS.push(makePigeon(x, z, groundAt(x, z, 2), PIGEONS.length));
 }
 HOOKS.frame.push((dt, t) => {
   if (!started || paused) return;
+  let wave = false;
   for (const p of PIGEONS) {
     if (p.state !== 'ground' || Math.hypot(P.pos.x - p.x, P.pos.z - p.z) > 7) continue;
     for (const q of PIGEONS) {
       if (q.state !== 'ground') continue;
       const d = Math.hypot(q.x - p.x, q.z - p.z);
       if (d > 20) continue;
-      q.state = 'queued'; q.delay = d * 0.015 + rr(0, 0.18);
+      q.state = 'queued'; wave = true; q.delay = d * 0.015 + rr(0, 0.18);
       const a = Math.atan2(q.x - P.pos.x, q.z - P.pos.z) + rr(-0.5, 0.5);
       q.dx = Math.sin(a); q.dz = Math.cos(a);
     }
   }
+  if (wave) flutterSound();
   for (const p of PIGEONS) {
     if (p.state === 'ground') {
       p.g.position.y = p.y + Math.sin(t * 3 + p.phase) * 0.025;
@@ -3282,6 +3342,47 @@ HOOKS.frame.push((dt, t) => {
         p.wings[0].rotation.z = -0.12; p.wings[1].rotation.z = 0.12;
       }
     }
+  }
+});
+
+// ---------------- walkers on Højbro Plads: simple, quiet loops around the starting point
+const START_WALKERS = [];
+function makeStartWalker(a, b, coat, phase) {
+  const root = new THREE.Group(); dyn.add(root);
+  const skin = tm('#eab995'), hair = tm('#704c34'), cloth = tm(coat), dark = tm('#33475b');
+  const body = mesh(new THREE.SphereGeometry(1, 10, 8), cloth, 0, 1.05, 0, { parent: root }); body.scale.set(0.30, 0.45, 0.22);
+  const head = mesh(new THREE.SphereGeometry(1, 10, 8), skin, 0, 1.65, 0, { parent: root }); head.scale.setScalar(0.22);
+  const cap = mesh(new THREE.SphereGeometry(1, 10, 8), hair, 0, 1.79, -0.02, { parent: root }); cap.scale.set(0.23, 0.11, 0.23);
+  const arms = [], legs = [];
+  for (const side of [-1, 1]) {
+    const arm = new THREE.Group(); arm.position.set(side * 0.31, 1.30, 0); root.add(arm);
+    mesh(new THREE.CapsuleGeometry(0.075, 0.30, 4, 7), cloth, 0, -0.20, 0, { parent: arm }); arms.push(arm);
+    const leg = new THREE.Group(); leg.position.set(side * 0.14, 0.65, 0); root.add(leg);
+    mesh(new THREE.CapsuleGeometry(0.09, 0.38, 4, 7), dark, 0, -0.30, 0, { parent: leg });
+    mesh(new THREE.SphereGeometry(0.13, 8, 6), dark, 0, -0.60, 0.10, { parent: leg }).scale.set(1, 0.5, 1.5); legs.push(leg);
+  }
+  return { root, arms, legs, a, b, phase, greeted: false };
+}
+const startWalkOk = ([x, z]) => !rawWater(x, z) && !inBuilding(x, z) && !nearRoute(x, z, 3) && groundAt(x, z, 2) < 0.6;
+for (const [a, b, col, phase] of [
+  [[-24, -230], [-16, -213], '#e7894f', 0],
+  [[7, -219], [15, -236], '#5c91b8', 1.8],
+  [[-17, -244], [-3, -240], '#82a66b', 3.2],
+  [[5, -207], [-8, -212], '#c47bb0', 4.5]
+]) if (startWalkOk(a) && startWalkOk(b)) START_WALKERS.push(makeStartWalker(a, b, col, phase));
+HOOKS.frame.push((dt, t) => {
+  if (!started || paused) return;
+  for (const w of START_WALKERS) {
+    const a = t * 0.34 + w.phase, u = (Math.sin(a) + 1) / 2, moving = Math.abs(Math.cos(a));
+    const x = w.a[0] + (w.b[0] - w.a[0]) * u, z = w.a[1] + (w.b[1] - w.a[1]) * u;
+    w.root.position.set(x, groundAt(x, z, 2), z);
+    w.root.rotation.y = Math.atan2(w.b[0] - w.a[0], w.b[1] - w.a[1]) + (Math.cos(a) < 0 ? Math.PI : 0);
+    const swing = Math.sin(t * 7 + w.phase) * 0.5 * moving;
+    w.legs[0].rotation.x = swing; w.legs[1].rotation.x = -swing;
+    w.arms[0].rotation.x = -swing * 0.8; w.arms[1].rotation.x = swing * 0.8;
+    const d = Math.hypot(P.pos.x - x, P.pos.z - z);
+    if (d < 4.5 && !w.greeted) { w.greeted = true; popLabel('Hej!', w.root.position, 1.6); tone(630, 780, 0, 0.13, 0.025, 'triangle'); }
+    if (d > 12) w.greeted = false;
   }
 });
 
@@ -3521,7 +3622,7 @@ const taskOf = p => p ? TASKS.find(t => t.at.includes(p.n)) : null;
 function taskLine(p) { const t = taskOf(p); return !t ? '' : tasksDone.has(t.id) ? 'Opgave klaret!' : 'Opgave: ' + t.t; }
 function updTaskCard() {
   const el = $('poiTask'), line = taskLine(curPoi);
-  el.hidden = !line; if (line) el.innerHTML = '<span class="star">★</span> ' + line;
+  el.hidden = !poiExpanded || !line; if (line) el.innerHTML = '<span class="star">★</span> ' + line;
   setPoiH();
 }
 function setPoiH() { const el = $('poi'); document.documentElement.style.setProperty('--poiH', (el.hidden ? 0 : Math.round(window.innerHeight - el.getBoundingClientRect().top)) + 'px'); }   // the E button stays above the place card
@@ -3536,7 +3637,7 @@ updStars();
 function completeTask(t) {
   if (tasksDone.has(t.id)) return;
   tasksDone.add(t.id); save(); updStars(true); updTaskCard();
-  burst(kid.root.position); popLabel('Godt klaret!', kid.root.position, 1.3);
+  burst(kid.root.position); rewardRipple(P.pos.x, P.pos.y, P.pos.z); popLabel('Godt klaret!', kid.root.position, 1.3);
   [880, 1109, 1319, 1760].forEach((f, k) => tone(f, f, 0.1 + k * 0.08, 0.3, 0.06, 'triangle'));
   if (tasksDone.size >= TASKS.length) setTimeout(() => {
     toast('Du har klaret alle opgaverne! Nu kender du Slotsholmen.');
