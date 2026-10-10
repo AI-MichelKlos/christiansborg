@@ -1423,7 +1423,112 @@ function rytter(x, z, ry) {
   for (const s of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.1, 0.6, 3, 6), bronze, s * 0.38, 2.15, 0.1, { parent: hr, rx: 0.4 });
   colCirc(x, z, 3.8, 6.4);
 }
-rytter(81, -51, Math.atan2(34, -23));
+// Frederik VII on Slotspladsen: a walking horse, bowed head, uniform cap and long cloak.
+function frederikVII(x, z, ry) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; world.add(g);
+  const stone = tm('#938a80'), stoneDark = tm('#716b65'), stoneLight = tm('#aaa094');
+  const bronze = tm('#548b80'), bronzeLight = tm('#72a69a'), bronzeDark = tm('#34645e');
+  const bronzeShadow = tm('#274d49'), plaque = tm('#6d675f'), letters = tm('#c5a76d');
+  // Granite plinth, high pedestal and projecting cornice.
+  box(4.3, 0.45, 8.0, stoneDark, 0, 0, 0, { parent: g, edges: true });
+  box(3.9, 0.35, 7.6, stoneLight, 0, 0.45, 0, { parent: g, edges: true });
+  box(3.45, 4.15, 7.0, stone, 0, 0.8, 0, { parent: g, edges: true });
+  box(3.9, 0.27, 7.45, stoneDark, 0, 4.95, 0, { parent: g, edges: true });
+  box(4.15, 0.34, 7.7, stoneLight, 0, 5.22, 0, { parent: g, edges: true });
+  box(3.7, 0.22, 7.3, bronzeDark, 0, 5.56, 0, { parent: g, edges: true });
+  // Recessed inscriptions, including the date of the June Constitution.
+  box(2.75, 2.6, 0.08, plaque, 0, 1.55, 3.55, { parent: g });
+  box(0.08, 2.6, 4.9, plaque, 1.77, 1.55, 0, { parent: g });
+  box(0.08, 2.6, 4.9, plaque, -1.77, 1.55, 0, { parent: g });
+  function inscription(lines, w, h, px, py, pz, turn) {
+    const tx = ctex(512, 256, (c, tw, th) => {
+      c.clearRect(0, 0, tw, th); c.fillStyle = '#d1b57c'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.font = 'bold 48px Georgia, serif';
+      lines.forEach((line, i) => c.fillText(line, tw / 2, th / 2 + (i - (lines.length - 1) / 2) * 63, tw - 24));
+    }, { wrap: false });
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tx, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+    m.position.set(px, py, pz); m.rotation.y = turn; g.add(m);
+  }
+  inscription(['5 JUNI', '1849'], 2.45, 1.55, 0, 2.85, 3.61, 0);
+  inscription(['FREDERIK D. SYVENDE', 'GRUNDLOVENS GIVER'], 4.45, 1.5, 1.83, 2.85, 0, Math.PI / 2);
+  inscription(['FREDERIK VII'], 4.2, 1.1, -1.83, 2.85, 0, -Math.PI / 2);
+  for (const sx of [-1, 1]) box(0.16, 2.95, 0.16, stoneLight, sx * 1.58, 1.40, 3.58, { parent: g });
+  // Small modelling helpers: ovals for muscle and cloth, tapered rods for limbs and reins.
+  const statue = new THREE.Group(); statue.position.y = 5.77; g.add(statue);
+  const oval = (mat, px, py, pz, sx, sy, sz) => {
+    const m = mesh(new THREE.SphereGeometry(1, 12, 9), mat, px, py, pz, { parent: statue });
+    m.scale.set(sx, sy, sz); return m;
+  };
+  const limb = (a, b, r0, r1, mat) => {
+    const va = new THREE.Vector3(...a), vb = new THREE.Vector3(...b), d = vb.clone().sub(va);
+    const m = mesh(new THREE.CylinderGeometry(r1, r0, d.length(), 9), mat, (va.x + vb.x) / 2, (va.y + vb.y) / 2, (va.z + vb.z) / 2, { parent: statue });
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return m;
+  };
+  const line = (points, mat, radius = 0.025) => {
+    mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p))), 12, radius, 4, false), mat, 0, 0, 0, { parent: statue, cast: false });
+  };
+  // Horse in a slow walk: one foreleg lifted and the head lowered.
+  oval(bronze, 0, 2.15, -0.05, 0.78, 0.69, 1.67);
+  oval(bronzeLight, 0, 2.17, -1.14, 0.75, 0.72, 0.78);
+  oval(bronze, 0, 2.15, 1.10, 0.70, 0.79, 0.69);
+  limb([0, 2.53, 1.30], [0, 1.72, 2.14], 0.43, 0.30, bronze);
+  oval(bronze, 0, 1.57, 2.34, 0.31, 0.39, 0.59);
+  oval(bronzeLight, 0, 1.36, 2.75, 0.28, 0.22, 0.35);
+  for (const sx of [-1, 1]) {
+    const ear = mesh(new THREE.ConeGeometry(0.12, 0.34, 7), bronzeDark, sx * 0.22, 1.98, 2.07, { parent: statue });
+    ear.rotation.z = sx * -0.18;
+    oval(bronzeShadow, sx * 0.275, 1.58, 2.52, 0.035, 0.035, 0.035);
+    oval(bronzeShadow, sx * 0.18, 1.33, 3.01, 0.035, 0.025, 0.035);
+  }
+  // Swept mane and a long tail keep the silhouette close to the original bronze.
+  for (let i = 0; i < 6; i++) limb([0, 2.72 - i * 0.14, 1.12 + i * 0.17], [0, 2.49 - i * 0.15, 1.01 + i * 0.17], 0.15, 0.055, bronzeDark);
+  limb([0, 2.36, -1.77], [0, 1.62, -2.17], 0.20, 0.17, bronzeDark);
+  limb([0, 1.62, -2.17], [0, 0.72, -2.39], 0.18, 0.065, bronzeDark);
+  for (const sx of [-1, 1]) {
+    // Rear legs bend at the hock.
+    limb([sx * 0.50, 1.85, -1.18], [sx * 0.57, 0.94, -1.62], 0.28, 0.16, bronze);
+    limb([sx * 0.57, 0.94, -1.62], [sx * 0.57, 0.19, -1.83], 0.16, 0.12, bronze);
+    oval(bronzeDark, sx * 0.57, 0.13, -1.83, 0.20, 0.12, 0.28);
+  }
+  limb([-0.49, 1.93, 1.10], [-0.51, 0.91, 1.34], 0.25, 0.16, bronze);
+  limb([-0.51, 0.91, 1.34], [-0.51, 0.18, 1.27], 0.16, 0.11, bronze);
+  oval(bronzeDark, -0.51, 0.12, 1.31, 0.20, 0.12, 0.29);
+  limb([0.49, 1.93, 1.08], [0.51, 1.16, 1.65], 0.25, 0.17, bronze);
+  limb([0.51, 1.16, 1.65], [0.51, 0.59, 2.19], 0.17, 0.12, bronze);
+  oval(bronzeDark, 0.51, 0.55, 2.24, 0.20, 0.13, 0.29);
+  // Saddle, hanging stirrups and reins.
+  oval(bronzeShadow, 0, 2.76, -0.14, 0.65, 0.15, 0.79);
+  for (const sx of [-1, 1]) {
+    line([[sx * 0.51, 2.69, -0.12], [sx * 0.75, 1.74, 0.02], [sx * 0.72, 1.50, 0.08]], bronzeShadow, 0.035);
+    limb([sx * 0.49, 1.53, 0.02], [sx * 0.75, 1.53, 0.15], 0.055, 0.055, bronzeDark);
+  }
+  line([[0.20, 1.42, 2.84], [0.18, 1.53, 2.45], [0.17, 2.03, 2.12], [0.22, 3.45, 0.96]], bronzeShadow, 0.035);
+  line([[-0.20, 1.42, 2.84], [-0.18, 1.53, 2.45], [-0.17, 2.03, 2.12], [-0.22, 3.45, 0.96]], bronzeShadow, 0.035);
+  // Frederik VII's boots, broad military coat, beard and peaked cap.
+  oval(bronzeDark, 0, 3.05, -0.17, 0.52, 0.32, 0.46);
+  for (const sx of [-1, 1]) {
+    limb([sx * 0.38, 2.98, -0.05], [sx * 0.67, 2.21, 0.37], 0.20, 0.15, bronzeDark);
+    limb([sx * 0.67, 2.21, 0.37], [sx * 0.68, 1.57, 0.21], 0.16, 0.14, bronzeDark);
+    oval(bronzeShadow, sx * 0.67, 1.54, 0.37, 0.16, 0.13, 0.31);
+  }
+  mesh(new THREE.CylinderGeometry(0.39, 0.62, 1.55, 12), bronze, 0, 3.82, -0.15, { parent: statue });
+  // A cloak widening over the horse's flanks, with visible folds on its back.
+  mesh(new THREE.ConeGeometry(0.94, 2.6, 12, 1, true), bronzeDark, 0, 3.28, -0.41, { parent: statue });
+  for (const sx of [-1, 0, 1]) limb([sx * 0.30, 4.25, -0.54], [sx * 0.61, 2.30, -0.82], 0.08, 0.05, bronzeLight);
+  oval(bronzeLight, 0, 4.66, -0.12, 0.25, 0.20, 0.26);
+  oval(bronze, 0, 4.92, -0.04, 0.26, 0.31, 0.28);
+  oval(bronzeDark, 0, 4.74, 0.19, 0.20, 0.12, 0.12); // beard
+  for (const sx of [-1, 1]) {
+    limb([sx * 0.40, 4.29, 0], [sx * 0.51, 3.80, 0.39], 0.20, 0.14, bronze);
+    limb([sx * 0.51, 3.80, 0.39], [sx * 0.22, 3.50, 0.94], 0.14, 0.10, bronze);
+  }
+  mesh(new THREE.CylinderGeometry(0.28, 0.29, 0.39, 10), bronzeDark, 0, 5.24, -0.06, { parent: statue });
+  mesh(new THREE.CylinderGeometry(0.33, 0.34, 0.06, 10), bronzeShadow, 0, 5.05, -0.02, { parent: statue });
+  oval(bronzeShadow, 0, 5.05, 0.20, 0.32, 0.04, 0.16); // visor
+  mesh(new THREE.ConeGeometry(0.10, 0.42, 8), bronzeLight, -0.10, 5.61, -0.08, { parent: statue });
+  colCirc(x, z, 4.3, 5.85);
+}
+frederikVII(81, -51, Math.atan2(34, -23));
 rytter(-73, 50, Math.atan2(-73, 10));
 
 // ======================================================================== RIDEBANEN OG STALDENE
@@ -3138,7 +3243,7 @@ function makePigeon(x, z, y, i) {
 }
 for (let attempt = 0; PIGEONS.length < (isTouch ? 20 : 32) && attempt < 500; attempt++) {
   const a = rand() * Math.PI * 2, r = rr(8, 31), x = 81 + Math.cos(a) * r, z = -51 + Math.sin(a) * r;
-  if (rawWater(x, z) || inBuilding(x, z) || groundAt(x, z, 2) > 0.6) continue;
+  if (z < -63 || rawWater(x, z) || inBuilding(x, z) || groundAt(x, z, 2) > 0.6 || nearRoute(x, z, 3.5)) continue;
   if (PIGEONS.some(p => Math.hypot(p.x - x, p.z - z) < 1.7)) continue;
   PIGEONS.push(makePigeon(x, z, groundAt(x, z, 2), PIGEONS.length));
 }
