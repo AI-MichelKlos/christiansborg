@@ -1305,6 +1305,21 @@ cutGate(79, 45, 18, 25);       // toward Christiansborg Slotsplads
 const FT_GATE = RG_GATES[0] || {};
 for (const p of PARTS) partBlock(p);
 
+// Projecting stone surrounds keep the palace windows legible from the square without changing their glass.
+function palaceWindowSurround(kind, x, y, z, ry, w, h, mat) {
+  const g = new THREE.Group();
+  g.position.set(x + Math.sin(ry) * 0.07, 0, z + Math.cos(ry) * 0.07);
+  g.rotation.y = ry; world.add(g);
+  const foot = y - h / 2, arch = kind === 'arch', rise = arch ? w / 2 : 0;
+  box(w + 0.48, 0.18, 0.34, mat, 0, foot - 0.19, 0.03, { parent: g, cast: false });
+  for (const side of [-1, 1])
+    box(0.2, h - rise + 0.12, 0.3, mat, side * (w / 2 + 0.13), foot, 0.02, { parent: g, cast: false });
+  if (arch) {
+    mesh(new THREE.TorusGeometry(w / 2 + 0.12, 0.11, 6, 16, Math.PI), mat, 0, y + h / 2 - rise, 0.09, { parent: g, cast: false });
+    box(0.34, 0.35, 0.38, mat, 0, y + h / 2 - 0.2, 0.11, { parent: g, cast: false });
+  } else box(w + 0.46, 0.2, 0.33, mat, 0, y + h / 2, 0.03, { parent: g, cast: false });
+}
+
 // ---------------- the palace facade: granite from about 700 parishes all over Denmark, a rough granite base, pilasters,
 // a heavy cornice, dormers in the copper roof, the King's Gate and the Queen's Gate with columns and a balcony,
 // faces of famous Danes over the ground floor windows, and four statues in Prins Jørgens Gård.
@@ -1312,10 +1327,17 @@ for (const p of PARTS) partBlock(p);
   const main = PARTS.find(p => p.h === 38.6), r = main.ring;
   const GATES = [[47, -28], [-31.4, -45.7]], FT_DOOR = [27.4, 53.7];   // and Folketingets indgang toward Rigsdagsgården (built further down)   // Kongeporten (east, under the tower) and Dronningeporten (north)
   const ROWS = [[3.6, 2.4, 'rect'], [9.8, 3.8, 'arch'], [15.6, 3.0, 'rect'], [20.8, 2.3, 'rect']];
-  const stoneM = tm('#cfc6b9'), faceM = tm('#d8d0c4'), roofM = tm(COPPER);
+  const stoneM = tm('#cfc6b9'), faceM = tm('#d8d0c4'), roofM = tm(COPPER), seamM = tm('#95644e');
+  const seamGeo = new THREE.CylinderGeometry(0.055, 0.055, 1, 6), vertical = new THREE.Vector3(0, 1, 0);
+  const seam = (a, b) => {
+    const v = new THREE.Vector3().subVectors(b, a), m = mesh(seamGeo, seamM, (a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2, { cast: false });
+    m.scale.y = v.length(); m.quaternion.setFromUnitVectors(vertical, v.normalize());
+  };
   const ext = (ring, y0, y1, mat) => { const g = new THREE.ExtrudeGeometry(shapeOf([ring]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2); return mesh(g, mat, 0, y0, 0, { edges: 25 }); };
   ext(insetRing(r, -0.2), 0, 5.4, toon('#ffffff', { map: TX.granBase }));   // the rough base
   ext(insetRing(r, -0.35), 5.4, 5.9, stoneM);                                // a band over the base
+  ext(insetRing(r, -0.22), 12.35, 12.61, stoneM);                             // courses between the window floors
+  ext(insetRing(r, -0.22), 18.15, 18.41, stoneM);
   ext(insetRing(r, -0.6), 25.4, 26.2, stoneM);                               // the big cornice under the roof
   const head = new THREE.SphereGeometry(0.33, 10, 8); head.scale(1, 1.15, 0.45);
   const cap = prismGeo([[-1.05, 0], [1.05, 0], [0, 0.95]], 2.3);
@@ -1324,10 +1346,19 @@ for (const p of PARTS) partBlock(p);
     const n = Math.max(1, Math.floor((e.len - 3) / 4.8)), at = t => [e.a[0] + (e.b[0] - e.a[0]) * t, e.a[1] + (e.b[1] - e.a[1]) * t];
     for (let k = 0; k <= n; k++) {
       const [x, z] = at(k / n);
-      if (k > 0 && k < n) box(0.8, 19.5, 0.35, stoneM, x + e.nx * 0.12, 5.9, z + e.nz * 0.12, { ry: e.ry, cast: false });   // pilasters between the bays
+      if (k > 0 && k < n) {
+        box(0.8, 19.5, 0.35, stoneM, x + e.nx * 0.12, 5.9, z + e.nz * 0.12, { ry: e.ry, cast: false });   // pilasters between the bays
+        box(1.18, 0.38, 0.55, stoneM, x + e.nx * 0.23, 5.85, z + e.nz * 0.23, { ry: e.ry, cast: false });
+        box(1.18, 0.5, 0.55, stoneM, x + e.nx * 0.23, 24.75, z + e.nz * 0.23, { ry: e.ry, cast: false });
+      }
       if (k === n) continue;
       const [cx, cz] = at((k + 0.5) / n), gate = GATES.some(([gx, gz]) => Math.hypot(cx - gx, cz - gz) < 4.5), ft = Math.hypot(cx - FT_DOOR[0], cz - FT_DOOR[1]) < 5.5;
-      for (const [y, h, kind] of ROWS) if (!(gate && y < 12) && !(ft && y < 6)) { const o = y < 5.4 ? 0.29 : WOFF; addWin(kind, cx + e.nx * o, y, cz + e.nz * o, e.ry, kind === 'arch' ? 1.8 : 1.6, h, 0.6); }
+      for (const [y, h, kind] of ROWS) if (!(gate && y < 12) && !(ft && y < 6)) {
+        const o = y < 5.4 ? 0.29 : WOFF, w = kind === 'arch' ? 1.8 : 1.6;
+        const wx = cx + e.nx * o, wz = cz + e.nz * o;
+        addWin(kind, wx, y, wz, e.ry, w, h, 0.6);
+        if (e.len > 18) palaceWindowSurround(kind, wx, y, wz, e.ry, w, h, stoneM);
+      }
       if (!gate && !ft) mesh(head, faceM, cx + e.nx * 0.24, 5.05, cz + e.nz * 0.24, { ry: e.ry, cast: false });   // a famous Dane looks down
       if (k % 2 === 0) {   // a dormer in the roof over every other bay
         const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = e.ry; world.add(g);
@@ -1335,6 +1366,15 @@ for (const p of PARTS) partBlock(p);
         mesh(cap, roofM, 0, 28.9, -1.4, { parent: g, edges: 30 });
         addWin('rect', cx - e.nx * 0.33, 27.6, cz - e.nz * 0.33, e.ry, 1.0, 1.6, 0.5);
       }
+    }
+    if (e.len > 18) for (let d = 0.8; d < e.len - 0.4; d += 1.25) {
+      const t = d / e.len, [dx, dz] = at(t);
+      box(0.42, 0.34, 0.48, stoneM, dx + e.nx * 0.42, 25.02, dz + e.nz * 0.42, { ry: e.ry, cast: false });
+    }
+    if (e.len > 35 && e.nx > 0.65 && e.nz < 0) for (let d = 4; d < e.len - 4; d += 3.0) {
+      const [sx, sz] = at(d / e.len);
+      seam(new THREE.Vector3(sx - e.nx * 0.05, 26.18, sz - e.nz * 0.05),
+           new THREE.Vector3(sx - e.nx * 5.48, 38.48, sz - e.nz * 5.48));
     }
   }
   // the two gates: a tall door, two pairs of columns, a balcony with a balustrade and a gold crown
@@ -1383,15 +1423,21 @@ for (const p of PARTS) partBlock(p);
 
 // ---------------- the tower (106 m): stone tower, copper spire and three gold crowns
 {
-  const TX0 = 25.5, TZ0 = -14.1, ry = 0.6, stone = tm('#bdb5ac'), cop = tm(COPPER);
+  const TX0 = 25.5, TZ0 = -14.1, ry = 0.6, stone = tm('#bdb5ac'), stoneTrim = tm('#d3c8bb');
+  const cop = tm(COPPER), copperTrim = tm('#a16a50'), copperRib = tm('#684639');
   const sq = (side, y0, y1, mat) => box(side, y1 - y0, side, mat, TX0, y0, TZ0, { ry, edges: true });
   const frustum = (s0, s1, y0, y1, mat, seg = 4) => { const k = 0.5 / Math.cos(Math.PI / seg); mesh(new THREE.CylinderGeometry(s1 * k, s0 * k, y1 - y0, seg), mat, TX0, (y0 + y1) / 2, TZ0, { ry: ry + Math.PI / seg, edges: 30 }); };
   sq(18, 0, 40, stone);                     // the stone tower
+  sq(18.7, 26.25, 26.65, stoneTrim);
+  sq(18.5, 35.2, 35.55, stoneTrim);
   sq(18.8, 38.8, 40.2, tm('#c9bfb7'));      // cornice
   frustum(18.6, 12.6, 40.2, 46, cop);       // copper roof around the upper tower
   sq(12.4, 46, 60.3, cop);                  // the copper-clad upper tower with big openings
+  sq(13.25, 46.0, 46.55, copperTrim);
+  sq(13.2, 59.7, 60.45, copperTrim);
   frustum(12.6, 5.6, 60.3, 72.5, cop);      // the spire starts
   frustum(6.2, 6.2, 66, 79, cop, 8);        // octagonal lantern
+  frustum(7.0, 7.0, 66.0, 66.4, copperTrim, 8);
   frustum(7.0, 7.0, 78.6, 79.4, tm('#9b6a52'), 8);
   mesh(new THREE.SphereGeometry(3.3, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), cop, TX0, 79.4, TZ0, { edges: 40 });
   mesh(new THREE.CylinderGeometry(0.18, 1.0, 26, 8), cop, TX0, 81 + 13, TZ0);   // the thin spire up to 106 m
@@ -1407,8 +1453,19 @@ for (const p of PARTS) partBlock(p);
   // openings: arched windows on the stone tower and big dark arches in the copper tower
   for (let f = 0; f < 4; f++) {
     const a = ry + f * Math.PI / 2, nx = Math.sin(a), nz = Math.cos(a), tx = Math.cos(a), tz = -Math.sin(a);
-    for (const s of [-3.6, 3.6]) addWin('arch', TX0 + nx * (9 + WOFF) + tx * s, 31, TZ0 + nz * (9 + WOFF) + tz * s, a, 2.4, 5.5, 0.7);
-    addWin('arch', TX0 + nx * (6.2 + WOFF), 53, TZ0 + nz * (6.2 + WOFF), a, 4.2, 7.5, 0.8);
+    for (const s of [-8.2, 8.2]) box(0.68, 11.3, 0.42, stoneTrim, TX0 + nx * 9.22 + tx * s, 27.1, TZ0 + nz * 9.22 + tz * s, { ry: a, cast: false });
+    for (const s of [-5.4, 5.4]) {
+      box(0.46, 12.7, 0.42, copperRib, TX0 + nx * 6.35 + tx * s, 46.55, TZ0 + nz * 6.35 + tz * s, { ry: a, cast: false });
+      box(0.72, 0.5, 0.5, copperTrim, TX0 + nx * 6.38 + tx * s, 58.95, TZ0 + nz * 6.38 + tz * s, { ry: a, cast: false });
+    }
+    for (const s of [-3.6, 3.6]) {
+      const wx = TX0 + nx * (9 + WOFF) + tx * s, wz = TZ0 + nz * (9 + WOFF) + tz * s;
+      addWin('arch', wx, 31, wz, a, 2.4, 5.5, 0.7);
+      palaceWindowSurround('arch', wx, 31, wz, a, 2.4, 5.5, stoneTrim);
+    }
+    const ux = TX0 + nx * (6.2 + WOFF), uz = TZ0 + nz * (6.2 + WOFF);
+    addWin('arch', ux, 53, uz, a, 4.2, 7.5, 0.8);
+    palaceWindowSurround('arch', ux, 53, uz, a, 4.2, 7.5, copperTrim);
     for (const s of [-1.3, 1.3]) addWin('arch', TX0 + nx * (3.1 + WOFF) + tx * s, 73.5, TZ0 + nz * (3.1 + WOFF) + tz * s, a, 0.9, 2.6, 0.8);
   }
 }
