@@ -127,3 +127,32 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Ny vej (en blød kurve, `CatmullRomCurve3`): ind fra Tøjhusgade gennem porten, langs den fjerne side af gården, rundt for enden og tilbage langs slottet, så trappen er på bilernes højre side, når de holder. Så ud igen gennem samme port. Bilerne holder på række med 7,5 m imellem, og statsministerens bil holder lige ud for trappen (`FT.stopS`).
   - Ved trappen: forreste og bageste bil åbner fordøren, og en livvagt stiger ud af hver. Så stiger livvagten i den midterste bil ud, lukker sin dør og åbner bagdøren, og statsministeren stiger ud. Dørene lukker igen. Lyd: motor, et lille klik når en dør åbner, og et blødt bump når den lukker (svagere langt væk).
   - Bilerne er stadig 3 grupper i `dyn`. `__cb.FT_CARS` er nu objekter med `g`, `body`, `doors`, `wheels` og `want`.
+- [x] Ekstra: lavet uden for planen 10.-13. okt. 2026 (skrevet ind her 13. okt.)
+  - Duer på Slotspladsen omkring Frederik 7. (`PIGEONS`): de letter i bølger, når pigen kommer tæt på, og lander igen, når hun er gået. Fem duer på Højbro Plads. Rytterstatuen af Frederik 7. er gjort flottere.
+  - Vejvisning: skiltet "Nærmeste krone" under tællerne peger mod den nærmeste krone (`updGuide`). Stedkortene viser først en kort tekst med "Læs mere".
+  - Gående folk på Højbro Plads (`START_WALKERS`), som siger "Hej!", når pigen kommer tæt på.
+  - Et løbehjul at låne på Højbro Plads (`SCOOTER`, `FX.scooter`). Hop-knappen stiller det fra sig.
+  - Fodgængerlys ved overgangen over Vindebrogade efter Højbro (`HOJBRO_LIGHT`, `FX.hojbroLight`): hun venter ved rødt.
+  - Flottere facade og tårn på Christiansborg (stenrammer om vinduerne, `palaceWindowSurround`).
+  - Mere liv på Christiansborg Slotsplads: små granitbrosten (`TX.slotsSetts`, `SLOTSPLADS_RING`), granitkugler langs gaden og turister, der tager billeder eller går frem og tilbage (`TOURISTS`).
+- [x] Ekstra: op i tårnet (13. okt. 2026)
+  - Ved Kongeporten kommer knappen "Kør op i tårnet" (`TOWER.door`). Besøgende går ind ad Kongeporten under tårnet (european-traveler.com), og Udsigten ligger 44 m oppe (ft.dk, Lonely Planet).
+  - Elevatoren: et lyst kort dækker skærmen, og meterne tæller op til 44 (ned igen på vej ned), så siger det ding (`#lift`).
+  - Oppe står hun ved et rækværk (`rail`, kun synligt deroppe) på en firkantet gang rundt om tårnet (`TOWER.gallery(f)`). Pilene eller tommelen drejer hende rundt, op og ned kigger op og ned (`cam.pitch`, `TOWER.look()`), og at trække virker også. Kigger hun langt ned, læner hun sig ud over rækværket. Kameraet sættes i en `HOOKS.frame` efter det almindelige kamera.
+  - Navneskilte over de store steder (`SIGHTS`, kun synlige i tårnet). Mellemrum eller knappen Kikkert zoomer ind. Tågen er længere væk deroppe.
+  - Nyt sted: Udsigten (midt i tårnet, kun når hun er deroppe). Ny opgave: "Drej rundt, til du kan se Børsens drager" (`TOWER.sees(x, z)`). "Kør ned igen" sætter hende uden for Kongeporten.
+  - Mens elevatoren kører, kan hun ikke gøre andet (`FX.tower.busy` i `updActions`).
+- [x] Ekstra: svaner og springvand (13. okt. 2026)
+  - En svanefamilie i havnen foran Den Sorte Diamant (`SWANS`, hjem (242, 290)): to hvide knopsvaner og tre grå unger, lidt større end i virkeligheden. "Vink til svanerne" ved kajen: forældrene løfter vingerne, og familien svømmer hen til hende. Nyt sted: Svanerne. Ny opgave.
+  - Springvandet i Bibliotekshaven (`FOUNTAIN`): dammen (OSM-vand med første punkt (67, 163)) har fået en lav stenkant, og i midten står en høj skulptur af kobber (8 m, Mogens Møller, jf. Wikipedia). Vandet løber ned fra skålen på toppen (`THREE.Points`) med ringe på vandet. Det sker af sig selv en gang imellem, og "Start springvandet" sætter det i gang. Skulpturens form er gættet. Ny opgave.
+- [x] Ekstra: de sidste porte (13. okt. 2026)
+  - Det lange hus "Slotsholmen" (OSM, første punkt (107, 66)) er skåret i stykker af `passageHouse`: Proviantpassagen (s 92,8-97,8 i Rigsdagsgårdens ramme, 5 m bred) og gangen mod Bibliotekshaven (s 44,2-48,2). Over portene er der et stykke hus fra 4,6 m, og portene har brosten og en stenramme. Pigen kan gå igennem begge. Nyt sted: Proviantpassagen.
+- [x] Ekstra: tjek på telefonen (13. okt. 2026)
+  - Målt i en telefonstørrelse (390 x 844, touch): tegnekald pr. billede på Slotspladsen 379 før, 258 nu. Rigsdagsgården 316 før, 234 nu. Højbro Plads 138 før, 126 nu.
+  - `bakeColored(root)` lægger de faste dele af små ting sammen til én mesh med farverne i hjørnerne. Bruges på duer, turister og gående folk (ben, arme og vinger bliver for sig selv, de er mærket `keep`). Turister, der tager billeder, er én mesh.
+  - `hideWhenFar(objs, x, z, r)` skjuler duer, turister, gående folk, ænder, svaner og havmanden, når kameraet er langt væk.
+  - På telefon kaster de små mennesker ingen skygge.
+  - Ideer til senere: folkene ved Folketinget (statsministeren og livvagterne) er mange små dele og kunne også lægges sammen.
+
+## Næste idé
+- Følg statsministeren ind: en enkel Folketingssal bag døren i Rigsdagsgården, som pigen kan gå ind ad efter hende. Michel har bedt om at gemme den til senere.

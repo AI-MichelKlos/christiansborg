@@ -62,6 +62,11 @@ button.ctr{cursor:pointer}
 .qopt:disabled{opacity:.3;cursor:default}
 .qopt.ok{outline:4px solid var(--leaf);outline-offset:3px;opacity:1}
 #qMsg{min-height:1.5em;text-align:center;font-weight:700;margin:0 0 6px}
+#lift{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff3df;opacity:0;pointer-events:none;transition:opacity .45s}
+#lift.on{opacity:1}
+#lift .sticker{padding:16px 28px;text-align:center}
+#lift b{font-family:var(--display);font-size:24px;font-weight:800;display:block;margin-bottom:4px}
+#lift .num{font-size:46px}
 #toast{position:fixed;left:50%;top:24%;transform:translateX(-50%);padding:9px 16px;font-weight:600;font-size:15px;max-width:calc(100% - 32px);box-sizing:border-box;text-align:center;background:#fff1d8;animation:pop .3s ease-out}
 @keyframes pop{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
 .overlay{position:fixed;inset:0;display:grid;place-items:center;padding:16px;box-sizing:border-box;background:radial-gradient(ellipse at center,rgba(42,34,56,.06),rgba(42,34,56,.38))}
@@ -93,6 +98,7 @@ kbd{display:inline-block;min-width:1.6em;text-align:center;padding:1px 6px;borde
 #kickBtn{position:fixed;right:112px;bottom:calc(30px + env(safe-area-inset-bottom,0px));width:70px;height:70px;border-radius:50%;font:800 16px var(--display);color:var(--ink);background:#ffd27a;touch-action:none}
 #umb{position:fixed;right:16px;bottom:calc(22px + env(safe-area-inset-bottom,0px));background:#cfe4f3}
 .touch #umb{bottom:calc(116px + env(safe-area-inset-bottom,0px))}
+#jump.long{font-size:14px}
 #jump{position:fixed;right:22px;bottom:calc(26px + env(safe-area-inset-bottom,0px));width:78px;height:78px;border-radius:50%;font:800 18px var(--display);color:var(--ink);background:var(--leaf);touch-action:none}
 #poi,#toast{pointer-events:none}   /* the text cards must not block the thumbs */
 #poiActions{pointer-events:auto}
@@ -121,7 +127,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   </div>
   <button id="stars" class="sticker ctr" type="button" aria-label="Stjerner for opgaver. Tryk for at se opgaverne.">
     <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l4.7 10.2 11.1 1.2-8.3 7.5 2.3 11L20 28.3l-9.8 5.6 2.3-11-8.3-7.5 11.1-1.2z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/></svg>
-    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 15</span></div>
+    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 18</span></div>
   </button>
   </div>
   <div id="tools">
@@ -283,6 +289,11 @@ const camOnly = [];
 // HOOKS.start: () => {}        called once when the walk starts.
 const FX = {};
 const HOOKS = { frame: [], ride: [], key: [], found: [], start: [] };
+// Small moving things far from the camera are hidden: they are too small to see from there, but each of them is
+// something the phone has to draw. hideWhenFar puts them in a group that is only shown within r metres of (x, z).
+const FAR_HIDE = [];
+function hideWhenFar(objs, x, z, r) { const g = new THREE.Group(); dyn.add(g); for (const o of objs) g.add(o); FAR_HIDE.push({ g, x, z, r }); return g; }
+HOOKS.frame.push(() => { for (const f of FAR_HIDE) f.g.visible = Math.hypot(camera.position.x - f.x, camera.position.z - f.z) < f.r; });
 const LOCKED = []; // locked doors: { x, z, y, n } // roofs the camera must stay under: { x0, x1, z0, z1, bot, top }
 const mapItems = [];
 function colBox(x0, x1, z0, z1, top) { cols.push({ t: 'b', x0, x1, z0, z1, top }); }
@@ -1050,7 +1061,7 @@ const MERMAN = { g: new THREE.Group(), kids: [], wave: 0 };
   const glass = new THREE.MeshBasicMaterial({ map: TX.water, color: '#9fcbe8', transparent: true, opacity: 0.32, depthWrite: false });
   const gm = mesh(top, glass, P0.x, WL - 0.03, P0.z, { cast: false }); gm.renderOrder = 2;
   // bronze figures reaching up: the big merman with a fish tail, and seven small sons around him
-  const bronze = toon('#55806f'), G = MERMAN.g; G.position.set(P0.x, WL - d + 0.05, P0.z); dyn.add(G);
+  const bronze = toon('#55806f'), G = MERMAN.g; G.position.set(P0.x, WL - d + 0.05, P0.z); dyn.add(G); hideWhenFar([G], P0.x, P0.z, 70);
   const figure = (x, z, s, tail) => {
     const f = new THREE.Group(); f.position.set(x, 0, z); f.scale.setScalar(s); G.add(f);
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.28, 0.7, 4, 10), bronze); body.position.y = 0.75; f.add(body);
@@ -1168,6 +1179,30 @@ function building(rings, h, wall, roof, o = {}) {
   pcols.push({ rings, ...bboxOf(rings[0]), top: h, bot: y0 });
   if (!o.noMap) mapItems.push({ k: 'p', pts: rings[0], fill: roof, line: true });
 }
+// Two real gates through the long house between Rigsdagsgården and Proviantgården (OpenStreetMap: building passages):
+// Proviantpassagen, a service road (about 5 m), and a narrow gate toward Bibliotekshaven (about 4 m). The house is cut
+// into pieces with a bridge over each gate from 4.6 m up, so she can walk through. The frame is the one of the gates
+// into Rigsdagsgården: s along the palace facade, d out into the yard.
+function passageHouse(ring, h, wall, roof) {
+  const A = [-23.4, 86.5], U = [0.840, -0.543], N = [0.543, 0.840], sOf = q => (q[0] - A[0]) * U[0] + (q[1] - A[1]) * U[1], dOf = q => (q[0] - A[0]) * N[0] + (q[1] - A[1]) * N[1];
+  const clip = (r, keep) => { const out = []; for (let i = 0; i < r.length; i++) { const p = r[i], q = r[(i + 1) % r.length], kp = keep(p), kq = keep(q); if (kp >= 0) out.push(p); if ((kp >= 0) !== (kq >= 0)) { const t = kp / (kp - kq); out.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]); } } return out; };
+  const stone = tm('#e3dccf');
+  let lo = -1e9;
+  for (const [s0, s1] of [[44.2, 48.2], [92.8, 97.8]]) {
+    building([clip(clip(ring, q => sOf(q) - lo), q => s0 - sOf(q))], h, wall, roof);
+    const mid = clip(clip(ring, q => sOf(q) - s0), q => s1 - sOf(q)); building([mid], h, wall, roof, { y0: 4.6 });
+    let d0 = 1e9, d1 = -1e9; for (const q of mid) { d0 = Math.min(d0, dOf(q)); d1 = Math.max(d1, dOf(q)); }
+    const w = s1 - s0, dep = d1 - d0, sc = (s0 + s1) / 2, dc = (d0 + d1) / 2;
+    const g = new THREE.Group(); g.position.set(A[0] + U[0] * sc + N[0] * dc, 0, A[1] + U[1] * sc + N[1] * dc); g.rotation.y = Math.atan2(N[0], N[1]); world.add(g);   // local z through the house
+    const fl = new THREE.PlaneGeometry(w, dep + 0.8); fl.rotateX(-Math.PI / 2); mesh(fl, SM.setts, 0, 0.02, 0, { parent: g, cast: false });
+    for (const zf of [-dep / 2, dep / 2]) {
+      for (const sx of [-1, 1]) box(0.45, 4.6, 0.36, stone, sx * (w / 2 + 0.2), 0, zf, { parent: g, edges: true });
+      box(w + 0.9, 0.55, 0.36, stone, 0, 4.35, zf, { parent: g, edges: true });
+    }
+    lo = s1;
+  }
+  building([clip(ring, q => sOf(q) - lo)], h, wall, roof);
+}
 for (const b of DATA.B) {
   const nm = NAMED[b.n];
   let h = nm ? nm[2] : b.h || (b.lv ? (b.lv > 8 ? b.lv : b.lv * 3.2 + 2) : (areaOf(b.rings[0]) > 1500 ? 17 : 14));
@@ -1180,6 +1215,7 @@ for (const b of DATA.B) {
   if (own) {   // drawn by hand further down; the outline only stops her and the camera
     pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: own[0], bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: own[1], line: true }); continue;
   }
+  if (b.n === 'Slotsholmen' && b.rings[0][0][0] === 107 && b.rings[0][0][1] === 66) { passageHouse(b.rings[0], h, wall, roof); continue; }   // the long house with Proviantpassagen
   building(b.rings, h, wall, roof);
 }
 
@@ -2192,6 +2228,29 @@ function bakeGroup(root) {   // merges the parts of a moving group by material (
     const m = new THREE.Mesh(bg, mat); m.castShadow = true; root.add(m); for (const o of list) o.parent.remove(o);
   }
 }
+// merges all the plain coloured parts of a small moving thing (a person, a bird) into one mesh with the colours in the
+// vertices, so the phone has one thing to draw instead of many. Parts under a group marked keep (legs, arms, wings)
+// stay where they are, and so do parts with a texture or a special material.
+const VCOL_M = toon('#ffffff', { vertexColors: true });
+function bakeColored(root, cast = true) {
+  root.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), list = [];
+  root.traverse(o => {
+    if (!o.isMesh || o === root || Array.isArray(o.material) || !o.material.isMeshToonMaterial || o.material.map || o.material.vertexColors || o.material.polygonOffset || o.children.length || !o.visible) return;
+    for (let p = o.parent; p && p !== root; p = p.parent) if (p.userData.keep) return;
+    list.push(o);
+  });
+  if (list.length < 2) return;
+  const gs = list.map(o => { const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld)); if (!g.attributes.normal) g.computeVertexNormals(); return { g, c: o.material.color }; });
+  let n = 0; for (const { g } of gs) n += g.attributes.position.count;
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3); let v = 0;
+  for (const { g, c } of gs) {
+    const k = g.attributes.position.count; pos.set(g.attributes.position.array, v * 3); nor.set(g.attributes.normal.array, v * 3);
+    for (let i = 0; i < k; i++) { col[(v + i) * 3] = c.r; col[(v + i) * 3 + 1] = c.g; col[(v + i) * 3 + 2] = c.b; }
+    v += k; g.dispose();
+  }
+  const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); bg.setAttribute('color', new THREE.BufferAttribute(col, 3)); bg.computeBoundingSphere();
+  const m = new THREE.Mesh(bg, VCOL_M); m.castShadow = cast; m.receiveShadow = true; root.add(m); for (const o of list) o.parent.remove(o);
+}
 function hullShape(L, B) {   // seen from above, bow at +y (turned to +z below)
   const s = new THREE.Shape(); s.moveTo(-B / 2, -L / 2 + 0.6); s.quadraticCurveTo(-B / 2, -L / 2, -B / 2 + 0.6, -L / 2); s.lineTo(B / 2 - 0.6, -L / 2); s.quadraticCurveTo(B / 2, -L / 2, B / 2, -L / 2 + 0.6);
   s.lineTo(B / 2, L / 2 - 3); s.quadraticCurveTo(B / 2, L / 2 - 0.4, 0, L / 2); s.quadraticCurveTo(-B / 2, L / 2 - 0.4, -B / 2, L / 2 - 3); s.closePath(); return s;
@@ -2726,7 +2785,7 @@ function rayPoly(a, b, best) {
 // ======================================================================== POIs: the names are shown and read aloud when she comes near
 const POIS = [
   { n: 'Christiansborg Slot', t: 'Et kæmpe slot midt i byen. Her mødes Folketinget, som bestemmer over Danmark. Kongen holder også fest her. Muren er lavet af granitsten fra hele Danmark, og over vinduerne nederst sidder ansigter af kendte danskere.', x: 0, z: 40, r: 80 },
-  { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt. Det er det højeste tårn i København. På toppen sidder tre kroner af guld. Man kan køre op i tårnet med en elevator og kigge ud over byen.', x: 44, z: -27, r: 16 },
+  { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt. Det er det højeste tårn i København. På toppen sidder tre kroner af guld. Man kan køre op i tårnet med en elevator og kigge ud over byen. Indgangen er her ved Kongeporten.', x: 44, z: -27, r: 16 },
   { n: 'Prins Jørgens Gård', t: 'Gården foran Dronningeporten. Her står fire statuer på høje sokler. En af dem er Herkules med sin kølle.', x: -36, z: -62, r: 16 },
   { n: 'Beskæftigelsesministeriet', t: 'Her arbejder et ministerium, som hjælper folk med at få et arbejde. Huset ligger lige over for slottet på den anden side af kanalen. Kig efter flaget og skiltet over døren.', x: 138, z: -98, r: 20 },
   { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her kører ministrene ind i sorte biler, og politikerne går op ad den store trappe og ind i Folketinget.', x: 36, z: 72, r: 26 },
@@ -2739,8 +2798,9 @@ const POIS = [
   { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer, som Thorvaldsen lavede for længe siden. Rundt om huset er der malet mennesker, der byder ham velkommen hjem fra en lang rejse med skib. På taget kører en gudinde med fire heste.', x: -100, z: -72, r: 32 },
   { n: 'Børsen', t: 'Et meget gammelt hus, som kong Christian den Fjerde byggede. Her købte og solgte man varer. Spiret er fire drager, der snor halerne sammen, og øverst sidder tre kroner. Her ser Børsen ud, som den gjorde før branden i 2024. Nu bliver den bygget op igen.', x: 250, z: 65, r: 50 },
   { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten med et grønt spir. Her gik sømændene i kirke, og der hænger et skib fra loftet. Dronning Margrethe blev gift her. I muren sidder en gammel kanonkugle.', x: 215, z: -45, r: 32 },
+  { n: 'Proviantpassagen', t: 'En port gennem huset. Den går fra Rigsdagsgården til Proviantgården.', x: 82, z: 74, r: 8 },
   { n: 'Proviantgården', t: 'Gamle huse omkring en gård. Her gemte man mad til kongens skibe.', x: 138, z: 128, r: 28 },
-  { n: 'Bibliotekshaven', t: 'En hyggelig have med træer, bænke og en dam med et springvand.', x: 85, z: 160, r: 40 },
+  { n: 'Bibliotekshaven', t: 'En hyggelig have med træer, bænke og en dam. I dammen står en høj skulptur af kobber. Hver hele time løber der vand ned ad den.', x: 85, z: 160, r: 40 },
   { n: 'Tøjhusmuseet', t: 'Et meget langt hus af røde mursten, som Christian den Fjerde byggede. Her lå kongens kanoner og våben. Nu er det et museum, hvor man kan se kanoner og rustninger. Kanonerne ved døren skyder kun med konfetti.', x: 20, z: 205, r: 40 },
   { n: 'Det Kongelige Bibliotek', t: 'Det gamle bibliotek af røde mursten. Det er over hundrede år gammelt. Her er der flere bøger, end du kan tælle.', x: 125, z: 250, r: 30 },
   { n: 'Den Sorte Diamant', t: 'Den nye del af biblioteket. Den er sort og blank som en diamant og læner sig ud over vandet. I midten er der en stor væg af glas, og en glasbro går over vejen til det gamle bibliotek.', x: 215, z: 255, r: 45 },
@@ -3301,7 +3361,7 @@ function offerAction(o) { ACT.offers.push(o); }
 function runAction() { if (!started || paused || !ACT.cur) return; const c = ACT.cur; c.run(); taskAct(c.id); ACT.shownId = null; }
 function updActions() {
   let best = null; for (const o of ACT.offers) if (!best || (o.prio || 0) > (best.prio || 0)) best = o;
-  ACT.offers.length = 0; if (!started || paused || P.ride || P.swing) best = null;
+  ACT.offers.length = 0; if (!started || paused || P.ride || P.swing || FX.tower?.busy) best = null;
   ACT.cur = best;
   const el = $('actBtn');
   if (!best) { if (!el.hidden) el.hidden = true; ACT.shownId = null; return; }
@@ -3495,6 +3555,10 @@ function makePlazaTourist(coat, hair, photo, phase) {
     arms[0].rotation.x = arms[1].rotation.x = -1.15;
     arms[0].rotation.z = 0.2; arms[1].rotation.z = -0.2;
   }
+  // the ones taking photos stand still, so all of them can be one mesh; the walkers keep their legs and arms.
+  // On a phone the small people cast no shadow (half as much to draw).
+  if (!photo) for (const l of [...legs, ...arms]) { l.userData.keep = true; bakeColored(l, !isTouch); }
+  bakeColored(root, !isTouch);
   return { root, legs, arms, flash, photo, phase };
 }
 const touristOk = ([x, z]) => ptIn(SLOTSPLADS_RING, x, z) && !rawWater(x, z) && !inBuilding(x, z)
@@ -3521,6 +3585,7 @@ for (const [a, b, coat, hair, phase] of [
   const t = makePlazaTourist(coat, hair, false, phase); t.a = a; t.b = b;
   t.root.position.set(a[0], groundAt(...a, 2), a[1]); TOURISTS.push(t);
 }
+hideWhenFar(TOURISTS.map(t => t.root), 85, -50, 130);
 HOOKS.frame.push((dt, time) => {
   if (!started || paused) return;
   for (const t of TOURISTS) {
@@ -3560,8 +3625,9 @@ function makePigeon(x, z, y, i) {
   const wings = [-1, 1].map(side => {
     const pivot = new THREE.Group(); pivot.position.set(side * 0.19, 0.42, 0); g.add(pivot);
     mesh(pigeonGeo, pigeonGray, side * 0.22, 0, -0.03, { parent: pivot, cast: false }).scale.set(0.27, 0.055, 0.22);
-    pivot.rotation.z = side * 0.12; return pivot;
+    pivot.rotation.z = side * 0.12; pivot.userData.keep = true; return pivot;
   });
+  bakeColored(g, false);
   return { g, wings, x, z, y, phase: i * 1.7, state: 'ground', delay: 0, time: 0, clear: 0, dx: 0, dz: 0 };
 }
 for (let attempt = 0; PIGEONS.length < (isTouch ? 20 : 32) && attempt < 500; attempt++) {
@@ -3575,6 +3641,8 @@ for (const [x, z] of [[-20, -216], [11, -217], [-19, -238], [12, -238], [0, -210
   if (!rawWater(x, z) && !inBuilding(x, z) && !nearRoute(x, z, 3) && groundAt(x, z, 2) < 0.6)
     PIGEONS.push(makePigeon(x, z, groundAt(x, z, 2), PIGEONS.length));
 }
+hideWhenFar(PIGEONS.filter(p => p.z > -150).map(p => p.g), 81, -51, 120);
+hideWhenFar(PIGEONS.filter(p => p.z <= -150).map(p => p.g), 0, -225, 120);
 HOOKS.frame.push((dt, t) => {
   if (!started || paused) return;
   let wave = false;
@@ -3631,6 +3699,8 @@ function makeStartWalker(a, b, coat, phase) {
     mesh(new THREE.CapsuleGeometry(0.09, 0.38, 4, 7), dark, 0, -0.30, 0, { parent: leg });
     mesh(new THREE.SphereGeometry(0.13, 8, 6), dark, 0, -0.60, 0.10, { parent: leg }).scale.set(1, 0.5, 1.5); legs.push(leg);
   }
+  for (const l of [...legs, ...arms]) { l.userData.keep = true; bakeColored(l, !isTouch); }
+  bakeColored(root, !isTouch);
   return { root, arms, legs, a, b, phase, greeted: false };
 }
 const startWalkOk = ([x, z]) => !rawWater(x, z) && !inBuilding(x, z) && !nearRoute(x, z, 3) && groundAt(x, z, 2) < 0.6;
@@ -3640,6 +3710,7 @@ for (const [a, b, col, phase] of [
   [[-17, -244], [-3, -240], '#82a66b', 3.2],
   [[5, -207], [-8, -212], '#c47bb0', 4.5]
 ]) if (startWalkOk(a) && startWalkOk(b)) START_WALKERS.push(makeStartWalker(a, b, col, phase));
+hideWhenFar(START_WALKERS.map(w => w.root), 0, -225, 130);
 HOOKS.frame.push((dt, t) => {
   if (!started || paused) return;
   for (const w of START_WALKERS) {
@@ -3672,6 +3743,7 @@ const pathOk = (x0, z0, x1, z1) => [0.25, 0.5, 0.75, 1].every(f => waterOk(x0 + 
 const FAMILIES = [[-70, -152], [215, -15]].map(([hx, hz]) => {
   const mom = { g: makeDuck('mor'), x: hx, z: hz, h: 0 };
   const kids = [1, 2, 3, 4].map(k => ({ g: makeDuck('baby'), x: hx + k * 0.05, z: hz, h: 0 }));
+  hideWhenFar([mom.g, ...kids.map(k => k.g)], hx, hz, 110);
   return { hx, hz, mom, kids, tx: hx, tz: hz, timer: 0, quackT: rr(3, 8) };
 });
 const CRUMBS = [], crumbGeo = new THREE.SphereGeometry(0.08, 6, 5), crumbM = tm('#d9b27a');
@@ -3739,6 +3811,129 @@ HOOKS.frame.push((dt, t) => {
       offerAction({ id: 'brod', label: 'Giv ænderne brød', prio: 1, run: () => { throwBread(); if (!fedOnce) { fedOnce = true; setTimeout(() => toast('Rap rap! Ænderne kommer svømmende.'), 700); } } });
   }
 });
+
+// ---------------- swans in the harbour in front of Den Sorte Diamant: two white mute swans and three grey cygnets
+// (in the autumn the young ones are still grey-brown). They glide slowly near home. From the quay she can wave (E):
+// the parents lift their wings and the family swims over to her.
+function makeSwan(young) {   // the beak points to +z
+  const g = new THREE.Group(), s = young ? 0.62 : 1, body = tm(young ? '#a39588' : '#f7f5ef'), beakM = tm(young ? '#5b5552' : '#e8662d');
+  mesh(new THREE.SphereGeometry(0.36 * s, 14, 10), body, 0, 0.16 * s, 0, { parent: g }).scale.set(1, 0.72, 1.9);
+  const curve = new THREE.CatmullRomCurve3([[0, 0.22, 0.5], [0, 0.55, 0.62], [0, 0.86, 0.52], [0, 0.98, 0.6]].map(([x, y, z]) => new THREE.Vector3(x, y * s * (young ? 0.85 : 1), z * s)));
+  mesh(new THREE.TubeGeometry(curve, 14, 0.075 * s, 8), body, 0, 0, 0, { parent: g });
+  const hy = 0.98 * s * (young ? 0.85 : 1), hz = 0.62 * s;
+  mesh(new THREE.SphereGeometry(0.11 * s, 12, 9), body, 0, hy, hz, { parent: g }).scale.set(0.9, 0.9, 1.25);
+  mesh(new THREE.ConeGeometry(0.05 * s, 0.2 * s, 8), beakM, 0, hy - 0.04 * s, hz + 0.18 * s, { parent: g, rx: Math.PI / 2 + 0.35 });
+  if (!young) mesh(new THREE.SphereGeometry(0.035, 8, 6), tm('#1d1a1c'), 0, hy + 0.02, hz + 0.1, { parent: g, cast: false });   // the black knob on the beak
+  for (const sx of [-1, 1]) mesh(new THREE.SphereGeometry(0.022 * s + 0.008, 6, 5), tm('#1d1a1c'), sx * 0.085 * s, hy + 0.03 * s, hz + 0.05 * s, { parent: g, cast: false });
+  mesh(new THREE.ConeGeometry(0.12 * s, 0.3 * s, 7), body, 0, 0.3 * s, -0.66 * s, { parent: g, rx: -1.25 });   // the tail
+  const wings = [-1, 1].map(sx => {
+    const pv = new THREE.Group(); pv.position.set(sx * 0.2 * s, 0.32 * s, 0.1 * s); pv.userData.keep = true; g.add(pv);
+    mesh(new THREE.SphereGeometry(0.3 * s, 10, 8), body, sx * 0.08 * s, 0, -0.12 * s, { parent: pv }).scale.set(0.45, 0.32, 1.45);
+    pv.rotation.z = sx * 0.25; return pv;
+  });
+  bakeGroup(g); g.scale.setScalar(1.3); dyn.add(g); return { g, wings };   // a little bigger than real, so they are easy to see
+}
+const SWANS = (() => {
+  const hx = 242, hz = 290, quay = [221, 290];
+  const mk = (young, k) => { const { g, wings } = makeSwan(young); return { g, wings, young, x: hx + k * 1.6, z: hz + k * 0.8, h: 0.5, lift: 0 }; };
+  const F = { hx, hz, quay, mom: mk(false, 0), dad: mk(false, 1.5), kids: [1, 2, 3].map(k => mk(true, k * 0.6 + 2)), tx: hx, tz: hz, timer: 0, call: 0 };
+  F.all = [F.mom, F.dad, ...F.kids]; hideWhenFar(F.all.map(d => d.g), hx, hz, 120);
+  return F;
+})();
+POIS.push({ n: 'Svanerne', t: 'To hvide svaner og deres grå unger bor i havnen her. Svaneungerne er grå det første år og bliver hvide, når de bliver store.', x: 228, z: 290, r: 14 });
+{
+  let kidWave = 0, wavedOnce = false;
+  HOOKS.frame.push((dt, t) => {
+    const F = SWANS;
+    F.timer -= dt; if (F.call > 0) F.call -= dt;
+    const goal = F.call > 0 ? F.goal : null;
+    if (goal) { F.tx = goal[0]; F.tz = goal[1]; }
+    else if (F.timer <= 0 || Math.hypot(F.tx - F.mom.x, F.tz - F.mom.z) < 1) {   // glide to a new spot near home
+      for (let k = 0; k < 20; k++) { const a = rand() * 6.28, r = rr(2, 13), x = F.hx + Math.cos(a) * r, z = F.hz + Math.sin(a) * r; if (waterOk(x, z) && pathOk(F.mom.x, F.mom.z, x, z)) { F.tx = x; F.tz = z; break; } }
+      F.timer = rr(8, 14);
+    }
+    if (!swim(F.mom, F.tx, F.tz, goal ? 1.4 : 0.55, dt)) F.timer = 0;
+    // the father keeps beside the mother, the young ones come behind in a line
+    const side = [Math.cos(F.mom.h) * 1.8 - Math.sin(F.mom.h) * 0.6, -Math.sin(F.mom.h) * 1.8 - Math.cos(F.mom.h) * 0.6];
+    const dd = Math.hypot(F.mom.x + side[0] - F.dad.x, F.mom.z + side[1] - F.dad.z);
+    if (dd > 0.5) swim(F.dad, F.mom.x + side[0], F.mom.z + side[1], Math.min(1.8, dd * 0.8 + 0.2), dt); else F.dad.h += angDiff(F.mom.h, F.dad.h) * Math.min(1, dt);
+    let prev = F.mom;
+    for (const d of F.kids) {
+      const dist = Math.hypot(prev.x - d.x, prev.z - d.z), gap = prev.young ? 1.1 : 1.7;
+      if (dist > gap) swim(d, prev.x, prev.z, Math.min(2.2, (dist - gap) * 2 + 0.2), dt); else d.h += angDiff(prev.h, d.h) * Math.min(1, dt * 2);
+      prev = d;
+    }
+    for (const d of F.all) {
+      d.g.position.set(d.x, WL + Math.sin(t * 1.8 + d.x) * 0.025, d.z); d.g.rotation.y = d.h;
+      if (d.lift > 0) d.lift -= dt;
+      const up = d.lift > 0 ? Math.min(1, d.lift * 2, (2.2 - d.lift) * 3) : 0;   // the wings go up and come down again
+      d.wings.forEach((w, i) => { const sx = i ? 1 : -1; w.rotation.z = sx * (0.25 + up * 0.75); w.rotation.x = -up * 0.35; });
+    }
+    if (kidWave > 0) { kidWave -= dt; kid.arms[1].rotation.z = 2.6 + Math.sin(t * 12) * 0.3; }
+    if (!started || paused || MYBOAT.on) return;
+    const near = Math.hypot(P.pos.x - F.mom.x, P.pos.z - F.mom.z) < 26;
+    const fx = Math.sin(kid.root.rotation.y), fz = Math.cos(kid.root.rotation.y);
+    if (near && [3, 5, 7, 9].some(d => rawWater(P.pos.x + fx * d, P.pos.z + fz * d)))
+      offerAction({ id: 'svane', label: 'Vink til svanerne', prio: 1, run: () => {
+        kidWave = 2.5; F.mom.lift = F.dad.lift = 2.2; flutterSound(); [0, 0.25, 0.5].forEach(d => setTimeout(peep, d * 1000));
+        let gx = P.pos.x + fx * 4, gz = P.pos.z + fz * 4; for (let k = 0; k < 12 && !waterOk(gx, gz); k++) { gx += fx; gz += fz; }
+        F.goal = [gx, gz]; F.call = 7;
+        if (!wavedOnce) { wavedOnce = true; setTimeout(() => toast('Svanerne løfter vingerne og svømmer hen til dig.'), 600); }
+      } });
+  });
+}
+
+// ---------------- the fountain in Bibliotekshaven: a tall copper sculpture (8 m, Mogens Møller) in the middle of the
+// pond. In real life water runs down it on the hour; in the game it runs now and then, and she can start it (E).
+// What the sculpture looks like is a guess.
+const FOUNTAIN = (() => {
+  const pond = DATA.W.find(w => w.ring[0][0] === 67 && w.ring[0][1] === 163); if (!pond) return null;
+  const ring = pond.ring; let cx = 0, cz = 0; for (const [x, z] of ring) { cx += x; cz += z; } cx /= ring.length; cz /= ring.length;
+  const cop = tm('#5f9e8c'), copD = tm('#4a8070'), rim = tm('#cfc6b6'), FG = new THREE.Group(); world.add(FG);
+  // a low stone edge round the pond
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [ax, az] = ring[j], [bx, bz] = ring[i], l = Math.hypot(bx - ax, bz - az);
+    box(l + 0.5, 0.35, 0.5, rim, (ax + bx) / 2, 0, (az + bz) / 2, { ry: Math.atan2(bx - ax, bz - az) + Math.PI / 2, parent: FG });
+  }
+  box(1.6, 0.4, 1.6, rim, cx, 0, cz, { ry: 0.4, parent: FG });
+  const col = new THREE.CylinderGeometry(0.42, 0.62, 7.2, 4, 1); col.rotateY(Math.PI / 4);
+  mesh(col, cop, cx, 0.4 + 3.6, cz, { ry: 0.4, edges: 30 });
+  mesh(new THREE.CylinderGeometry(1.0, 0.5, 0.45, 16), copD, cx, 7.82, cz, { edges: 40 });   // the bowl on top
+  mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.05, 16), tm('#7fc0e6'), cx, 8.03, cz, { cast: false });
+  for (const y of [2.2, 4.4, 6.4]) box(0.95, 0.12, 0.95, copD, cx, y, cz, { ry: 0.4, cast: false, parent: FG });
+  bakeGroup(FG); FG.traverse(o => { o.receiveShadow = true; });
+  // the water: falling drops (one cloud of points) and rings on the pond
+  const N = 140, pos = new Float32Array(N * 3), vel = new Float32Array(N * 3), age = new Float32Array(N).fill(99);
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: '#e4f5ff', map: TX.glow, size: 0.42, transparent: true, opacity: 0.9, depthWrite: false }));
+  pts.frustumCulled = false; pts.visible = false; dyn.add(pts);
+  const ringG = new THREE.RingGeometry(0.85, 1.0, 32).rotateX(-Math.PI / 2);
+  const rings = [0, 1, 2].map(() => { const m = new THREE.Mesh(ringG, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false })); m.position.set(cx, 0.07, cz); m.visible = false; dyn.add(m); return m; });
+  const F = { cx, cz, on: 0, next: 25 };
+  const start = () => { F.on = 9; pts.visible = true; tone(300, 180, 0, 0.5, 0.03, 'triangle'); };
+  HOOKS.frame.push((dt, t) => {
+    F.next -= dt; if (F.next <= 0 && F.on <= 0) { F.next = rr(45, 70); if (started && Math.hypot(P.pos.x - cx, P.pos.z - cz) < 60) start(); }
+    if (F.on > 0) F.on -= dt;
+    let alive = 0, spawn = F.on > 0 ? Math.ceil(dt * 70) : 0;
+    for (let i = 0; i < N; i++) {
+      if (age[i] < 9) {
+        age[i] += dt; vel[i * 3 + 1] -= 9.8 * dt;
+        pos[i * 3] += vel[i * 3] * dt; pos[i * 3 + 1] += vel[i * 3 + 1] * dt; pos[i * 3 + 2] += vel[i * 3 + 2] * dt;
+        if (pos[i * 3 + 1] < 0.05) age[i] = 99; else alive++;
+      }
+      if (age[i] >= 9 && spawn > 0) {   // a new drop spills over the edge of the bowl
+        spawn--; const a = rand() * 6.283, r = 0.95, v = rr(0.6, 1.3);
+        pos[i * 3] = cx + Math.cos(a) * r; pos[i * 3 + 1] = 8.0; pos[i * 3 + 2] = cz + Math.sin(a) * r;
+        vel[i * 3] = Math.cos(a) * v; vel[i * 3 + 1] = rr(0.5, 1.6); vel[i * 3 + 2] = Math.sin(a) * v; age[i] = 0; alive++;
+      }
+    }
+    geo.attributes.position.needsUpdate = alive > 0; pts.visible = alive > 0;
+    rings.forEach((m, i) => { const ph = (t * 0.5 + i / 3) % 1; m.visible = alive > 0; m.scale.setScalar(1.6 + ph * 2.6); m.material.opacity = 0.55 * (1 - ph); });
+    if (!started || paused || F.on > 0) return;
+    if (Math.hypot(P.pos.x - cx, P.pos.z - cz) < 19) offerAction({ id: 'springvand', label: 'Start springvandet', prio: 1, run: start });
+  });
+  return F;
+})();
 
 // ======================================================================== THE LITTLE BOAT (she can sail it herself)
 // A little red boat lies at the quay at Gammel Strand. Near it she can get in (E). Then the same keys and the same
@@ -3865,6 +4060,129 @@ HOOKS.frame.push((dt, t) => {
   }
 });
 
+// ======================================================================== UP IN THE TOWER
+// Visitors go in through Kongeporten under the tower and take the lift up to Udsigten, 44 m up (ft.dk; entrance:
+// european-traveler.com). In the game: "Kør op i tårnet" at Kongeporten, a short lift ride where the metres count up,
+// and then she looks out from the gallery. She turns with the arrows (or by dragging), looks up and down, and the big
+// places have their names over them. Space (the Hop button) is a pair of binoculars. "Kør ned igen" takes her down.
+const TOWER = (() => {
+  const C = [25.5, -14.1], RY = 0.6, H = 7.4, FLOOR = 44, EYE = 1.85, GATE = [47, -28];   // EYE: the camera is a little over her head, so the railing stays low
+  const ux = [Math.cos(RY), -Math.sin(RY)], uz = [Math.sin(RY), Math.cos(RY)];
+  const OUT = (() => { const dx = GATE[0] - C[0], dz = GATE[1] - C[1], l = Math.hypot(dx, dz); return [dx / l, dz / l]; })();
+  const T = { on: false, busy: false, zoom: 0, C, FLOOR, GATE, OUT, door: [GATE[0] + OUT[0] * 2.6, GATE[1] + OUT[1] * 2.6] };
+  FX.tower = T;
+  // a point on the square gallery round the tower, in the direction f
+  T.gallery = f => { const dx = Math.sin(f), dz = Math.cos(f), a = Math.abs(dx * ux[0] + dz * ux[1]), b = Math.abs(dx * uz[0] + dz * uz[1]), s = H / Math.max(a, b); return [C[0] + dx * s, C[1] + dz * s]; };
+  T.look = () => 0.02 + (cam.pitch - 0.05) * 0.6;   // how far down she looks (radians)
+  T.sees = (x, z) => T.on && !T.busy && T.look() < 0.5 && Math.abs(angDiff(P.face, Math.atan2(x - C[0], z - C[1]))) < 0.16;
+  // the railing in front of her (only seen from up here)
+  const rail = new THREE.Group(); rail.visible = false; dyn.add(rail);
+  const stone = tm('#d3c8bb'), floorM = tm('#9c958b');
+  box(7, 0.3, 3.0, floorM, 0, -0.3, 0.2, { parent: rail, cast: false });
+  box(7, 0.14, 0.4, stone, 0, 0, 1.5, { parent: rail, cast: false });
+  box(7, 0.14, 0.38, stone, 0, 0.72, 1.5, { parent: rail, cast: false });
+  const bal = new THREE.CylinderGeometry(0.05, 0.08, 0.58, 8);
+  for (let x = -3.3; x <= 3.31; x += 0.3) mesh(bal, stone, x, 0.43, 1.5, { parent: rail, cast: false });
+  bakeGroup(rail); rail.traverse(o => { o.castShadow = false; });
+  // the names over the places
+  const SIGHTS = [['Børsen', 253, 65, 58], ['Holmens Kirke', 215, -45, 47], ['Slotskirken', -30, -105, 26], ['Thorvaldsens Museum', -100, -72, 21],
+    ['Den Sorte Diamant', 200, 262, 30], ['Tøjhusmuseet', 18.5, 204.5, 25], ['Ridebanen', -140, 85, 12], ['Højbro Plads', -6, -222, 6],
+    ['Marmorbroen', -206, 140, 8], ['Beskæftigelsesministeriet', 138, -98, 24], ['Bibliotekshaven', 85, 160, 10]];   // name, x, z, top of the place
+  function sightTex(text) {   // a name card as wide as its text
+    const cv = document.createElement('canvas'), g = cv.getContext('2d'), font = '800 72px Grandstander, "Trebuchet MS", sans-serif';
+    g.font = font; const tw = Math.ceil(g.measureText(text).width); cv.width = tw + 96; cv.height = 150;
+    g.font = font; g.fillStyle = '#2a2238'; roundRect(g, 10, 18, cv.width - 14, 124, 44); g.fill();
+    g.fillStyle = '#fffaf0'; roundRect(g, 4, 8, cv.width - 14, 124, 44); g.fill(); g.lineWidth = 7; g.strokeStyle = '#2a2238'; g.stroke();
+    g.fillStyle = '#2a2238'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, (cv.width - 10) / 2, 72);
+    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return { t, k: cv.width / cv.height };
+  }
+  const labels = SIGHTS.map(([n, x, z, y]) => {
+    const d = Math.hypot(x - C[0], z - C[1]), h = Math.max(4, d * 0.05), { t, k } = sightTex(n);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, fog: false }));
+    sp.renderOrder = 11; sp.scale.set(h * k, h, 1); sp.position.set(x, y + h * 0.75, z); sp.visible = false; dyn.add(sp);
+    return sp;
+  });
+  // the lift: a light card over everything while the metres count up or down
+  const lift = document.createElement('div'); lift.id = 'lift';
+  lift.innerHTML = '<div class="sticker"><b id="liftTxt"></b><span class="num" id="liftNum">0 meter</span></div>';
+  document.body.appendChild(lift);
+  const fog0 = [scene.fog.near, scene.fog.far];
+  const ding = () => { tone(1175, 1170, 0, 0.5, 0.06); tone(880, 876, 0.18, 0.7, 0.06); };
+  let ride = null, firstUp = true;
+  function go(up) {
+    if (T.busy) return;
+    T.busy = true; ride = { up, t: 0, swapped: false, hum: 0 }; keys.clear(); jumpReq = false;
+    $('liftTxt').textContent = up ? 'Elevatoren kører op' : 'Elevatoren kører ned'; $('liftNum').textContent = (up ? 0 : FLOOR) + ' meter';
+    lift.classList.add('on'); tone(520, 520, 0, 0.12, 0.04, 'triangle');
+  }
+  function enter() {
+    T.on = true; T.zoom = 0; P.vel.set(0, 0, 0);
+    P.face = Math.atan2(OUT[0], OUT[1]); cam.yaw = P.face + Math.PI; cam.pitch = 0.35;   // first she looks out over Slotspladsen
+    rail.visible = true; for (const l of labels) l.visible = true;
+    scene.fog.near = 380; scene.fog.far = 900; $('jump').textContent = 'Kikkert'; $('jump').classList.add('long');
+  }
+  function leave() {
+    T.on = false; T.zoom = 0; rail.visible = false; for (const l of labels) l.visible = false;
+    scene.fog.near = fog0[0]; scene.fog.far = fog0[1]; $('jump').textContent = 'Hop'; $('jump').classList.remove('long'); onResize();
+    const [x, z] = T.door; P.pos.set(x, groundAt(x, z, 2), z); P.face = Math.atan2(OUT[0], OUT[1]); P.vel.set(0, 0, 0); P.onGround = true;
+    cam.yaw = P.face + Math.PI; cam.pitch = 0.3; camInit = false;
+    kid.root.position.copy(P.pos); kid.root.rotation.y = P.face; kid.g.position.y = 0;
+  }
+  // while she is in the tower (or in the lift), the arrows turn her head instead of her legs
+  HOOKS.ride.push(dt => {
+    if (!T.on && !T.busy) return false;
+    P.vel.set(0, 0, 0); turnIn = 0;
+    if (!T.on) { jumpReq = false; return true; }
+    let turn = 0, tilt = 0;
+    if (!paused && !T.busy) {
+      if (keys.has('KeyA') || keys.has('ArrowLeft')) turn += 1;
+      if (keys.has('KeyD') || keys.has('ArrowRight')) turn -= 1;
+      if (keys.has('KeyW') || keys.has('ArrowUp')) tilt -= 1;
+      if (keys.has('KeyS') || keys.has('ArrowDown')) tilt += 1;
+      if (joy.id !== null) { turn += -joy.x; tilt += joy.y; }
+    }
+    if (drag.size) P.face = cam.yaw - Math.PI;
+    else { P.face += Math.max(-1, Math.min(1, turn)) * dt * (T.zoom ? 0.35 : 0.9); cam.yaw = P.face + Math.PI; }
+    cam.pitch = Math.min(1.25, Math.max(0.05, cam.pitch + Math.max(-1, Math.min(1, tilt)) * dt * 0.7));
+    if (jumpReq) { jumpReq = false; if (!T.busy) { T.zoom = T.zoom ? 0 : 1; tone(T.zoom ? 700 : 900, T.zoom ? 900 : 700, 0, 0.12, 0.04, 'triangle'); } }
+    P.pos.set(C[0], FLOOR, C[1]); P.onGround = true;
+    return true;
+  });
+  HOOKS.frame.push((dt, t) => {
+    if (ride) {   // fade in, count the metres, ding, fade out
+      ride.t += dt;
+      if (!ride.swapped && ride.t > 0.5) { ride.swapped = true; if (ride.up) enter(); else leave(); }
+      const u = Math.min(1, Math.max(0, (ride.t - 0.5) / 1.6)), m = Math.round(FLOOR * (ride.up ? u : 1 - u));
+      $('liftNum').textContent = m + ' meter';
+      ride.hum -= dt; if (ride.hum <= 0 && u > 0 && u < 1) { ride.hum = 0.28; tone(150, 150, 0, 0.2, 0.012, 'triangle'); }
+      if (ride.t > 2.1 && !ride.dinged) { ride.dinged = true; ding(); lift.classList.remove('on'); }
+      if (ride.t > 2.6) {
+        const up = ride.up; ride = null; T.busy = false;
+        if (up) { toast(firstUp ? `Du er 44 meter oppe! Drej rundt, og kig ud over byen. ${isTouch ? 'Tryk på Kikkert' : 'Tryk på mellemrum'} for at kigge langt.` : 'Du er oppe i tårnet igen!'); firstUp = false; }
+        else toast('Nu er du nede igen.');
+      }
+    }
+    if (!started || paused) return;
+    if (!T.on && !T.busy && !MYBOAT.on && !FX.scooter?.active && P.onGround && Math.hypot(P.pos.x - T.door[0], P.pos.z - T.door[1]) < 4.5)
+      offerAction({ id: 'taarnop', label: 'Kør op i tårnet', prio: 4, run: () => go(true) });
+    if (T.on && !T.busy) offerAction({ id: 'taarnned', label: 'Kør ned igen', prio: 4, run: () => go(false) });
+  });
+  // the camera stands at the railing (this runs after the normal camera)
+  HOOKS.frame.push(dt => {
+    if (!T.on) return;
+    const f = P.face, look = T.look(), lean = Math.max(0, Math.min(1, (look - 0.25) / 0.45));   // looking down, she leans out over the railing
+    const [gx, gz] = T.gallery(f), dx = Math.sin(f), dz = Math.cos(f), cz = -0.4 + lean * 1.95, cy = FLOOR + EYE;
+    camera.position.set(gx + dx * cz, cy, gz + dz * cz);
+    const cl = Math.cos(look); camera.lookAt(camera.position.x + dx * cl, cy - Math.sin(look), camera.position.z + dz * cl);
+    rail.position.set(gx, FLOOR, gz); rail.rotation.y = f;
+    kid.root.visible = false; kid.root.position.set(gx + dx * 11, FLOOR + 0.6, gz + dz * 11);   // stars and labels show up out in front of her
+    const base = window.innerWidth / window.innerHeight < 0.8 ? 70 : 55, want = T.zoom ? base * 0.36 : base;
+    if (Math.abs(camera.fov - want) > 0.05) { camera.fov += (want - camera.fov) * Math.min(1, dt * 6); camera.updateProjectionMatrix(); }
+  });
+  POIS.push({ n: 'Udsigten', t: 'Du er 44 meter oppe i tårnet. Herfra kan du se ud over hele Slotsholmen, havnen og byen. Drej rundt, og find de steder, du har været.', x: C[0], z: C[1], r: 6 });
+  return T;
+})();
+
 // ======================================================================== SMALL TASKS (a star for each)
 // Many places have a small task: do something (the same E actions as always), go somewhere, or answer a question
 // with three big buttons. The task stands on the place's card (and is read aloud with it). A star for each; the stars
@@ -3884,6 +4202,9 @@ const TASKS = [
   { id: 'kirke', s: 'Kirkens søjler', at: ['Slotskirken'], t: 'Hvor mange søjler står der foran kirken?', quiz: ['2', '4', '6'], ok: 1 },
   { id: 'port', s: 'Gennem porten', at: ['Kirkeløngangsbygningen'], t: 'Gå gennem porten i den gamle bygning.', test: () => { const { C, u, v } = LOENGANG, dx = P.pos.x - C[0], dz = P.pos.z - C[1]; return Math.abs(dx * u[0] + dz * u[1]) < 1.6 && Math.abs(dx * v[0] + dz * v[1]) < 1.5; } },
   { id: 'pm', s: 'Statsministeren', at: ['Rigsdagsgården'], t: 'Vink til statsministeren, når hun kommer i sin sorte bil.', act: 'pm' },
+  { id: 'svaner', s: 'Svanerne', at: ['Svanerne'], t: 'Vink til svanerne i havnen.', act: 'svane' },
+  { id: 'springvand', s: 'Springvandet', at: ['Bibliotekshaven'], t: 'Start springvandet i dammen.', act: 'springvand' },
+  { id: 'udsigt', s: 'Udsigten', at: ['Udsigten'], t: 'Drej rundt, til du kan se Børsens drager.', test: () => TOWER.sees(253, 65) },
   { id: 'herkules', s: 'Herkules', at: ['Prins Jørgens Gård'], t: 'Find Herkules med køllen, og gå hen til ham.', test: () => Math.hypot(P.pos.x + 20.3, P.pos.z + 61) < 3.2 },
 ];
 const tasksDone = new Set();
@@ -4118,7 +4439,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
