@@ -342,6 +342,20 @@ function slab(x0, x1, z0, z1, h, mat, fill) { const m = box(x1 - x0, h, z1 - z0,
 
 // ---------------------------------------------------------------- textures + materials for Slotsholmen
 TX.cobble = ctex(128, 128, (g, w, h) => { g.fillStyle = '#a39b8d'; g.fillRect(0, 0, w, h); for (let y = 0; y < 8; y++) for (let x = -1; x < 9; x++) { g.fillStyle = jit('#cfc6b6', 0.07); g.beginPath(); g.ellipse(x * 16 + (y % 2) * 8 + 8, y * 16 + 8, 7, 6.5, 0, 0, Math.PI * 2); g.fill(); } }, { rep: 1 / 2 });
+// Slotspladsen has small, uneven granite setts. The darker joints and several stone
+// tones break up the broad flat surface without adding thousands of meshes.
+TX.slotsSetts = ctex(256, 256, (g, w, h) => {
+  g.fillStyle = '#8f8a82'; g.fillRect(0, 0, w, h);
+  const shades = ['#c2bcb2', '#d0c8bc', '#aaa8a2', '#d8d0c3', '#bcb8ae', '#b2afa7'];
+  for (let row = 0; row < 16; row++) for (let col = -1; col < 17; col++) {
+    const x = col * 16 + (row % 2) * 8, y = row * 16;
+    const inset = rr(1.1, 2.1);
+    g.fillStyle = jit(pick(shades), 0.035);
+    g.fillRect(x + inset, y + inset, 16 - inset * 2, 16 - inset * 2);
+    g.fillStyle = 'rgba(255,255,255,.13)'; g.fillRect(x + inset, y + inset, 11, 1);
+  }
+  speckle(g, w, h, 1900, 0.09, 1);
+}, { rep: 1 / 8 });
 TX.water = ctex(256, 256, (g, w, h) => { g.fillStyle = '#4f93c4'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(255,255,255,.3)'; g.lineWidth = 3; g.lineCap = 'round'; for (let i = 0; i < 28; i++) { const x = rand() * (w - 40), y = 6 + rand() * (h - 12), l = rr(14, 34); g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + l / 2, y - 5, x + l, y); g.stroke(); } }, { rep: 1 / 12 });
 TX.asph = ctex(256, 256, (g, w, h) => { g.fillStyle = '#a19f9b'; g.fillRect(0, 0, w, h); speckle(g, w, h, 2400, 0.07, 2); }, { rep: 1 / 8 });
 const nightMats = [];
@@ -398,6 +412,7 @@ const WOFF = 0.075;
 const M = {
   ground: toon('#fff', { map: TX.cobble }),
   square: gmat(TX.sidewalk, 1), grass: gmat(TX.grass, 2), sand: gmat(TX.sand, 2), road: gmat(TX.asph, 3), water: gmat(TX.water, 4),
+  slotsSetts: gmat(TX.slotsSetts, 1.7),
   quay: toon('#8a8477', { polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -12 }),
   bridge: toon('#cdbfa5'), parapet: toon('#b3a58c'),
   steel: toon('#8f959c'), dark: toon('#363941'), trunk: toon('#6e4c35'), birch: toon('#efebe3'),
@@ -909,6 +924,10 @@ for (const a of DATA.A) {
   else if (a.k === 'pitch') flatPoly([a.ring], M.sand, 0, '#e6c991');
   else if (a.k === 'park' || a.k === 'grass' || a.k === 'garden') flatPoly([a.ring], M.grass, 0, '#a7c46f');
 }
+// The paved forecourt around Frederik VII. Streets and palace geometry are drawn
+// afterwards, so they retain their own materials where they cross this outline.
+const SLOTSPLADS_RING = [[19,-114],[44,-97],[79,-72],[111,-46],[126,-27],[136,-13],[78,14],[-5,-84]];
+flatPoly([SLOTSPLADS_RING], M.slotsSetts, 0.008, null);
 
 // ---------------- streets (flat ribbons), widths in metres
 const ROADW = { primary: 15, ter: 11, unc: 8, res: 7, liv: 8, ped: 7, service: 5 };
@@ -3419,6 +3438,107 @@ $('finAgain').addEventListener('click', () => {
   for (const c of CROWNS) { c.got = false; c.fly = 0; c.g.visible = c.beam.visible = true; c.g.scale.setScalar(1); c.g.position.set(c.x, c.y0 + 1.1, c.z); }
   $('finale').hidden = true; paused = false; canvas.focus(); toast('Kronerne er gemt igen. Kan du finde dem?');
 });
+// ---------------- Slotspladsen: granite spheres and a handful of visitors
+// The spheres follow the street side of the forecourt. Their spacing leaves room
+// to pass between them, and a few are omitted at the street crossings.
+const slotsBallPoints = [[19,-114],[44,-97],[79,-72],[111,-46],[126,-27],[136,-13],[100,3]];
+const slotsBalls = [];
+for (let i = 0; i < slotsBallPoints.length - 1; i++) {
+  const [ax, az] = slotsBallPoints[i], [bx, bz] = slotsBallPoints[i + 1];
+  const len = Math.hypot(bx - ax, bz - az), steps = Math.floor(len / 2.8);
+  for (let j = 0; j <= steps; j++) {
+    const u = j / steps, x = ax + (bx - ax) * u, z = az + (bz - az) * u;
+    if (rawWater(x, z) || inBuilding(x, z) || groundAt(x, z, 2) > 0.5 || nearRoute(x, z, 5.5)) continue;
+    if (Math.hypot(x - 81, z + 51) < 7) continue;
+    slotsBalls.push([x, z]);
+  }
+}
+if (slotsBalls.length) {
+  const balls = new THREE.InstancedMesh(new THREE.SphereGeometry(0.58, 14, 10), tm('#ffffff'), slotsBalls.length);
+  const dummy = new THREE.Object3D(), shades = ['#a49e95', '#b5afa4', '#99958e', '#c1b9ac'];
+  slotsBalls.forEach(([x, z], i) => {
+    const s = 0.96 + (i % 5) * 0.018;
+    dummy.position.set(x, 0.56 * s, z); dummy.scale.setScalar(s); dummy.updateMatrix();
+    balls.setMatrixAt(i, dummy.matrix); balls.setColorAt(i, new THREE.Color(shades[i % shades.length]));
+    colCirc(x, z, 0.58 * s, 99);
+  });
+  balls.instanceMatrix.needsUpdate = true;
+  if (balls.instanceColor) balls.instanceColor.needsUpdate = true;
+  balls.castShadow = balls.receiveShadow = true; world.add(balls);
+}
+
+const TOURISTS = [];
+const touristSkin = tm('#e9bd99'), touristPhone = tm('#232831');
+const touristHeadGeo = new THREE.SphereGeometry(1, 10, 8);
+function makePlazaTourist(coat, hair, photo, phase) {
+  const root = new THREE.Group(); dyn.add(root);
+  const clothes = tm(coat), dark = tm('#344052');
+  const torso = mesh(touristHeadGeo, clothes, 0, 1.12, 0, { parent: root }); torso.scale.set(0.28, 0.44, 0.20);
+  const head = mesh(touristHeadGeo, touristSkin, 0, 1.69, 0, { parent: root }); head.scale.setScalar(0.21);
+  const hairstyle = mesh(touristHeadGeo, tm(hair), 0, 1.83, -0.035, { parent: root }); hairstyle.scale.set(0.22, 0.12, 0.22);
+  const bag = mesh(touristHeadGeo, tm('#7a614b'), 0, 1.03, -0.24, { parent: root }); bag.scale.set(0.22, 0.29, 0.10);
+  const legs = [], arms = [];
+  for (const side of [-1, 1]) {
+    const leg = new THREE.Group(); leg.position.set(side * 0.13, 0.72, 0); root.add(leg);
+    mesh(new THREE.CapsuleGeometry(0.09, 0.37, 3, 7), dark, 0, -0.29, 0, { parent: leg });
+    mesh(touristHeadGeo, tm('#303038'), 0, -0.61, 0.08, { parent: leg }).scale.set(0.13, 0.07, 0.20); legs.push(leg);
+    const arm = new THREE.Group(); arm.position.set(side * 0.29, 1.4, 0); root.add(arm);
+    mesh(new THREE.CapsuleGeometry(0.07, 0.26, 3, 6), clothes, 0, -0.19, 0, { parent: arm });
+    mesh(touristHeadGeo, touristSkin, 0, -0.42, 0, { parent: arm }).scale.setScalar(0.08); arms.push(arm);
+  }
+  let flash = null;
+  if (photo) {
+    // A small phone held at eye level; the white screen lights briefly for each picture.
+    box(0.25, 0.36, 0.045, touristPhone, 0, 1.48, 0.42, { parent: root, cast: false });
+    flash = mesh(new THREE.PlaneGeometry(0.17, 0.26), new THREE.MeshBasicMaterial({ color: '#eaf5ff' }), 0, 1.66, 0.449, { parent: root, cast: false });
+    flash.visible = false;
+    arms[0].rotation.x = arms[1].rotation.x = -1.15;
+    arms[0].rotation.z = 0.2; arms[1].rotation.z = -0.2;
+  }
+  return { root, legs, arms, flash, photo, phase };
+}
+const touristOk = ([x, z]) => ptIn(SLOTSPLADS_RING, x, z) && !rawWater(x, z) && !inBuilding(x, z)
+  && groundAt(x, z, 2) < 0.5 && !nearRoute(x, z, 4) && Math.hypot(x - 81, z + 51) > 7;
+for (const [spot, aim, coat, hair, phase] of [
+  [[62,-62],[81,-51],'#d98155','#6c4433',0],
+  [[95,-34],[27,15],'#6d9aba','#503b32',2.3],
+  [[52,-80],[10,6],'#cfad5c','#745340',4.6],
+  [[102,-62],[81,-51],'#7aa284','#45342d',6.8]
+]) if (touristOk(spot)) {
+  const t = makePlazaTourist(coat, hair, true, phase);
+  t.root.position.set(spot[0], groundAt(...spot, 2), spot[1]);
+  t.root.rotation.y = Math.atan2(aim[0] - spot[0], aim[1] - spot[1]);
+  TOURISTS.push(t);
+}
+for (const [a, b, coat, hair, phase] of [
+  [[47,-87],[60,-75],'#e7a37d','#604334',0.4],
+  [[61,-92],[77,-84],'#799bc5','#826146',1.7],
+  [[103,-73],[106,-58],'#c794b2','#54352c',2.8],
+  [[77,-33],[88,-22],'#83a06b','#553c2f',3.9],
+  [[43,-70],[55,-57],'#d4b668','#664833',5.1],
+  [[89,-8],[78,-19],'#9c8bc3','#473a37',6.2]
+]) if (touristOk(a) && touristOk(b)) {
+  const t = makePlazaTourist(coat, hair, false, phase); t.a = a; t.b = b;
+  t.root.position.set(a[0], groundAt(...a, 2), a[1]); TOURISTS.push(t);
+}
+HOOKS.frame.push((dt, time) => {
+  if (!started || paused) return;
+  for (const t of TOURISTS) {
+    if (t.photo) {
+      t.flash.visible = ((time + t.phase) % 7.5) < 0.13;
+      t.root.rotation.z = Math.sin(time * 0.8 + t.phase) * 0.014;
+    } else {
+      const a = time * 0.48 + t.phase, u = (1 - Math.cos(a)) * 0.5;
+      const x = t.a[0] + (t.b[0] - t.a[0]) * u, z = t.a[1] + (t.b[1] - t.a[1]) * u;
+      t.root.position.set(x, groundAt(x, z, 2), z);
+      t.root.rotation.y = Math.atan2(t.b[0] - t.a[0], t.b[1] - t.a[1]) + (Math.sin(a) < 0 ? Math.PI : 0);
+      const step = Math.sin(time * 6 + t.phase) * 0.46 * Math.abs(Math.sin(a));
+      t.legs[0].rotation.x = step; t.legs[1].rotation.x = -step;
+      t.arms[0].rotation.x = -step * 0.8; t.arms[1].rotation.x = step * 0.8;
+    }
+  }
+});
+
 // ---------------- pigeons on Slotspladsen, around Frederik VII's statue
 // They take off in small waves as the player approaches and settle again after she leaves.
 const PIGEONS = [];
@@ -4004,3 +4124,4 @@ if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.c
 </script>
 </body>
 </html>
+
