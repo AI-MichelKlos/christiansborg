@@ -110,3 +110,9 @@ Kompaspartiet er opdigtet. Gang, etageplacering, kontorer og sekretariat er bygg
 ### Kontrol af runde 3
 
 Kontrolleret i Chromium ved 1280 x 800 og i touchkontekst ved 390 x 844. Gang ind og ud af Kompaspartiets hoveddør og gennem alle fire rumdøre. Adgang fra indgangen til Snapstinget og gang begge veje over de fire trin mellem niveauerne. Mobilens joystick afprøvet på trinene. Kopimaskinen og gangens vægge stopper spilleren. Rutesøgning med gulvhøjdekontrol finder gangbare forbindelser fra hovedindgangen til begge kontorer, sekretariat, mødelokalets indre, buffet og øvre spiseområde samt de tidligere rum. Hjælp/fortsættelse og udgang fungerer. Ingen JavaScript-fejl. Skærmbilleder af begge nye områder på computer og telefon gennemset. Syntakskontrol og git diff --check bestået.
+
+## Mobilkamera med automatisk følge
+
+Joysticket er bevaret. Ved gang fremad eller til siden følger kameraet roligt gangretningen, højst 0,9 radian pr. sekund. Hver berøring fastholder en reference til kameraretningen ved berøringens start, så automatisk følge ikke skaber en spiral i gangretningen. Manuel kameratrækning på højre side har prioritet og opdaterer referencen; automatisk følge holder pause i 1,2 sekunder efter et manuelt træk. Baglæns gang vender ikke kameraet rundt. Kameraet bliver stående, når man slipper, og gangens vandrette hastighed nulstilles straks. Båd og løbehjul bevarer deres særskilte styring.
+
+Kontrolleret med touch-events i Chromium på 390 x 844, udendørs og indendørs: kameraet følger en bevægelse til siden uden at spiralere ved fortsat berøring; højst 0,03 radian pr. simuleret trin på 1/30 sekund. Ved slip var både efterfølgende distance og kamerapanorering nul. Baglæns gang drejer ikke kameraet. Manuel kameratrækning tilsidesætter automatisk følge. Ingen JavaScript-fejl. Syntakskontrol og git diff --check bestået.

@@ -166,7 +166,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div id="guide" class="sticker" role="status" aria-live="off" hidden><span id="guideArrow" aria-hidden="true">↑</span><span id="guideText"></span></div>
   <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><p id="poiTask" hidden></p><div id="poiActions"><button id="poiMore" type="button">Læs mere</button><button id="poiRead" type="button">Læs op</button></div></div>
   <div id="toast" class="sticker" hidden></div>
-  <div id="touchHint" hidden><span>✥</span>Træk for at gå</div><div id="lookHint" hidden>Træk for at kigge</div>
+  <div id="touchHint" hidden><span>✥</span>Træk for at gå</div><div id="lookHint" hidden>Kig rundt (valgfrit)</div>
   <div id="joy" hidden><div id="knob"></div></div>
   <button id="jump" class="sticker" type="button" hidden>Hop</button>
   <button id="actBtn" class="sticker" type="button" hidden><kbd>E</kbd><span id="actTxt"></span></button>
@@ -190,8 +190,8 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
       <span>Læs op-knappen</span><span>Tryk, så bliver teksterne læst højt. Tryk igen for at slå det fra.</span>
     </div>
     <div class="keys" id="keysTouch" hidden>
-      <span>Venstre tommel</span><span>Træk i den retning, du vil gå. Træk lidt for at gå langsomt</span>
-      <span>Højre tommel</span><span>Træk for at kigge dig omkring</span>
+      <span>Venstre tommel</span><span>Træk i den retning, du vil gå. Træk lidt for at gå langsomt. Slip for at stoppe</span>
+      <span>Kamera</span><span>Følger roligt med. Træk på højre side for selv at kigge</span>
       <span>Hop-knappen</span><span>Hop · stig af løbehjulet</span>
       <span>Handlingsknappen</span><span>Tryk for at undersøge, tale eller bruge ting</span>
       <span>Læs op-knappen</span><span>Tryk for at få teksterne læst højt</span>
@@ -3055,6 +3055,7 @@ function updPlayer(dt) {
   P.face += turn * (run && fwd > 0 ? 2.0 : 2.5) * dt * (PM.turn ?? 1);
   let fx = Math.sin(P.face), fz = Math.cos(P.face);
   if (!paused && joy.id !== null && Math.hypot(joy.x, joy.y) > 0) {
+    followTouchCamera(dt);
     const v = touchWalk();
     speed = 5.2 * Math.hypot(joy.x, joy.y) * (PM.speed ?? 1);
     fx = v.x; fz = v.z;
@@ -3275,18 +3276,28 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => { keys.delete(e.code); });
 window.addEventListener('blur', () => keys.clear());
-let jumpReq = false, lastDragEnd = -10, turnIn = 0;
+let jumpReq = false, lastDragEnd = -10, turnIn = 0, lastManualLookAt = -Infinity;
 const cam = { yaw: Math.PI / 2, pitch: 0.3, dist: 7.5 };
 const drag = new Map();
-const joy = { id: null, ox: 0, oy: 0, x: 0, y: 0 };
-// Screen-up follows the camera, screen-right stays perpendicular to it.
+const joy = { id: null, ox: 0, oy: 0, x: 0, y: 0, baseYaw: 0 };
+// Hold a stable heading for each thumb gesture so camera follow cannot turn the walk into a spiral.
 function touchWalk() {
   const length = Math.hypot(joy.x, joy.y) || 1;
-  return { x: (Math.sin(cam.yaw)*joy.y + Math.cos(cam.yaw)*joy.x)/length,
-    z: (Math.cos(cam.yaw)*joy.y - Math.sin(cam.yaw)*joy.x)/length };
+  const yaw=joy.baseYaw;
+  return { x: (Math.sin(yaw)*joy.y + Math.cos(yaw)*joy.x)/length,
+    z: (Math.cos(yaw)*joy.y - Math.sin(yaw)*joy.x)/length };
+}
+function followTouchCamera(dt) {
+  if(!isTouch||paused||joy.id===null||drag.size||performance.now()-lastManualLookAt<1200||joy.y>.2||Math.hypot(joy.x,joy.y)<.12)return;
+  const v=touchWalk(),delta=angDiff(Math.atan2(v.x,v.z)+Math.PI,cam.yaw);
+  const change=delta*(1-Math.exp(-dt*2.4));
+  cam.yaw+=Math.max(-dt*.9,Math.min(dt*.9,change));
+}
+function stopTouchWalking() {
+  if(!MYBOAT.on&&!TOWER.on&&!FX.scooter?.active&&!P.ride&&!P.swing){P.vel.x=P.vel.z=0;}
 }
 function resetTouch() {
-  joy.id = null; joy.x = joy.y = 0; drag.clear(); jumpReq = false;
+  joy.id = null; joy.x = joy.y = 0; drag.clear(); jumpReq = false; stopTouchWalking();
   $('joy').hidden = true; $('knob').style.transform = '';
   $('touchHint').hidden = !isTouch;
 }
@@ -3296,7 +3307,7 @@ canvas.addEventListener('pointerdown', e => {
   if (!started || paused) return;
   canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
   if (e.pointerType !== 'mouse' && e.clientX < window.innerWidth * 0.45 && e.clientY > window.innerHeight * 0.45 && joy.id === null) {
-    joy.id = e.pointerId; joy.ox = e.clientX; joy.oy = e.clientY; joy.x = 0; joy.y = 0;
+    joy.id = e.pointerId; joy.baseYaw=cam.yaw; joy.ox = e.clientX; joy.oy = e.clientY; joy.x = 0; joy.y = 0;
     const j = $('joy'); j.style.left = e.clientX + 'px'; j.style.top = e.clientY + 'px'; j.hidden = false; $('knob').style.transform = ''; $('touchHint').hidden = true;
   } else drag.set(e.pointerId, { x: e.clientX, y: e.clientY });
 });
@@ -3309,9 +3320,11 @@ canvas.addEventListener('pointermove', e => {
   const d = drag.get(e.pointerId); if (!d) return;
   const sens = e.pointerType === 'mouse' ? 0.0055 : 0.0045;
   cam.yaw -= (e.clientX - d.x) * sens; cam.pitch = Math.min(1.25, Math.max(FX.interior?.on ? -0.55 : 0.05, cam.pitch + (e.clientY - d.y) * sens * 0.75));
+  lastManualLookAt=performance.now();
+  if(joy.id!==null)joy.baseYaw=cam.yaw;
   d.x = e.clientX; d.y = e.clientY;
 });
-const endPtr = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; $('joy').hidden = true; $('touchHint').hidden = !isTouch; } if (drag.delete(e.pointerId)) lastDragEnd = clockT; };
+const endPtr = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; stopTouchWalking(); $('joy').hidden = true; $('touchHint').hidden = !isTouch; } if (drag.delete(e.pointerId)) {lastDragEnd=clockT;lastManualLookAt=performance.now();} };
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr); canvas.addEventListener('lostpointercapture', endPtr);
 canvas.addEventListener('wheel', e => { if (!started) return; e.preventDefault(); cam.dist = Math.min(26, Math.max(3.2, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive: false });
 $('jump').addEventListener('pointerdown', e => { e.preventDefault(); if (FX.scooter?.active) FX.scooter.stop(); else jumpReq = true; });
@@ -5017,6 +5030,7 @@ const INTERIOR = (() => {
     let f=0,t=0;
     if(!paused){f=Number(keys.has('KeyW')||keys.has('ArrowUp'))-Number(keys.has('KeyS')||keys.has('ArrowDown'));t=Number(keys.has('KeyA')||keys.has('ArrowLeft'))-Number(keys.has('KeyD')||keys.has('ArrowRight'));}
     P.face+=Math.max(-1,Math.min(1,t))*dt*1.8;
+    followTouchCamera(dt);
     if(isTouch){cam.yaw+=Math.max(-1,Math.min(1,t))*dt*1.8;P.face=cam.yaw-Math.PI;}else if(drag.size)P.face=cam.yaw-Math.PI; else cam.yaw=P.face+Math.PI;
     let vx=Math.sin(P.face)*3*Math.max(-1,Math.min(1,f)),vz=Math.cos(P.face)*3*Math.max(-1,Math.min(1,f));
     if(!paused&&joy.id!==null){const v=touchWalk(),power=Math.hypot(joy.x,joy.y);vx=v.x*3*power;vz=v.z*3*power;}
@@ -5047,7 +5061,7 @@ const INTERIOR = (() => {
     if(room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
     if(room==='hall'&&(x>36||x< -36))offerAction({id:'sal-lukket',label:x>0?'Folketingssalen':'Landstingssalen',prio:5,run:()=>toast('Salen åbnes i et senere trin.')});
   });
-  const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);
+  const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);if(isTouch)badge.querySelector('span').textContent='Kameraet følger · slip for at stoppe';
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',leave);hud.appendChild(exit);
   const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);
   shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});

@@ -184,3 +184,5 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner venter.
 
 - [x] Mobilrettelse (15. okt. 2026): rettet fortegnet på joystickets sidelæns bevægelse. Venstre/højre var spejlet i forhold til kameraets faktiske højreakse, både ude og inde. Kontrolleret med faktiske touch-events mod renderkameraets højreakse: venstre og højre ved fire kameravinkler udendørs og indendørs, 16 beståede kontroller uden JavaScript-fejl.
+
+- [x] Automatisk mobilkamera (15. okt. 2026): beholdt joystick, roligt kamerafølge under gang, straks-stop ved slip og valgfrit manuelt kig. Fastholdt gangretning under samme berøring for at undgå spiral. Kontrolleret ude og inde med faktiske touch-events: begrænset drejehastighed, følge og stabil retning ved lang berøring, nul bevægelse og kamerapanorering efter slip, baglæns gang uden kameravending og manuel kamerastyring med prioritet. Ingen JavaScript-fejl.

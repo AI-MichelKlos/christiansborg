@@ -33,3 +33,6 @@ Indvendigt fører to trappeløb med repos op til Vandrehallen. Træbalustrader, 
 
 ### Kompaspartiet og Snapstinget
 Ved Vandrehallen mod Folketingssalen kan man gå ind i det fiktive Kompaspartiets gang med to kontorer, sekretariat og mødelokale. Snapstinget nås gennem den åbne dør til venstre ved indgangen, over for betjentstuen. Spisesalen har to gulvniveauer, borde, buffet og kaffeområde. Referencer og usikkerheder står i `dev/INTERIOR.md`. Rummene er til udforskning; mordgådens personer og funktioner følger senere.
+
+### Kamera på telefon
+Joysticket styrer gangretning og hastighed. Kameraet følger roligt gangretningen, og spilleren stopper straks, når joysticket slippes. Træk på højre side for selv at kigge; den manuelle kamerastyring får prioritet. Når man går baglæns, bliver kameraet i sin retning.
