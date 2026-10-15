@@ -169,3 +169,16 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 
 ## Næste idé
 - Følg statsministeren ind: en enkel Folketingssal bag døren i Rigsdagsgården, som pigen kan gå ind ad efter hende. Michel har bedt om at gemme den til senere.
+
+
+## Mord i Rigets midte: fysiske steder, to ad gangen
+- [x] Runde 1 (15. okt. 2026): betjentstuen med buet egetræsskranke, arbejdsplads og nøgleskab; Samtaleværelset med grønne vægge, mørke paneler, blå stole, runde borde, tæppe, høje vinduer, vaser og lysekrone. Åbne døre og sammenhængende gang fra det eksisterende interiør. Referencer og usikkerheder i dev/INTERIOR.md. Gang gennem døre, gulvhøjder, møbelkollision, hjælp, mobiljoystick og udgang kontrolleret i Chromium på computer og telefonstørrelse uden JavaScript-fejl.
+- [ ] Runde 2: Folketingets indgang/trappe og Vandrehallen/Rigets midte.
+- [ ] Runde 3: Kompaspartiets område og Snapstinget.
+- [ ] Runde 4: Finansministeriet og Reformministeriet.
+- [ ] Runde 5: kajen ved Reformministeriet og kajen ved Slotspladsen.
+- [ ] Runde 6: Bibliotekshaven og staldene.
+- [ ] Runde 7: tårnets indre og Udsigten.
+- [ ] Runde 8: Landstingssalen og Slotspladsens presseområde.
+
+Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner venter.

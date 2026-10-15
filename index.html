@@ -3248,7 +3248,7 @@ $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear(); resetTouch();
-  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Inde i Folketinget'; $('introLead').textContent = 'Gå op ad trappen og udforsk Vandrehallen. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; $('taskBox').hidden = true; }
+  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Inde i Folketinget'; $('introLead').textContent = 'Betjentstuen ligger til højre ved indgangen. Gå op til Vandrehallen og videre gennem den åbne dør til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; $('taskBox').hidden = true; }
   else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
   intro.hidden = false; goBtn.focus();
 }
@@ -4531,6 +4531,136 @@ const INTERIOR = (() => {
     for(const side of [-1,1]) { for(const y of [.35,1.55]) add(.9,1,.07,trim,side*.58,y,.13);add(.07,.25,.08,brass,side*.15,1.2,.19); }
     add(3,.22,.3,trim,0,3.3,0);sign(text,3.3,.6,x,I.floor+4,z+(ry===0?.2:-.2),ry);
   }
+
+  function openDoor(x,z,ry,y,text) {
+    const r=new THREE.Group();r.position.set(x,y,z);r.rotation.y=ry;g.add(r);
+    const add=(w,h,d,m,a,b,c,parent=r)=>box(w,h,d,m,a,b,c,{parent,cast:false});
+    for(const side of [-1,1]) {
+      add(.2,3.25,.35,trim,side*1.48,0,0);add(.1,3.1,.45,oak,side*1.36,0,0);
+      const hinge=new THREE.Group();hinge.position.x=side*1.27;hinge.rotation.y=side*1.48;r.add(hinge);
+      add(1.25,2.95,.12,oak,-side*.625,0,0,hinge);
+      for(const h of [.25,1.6]){add(.95,1.05,.06,trim,-side*.625,h,-.09,hinge);add(.8,.9,.07,oak,-side*.625,h+.07,-.125,hinge);}
+      add(.1,.23,.12,brass,-side*1.08,1.22,-.13,hinge);
+    }
+    add(3.25,.22,.42,trim,0,3.15,0);add(3.45,.12,.5,oak,0,3.37,0);
+    const tx=x-Math.sin(ry)*.28,tz=z-Math.cos(ry)*.28;
+    sign(text,2.9,.45,tx,y+3.7,tz,ry+Math.PI);
+    sign(text==='Betjentstuen'?'Til indgangen':'Til Vandrehallen',2.9,.4,x+Math.sin(ry)*.28,y+3.7,z+Math.cos(ry)*.28,ry);
+  }
+  function buildRoundOne(woodFloor) {
+    const cream=material('#ece7d7'),sage=material('#a3b5a1'),walnut=material('#453020'),blue=material('#293d51');
+    const ivory=material('#fff5d8'),lamp=new THREE.MeshBasicMaterial({color:'#fff0c1'});
+    function cylinder(radius,h,m,x,y,z,top=radius,n=24){return mesh(new THREE.CylinderGeometry(top,radius,h,n),m,x,y+h/2,z,{parent:g});}
+    function wall(a,c,z,y,H,m,alongX=true) {
+      const w=c-a,mid=(a+c)/2;
+      if(alongX){b(w,H,.25,m,mid,y,z);b(w,1.25,.12,walnut,mid,y,z-.16);b(w,.1,.19,walnut,mid,y+1.25,z-.18);}
+      else {b(.25,H,w,m,z,y,mid);b(.12,1.25,w,walnut,z+.16,y,mid);b(.19,.1,w,walnut,z+.18,y+1.25,mid);}
+    }
+    function chair(x,z,ry,y,arm=false) {
+      const r=new THREE.Group();r.position.set(x,y,z);r.rotation.y=ry;g.add(r);
+      const a=(w,h,d,m,x,y,z)=>box(w,h,d,m,x,y,z,{parent:r,cast:false});
+      const w=arm?.82:.53;
+      for(const sx of [-1,1])for(const sz of [-1,1])a(.055,.47,.055,walnut,sx*(w/2-.07),0,sz*.23);
+      a(w,.13,.62,blue,0,.43,0);a(w,.08,.62,walnut,0,.37,0);
+      if(arm){a(w,.5,.13,blue,0,.55,.28);for(const side of [-1,1])a(.13,.3,.65,blue,side*w/2,.58,0);}
+      else {
+        for(const side of [-1,1])a(.045,.65,.055,walnut,side*w/2,.49,.27);
+        a(w,.07,.07,walnut,0,1.06,.27);a(.07,.4,.04,walnut,0,.63,.27);
+        for(const side of [-1,1]){const q=a(.035,.4,.04,walnut,side*.1,.64,.27);q.rotation.z=side*.4;}
+      }
+      obstacle(x,z,w+.12,.8);
+    }
+    function roundTable(x,z,y,r=1.15) {
+      cylinder(r,.12,oak,x,y+.76,z);cylinder(r*.98,.025,brass,x,y+.885,z);
+      cylinder(.19,.68,walnut,x,y+.08,z,.25);b(r*1.25,.12,.22,walnut,x,y,z);b(.22,.12,r*1.25,walnut,x,y,z);
+      obstacle(x,z,r*2,r*2);
+    }
+    function framedScene(x,z,ry,y,w,h,modern) {
+      const r=new THREE.Group();r.position.set(x,y,z);r.rotation.y=ry;g.add(r);
+      box(w+.22,h+.22,.1,walnut,0,0,0,{parent:r,cast:false});
+      box(w+.1,h+.1,.04,brass,0,.06,.065,{parent:r,cast:false});
+      // Original schematic group scenes; no imported artwork or politician likenesses.
+      const tex=ctex(768,448,(c,W,H)=>{
+        c.fillStyle=modern?'#769f9e':'#69604a';c.fillRect(0,0,W,H);
+        c.fillStyle=modern?'#45655b':'#393326';c.fillRect(0,H*.68,W,H*.32);
+        for(let row=0;row<3;row++)for(let j=0;j<10;j++){
+          const px=36+j*76+Math.sin(j+row)*9,py=75+row*108;
+          c.fillStyle=modern?['#b95e4c','#597a88','#c5aa53','#466b5a','#c3bca0'][(j+row)%5]:['#292e29','#3b3b32','#4d4839'][(j+row)%3];
+          c.beginPath();c.moveTo(px-12,py+28);c.lineTo(px-25,py+42);c.lineTo(px-19,py+99);c.lineTo(px+21,py+99);c.lineTo(px+25,py+42);c.lineTo(px+11,py+28);c.closePath();c.fill();
+          c.fillStyle='#c5b49a';c.beginPath();c.ellipse(px,py+10,12,17,-.12,0,Math.PI*2);c.fill();
+          c.fillStyle=modern?['#45382c','#a59978','#7d7669'][j%3]:'#33312b';c.beginPath();c.ellipse(px,py+1,13,9,-.1,Math.PI,Math.PI*2);c.fill();
+          c.fillStyle='#ddd3bb';c.beginPath();c.moveTo(px-7,py+29);c.lineTo(px+7,py+29);c.lineTo(px,py+44);c.closePath();c.fill();
+          c.strokeStyle='#b5a087';c.lineWidth=5;c.beginPath();c.moveTo(px-19,py+48);c.lineTo(px-9,py+72);c.lineTo(px+9,py+72);c.stroke();
+        }
+      },{wrap:false});
+      const pl=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex}));pl.position.set(0,h/2+.11,.1);r.add(pl);
+    }
+    // Samtaleværelset: pale green salon with dark wainscot, blue seats, round tables,
+    // tall windows, cornice and chandelier, based on the room photograph linked in INTERIOR.md.
+    const fy=I.floor;
+    b(12,.22,13,woodFloor,12,fy-.22,11.3);b(12,.22,13,cream,12,11.3,11.3);
+    for(const [a,c] of [[6,10.5],[13.5,18]])wall(a,c,4.8,fy,6.5,sage);
+    b(3,3.25,.25,sage,12,fy+3.25,4.8);wall(6,18,17.8,fy,6.5,sage);
+    wall(4.8,17.8,6,fy,6.5,sage,false);wall(4.8,17.8,18,fy,6.5,sage,false);
+    // Panel mouldings and layered white ceiling cornice.
+    for(const x of [6.22,17.78]) {
+      for(const [y,w] of [[10.7,.18],[10.95,.28],[11.12,.38]])b(w,.13,12.7,cream,x,y,11.3);
+      for(let z=5.7;z<17.3;z+=1.2){b(.04,.06,1,oak,x,fy+.2,z);b(.04,.8,.04,oak,x,fy+.3,z-.5);}
+    }
+    for(const z of [5.02,17.58])for(const y of [10.7,10.95,11.12])b(11.7,.13,.26,cream,12,y,z);
+    // Cream patterned carpet, individual geometry instead of a photograph.
+    const carpet=ctex(256,256,(c,W,H)=>{c.fillStyle='#c6bfb0';c.fillRect(0,0,W,H);c.strokeStyle='#b5aa96';c.lineWidth=2;for(let y=0;y<H;y+=64)for(let x=0;x<W;x+=64){c.beginPath();c.ellipse(x+32,y+32,25,18,Math.PI/4,0,Math.PI*2);c.stroke();c.beginPath();c.ellipse(x+32,y+32,18,25,Math.PI/4,0,Math.PI*2);c.stroke();}},{rep:.7});
+    b(10.5,.018,10.8,material('#ffffff',{map:carpet}),12,fy+.005,11.4);
+    for(const x of [8.1,12,15.9]) {
+      b(2.25,4.65,.16,cream,x,fy+.4,17.56);b(1.85,4.2,.17,material('#d3e2df',{emissive:'#b6ccc4',emissiveIntensity:.28}),x,fy+.65,17.42);
+      for(const dx of [-.94,0,.94])b(.055,4.25,.12,cream,x+dx,fy+.62,17.3);
+      for(const y of [fy+2.05,fy+3.5])b(1.9,.065,.12,cream,x,y,17.28);
+      b(2.5,.14,.46,cream,x,fy+.45,17.48);
+    }
+    framedScene(6.24,11.1,Math.PI/2,fy+1.7,5.1,3.05,true);
+    framedScene(17.76,11.1,-Math.PI/2,fy+1.7,5.4,3.1,false);
+    b(.8,.38,2.5,blue,6.8,fy+.4,11.1);b(.15,.62,2.5,walnut,6.38,fy+.6,11.1);obstacle(6.8,11.1,1,2.7);
+    for(const x of [8,9,10,14,15,16])chair(x,16.7,0,fy);
+    b(2.5,.38,.8,blue,12,fy+.4,16.65);b(2.5,.62,.15,walnut,12,fy+.6,17);obstacle(12,16.65,2.7,1);
+    for(const [x,z] of [[10.5,9.2],[13.6,13.4]]) {
+      roundTable(x,z,fy);chair(x-1.65,z,-Math.PI/2,fy,true);chair(x+1.65,z,Math.PI/2,fy,true);
+    }
+    // Two tall porcelain vases on plinths, simplified shapes from official room description.
+    for(const z of [6.3,16.1]) {b(.7,.7,.7,walnut,7.1,fy,z);cylinder(.22,.72,ivory,7.1,fy+.7,z,.16);cylinder(.15,.17,brass,7.1,fy+1.42,z,.2);obstacle(7.1,z,.8,.8);}
+    // Lightweight crystal chandelier, no extra real-time shadow lights.
+    cylinder(.035,1.1,brass,12,10.2,11.3);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.8,.035,6,32),brass);ring.rotation.x=Math.PI/2;ring.position.set(12,10.1,11.3);g.add(ring);
+    for(let k=0;k<12;k++){const a=k*Math.PI/6,x=12+Math.cos(a)*.8,z=11.3+Math.sin(a)*.8;cylinder(.045,.28,lamp,x,9.92,z);mesh(new THREE.OctahedronGeometry(.095),ivory,x,9.72,z,{parent:g});}
+    // Betjentstuen: inferred layout; the oak reception counter is based on JJI's real work.
+    const bx=8.4,bz=22.1;
+    b(8,.2,6.8,woodFloor,bx,-.2,bz);b(8,.2,6.8,cream,bx,3.65,bz);
+    wall(4.4,12.4,18.7,0,3.65,cream);wall(4.4,12.4,25.5,0,3.65,cream);wall(18.7,25.5,12.4,0,3.65,cream,false);
+    for(const [a,c] of [[18.7,18.9],[21.9,25.5]])wall(a,c,4.4,0,3.65,cream,false);
+    b(.25,.65,3,cream,4.4,3,20.4);
+    // Rounded front: individual slats with raised panels and a curved wooden worktop.
+    for(let k=0;k<18;k++){
+      const a=-1.12+k*2.24/17,x=9.5+Math.sin(a)*2.05,z=23.45-Math.cos(a)*1.05;
+      const front=b(.26,1.08,.16,oak,x,0,z);front.rotation.y=-a*.6;
+      const top=b(.29,.09,.5,walnut,x,1.08,z);top.rotation.y=-a*.6;
+      if(k%3===0)b(.045,.78,.06,trim,x,.17,z-.1);
+    }
+    obstacle(9.5,22.7,3.8,1.3);
+    b(1.5,.05,.58,walnut,9.4,1.04,23.4);chair(9.5,24,0,0,true);
+    b(.7,.47,.055,dark,9.6,1.28,23.2);b(.09,.2,.1,dark,9.6,1.08,23.2);
+    b(.6,.025,.18,dark,9.6,1.13,22.91);b(.32,.07,.2,cream,8.3,1.13,22.8);
+    // Screen and pinboard are blank physical props; no case data or access-log gameplay yet.
+    b(1.7,1.7,.16,walnut,7,1.35,25.28);b(1.5,1.45,.17,material('#b6ad92'),7,1.46,25.16);
+    for(let row=0;row<3;row++)for(let col=0;col<5;col++){
+      b(.025,.1,.04,brass,6.42+col*.29,1.68+row*.37,25.04);
+      const r=new THREE.Mesh(new THREE.TorusGeometry(.045,.009,5,10),brass);r.position.set(6.42+col*.29,1.62+row*.37,25.02);g.add(r);
+    }
+    b(1.6,.9,.55,oak,6.9,0,24.9);obstacle(6.9,24.9,1.7,.65);
+    b(.1,1.2,1.8,walnut,12.15,1.45,20.7);b(.12,1.05,1.65,material('#a19b79'),12.06,1.52,20.7);
+    for(const z of [20.15,20.7,21.25])b(.025,.45,.34,cream,11.97,1.8,z);
+    chair(5.3,23.25,-Math.PI/2,0);chair(5.3,24.3,-Math.PI/2,0);
+    b(4.7,.12,.5,cream,8.4,3.32,22.1);b(4.4,.07,.38,lamp,8.4,3.24,22.1);
+  }
+
   function build() {
     if(I.built)return; I.built=true;
     const parquet=ctex(256,256,(c,W,H)=>{c.fillStyle='#b29466';c.fillRect(0,0,W,H);for(let y=0;y<8;y++)for(let x=0;x<4;x++){c.fillStyle=['#b79c72','#a98e64','#c1a780','#bda077'][(x+3*y)%4];c.fillRect(x*64+(y%2)*32,y*32,62,30);}}, {rep:.6});
@@ -4540,7 +4670,7 @@ const INTERIOR = (() => {
     b(80,.25,9.6,plaster,0,11.3,0);
     for(const side of [-1,1]) {
       // Opening on the entrance side into the simplified stair hall.
-      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,40]]:[[-40,40]])) {
+      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,10.5],[13.5,40]]:[[-40,40]])) {
         const w=c-a,x=(a+c)/2,z=side*4.8;
         b(w,6.5,.35,plaster,x,I.floor,z);b(w,2,.15,oak,x,I.floor,z-side*.22);
         b(w,.14,.22,trim,x,I.floor+2,z-side*.25);
@@ -4554,7 +4684,7 @@ const INTERIOR = (() => {
       // Floral frieze: procedural interpretation, no reproduction of original art.
       const frieze=ctex(1024,128,(c,W,H)=>{c.fillStyle='#d8cfad';c.fillRect(0,0,W,H);c.strokeStyle='#63765a';c.lineWidth=4;c.beginPath();for(let x=0;x<W;x+=4){let y=66+22*Math.sin(x/38);x?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();for(let x=22;x<W;x+=48){let y=66+22*Math.sin(x/38);c.fillStyle='#6c8058';c.beginPath();c.ellipse(x,y-17,7,17,.6,0,Math.PI*2);c.fill();c.fillStyle='#ac785b';c.beginPath();c.arc(x+12,y-26,7,0,Math.PI*2);c.fill();}},{rep:.18});
       const fm=material('#ffffff',{map:frieze});
-      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,40]]:[[-40,40]])) b(c-a,.85,.05,fm,(a+c)/2,I.floor+2.25,side*4.57);
+      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,10.5],[13.5,40]]:[[-40,40]])) b(c-a,.85,.05,fm,(a+c)/2,I.floor+2.25,side*4.57);
       for(let x=-36;x<=36;x+=6) {
         // Tall window bays and wall pilasters, reduced to a consistent rhythm.
         if(side===-1) {
@@ -4587,7 +4717,9 @@ const INTERIOR = (() => {
       obstacle(x,3.9,3.6,.9);
     }
     sign('Grundlovene',3.2,.6,-24,I.floor+2.05,4.53,Math.PI);
-    door(12,4.53,Math.PI,'Samtaleværelset');
+    b(3,3.25,.35,plaster,12,I.floor+3.25,4.8);
+    openDoor(12,4.8,0,I.floor,'Samtaleværelset');
+    buildRoundOne(woodFloor);
     // Suspended brass luminaires with frosted glass, repeated down the hall.
     const luminous=new THREE.MeshBasicMaterial({color:'#fff2cb'});
     for(let x=-33;x<40;x+=11) {
@@ -4596,7 +4728,11 @@ const INTERIOR = (() => {
     }
     // Approximate entrance and a walkable straight stair connection.
     b(8.4,.25,16,stone,0,-.25,15);
-    for(const side of [-1,1]) { b(.35,11.3,18,plaster,side*4.4,0,14);b(.16,1.7,18,stone,side*4.18,0,14); }
+    for(const side of [-1,1])for(const [a,c] of (side===1?[[5,18.9],[21.9,23]]:[[5,23]])) {
+      b(.35,11.3,c-a,plaster,side*4.4,0,(a+c)/2);b(.16,1.7,c-a,stone,side*4.18,0,(a+c)/2);
+    }
+    b(.35,8.3,3,plaster,4.4,3,20.4);
+    openDoor(4.4,20.4,Math.PI/2,0,'Betjentstuen');
     b(8.8,.25,18,plaster,0,11.3,14);b(8.8,11.3,.3,plaster,0,0,23);
     for(let i=0;i<24;i++) b(7.8,(i+1)*.2,.42,stone,0,0,18-(i+.5)*.4166667);
     b(8.4,.25,3.2,woodFloor,0,I.floor-.25,6.4);
@@ -4611,18 +4747,27 @@ const INTERIOR = (() => {
     const light=new THREE.HemisphereLight('#fff5dd','#a18d72',2.2);g.add(light);
     bakeGroup(g);
   }
-  function height(x,z) { return z<8?I.floor:z>18?0:Math.ceil((18-z)/.4166667)*.2; }
+  function roomAt(x,z) {
+    if(x>5.9&&x<18.1&&z>4.8&&z<18)return 'samtale';
+    if(x>4.4&&x<12.6&&z>18.6&&z<25.6)return 'betjent';
+    return 'hall';
+  }
+  function height(x,z) { if(roomAt(x,z)==='samtale')return I.floor; return z<8?I.floor:z>18?0:Math.ceil((18-z)/.4166667)*.2; }
   function fits(x,z) {
     const hall=Math.abs(x)<39.25 && Math.abs(z)<4.2;
     const entry=Math.abs(x)<3.7 && z>=3.6 && z<22.3;
-    return (hall||entry)&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
+    const samtale=x>6.35&&x<17.65&&z>5.15&&z<17.45;
+    const samtaleDoor=Math.abs(x-12)<1.15&&z>3.8&&z<5.5;
+    const betjent=x>4.75&&x<12.05&&z>19.05&&z<25.15;
+    const betjentDoor=x>3.5&&x<5.1&&Math.abs(z-20.4)<1.15;
+    return (hall||entry||samtale||samtaleDoor||betjent||betjentDoor)&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
   }
   function enter() {
     if(I.on||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;
     build(); I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
     I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
     P.pos.set(I.x,0,21);P.face=Math.PI;cam.yaw=0;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
-    document.body.classList.add('inFolketing');showPoi(null);toast('Folketinget. Gå op ad trappen til Vandrehallen.');
+    document.body.classList.add('inFolketing');showPoi(null);toast('Betjentstuen er til højre. Samtaleværelset ligger ved Vandrehallen.');
   }
   function leave() {
     I.on=false;g.visible=false;world.visible=true;dyn.visible=true;scene.fog=I.fog;scene.background=I.bg;evApplied=-1;applyEvening();
@@ -4655,18 +4800,19 @@ const INTERIOR = (() => {
     camera.position.set(P.pos.x,P.pos.y+1.7,z);const pitch=Math.max(-.55,Math.min(.65,cam.pitch));
     camera.lookAt(P.pos.x+Math.sin(P.face)*Math.cos(pitch)*10,P.pos.y+1.7-Math.sin(pitch)*10,z+Math.cos(P.face)*Math.cos(pitch)*10);
     kid.root.visible=false;
-    const name=z>8?'Trappen til Vandrehallen':Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen';
+    const room=roomAt(x,z);
+    const name=room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>8?'Trappen til Vandrehallen':Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen';
     $('indoorName').textContent=name;
-    if(z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
-    if(z<5&&x<-18&&x>-30)offerAction({id:'grundlov-info',label:'Se grundlovene',prio:5,run:()=>toast('I Vandrehallen er kopier af grundlovene fra 1849, 1866, 1915 og 1953 udstillet.')});
-    if(z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
+    if(room==='hall'&&z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
+    if(room==='hall'&&z<5&&x<-18&&x>-30)offerAction({id:'grundlov-info',label:'Se grundlovene',prio:5,run:()=>toast('I Vandrehallen er kopier af grundlovene fra 1849, 1866, 1915 og 1953 udstillet.')});
+    if(room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
     if(x>36||x< -36)offerAction({id:'sal-lukket',label:x>0?'Folketingssalen':'Landstingssalen',prio:5,run:()=>toast('Salen åbnes i et senere trin.')});
   });
   const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',leave);hud.appendChild(exit);
   const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);
   shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
-  I.enter=enter;I.leave=leave;I.fits=fits;I.height=height;FX.interior=I;return I;
+  I.enter=enter;I.leave=leave;I.fits=fits;I.height=height;I.roomAt=roomAt;FX.interior=I;return I;
 })();
 
 // ======================================================================== BOOT
