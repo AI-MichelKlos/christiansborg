@@ -6,7 +6,7 @@
 
 Ved hovedtrappen i Rigsdagsgården vises "Gå ind i Folketinget". E eller handlingsknappen åbner en separat 3D-model med en gangbar trappe og Vandrehallen. Telefon og computer bruger de eksisterende kontroller. Indendørs ses verden i øjenhøjde. Spilleren kan gå tilbage til døren eller bruge "Ud i gården". Startskærmen har en genvej til hovedtrappen.
 
-Vandrehallens 80 meter lange akse, egetræspaneler, blomsterfrise, seks marmorsøjler, kamin og grundlovsmontrer bygger på Folketingets offentlige beskrivelser. Døre markerer Folketingssalen, Landstingssalen og Samtaleværelset. Salene er ikke bygget endnu. Frisen er en enkel, selvtegnet botanisk fortolkning, ikke en gengivelse af Rasmus Larsens kunstværk.
+Vandrehallens 80 meter lange akse, egetræspaneler, blomsterfrise, seks marmorsøjler, kamin og grundlovsmontrer bygger på Folketingets offentlige beskrivelser. Døre markerer Folketingssalen, Landstingssalen og Samtaleværelset. Folketingssalen og Landstingssalen er ikke bygget endnu; Samtaleværelset er tilføjet i runde 1. Frisen er en enkel, selvtegnet botanisk fortolkning, ikke en gengivelse af Rasmus Larsens kunstværk.
 
 ## Kilder
 
@@ -16,9 +16,9 @@ Vandrehallens 80 meter lange akse, egetræspaneler, blomsterfrise, seks marmors�
 
 ## Grænser for nøjagtighed
 
-Dette er en foreløbig fortolkning, ikke en opmålt digital kopi. Den indvendige trappes udformning, forbindelsen til hallen, bredder, etagehøjde, vinduers rytme og detaljers præcise placering er anslået. Trappen er foreløbig et lige løb og må ikke beskrives som en korrekt gengivelse af Folketingets hovedtrappe. Billedgalleriet kunne findes via søgning, men direkte billedvisning blev blokeret af et sikkerhedstjek. Google-rundvisningens tekst kunne læses; panoramaerne kunne ikke vises i testbrowseren. Ingen fotografier er kopieret ind i spillet.
+Dette er en foreløbig fortolkning, ikke en opmålt digital kopi. Den indvendige trappes udformning, forbindelsen til hallen, bredder, etagehøjde, vinduers rytme og detaljers præcise placering er anslået. Den første trappe var ét lige løb. Runde 2 nedenfor erstatter den med to flugter i samme retning og en repos, stadig med anslåede mål og placering. Billedgalleriet kunne findes via søgning, men direkte billedvisning blev blokeret af et sikkerhedstjek. Google-rundvisningens tekst kunne læses; panoramaerne kunne ikke vises i testbrowseren. Ingen fotografier er kopieret ind i spillet.
 
-Næste arbejde med realisme bør prioritere dokumentation af trappen og den faktiske forbindelse til Vandrehallen samt sammenligning med tilgængelige interiørfotos. Portrætterne er endnu ikke modelleret. Voksenhistorie og gåder følger i senere trin.
+Den faktiske forbindelse mellem hovedindgangen og Vandrehallen er fortsat ikke verificeret med en plantegning. Runde 2 bruger nu visuelt gennemsete fotos af trappe og hal. Portrætterne er endnu ikke modelleret. Voksenhistorie og gåder følger i senere trin.
 
 ## Teknik
 
@@ -50,3 +50,30 @@ Dette trin bygger kun steder og almindeligt inventar. Ingen figurer, spor, adgan
 ### Kontrol af runde 1
 
 Kontrolleret i Chromium i desktopformat (1280 x 800) og mobilformat med touch (390 x 844). Gået begge veje gennem begge døråbninger. Gulvet i Samtaleværelset bliver på 4,8 m, mens betjentstuen har gulv i indgangens niveau. Vægge og borde stopper spilleren, og en søgning gennem de gangbare områder finder veje fra indgangen til begge rums gangarealer. Mobilens joystick blev afprøvet i Samtaleværelset. Hjælp, fortsættelse og udgang til gården er kontrolleret. Ingen JavaScript-fejl; skærmbilleder i begge formater gennemset. JavaScript-syntaks og git diff --check bestået.
+
+
+## Runde 2: indgang, trappe og Vandrehallen
+
+15. oktober 2026. Den indvendige trappe er ændret fra en enkelt lang stigning til to trappeløb i samme retning med en repos i 2,4 meters højde. Gulvet i Vandrehallen ligger stadig i 4,8 meters højde. Trappen har mørke trin, træhåndlister, drejede balustre og øvre gallerier. Galleriernes kanter er lukkede for gang, og højdekontrollen forhindrer, at spilleren pludselig kommer fra et lavt trappeløb op på galleriet eller falder ned fra det.
+
+Vandrehallen har fået et hvælvet loft, tværgående hvide buer, ringformede messingkroner med lys, polstrede siddepladser i nicher, en mere detaljeret kamin med ur og en siddegruppe omkring et rundt bord. De seks marmorsøjler er bevaret og arrangeret omkring det centrale område. Sofaerne ved de øvrige borde er mere detaljerede. Der er stadig intet nyt mordgådespil, ingen figurer eller spor.
+
+Folketingets beskrivelse angiver to døre til Samtaleværelset midt i Vandrehallen. Samtaleværelset er derfor flyttet fra den tidligere anslåede sideplacering til midten på modsatte side af trappen, med to åbne døre. Det er en forbedring af den relative placering, men ikke en verificeret gengivelse af den faktiske plantegning. Betjentstuen bliver liggende ved indgangen med adgang som før.
+
+### Billedgrundlag
+
+Disse tre fotos blev hentet og visuelt gennemset, kun som model for geometri og materialer:
+
+- Kontrapunkt, eget projekt for Folketinget: https://kontrapunkt.com/work/bringing-history-into-the-future . Fotoet https://cdn.sanity.io/images/zmr0zdju/production/bd39602ed6551ba0d25d4e89723ac212ffee64e1-8000x4500.jpg viser træbalustrade, vægpaneler, blomsterfrise, marmorsøjler, hvide buer og messingkroner. Bruges som hovedreference for hallens materialer og arkitektoniske rytme.
+- Trappefoto fundet via Mindtrip: https://mindtrip.ai/attraction/copenhagen-denmark/danish-parliament/at-XdOFhRQA . Billedadresse: https://d3fphkxyf5o5bm.cloudfront.net/image-resize/format%3Dwebp%2Cw%3D1200/QwRY54Li1HMwD7oNfohccYpWlVofn6EkZisyqicxLy . Fotoet viser to trappeløb i samme retning med repos, træbalustrader, gallerier og hvide buer. Det er ikke sikkert verificeret, hvilket af Vandrehallens trappeanlæg fotoet viser, eller hvordan hovedindgangen i Rigsdagsgården forbindes til det. Bruges som trappemotiv, ikke som dokumentation for en præcis rute.
+- Rundt i Danmark, Vandrehallen: https://www.rundtidanmark.dk/vandrehallen-christiansborg/ . Foto https://www.rundtidanmark.dk/wp-content/uploads/2025/12/vandrehallen-christiansborg-768x512.jpg viser kamin med ur, en siddegruppe ved et rundt bord og hvælvinger. Rug og møbler i spillet er egne forenklinger.
+
+Folketingets egen tekst: https://www.ft.dk/da/folkestyret/folketinget-og-christiansborg/folketingets-lokaler dokumenterer seks marmorsøjler, kamin, siddepladser i nicher, to døre til Samtaleværelset i midten og grundlovsmontrerne.
+
+Supplerende fotofund, som ikke kunne hentes direkte: https://commons.wikimedia.org/wiki/File:Stairs_in_Vandrehallen,_Christiansborg_Palace,_Denmark.jpg , https://commons.wikimedia.org/wiki/File:Rigets_Midte_(54876716078).jpg og https://www.ft.dk/da/billeder_fra_christiansborg/vandrehallen/01 .
+
+Ingen af referencefotografierne indgår i spillet som teksturer. Loftshøjde, søjlernes præcise opstilling, møbelplacering, trappebredde, antal trin, etagehøjde, gallerier og dørplacering er fortsat anslået. Den udvendige hovedtrappe er bevaret; runde 2 forbedrer den indvendige forbindelse.
+
+### Kontrol af runde 2
+
+Chromium ved 1280 x 800 og med touch ved 390 x 844: gang fra indgangen over første trappeløb, repos, andet trappeløb og ind i hallen; gang hele vejen ned igen; højdeforskel pr. trin højst 0,172 m. Begge døre til Samtaleværelset passeret i begge retninger. Galleriets gelænder og kaminen stopper spilleren. Betjentstuen, hjælp/fortsættelse og udgang fungerer. Mobilens joystick kan gå op ad trappen. Automatisk rutesøgning med gulvhøjdekontrol finder sammenhængende veje fra indgangen til begge døre til Samtaleværelset. Ingen JavaScript-fejl. Skærmbilleder på computer og telefon gennemset. Syntakskontrol og git diff --check bestået.

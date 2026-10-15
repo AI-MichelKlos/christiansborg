@@ -3248,7 +3248,7 @@ $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear(); resetTouch();
-  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Inde i Folketinget'; $('introLead').textContent = 'Betjentstuen ligger til højre ved indgangen. Gå op til Vandrehallen og videre gennem den åbne dør til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; $('taskBox').hidden = true; }
+  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Inde i Folketinget'; $('introLead').textContent = 'Betjentstuen ligger til højre ved indgangen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; $('taskBox').hidden = true; }
   else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
   intro.hidden = false; goBtn.focus();
 }
@@ -4597,10 +4597,11 @@ const INTERIOR = (() => {
     }
     // Samtaleværelset: pale green salon with dark wainscot, blue seats, round tables,
     // tall windows, cornice and chandelier, based on the room photograph linked in INTERIOR.md.
+    const salonStart=g.children.length,salonObstacleStart=I.obstacles.length;
     const fy=I.floor;
     b(12,.22,13,woodFloor,12,fy-.22,11.3);b(12,.22,13,cream,12,11.3,11.3);
-    for(const [a,c] of [[6,10.5],[13.5,18]])wall(a,c,4.8,fy,6.5,sage);
-    b(3,3.25,.25,sage,12,fy+3.25,4.8);wall(6,18,17.8,fy,6.5,sage);
+    for(const [a,c] of [[6,7.5],[10.5,13.5],[16.5,18]])wall(a,c,4.8,fy,6.5,sage);
+    for(const x of [9,15])b(3,3.25,.25,sage,x,fy+3.25,4.8);wall(6,18,17.8,fy,6.5,sage);
     wall(4.8,17.8,6,fy,6.5,sage,false);wall(4.8,17.8,18,fy,6.5,sage,false);
     // Panel mouldings and layered white ceiling cornice.
     for(const x of [6.22,17.78]) {
@@ -4631,6 +4632,10 @@ const INTERIOR = (() => {
     cylinder(.035,1.1,brass,12,10.2,11.3);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(.8,.035,6,32),brass);ring.rotation.x=Math.PI/2;ring.position.set(12,10.1,11.3);g.add(ring);
     for(let k=0;k<12;k++){const a=k*Math.PI/6,x=12+Math.cos(a)*.8,z=11.3+Math.sin(a)*.8;cylinder(.045,.28,lamp,x,9.92,z);mesh(new THREE.OctahedronGeometry(.095),ivory,x,9.72,z,{parent:g});}
+    // Reorient the salon opposite the entrance stairs, with two doors flanking the fireplace.
+    const salonParts=g.children.slice(salonStart),salon=new THREE.Group();g.add(salon);
+    for(const part of salonParts)salon.add(part);salon.position.x=12;salon.rotation.y=Math.PI;
+    for(let i=salonObstacleStart;i<I.obstacles.length;i++){const o=I.obstacles[i];I.obstacles[i]=[12-o[1],12-o[0],-o[3],-o[2]];}
     // Betjentstuen: inferred layout; the oak reception counter is based on JJI's real work.
     const bx=8.4,bz=22.1;
     b(8,.2,6.8,woodFloor,bx,-.2,bz);b(8,.2,6.8,cream,bx,3.65,bz);
@@ -4661,16 +4666,62 @@ const INTERIOR = (() => {
     b(4.7,.12,.5,cream,8.4,3.32,22.1);b(4.4,.07,.38,lamp,8.4,3.24,22.1);
   }
 
+
+  function sofa(x,z,ry,y,w) {
+    const r=new THREE.Group();r.position.set(x,y,z);r.rotation.y=ry;g.add(r);
+    const add=(w,h,d,m,x,y,z)=>box(w,h,d,m,x,y,z,{parent:r,cast:false});
+    add(w,.17,.82,trim,0,.25,0);
+    for(const side of [-1,1]){add(.11,.3,.12,trim,side*(w/2-.12),0,0);add(.18,.62,.9,oak,side*(w/2-.04),.28,0);add(.2,.12,.9,green,side*(w/2-.04),.81,0);}
+    for(let j=0;j<3;j++){const xx=(j-1)*(w-.35)/3;add((w-.4)/3,.22,.7,green,xx,.42,-.02);add((w-.4)/3,.62,.2,green,xx,.57,-.35);}
+    obstacle(x,z,w+.15,1.05);
+  }
+  function archFrame(x,z,ry,y,w,stem,sy=1) {
+    const r=new THREE.Group();r.position.set(x,y,z);r.rotation.y=ry;g.add(r);
+    for(const side of [-1,1]){box(.24,stem,.35,plaster,side*w/2,0,0,{parent:r,cast:false});box(.46,.2,.5,stone,side*w/2,stem-.2,0,{parent:r,cast:false});}
+    const radius=w/2,shape=new THREE.Shape();shape.absarc(0,0,radius+.16,0,Math.PI,false);shape.lineTo(-radius+.16,0);shape.absarc(0,0,radius-.16,Math.PI,0,true);shape.closePath();
+    const geo=new THREE.ExtrudeGeometry(shape,{depth:.32,bevelEnabled:false,curveSegments:24});geo.scale(1,sy,1);
+    const m=new THREE.Mesh(geo,plaster);m.position.set(0,stem,-.16);r.add(m);
+  }
+  function rail(x1,z1,y1,x2,z2,y2) {
+    const a=new THREE.Vector3(x1,y1+1.1,z1),b2=new THREE.Vector3(x2,y2+1.1,z2),v=b2.clone().sub(a);
+    const hand=new THREE.Mesh(new THREE.CylinderGeometry(.085,.085,v.length(),10),oak);hand.position.copy(a.clone().add(b2).multiplyScalar(.5));hand.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.clone().normalize());g.add(hand);
+    const n=Math.ceil(Math.hypot(x2-x1,z2-z1)/.36);
+    const profile=[[.045,0],[.07,.08],[.045,.18],[.065,.28],[.09,.43],[.045,.56],[.055,.78],[.07,.87],[.045,1.05]].map(p=>new THREE.Vector2(...p));
+    const baluster=new THREE.LatheGeometry(profile,8);
+    for(let i=0;i<=n;i++){const t=i/n;mesh(baluster,oak,x1+(x2-x1)*t,y1+(y2-y1)*t,z1+(z2-z1)*t,{parent:g});}
+  }
+  function buildHallVaults() {
+    // Barrel vault with a low elliptical rise, plus transverse white arches.
+    const pos=[],nor=[],segments=24;
+    for(let j=0;j<segments;j++)for(const [x,k] of [[-40,j],[40,j],[-40,j+1],[-40,j+1],[40,j],[40,j+1]]){
+      const a=k/segments*Math.PI;pos.push(x,I.floor+3.8+2.7*Math.sin(a),4.6*Math.cos(a));nor.push(0,-Math.sin(a),-Math.cos(a));
+    }
+    const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
+    g.add(new THREE.Mesh(geo,material('#e4dfd1',{side:THREE.DoubleSide})));
+    for(let x=-36;x<=36;x+=12)archFrame(x,0,Math.PI/2,I.floor,9.15,3.8,.59);
+    const bulb=new THREE.MeshBasicMaterial({color:'#fff0be'});
+    for(const x of [-32,-16,0,16,32]) {
+      const y=I.floor+3.65;
+      mesh(new THREE.CylinderGeometry(.035,.035,2,8),brass,x,y+1.2,0,{parent:g});
+      const ring=new THREE.Mesh(new THREE.TorusGeometry(.62,.055,6,24),brass);ring.rotation.x=Math.PI/2;ring.position.set(x,y,0);g.add(ring);
+      mesh(new THREE.SphereGeometry(.22,12,8),brass,x,y-.18,0,{parent:g});
+      for(let j=0;j<8;j++){const a=j*Math.PI/4,dx=Math.cos(a)*.62,dz=Math.sin(a)*.62;
+        mesh(new THREE.CylinderGeometry(.04,.04,.25,6),brass,x+dx,y+.1,dz,{parent:g});mesh(new THREE.SphereGeometry(.095,10,8),bulb,x+dx,y+.28,dz,{parent:g});
+        const wire=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,1,6),brass);const v=new THREE.Vector3(dx,-.7,dz);wire.scale.y=v.length();wire.position.set(x+dx/2,y+.55,dz/2);wire.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());g.add(wire);
+      }
+    }
+  }
+
   function build() {
     if(I.built)return; I.built=true;
     const parquet=ctex(256,256,(c,W,H)=>{c.fillStyle='#b29466';c.fillRect(0,0,W,H);for(let y=0;y<8;y++)for(let x=0;x<4;x++){c.fillStyle=['#b79c72','#a98e64','#c1a780','#bda077'][(x+3*y)%4];c.fillRect(x*64+(y%2)*32,y*32,62,30);}}, {rep:.6});
     const woodFloor=material('#ffffff',{map:parquet});
     // Full 80 m axis; dimensions other than the documented length are approximations.
     b(80,.25,9.6,woodFloor,0,I.floor-.25,0);
-    b(80,.25,9.6,plaster,0,11.3,0);
+    b(80,.25,9.6,plaster,0,11.65,0);
     for(const side of [-1,1]) {
       // Opening on the entrance side into the simplified stair hall.
-      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,10.5],[13.5,40]]:[[-40,40]])) {
+      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,40]]:[[-40,-4.5],[-1.5,1.5],[4.5,40]])) {
         const w=c-a,x=(a+c)/2,z=side*4.8;
         b(w,6.5,.35,plaster,x,I.floor,z);b(w,2,.15,oak,x,I.floor,z-side*.22);
         b(w,.14,.22,trim,x,I.floor+2,z-side*.25);
@@ -4684,32 +4735,47 @@ const INTERIOR = (() => {
       // Floral frieze: procedural interpretation, no reproduction of original art.
       const frieze=ctex(1024,128,(c,W,H)=>{c.fillStyle='#d8cfad';c.fillRect(0,0,W,H);c.strokeStyle='#63765a';c.lineWidth=4;c.beginPath();for(let x=0;x<W;x+=4){let y=66+22*Math.sin(x/38);x?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();for(let x=22;x<W;x+=48){let y=66+22*Math.sin(x/38);c.fillStyle='#6c8058';c.beginPath();c.ellipse(x,y-17,7,17,.6,0,Math.PI*2);c.fill();c.fillStyle='#ac785b';c.beginPath();c.arc(x+12,y-26,7,0,Math.PI*2);c.fill();}},{rep:.18});
       const fm=material('#ffffff',{map:frieze});
-      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,10.5],[13.5,40]]:[[-40,40]])) b(c-a,.85,.05,fm,(a+c)/2,I.floor+2.25,side*4.57);
+      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,40]]:[[-40,-4.5],[-1.5,1.5],[4.5,40]])) b(c-a,.85,.05,fm,(a+c)/2,I.floor+2.25,side*4.57);
       for(let x=-36;x<=36;x+=6) {
-        // Tall window bays and wall pilasters, reduced to a consistent rhythm.
-        if(side===-1) {
-          b(1.9,3.4,.12,trim,x,I.floor+2.25,-4.52);
-          const glass=material('#c9d8d3',{emissive:'#a8bcb3',emissiveIntensity:.3});
-          b(1.65,3.16,.12,glass,x,I.floor+2.37,-4.4);
-          b(.08,3.16,.1,stone,x,I.floor+2.37,-4.3);b(1.65,.08,.1,stone,x,I.floor+3.9,-4.3);
+        // The photos show seating niches rather than repeated tall exterior windows.
+        if(side===-1&&Math.abs(x)>10) {
+          b(2.7,2.6,.08,trim,x,I.floor,-4.53);
+          b(2.5,1.8,.09,plaster,x,I.floor+.8,-4.43);
+          sofa(x,-4.03,0,I.floor,2.6);
+          archFrame(x,-4.36,0,I.floor,2.75,1.9,.62);
         }
-        b(.3,4.2,.3,plaster,x+2.6,I.floor+2.1,side*4.5);
+        if(!(side===-1&&Math.abs(x+2.6)<4.8))b(.3,4.2,.3,plaster,x+2.6,I.floor+2.1,side*4.5);
       }
     }
-    for(const x of [-40,40]) b(.4,6.5,9.6,plaster,x,I.floor,-0);
+    for(const x of [-40,40]) b(.4,6.85,9.6,plaster,x,I.floor,-0);
     door(-39.7,0,Math.PI/2,'Landstingssalen');door(39.7,0,-Math.PI/2,'Folketingssalen');
     // Rigets midte: six Norwegian marble columns, fireplace and seating.
-    const marbleTex=ctex(128,256,(c,W,H)=>{c.fillStyle='#a3a497';c.fillRect(0,0,W,H);for(let k=0;k<20;k++){c.strokeStyle=k%2?'#c1c0b0':'#7d877e';c.lineWidth=1+(k%3);c.beginPath();for(let y=0;y<H;y+=8){let x=(k*17+Math.sin(y/45+k)*12)%W;y?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}},{rep:1});
+    const marbleTex=ctex(128,256,(c,W,H)=>{c.fillStyle='#a3a497';c.fillRect(0,0,W,H);for(let k=0;k<20;k++){c.strokeStyle=k%2?'#c1c0b0':'#7d877e';c.lineWidth=.7+(k%3)*.4;c.beginPath();for(let y=0;y<H;y+=8){let x=k*11-45+Math.sin(y/70+k)*6+y*.12;y?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}},{rep:1});
     const marble=material('#ffffff',{map:marbleTex});
-    for(const x of [-5,0,5])for(const z of [-2.7,2.7]) {
-      mesh(new THREE.CylinderGeometry(.32,.42,5.2,20),marble,x,I.floor+2.8,z,{parent:g});
-      b(.95,.25,.95,stone,x,I.floor,z);b(1,.3,1,stone,x,I.floor+5.35,z);obstacle(x,z,.95,.95);
+    for(const x of [-4,4])for(const z of [-3,0,3]) {
+      mesh(new THREE.CylinderGeometry(.32,.42,3.6,20),marble,x,I.floor+2.0,z,{parent:g});
+      b(.95,.25,.95,stone,x,I.floor,z);b(1,.3,1,stone,x,I.floor+3.8,z);obstacle(x,z,.95,.95);
     }
-    b(3.8,2.9,.65,stone,0,I.floor,-4.27);b(2.5,1.9,.1,dark,0,I.floor+.1,-3.88);b(4.2,.26,.95,stone,0,I.floor+2.85,-4.2);obstacle(0,-4,4.3,1.3);
+    b(2.9,3.05,.65,stone,0,I.floor,-4.27);b(1.85,2,.1,dark,0,I.floor+.12,-3.88);
+    for(const x of [-1.1,1.1]){b(.45,2.4,.7,marble,x,I.floor,-4.18);b(.6,.2,.8,stone,x,I.floor+2.35,-4.15);}
+    for(const [y,w] of [[2.55,3.1],[2.75,3.35],[3.0,3.6]])b(w,.16,.9,stone,0,I.floor+y,-4.2);
+    b(3.3,.12,1.2,marble,0,I.floor,-4);obstacle(0,-4,3.4,1.3);
     for(const x of [-8,8]) {
-      b(2.4,.15,1.2,oak,x,I.floor+.7,-1.5);b(.25,.7,.25,trim,x,I.floor,-1.5);obstacle(x,-1.5,2.5,1.3);
-      for(const z of [-3,.2]) { b(2,.35,.8,green,x,I.floor+.35,z);b(2,.9,.2,green,x,I.floor+.5,z+(z<0?-.35:.35));obstacle(x,z,2.1,.9); }
+      b(2.2,.13,1.05,oak,x,I.floor+.64,-1.5);
+      for(const dx of [-.85,.85])for(const dz of [-.33,.33])b(.09,.64,.09,trim,x+dx,I.floor,-1.5+dz);
+      obstacle(x,-1.5,2.3,1.15);
+      sofa(x,-3.25,0,I.floor,2.7);sofa(x,.35,Math.PI,I.floor,2.7);
     }
+    // The central seating group and mantel clock follow the additional hall photo.
+    b(5.5,.018,4.1,material('#4d514b'),0,I.floor+.004,-.55);
+    for(const z of [-2.5,1.4])b(5.5,.02,.13,plaster,0,I.floor+.02,z);
+    for(const x of [-2.65,2.65])b(.13,.02,4.1,plaster,x,I.floor+.02,-.55);
+    mesh(new THREE.CylinderGeometry(.8,.76,.12,32),oak,0,I.floor+.76,-.8,{parent:g});
+    b(.2,.7,.2,trim,0,I.floor,-.8);obstacle(0,-.8,1.65,1.65);
+    for(const [x,z,ry] of [[-1.6,-.8,-Math.PI/2],[1.6,-.8,Math.PI/2],[-.8,.9,Math.PI],[.8,.9,Math.PI]])sofa(x,z,ry,I.floor,.8);
+    b(1.05,1.25,.3,trim,0,I.floor+3.2,-4.4);b(1.2,.12,.4,stone,0,I.floor+4.45,-4.4);
+    const dial=ctex(256,256,(c,W,H)=>{c.fillStyle='#ddd4b9';c.fillRect(0,0,W,H);c.translate(W/2,H/2);c.strokeStyle='#3b3528';c.lineWidth=5;for(let i=0;i<12;i++){c.save();c.rotate(i*Math.PI/6);c.beginPath();c.moveTo(0,-84);c.lineTo(0,-99);c.stroke();c.restore();}for(const [a,l] of [[-Math.PI/3,56],[Math.PI/3,78]]){c.save();c.rotate(a);c.beginPath();c.moveTo(0,0);c.lineTo(0,-l);c.stroke();c.restore();}},{wrap:false});
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(.8,.8),new THREE.MeshBasicMaterial({map:dial}));face.position.set(0,I.floor+3.85,-4.22);g.add(face);
     // Constitution display cases with books, not invented politician likenesses.
     for(const x of [-27,-21]) {
       b(3.5,.8,.8,oak,x,I.floor,3.9);b(3.5,.5,.8,material('#d5e5df',{transparent:true,opacity:.35}),x,I.floor+.8,3.9);
@@ -4717,57 +4783,69 @@ const INTERIOR = (() => {
       obstacle(x,3.9,3.6,.9);
     }
     sign('Grundlovene',3.2,.6,-24,I.floor+2.05,4.53,Math.PI);
-    b(3,3.25,.35,plaster,12,I.floor+3.25,4.8);
-    openDoor(12,4.8,0,I.floor,'Samtaleværelset');
+    for(const x of [-3,3]){b(3,3.25,.35,plaster,x,I.floor+3.25,-4.8);openDoor(x,-4.8,Math.PI,I.floor,'Samtaleværelset');}
     buildRoundOne(woodFloor);
-    // Suspended brass luminaires with frosted glass, repeated down the hall.
-    const luminous=new THREE.MeshBasicMaterial({color:'#fff2cb'});
-    for(let x=-33;x<40;x+=11) {
-      b(.07,1.1,.07,brass,x,9.9,0);b(1.9,.18,.65,brass,x,9.72,0);b(1.75,.24,.5,luminous,x,9.48,0);
-      for(const z of [-4.4,4.4]){b(.14,.9,.2,brass,x,8.2,z);b(.3,.6,.22,luminous,x,8.45,z);}
-    }
-    // Approximate entrance and a walkable straight stair connection.
-    b(8.4,.25,16,stone,0,-.25,15);
+    buildHallVaults();
+    // Two aligned flights and a broad intermediate landing, based on the stair photograph.
+    b(8.4,.25,18,stone,0,-.25,14);
     for(const side of [-1,1])for(const [a,c] of (side===1?[[5,18.9],[21.9,23]]:[[5,23]])) {
       b(.35,11.3,c-a,plaster,side*4.4,0,(a+c)/2);b(.16,1.7,c-a,stone,side*4.18,0,(a+c)/2);
     }
-    b(.35,8.3,3,plaster,4.4,3,20.4);
-    openDoor(4.4,20.4,Math.PI/2,0,'Betjentstuen');
+    b(.35,8.3,3,plaster,4.4,3,20.4);openDoor(4.4,20.4,Math.PI/2,0,'Betjentstuen');
     b(8.8,.25,18,plaster,0,11.3,14);b(8.8,11.3,.3,plaster,0,0,23);
-    for(let i=0;i<24;i++) b(7.8,(i+1)*.2,.42,stone,0,0,18-(i+.5)*.4166667);
-    b(8.4,.25,3.2,woodFloor,0,I.floor-.25,6.4);
-    // Handrails follow the stair pitch.
-    for(const side of [-1,1]) {
-      const a=new THREE.Vector3(side*3.8,1,18),c=new THREE.Vector3(side*3.8,5.8,8),v=c.clone().sub(a);
-      const r=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,v.length(),8),brass);r.position.copy(a.clone().add(c).multiplyScalar(.5));r.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());g.add(r);
-      for(let j=0;j<13;j++)b(.07,.95,.07,brass,side*3.8,j*.4,18-j*.83333);
+    const tread=material('#77756b');
+    for(const [start,base] of [[18.5,0],[12,2.4]])for(let i=0;i<14;i++) {
+      const y=base+(i+1)*2.4/14,z=start-(i+.5)*4.5/14;
+      b(5.6,y,.325,stone,0,0,z);b(4.65,.025,.325,tread,0,y+.006,z);
+      b(5.65,.04,.055,stone,0,y-.025,z+.145);
     }
+    b(5.6,2.4,2,stone,0,0,13);b(4.65,.025,2,tread,0,2.406,13);
+    b(8.4,.25,2.7,woodFloor,0,I.floor-.25,6.15);
+    for(const side of [-1,1]) {
+      b(1.0,.25,11.1,woodFloor,side*3.72,I.floor-.25,13);
+      rail(side*2.92,18.5,0,side*2.92,14,2.4);
+      rail(side*2.92,14,2.4,side*2.92,12,2.4);
+      rail(side*2.92,12,2.4,side*2.92,7.5,4.8);
+      rail(side*3.12,18.5,4.8,side*3.12,7.5,4.8);
+    }
+    for(const z of [8.2,15.2])archFrame(0,z,0,0,8.4,7.7,.65);
     b(2.8,3.4,.18,oak,0,0,22.75);sign('Ud til Rigsdagsgården',3.7,.65,0,3.9,22.6,Math.PI);
-    sign('Vandrehallen · 1. sal',4.5,.7,0,7.2,5.1);
+    sign('Vandrehallen',3.6,.5,0,7.3,6.9,Math.PI);
+    sign('Landstingssalen  ←',3,.4,-2.1,6.7,4.8,Math.PI);
+    sign('→  Folketingssalen',3,.4,2.1,6.7,4.8,Math.PI);
     const light=new THREE.HemisphereLight('#fff5dd','#a18d72',2.2);g.add(light);
     bakeGroup(g);
   }
   function roomAt(x,z) {
-    if(x>5.9&&x<18.1&&z>4.8&&z<18)return 'samtale';
+    if(Math.abs(x)<6.1&&z< -4.8&&z> -18)return 'samtale';
     if(x>4.4&&x<12.6&&z>18.6&&z<25.6)return 'betjent';
     return 'hall';
   }
-  function height(x,z) { if(roomAt(x,z)==='samtale')return I.floor; return z<8?I.floor:z>18?0:Math.ceil((18-z)/.4166667)*.2; }
+  function height(x,z) {
+    if(roomAt(x,z)==='samtale'||z<=7.5||(Math.abs(x)>3.2&&z<18.5))return I.floor;
+    if(z>=18.5)return 0;
+    if(z>=14)return Math.min(2.4,Math.ceil((18.5-z)/4.5*14-1e-7)*2.4/14);
+    if(z>=12)return 2.4;
+    return 2.4+Math.min(2.4,Math.ceil((12-z)/4.5*14-1e-7)*2.4/14);
+  }
   function fits(x,z) {
-    const hall=Math.abs(x)<39.25 && Math.abs(z)<4.2;
-    const entry=Math.abs(x)<3.7 && z>=3.6 && z<22.3;
-    const samtale=x>6.35&&x<17.65&&z>5.15&&z<17.45;
-    const samtaleDoor=Math.abs(x-12)<1.15&&z>3.8&&z<5.5;
+    const hall=Math.abs(x)<39.25&&Math.abs(z)<4.2;
+    const entry=Math.abs(x)<3.95&&z>=3.6&&z<=7.5;
+    const lower=Math.abs(x)<3.95&&z>=18.5&&z<22.3;
+    const stairs=Math.abs(x)<2.65&&z>7.5&&z<18.5;
+    const gallery=Math.abs(x)>3.4&&Math.abs(x)<3.95&&z>7.2&&z<18.25;
+    const samtale=Math.abs(x)<5.65&&z< -5.15&&z> -17.45;
+    const samtaleDoor=(Math.abs(x-3)<1.15||Math.abs(x+3)<1.15)&&z< -3.8&&z> -5.5;
     const betjent=x>4.75&&x<12.05&&z>19.05&&z<25.15;
     const betjentDoor=x>3.5&&x<5.1&&Math.abs(z-20.4)<1.15;
-    return (hall||entry||samtale||samtaleDoor||betjent||betjentDoor)&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
+    return (hall||entry||lower||stairs||gallery||samtale||samtaleDoor||betjent||betjentDoor)&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
   }
   function enter() {
     if(I.on||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;
     build(); I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
     I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
     P.pos.set(I.x,0,21);P.face=Math.PI;cam.yaw=0;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
-    document.body.classList.add('inFolketing');showPoi(null);toast('Betjentstuen er til højre. Samtaleværelset ligger ved Vandrehallen.');
+    document.body.classList.add('inFolketing');showPoi(null);toast('Betjentstuen er til højre. Følg trappen op til Vandrehallen.');
   }
   function leave() {
     I.on=false;g.visible=false;world.visible=true;dyn.visible=true;scene.fog=I.fog;scene.background=I.bg;evApplied=-1;applyEvening();
@@ -4784,7 +4862,8 @@ const INTERIOR = (() => {
     let vx=Math.sin(P.face)*3*Math.max(-1,Math.min(1,f)),vz=Math.cos(P.face)*3*Math.max(-1,Math.min(1,f));
     if(!paused&&joy.id!==null){const v=touchWalk(),power=Math.hypot(joy.x,joy.y);vx=v.x*3*power;vz=v.z*3*power;}
     const x=P.pos.x-I.x,z=P.pos.z,nx=x+vx*dt,nz=z+vz*dt;
-    if(fits(nx,z))P.pos.x=I.x+nx;if(fits(P.pos.x-I.x,nz))P.pos.z=nz;
+    const canStep=(a,b)=>fits(a,b)&&Math.abs(height(a,b)-P.pos.y)<.3;
+    if(canStep(nx,z))P.pos.x=I.x+nx;if(canStep(P.pos.x-I.x,nz))P.pos.z=nz;
     P.pos.y=height(P.pos.x-I.x,P.pos.z);P.vel.set(0,0,0);P.onGround=true;jumpReq=false;return true;
   });
   HOOKS.frame.push(()=>{
@@ -4801,7 +4880,7 @@ const INTERIOR = (() => {
     camera.lookAt(P.pos.x+Math.sin(P.face)*Math.cos(pitch)*10,P.pos.y+1.7-Math.sin(pitch)*10,z+Math.cos(P.face)*Math.cos(pitch)*10);
     kid.root.visible=false;
     const room=roomAt(x,z);
-    const name=room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>8?'Trappen til Vandrehallen':Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen';
+    const name=room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>7.5?(Math.abs(x)>3.2?'Vandrehallen · trappegalleriet':'Trappen til Vandrehallen'):Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen';
     $('indoorName').textContent=name;
     if(room==='hall'&&z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
     if(room==='hall'&&z<5&&x<-18&&x>-30)offerAction({id:'grundlov-info',label:'Se grundlovene',prio:5,run:()=>toast('I Vandrehallen er kopier af grundlovene fra 1849, 1866, 1915 og 1953 udstillet.')});
