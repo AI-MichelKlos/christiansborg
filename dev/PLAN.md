@@ -182,3 +182,5 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 - [ ] Runde 8: Landstingssalen og Slotspladsens presseområde.
 
 Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner venter.
+
+- [x] Mobilrettelse (15. okt. 2026): rettet fortegnet på joystickets sidelæns bevægelse. Venstre/højre var spejlet i forhold til kameraets faktiske højreakse, både ude og inde. Kontrolleret med faktiske touch-events mod renderkameraets højreakse: venstre og højre ved fire kameravinkler udendørs og indendørs, 16 beståede kontroller uden JavaScript-fejl.
