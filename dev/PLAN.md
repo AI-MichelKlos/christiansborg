@@ -174,7 +174,7 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 ## Mord i Rigets midte: fysiske steder, to ad gangen
 - [x] Runde 1 (15. okt. 2026): betjentstuen med buet egetræsskranke, arbejdsplads og nøgleskab; Samtaleværelset med grønne vægge, mørke paneler, blå stole, runde borde, tæppe, høje vinduer, vaser og lysekrone. Åbne døre og sammenhængende gang fra det eksisterende interiør. Referencer og usikkerheder i dev/INTERIOR.md. Gang gennem døre, gulvhøjder, møbelkollision, hjælp, mobiljoystick og udgang kontrolleret i Chromium på computer og telefonstørrelse uden JavaScript-fejl.
 - [x] Runde 2 (15. okt. 2026): to indvendige trappeløb med repos, træbalustrader og gallerier; hvælvinger, messingkroner, nicher, kamin med ur og forbedrede siddegrupper. Samtaleværelset har to åbne døre midt i Vandrehallen. Visuelt gennemsete fotoreferencer og fortsat anslået plantegning dokumenteret i dev/INTERIOR.md. Trappe op/ned, repos, galleri, begge døre, betjentstue, udgang og mobiljoystick kontrolleret uden JavaScript-fejl.
-- [ ] Runde 3: Kompaspartiets område og Snapstinget.
+- [x] Runde 3 (15. okt. 2026): Kompaspartiets gang, to kontorer, sekretariat med kopimaskine og U-bord i mødelokale. Snapstinget i indgangens niveau med spiseborde, buffet, kaffeområde, lyse søjler og to gulvniveauer. Åbne døre, skilte og gangbare forbindelser. Billedreferencer og anslåede placeringer dokumenteret i dev/INTERIOR.md. Alle rumdøre, forbindelser fra indgangen, restaurantens trin, mobiljoystick, kollisioner og udgang kontrolleret på computer og telefonstørrelse uden JavaScript-fejl.
 - [ ] Runde 4: Finansministeriet og Reformministeriet.
 - [ ] Runde 5: kajen ved Reformministeriet og kajen ved Slotspladsen.
 - [ ] Runde 6: Bibliotekshaven og staldene.

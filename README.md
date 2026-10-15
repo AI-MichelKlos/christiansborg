@@ -30,3 +30,6 @@ Betjentstuen er åben til højre ved foden af den indvendige trappe. Samtalevær
 
 ### Trappe og Vandrehallen
 Indvendigt fører to trappeløb med repos op til Vandrehallen. Træbalustrader, hvide hvælvinger, messingkroner, siddepladser i nicher og kamin med ur bygger på billedreferencer. Mål og den præcise forbindelse til indgangen er fortsat anslået.
+
+### Kompaspartiet og Snapstinget
+Ved Vandrehallen mod Folketingssalen kan man gå ind i det fiktive Kompaspartiets gang med to kontorer, sekretariat og mødelokale. Snapstinget nås gennem den åbne dør til venstre ved indgangen, over for betjentstuen. Spisesalen har to gulvniveauer, borde, buffet og kaffeområde. Referencer og usikkerheder står i `dev/INTERIOR.md`. Rummene er til udforskning; mordgådens personer og funktioner følger senere.

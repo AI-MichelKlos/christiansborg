@@ -77,3 +77,36 @@ Ingen af referencefotografierne indgår i spillet som teksturer. Loftshøjde, s�
 ### Kontrol af runde 2
 
 Chromium ved 1280 x 800 og med touch ved 390 x 844: gang fra indgangen over første trappeløb, repos, andet trappeløb og ind i hallen; gang hele vejen ned igen; højdeforskel pr. trin højst 0,172 m. Begge døre til Samtaleværelset passeret i begge retninger. Galleriets gelænder og kaminen stopper spilleren. Betjentstuen, hjælp/fortsættelse og udgang fungerer. Mobilens joystick kan gå op ad trappen. Automatisk rutesøgning med gulvhøjdekontrol finder sammenhængende veje fra indgangen til begge døre til Samtaleværelset. Ingen JavaScript-fejl. Skærmbilleder på computer og telefon gennemset. Syntakskontrol og git diff --check bestået.
+
+
+## Runde 3: Kompaspartiets område og Snapstinget
+
+15. oktober 2026. Nye gangbare områder:
+
+- Fra Vandrehallen mod Folketingssalen fører en åben dør til Kompaspartiets gang. Fire åbne døre fører til to kontorer med skriveborde og reoler, et sekretariat med kopimaskine og et mødelokale med U-bord og skærm. Alle ligger i spillet i Vandrehallens gulvniveau, 4,8 m.
+- Til venstre ved indgangen, over for betjentstuen, fører en åben dør gennem en kort gang til Snapstinget. Spisesalen har borde, buffet, kaffemaskiner, lyse søjler med gulddetaljer, store buede vinduer, loftsfelter, mønsterparket og en ringlysekrone. To gulvniveauer forbindes med fire trin; niveauforskellen i modellen er 0,6 m. Rækværk af metal afskærmer resten af overgangen.
+
+### Undersøgte billedreferencer
+
+Disse fotos blev hentet og visuelt gennemset:
+
+- Meyers' pressemeddelelse med fotos af Snapstinget: https://via.ritzau.dk/pressemeddelelse/13596315/meyers-kantiner-vinder-folketinget . Direkte rumfoto: https://via.ritzau.dk/data/images/00048/35b22ca0-6046-45da-ba66-074f8b059a43.jpg . Primær visuel reference til de lyse søjler med guldgesimser, vinduerne, loftet, ringlysekronen, træborde og stole, parket og to gulvniveauer.
+- Hørning Parket, eget projekt ved Snapstinget: https://www.horningfloor.dk/christiansborg/ . Foto https://www.horningfloor.dk/wp-content/uploads/2021/01/Christinasborg_foto_2400x800px.jpg blev gennemset. Understøtter parketmønster, niveauforskel og metalrækværk. Leverandøren angiver mønsterparket, sildeben og firkantet mønster i eg.
+- NB Økonomi, foto af et daværende gruppeværelse: https://www.nb-okonomi.dk/2019/06/18/df-blev-decimeret-ved-valget-og-overtager-las-gruppevaerelse/ . Direkte foto https://selvbetjening.nb-medier.dk/storage/media-library/2019/10/20190618151252269-1000-1570750989-nn2kb.jpg blev gennemset. Bruges som inspiration til lyst U-bord, mørkt tæppe og lette træstole. Kompaspartiets rum er ikke en kopi af det konkrete partiværelse. Vægbillederne er egne, enkle landskabsmotiver.
+
+Supplerende kilder, som blev undersøgt, men hvis billedfiler ikke kunne hentes:
+
+- Louis Poulsen, Folketingets formandskontor: https://www.louispoulsen.com/en-gb/professional/applications/projects-cases2/institutions--public-buildings/folketinget-the-chairmans-office . De fundne billedadresser gav HTTP 404.
+- BASWA, Grønlandsværelset: https://baswa.dk/akustikloft-christiansborg-groenlandsvaerelset/ . Fotohentning gav HTTP 502.
+
+### Placering og usikkerheder
+
+Folketingets officielle beskrivelse fastslår, at Snapstinget vender ud mod Ridebanen og består af flere spiseområder og café: https://www.ft.dk/da/folkestyret/folketinget-og-christiansborg/folketingets-lokaler . Folketingets besøgsside: https://www.ft.dk/da/besoeg/planlaeg-dit-besoeg/snapstinget . God Adgang beskriver placeringen i stueetagen: https://godadgang.dk/faktaark/folketinget-snapstinget-5325/data?filter=1 .
+
+Spillets restaurant ligger derfor i indgangens niveau, men gangens konkrete placering fra hovedindgangen, orientering i den virkelige bygning, antal trin, mål og møbelplacering er fortsat anslået. Fotoet viser ét af Snapstingets rum, ikke en fuld plantegning. Buffet og kaffemaskiner er fiktive placeringer af almindeligt kantineinventar, ikke aftegninger af en dokumenteret køkkenplan.
+
+Kompaspartiet er opdigtet. Gang, etageplacering, kontorer og sekretariat er bygget til spillets rumlige behov. De må ikke beskrives som et bestemt eksisterende partis lokaler. Der er ingen personer, replikker, spor, logdata, puslespil eller andre mordgådefunktioner i dette trin. Kopimaskine og skærme er kun inventar. Ingen referencefotos er kopieret ind i spillet.
+
+### Kontrol af runde 3
+
+Kontrolleret i Chromium ved 1280 x 800 og i touchkontekst ved 390 x 844. Gang ind og ud af Kompaspartiets hoveddør og gennem alle fire rumdøre. Adgang fra indgangen til Snapstinget og gang begge veje over de fire trin mellem niveauerne. Mobilens joystick afprøvet på trinene. Kopimaskinen og gangens vægge stopper spilleren. Rutesøgning med gulvhøjdekontrol finder gangbare forbindelser fra hovedindgangen til begge kontorer, sekretariat, mødelokalets indre, buffet og øvre spiseområde samt de tidligere rum. Hjælp/fortsættelse og udgang fungerer. Ingen JavaScript-fejl. Skærmbilleder af begge nye områder på computer og telefon gennemset. Syntakskontrol og git diff --check bestået.
