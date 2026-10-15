@@ -3530,12 +3530,19 @@ if (slotsBalls.length) {
 const TOURISTS = [];
 const touristSkin = tm('#e9bd99'), touristPhone = tm('#232831');
 const touristHeadGeo = new THREE.SphereGeometry(1, 10, 8);
-function makePlazaTourist(coat, hair, photo, phase) {
+function makePlazaTourist(coat, hair, photo, phase, style = {}) {
   const root = new THREE.Group(); dyn.add(root);
   const clothes = tm(coat), dark = tm('#344052');
   const torso = mesh(touristHeadGeo, clothes, 0, 1.12, 0, { parent: root }); torso.scale.set(0.28, 0.44, 0.20);
-  const head = mesh(touristHeadGeo, touristSkin, 0, 1.69, 0, { parent: root }); head.scale.setScalar(0.21);
+  const skin = style.skin ? tm(style.skin) : touristSkin;
+  const head = mesh(touristHeadGeo, skin, 0, 1.69, 0, { parent: root }); head.scale.setScalar(0.21);
   const hairstyle = mesh(touristHeadGeo, tm(hair), 0, 1.83, -0.035, { parent: root }); hairstyle.scale.set(0.22, 0.12, 0.22);
+  if (style.woman) {
+    // Bob, bun or ponytail, with ordinary trousers and varied coat colours.
+    const back = mesh(touristHeadGeo, tm(hair), 0, 1.65, -0.13, { parent: root });
+    back.scale.set(0.23, style.hairdo === 'bob' ? 0.24 : 0.16, 0.14);
+    if (style.hairdo !== 'bob') mesh(touristHeadGeo, tm(hair), 0, style.hairdo === 'bun' ? 1.88 : 1.65, -0.27, { parent: root }).scale.set(0.12, style.hairdo === 'bun' ? 0.12 : 0.23, 0.14);
+  }
   const bag = mesh(touristHeadGeo, tm('#7a614b'), 0, 1.03, -0.24, { parent: root }); bag.scale.set(0.22, 0.29, 0.10);
   const legs = [], arms = [];
   for (const side of [-1, 1]) {
@@ -3544,7 +3551,7 @@ function makePlazaTourist(coat, hair, photo, phase) {
     mesh(touristHeadGeo, tm('#303038'), 0, -0.61, 0.08, { parent: leg }).scale.set(0.13, 0.07, 0.20); legs.push(leg);
     const arm = new THREE.Group(); arm.position.set(side * 0.29, 1.4, 0); root.add(arm);
     mesh(new THREE.CapsuleGeometry(0.07, 0.26, 3, 6), clothes, 0, -0.19, 0, { parent: arm });
-    mesh(touristHeadGeo, touristSkin, 0, -0.42, 0, { parent: arm }).scale.setScalar(0.08); arms.push(arm);
+    mesh(touristHeadGeo, skin, 0, -0.42, 0, { parent: arm }).scale.setScalar(0.08); arms.push(arm);
   }
   let flash = null;
   if (photo) {
@@ -3559,7 +3566,60 @@ function makePlazaTourist(coat, hair, photo, phase) {
   // On a phone the small people cast no shadow (half as much to draw).
   if (!photo) for (const l of [...legs, ...arms]) { l.userData.keep = true; bakeColored(l, !isTouch); }
   bakeColored(root, !isTouch);
-  return { root, legs, arms, flash, photo, phase };
+  if (style.child) root.scale.setScalar(0.64);
+  return { root, legs, arms, flash, photo, phase, style };
+}
+// A group shares its route and turning direction. Companions cannot drift apart.
+function addWalkingCompany(lead, kind, phase) {
+  lead.members = [lead]; lead.dogs = []; lead.company = kind;
+  function companion(coat, hair, x, child, woman, hairdo) {
+    const p = makePlazaTourist(coat, hair, false, phase + lead.members.length * 1.2,
+      { child, woman, hairdo });
+    lead.root.add(p.root); p.root.position.set(x, 0, child ? 0.13 : -0.06);
+    lead.members.push(p);
+  }
+  if (kind === 'pair') companion('#779bb3', '#5c4031', 0.82, false, true, 'bob');
+  if (kind === 'family') {
+    companion('#d7a14d', '#795337', 0.7, true, false);
+    companion('#7eae96', '#49372c', -0.7, true, true, 'ponytail');
+  }
+  if (kind === 'dog') {
+    const root = new THREE.Group(), paws = [], fur = tm('#b7804f'), dark = tm('#423028');
+    lead.root.add(root); root.position.set(0.95, 0, 0.24);
+    mesh(touristHeadGeo, fur, 0, 0.39, 0, { parent: root }).scale.set(0.18, 0.22, 0.39);
+    mesh(touristHeadGeo, fur, 0, 0.63, 0.31, { parent: root }).scale.set(0.18, 0.19, 0.20);
+    mesh(touristHeadGeo, fur, 0, 0.57, 0.48, { parent: root }).scale.set(0.13, 0.10, 0.15);
+    mesh(touristHeadGeo, dark, 0, 0.60, 0.61, { parent: root }).scale.setScalar(0.055);
+    for (const side of [-1, 1]) {
+      mesh(touristHeadGeo, dark, side * 0.16, 0.65, 0.28, { parent: root }).scale.set(0.075, 0.19, 0.11);
+      mesh(touristHeadGeo, tm('#22232a'), side * 0.13, 0.70, 0.44, { parent: root }).scale.setScalar(0.025);
+      for (const z of [-0.23, 0.23]) {
+        const paw = new THREE.Group(); paw.position.set(side * 0.13, 0.30, z); paw.userData.keep = true; root.add(paw);
+        box(0.09, 0.26, 0.12, fur, 0, -0.29, 0, { parent: paw, cast: false }); paws.push(paw);
+      }
+    }
+    const tail = new THREE.Group(); tail.position.set(0, 0.47, -0.30); tail.userData.keep = true; root.add(tail);
+    mesh(new THREE.CapsuleGeometry(0.045, 0.25, 3, 6), fur, 0, 0.09, -0.09, { parent: tail, rx: -0.8 });
+    mesh(new THREE.TorusGeometry(0.15, 0.025, 5, 10), tm('#b84641'), 0, 0.55, 0.25, { parent: root, rx: Math.PI / 2 });
+    bakeColored(root, !isTouch);
+    const leash = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0.30, 1.00, 0), new THREE.Vector3(0.65, 0.70, 0.22), new THREE.Vector3(0.95, 0.58, 0.49)
+    ]), new THREE.LineBasicMaterial({ color: '#62433b' }));
+    lead.root.add(leash); lead.dogs.push({ root, paws, tail, leash });
+  }
+  return lead;
+}
+function animateWalkingCompany(lead, time, moving) {
+  for (const p of lead.members || [lead]) {
+    const step = Math.sin(time * (p.style.child ? 7.8 : 6) + p.phase) * 0.46 * moving;
+    p.legs[0].rotation.x = step; p.legs[1].rotation.x = -step;
+    p.arms[0].rotation.x = -step * 0.8; p.arms[1].rotation.x = step * 0.8;
+    if (lead.dogs && lead.dogs.length && p === lead) p.arms[1].rotation.x = -0.1;
+  }
+  for (const d of lead.dogs || []) {
+    d.paws.forEach((p, i) => { p.rotation.x = Math.sin(time * 9 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.5 * moving; });
+    d.tail.rotation.z = Math.sin(time * 7) * 0.35;
+  }
 }
 const touristOk = ([x, z]) => ptIn(SLOTSPLADS_RING, x, z) && !rawWater(x, z) && !inBuilding(x, z)
   && groundAt(x, z, 2) < 0.5 && !nearRoute(x, z, 4) && Math.hypot(x - 81, z + 51) > 7;
@@ -3569,20 +3629,20 @@ for (const [spot, aim, coat, hair, phase] of [
   [[52,-80],[10,6],'#cfad5c','#745340',4.6],
   [[102,-62],[81,-51],'#7aa284','#45342d',6.8]
 ]) if (touristOk(spot)) {
-  const t = makePlazaTourist(coat, hair, true, phase);
+  const t = makePlazaTourist(coat, hair, true, phase, { woman: phase !== 2.3, hairdo: phase === 0 ? 'bun' : 'bob' });
   t.root.position.set(spot[0], groundAt(...spot, 2), spot[1]);
   t.root.rotation.y = Math.atan2(aim[0] - spot[0], aim[1] - spot[1]);
   TOURISTS.push(t);
 }
-for (const [a, b, coat, hair, phase] of [
-  [[47,-87],[60,-75],'#e7a37d','#604334',0.4],
-  [[61,-92],[77,-84],'#799bc5','#826146',1.7],
-  [[103,-73],[106,-58],'#c794b2','#54352c',2.8],
-  [[77,-33],[88,-22],'#83a06b','#553c2f',3.9],
-  [[43,-70],[55,-57],'#d4b668','#664833',5.1],
-  [[89,-8],[78,-19],'#9c8bc3','#473a37',6.2]
+for (const [a, b, coat, hair, phase, company, woman] of [
+  [[47,-87],[60,-75],'#e7a37d','#604334',0.4,'pair',false],
+  [[61,-92],[77,-84],'#799bc5','#826146',1.7,'family',true],
+  [[103,-73],[106,-58],'#c794b2','#54352c',2.8,'pair',true],
+  [[77,-33],[88,-22],'#83a06b','#553c2f',3.9,'dog',true],
+  [[43,-70],[55,-57],'#d4b668','#664833',5.1,'family',false],
+  [[89,-8],[78,-19],'#9c8bc3','#473a37',6.2,'solo',true]
 ]) if (touristOk(a) && touristOk(b)) {
-  const t = makePlazaTourist(coat, hair, false, phase); t.a = a; t.b = b;
+  const t = addWalkingCompany(makePlazaTourist(coat, hair, false, phase, { woman, hairdo: 'ponytail' }), company, phase); t.a = a; t.b = b;
   t.root.position.set(a[0], groundAt(...a, 2), a[1]); TOURISTS.push(t);
 }
 hideWhenFar(TOURISTS.map(t => t.root), 85, -50, 130);
@@ -3597,9 +3657,7 @@ HOOKS.frame.push((dt, time) => {
       const x = t.a[0] + (t.b[0] - t.a[0]) * u, z = t.a[1] + (t.b[1] - t.a[1]) * u;
       t.root.position.set(x, groundAt(x, z, 2), z);
       t.root.rotation.y = Math.atan2(t.b[0] - t.a[0], t.b[1] - t.a[1]) + (Math.sin(a) < 0 ? Math.PI : 0);
-      const step = Math.sin(time * 6 + t.phase) * 0.46 * Math.abs(Math.sin(a));
-      t.legs[0].rotation.x = step; t.legs[1].rotation.x = -step;
-      t.arms[0].rotation.x = -step * 0.8; t.arms[1].rotation.x = step * 0.8;
+      animateWalkingCompany(t, time, Math.abs(Math.sin(a)));
     }
   }
 });
@@ -3685,31 +3743,19 @@ HOOKS.frame.push((dt, t) => {
 
 // ---------------- walkers on Højbro Plads: simple, quiet loops around the starting point
 const START_WALKERS = [];
-function makeStartWalker(a, b, coat, phase) {
-  const root = new THREE.Group(); dyn.add(root);
-  const skin = tm('#eab995'), hair = tm('#704c34'), cloth = tm(coat), dark = tm('#33475b');
-  const body = mesh(new THREE.SphereGeometry(1, 10, 8), cloth, 0, 1.05, 0, { parent: root }); body.scale.set(0.30, 0.45, 0.22);
-  const head = mesh(new THREE.SphereGeometry(1, 10, 8), skin, 0, 1.65, 0, { parent: root }); head.scale.setScalar(0.22);
-  const cap = mesh(new THREE.SphereGeometry(1, 10, 8), hair, 0, 1.79, -0.02, { parent: root }); cap.scale.set(0.23, 0.11, 0.23);
-  const arms = [], legs = [];
-  for (const side of [-1, 1]) {
-    const arm = new THREE.Group(); arm.position.set(side * 0.31, 1.30, 0); root.add(arm);
-    mesh(new THREE.CapsuleGeometry(0.075, 0.30, 4, 7), cloth, 0, -0.20, 0, { parent: arm }); arms.push(arm);
-    const leg = new THREE.Group(); leg.position.set(side * 0.14, 0.65, 0); root.add(leg);
-    mesh(new THREE.CapsuleGeometry(0.09, 0.38, 4, 7), dark, 0, -0.30, 0, { parent: leg });
-    mesh(new THREE.SphereGeometry(0.13, 8, 6), dark, 0, -0.60, 0.10, { parent: leg }).scale.set(1, 0.5, 1.5); legs.push(leg);
-  }
-  for (const l of [...legs, ...arms]) { l.userData.keep = true; bakeColored(l, !isTouch); }
-  bakeColored(root, !isTouch);
-  return { root, arms, legs, a, b, phase, greeted: false };
+function makeStartWalker(a, b, coat, phase, company, woman) {
+  const w = makePlazaTourist(coat, phase < 2 ? '#704c34' : '#b08a52', false, phase,
+    { woman, hairdo: phase < 2 ? 'bob' : 'bun' });
+  addWalkingCompany(w, company, phase);
+  return Object.assign(w, { a, b, greeted: false });
 }
 const startWalkOk = ([x, z]) => !rawWater(x, z) && !inBuilding(x, z) && !nearRoute(x, z, 3) && groundAt(x, z, 2) < 0.6;
-for (const [a, b, col, phase] of [
-  [[-24, -230], [-16, -213], '#e7894f', 0],
-  [[7, -219], [15, -236], '#5c91b8', 1.8],
-  [[-17, -244], [-3, -240], '#82a66b', 3.2],
-  [[5, -207], [-8, -212], '#c47bb0', 4.5]
-]) if (startWalkOk(a) && startWalkOk(b)) START_WALKERS.push(makeStartWalker(a, b, col, phase));
+for (const [a, b, col, phase, company, woman] of [
+  [[-24, -230], [-16, -213], '#e7894f', 0, 'pair', true],
+  [[7, -219], [15, -236], '#5c91b8', 1.8, 'family', true],
+  [[-17, -244], [-3, -240], '#82a66b', 3.2, 'dog', true],
+  [[5, -207], [-8, -212], '#c47bb0', 4.5, 'pair', false]
+]) if (startWalkOk(a) && startWalkOk(b)) START_WALKERS.push(makeStartWalker(a, b, col, phase, company, woman));
 hideWhenFar(START_WALKERS.map(w => w.root), 0, -225, 130);
 HOOKS.frame.push((dt, t) => {
   if (!started || paused) return;
@@ -3718,9 +3764,7 @@ HOOKS.frame.push((dt, t) => {
     const x = w.a[0] + (w.b[0] - w.a[0]) * u, z = w.a[1] + (w.b[1] - w.a[1]) * u;
     w.root.position.set(x, groundAt(x, z, 2), z);
     w.root.rotation.y = Math.atan2(w.b[0] - w.a[0], w.b[1] - w.a[1]) + (Math.cos(a) < 0 ? Math.PI : 0);
-    const swing = Math.sin(t * 7 + w.phase) * 0.5 * moving;
-    w.legs[0].rotation.x = swing; w.legs[1].rotation.x = -swing;
-    w.arms[0].rotation.x = -swing * 0.8; w.arms[1].rotation.x = swing * 0.8;
+    animateWalkingCompany(w, t, moving);
     const d = Math.hypot(P.pos.x - x, P.pos.z - z);
     if (d < 4.5 && !w.greeted) { w.greeted = true; popLabel('Hej!', w.root.position, 1.6); tone(630, 780, 0, 0.13, 0.025, 'triangle'); }
     if (d > 12) w.greeted = false;

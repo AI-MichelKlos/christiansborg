@@ -154,5 +154,10 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - På telefon kaster de små mennesker ingen skygge.
   - Ideer til senere: folkene ved Folketinget (statsministeren og livvagterne) er mange små dele og kunne også lægges sammen.
 
+- [x] Ekstra: par, familier og hundeluftere (15. okt. 2026)
+  - De gående på Højbro Plads og Slotspladsen går nu i tre par, to familier med to børn hver, to hundeluftere og én person alene. Flere af de voksne er kvinder med forskellige frisurer og almindeligt, varieret tøj. Børnene er mindre og tager hurtigere skridt.
+  - Par og familier deler rute og vender sammen. To små hunde går i snor med bevægelige ben og logrende hale. De nye figurer bruger den eksisterende sammenlægning af geometri og skjules på afstand.
+  - Kontrolleret i Chromium: ingen JavaScript-fejl; alle gruppemedlemmers og hundes ruter er fri for vand, bygninger og trafik gennem hele turen i begge retninger. To skærmbilleder gennemset.
+
 ## Næste idé
 - Følg statsministeren ind: en enkel Folketingssal bag døren i Rigsdagsgården, som pigen kan gå ind ad efter hende. Michel har bedt om at gemme den til senere.
