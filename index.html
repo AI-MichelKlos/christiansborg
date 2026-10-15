@@ -114,6 +114,15 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   .card{padding:18px 18px 20px}
 }
 @media (prefers-reduced-motion:reduce){#poi,#toast{animation:none}.btn{transition:none}}
+
+#indoorBadge,#indoorExit{display:none}
+.inFolketing #indoorBadge{display:flex;position:fixed;left:18px;top:calc(18px + env(safe-area-inset-top));flex-direction:column;gap:5px;color:#f7edcf;background:rgba(33,43,36,.94);padding:13px 18px;border:1px solid #b9a36b;border-radius:5px;max-width:calc(100% - 160px);pointer-events:none}
+#indoorBadge strong{font:600 18px var(--body)}#indoorBadge span{font:12px var(--body);opacity:.8}
+.inFolketing #indoorExit{display:block;position:fixed;right:14px;top:calc(70px + env(safe-area-inset-top));background:#eee5cf}
+.inFolketing #counters,.inFolketing #guide,.inFolketing #map,.inFolketing #poi,.inFolketing #bMap,.inFolketing #bNight,.inFolketing #jump,.inFolketing #touchHint{display:none!important}
+.inFolketing #tools{top:auto;bottom:calc(18px + env(safe-area-inset-bottom))}
+.inFolketing #actBtn{bottom:calc(100px + env(safe-area-inset-bottom));font:600 16px var(--body);border-radius:5px;background:#eee5cf}
+@media(max-width:600px){#indoorBadge strong{font-size:14px}#indoorBadge span{font-size:10px}.inFolketing #tools .btn{font-size:11px;padding:6px}}
 </style>
 </head>
 <body>
@@ -3218,7 +3227,8 @@ $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear();
-  if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
+  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Inde i Folketinget'; $('introLead').textContent = 'Gå op ad trappen og udforsk Vandrehallen. Brug de samme taster eller venstre tommel til at gå og dreje. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; $('taskBox').hidden = true; }
+  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
@@ -3263,7 +3273,7 @@ canvas.addEventListener('pointermove', e => {
   }
   const d = drag.get(e.pointerId); if (!d) return;
   const sens = e.pointerType === 'mouse' ? 0.0055 : 0.008;
-  cam.yaw -= (e.clientX - d.x) * sens; cam.pitch = Math.min(1.25, Math.max(0.05, cam.pitch + (e.clientY - d.y) * sens * 0.75));
+  cam.yaw -= (e.clientX - d.x) * sens; cam.pitch = Math.min(1.25, Math.max(FX.interior?.on ? -0.55 : 0.05, cam.pitch + (e.clientY - d.y) * sens * 0.75));
   d.x = e.clientX; d.y = e.clientY;
 });
 const endPtr = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; $('joy').hidden = true; } if (drag.delete(e.pointerId)) lastDragEnd = clockT; };
@@ -3376,7 +3386,7 @@ let soundOn = true, started = false, paused = true, showMap = !isTouch || window
 const SKEY = 'christiansborg3d';
 function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, readAloud: voiceOn, crowns: [...found], tasks: [...tasksDone] })); } catch (e) {} }
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
-HOOKS.start.push(() => setTimeout(() => toast(found.size === 0 ? 'Kongen har tabt 10 guldkroner. Kan du finde dem?' : found.size === 9 ? 'Find den sidste krone.' : found.size < 10 ? `Find de sidste ${10 - found.size} kroner.` : 'Gå over broen hen til slottet.'), 1200));
+HOOKS.start.push(() => setTimeout(() => !FX.interior?.on && toast(found.size === 0 ? 'Kongen har tabt 10 guldkroner. Kan du finde dem?' : found.size === 9 ? 'Find den sidste krone.' : found.size < 10 ? `Find de sidste ${10 - found.size} kroner.` : 'Gå over broen hen til slottet.'), 1200));
 
 // ======================================================================== MAIN LOOP
 let last = performance.now(), clockT = 0, poiT = 0, mapT = 0, guideT = 0;
@@ -4464,6 +4474,158 @@ const SCOOTER = (() => {
 })();
 FX.scooter = SCOOTER;
 
+// ======================================================================== FOLKETINGET INTERIOR
+// Sources and the limits of this reconstruction are documented in dev/INTERIOR.md.
+// The stair connection is an approximation, not a surveyed floor plan.
+const INTERIOR = (() => {
+  const I = { on: false, built: false, x: 1000, floor: 4.8, obstacles: [] };
+  const g = new THREE.Group(); g.position.x = I.x; g.visible = false; scene.add(g);
+  const material = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: .78, ...extra });
+  const oak = material('#705034'), trim = material('#48311f'), plaster = material('#e4d9bc'), stone = material('#c9c0ac'), brass = material('#ad9155', { metalness: .55, roughness: .4 });
+  const dark = material('#252621'), green = material('#627568');
+  function b(w,h,d,m,x,y,z) { return box(w,h,d,m,x,y,z,{parent:g,cast:false}); }
+  function obstacle(x,z,w,d) { I.obstacles.push([x-w/2,x+w/2,z-d/2,z+d/2]); }
+  function sign(text,w,h,x,y,z,ry=0) {
+    const tex=ctex(1024,256,(c,W,H)=>{c.fillStyle='#26372f';c.fillRect(0,0,W,H);c.strokeStyle='#bda66d';c.lineWidth=9;c.strokeRect(12,12,W-24,H-24);c.fillStyle='#f4e9c9';c.font='38px Georgia';c.textAlign='center';c.textBaseline='middle';c.fillText(text,W/2,H/2,W-60);},{wrap:false});
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex}));p.position.set(x,y,z);p.rotation.y=ry;g.add(p);
+  }
+  function door(x,z,ry,text) {
+    const root=new THREE.Group();root.position.set(x,I.floor,z);root.rotation.y=ry;g.add(root);
+    const add=(w,h,d,m,a,y,c)=>box(w,h,d,m,a,y,c,{parent:root,cast:false});
+    add(2.65,3.3,.16,trim,0,0,0);add(2.35,3.05,.17,oak,0,0,.02);
+    for(const side of [-1,1]) { for(const y of [.35,1.55]) add(.9,1,.07,trim,side*.58,y,.13);add(.07,.25,.08,brass,side*.15,1.2,.19); }
+    add(3,.22,.3,trim,0,3.3,0);sign(text,3.3,.6,x,I.floor+4,z+(ry===0?.2:-.2),ry);
+  }
+  function build() {
+    if(I.built)return; I.built=true;
+    const parquet=ctex(256,256,(c,W,H)=>{c.fillStyle='#b29466';c.fillRect(0,0,W,H);for(let y=0;y<8;y++)for(let x=0;x<4;x++){c.fillStyle=['#b79c72','#a98e64','#c1a780','#bda077'][(x+3*y)%4];c.fillRect(x*64+(y%2)*32,y*32,62,30);}}, {rep:.6});
+    const woodFloor=material('#ffffff',{map:parquet});
+    // Full 80 m axis; dimensions other than the documented length are approximations.
+    b(80,.25,9.6,woodFloor,0,I.floor-.25,0);
+    b(80,.25,9.6,plaster,0,11.3,0);
+    for(const side of [-1,1]) {
+      // Opening on the entrance side into the simplified stair hall.
+      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,40]]:[[-40,40]])) {
+        const w=c-a,x=(a+c)/2,z=side*4.8;
+        b(w,6.5,.35,plaster,x,I.floor,z);b(w,2,.15,oak,x,I.floor,z-side*.22);
+        b(w,.14,.22,trim,x,I.floor+2,z-side*.25);
+        b(w,.2,.45,plaster,x,10.8,z-side*.15);
+        for(let px=a+.7;px<c;px+=1.4) {
+          b(.07,1.72,.07,trim,px,I.floor+.15,z-side*.32);
+          b(1.15,.06,.08,trim,px+.58,I.floor+.24,z-side*.32);
+          b(1.15,.06,.08,trim,px+.58,I.floor+1.78,z-side*.32);
+        }
+      }
+      // Floral frieze: procedural interpretation, no reproduction of original art.
+      const frieze=ctex(1024,128,(c,W,H)=>{c.fillStyle='#d8cfad';c.fillRect(0,0,W,H);c.strokeStyle='#63765a';c.lineWidth=4;c.beginPath();for(let x=0;x<W;x+=4){let y=66+22*Math.sin(x/38);x?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();for(let x=22;x<W;x+=48){let y=66+22*Math.sin(x/38);c.fillStyle='#6c8058';c.beginPath();c.ellipse(x,y-17,7,17,.6,0,Math.PI*2);c.fill();c.fillStyle='#ac785b';c.beginPath();c.arc(x+12,y-26,7,0,Math.PI*2);c.fill();}},{rep:.18});
+      const fm=material('#ffffff',{map:frieze});
+      for(const [a,c] of (side===1?[[-40,-4.2],[4.2,40]]:[[-40,40]])) b(c-a,.85,.05,fm,(a+c)/2,I.floor+2.25,side*4.57);
+      for(let x=-36;x<=36;x+=6) {
+        // Tall window bays and wall pilasters, reduced to a consistent rhythm.
+        if(side===-1) {
+          b(1.9,3.4,.12,trim,x,I.floor+2.25,-4.52);
+          const glass=material('#c9d8d3',{emissive:'#a8bcb3',emissiveIntensity:.3});
+          b(1.65,3.16,.12,glass,x,I.floor+2.37,-4.4);
+          b(.08,3.16,.1,stone,x,I.floor+2.37,-4.3);b(1.65,.08,.1,stone,x,I.floor+3.9,-4.3);
+        }
+        b(.3,4.2,.3,plaster,x+2.6,I.floor+2.1,side*4.5);
+      }
+    }
+    for(const x of [-40,40]) b(.4,6.5,9.6,plaster,x,I.floor,-0);
+    door(-39.7,0,Math.PI/2,'Landstingssalen');door(39.7,0,-Math.PI/2,'Folketingssalen');
+    // Rigets midte: six Norwegian marble columns, fireplace and seating.
+    const marbleTex=ctex(128,256,(c,W,H)=>{c.fillStyle='#a3a497';c.fillRect(0,0,W,H);for(let k=0;k<20;k++){c.strokeStyle=k%2?'#c1c0b0':'#7d877e';c.lineWidth=1+(k%3);c.beginPath();for(let y=0;y<H;y+=8){let x=(k*17+Math.sin(y/45+k)*12)%W;y?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}},{rep:1});
+    const marble=material('#ffffff',{map:marbleTex});
+    for(const x of [-5,0,5])for(const z of [-2.7,2.7]) {
+      mesh(new THREE.CylinderGeometry(.32,.42,5.2,20),marble,x,I.floor+2.8,z,{parent:g});
+      b(.95,.25,.95,stone,x,I.floor,z);b(1,.3,1,stone,x,I.floor+5.35,z);obstacle(x,z,.95,.95);
+    }
+    b(3.8,2.9,.65,stone,0,I.floor,-4.27);b(2.5,1.9,.1,dark,0,I.floor+.1,-3.88);b(4.2,.26,.95,stone,0,I.floor+2.85,-4.2);obstacle(0,-4,4.3,1.3);
+    for(const x of [-8,8]) {
+      b(2.4,.15,1.2,oak,x,I.floor+.7,-1.5);b(.25,.7,.25,trim,x,I.floor,-1.5);obstacle(x,-1.5,2.5,1.3);
+      for(const z of [-3,.2]) { b(2,.35,.8,green,x,I.floor+.35,z);b(2,.9,.2,green,x,I.floor+.5,z+(z<0?-.35:.35));obstacle(x,z,2.1,.9); }
+    }
+    // Constitution display cases with books, not invented politician likenesses.
+    for(const x of [-27,-21]) {
+      b(3.5,.8,.8,oak,x,I.floor,3.9);b(3.5,.5,.8,material('#d5e5df',{transparent:true,opacity:.35}),x,I.floor+.8,3.9);
+      for(let i=0;i<3;i++){b(.55,.08,.45,plaster,x-.9+i*.9,I.floor+.85,3.9);b(.03,.09,.45,brass,x-.9+i*.9,I.floor+.85,3.9);}
+      obstacle(x,3.9,3.6,.9);
+    }
+    sign('Grundlovene',3.2,.6,-24,I.floor+2.05,4.53,Math.PI);
+    door(12,4.53,Math.PI,'Samtaleværelset');
+    // Suspended brass luminaires with frosted glass, repeated down the hall.
+    const luminous=new THREE.MeshBasicMaterial({color:'#fff2cb'});
+    for(let x=-33;x<40;x+=11) {
+      b(.07,1.1,.07,brass,x,9.9,0);b(1.9,.18,.65,brass,x,9.72,0);b(1.75,.24,.5,luminous,x,9.48,0);
+      for(const z of [-4.4,4.4]){b(.14,.9,.2,brass,x,8.2,z);b(.3,.6,.22,luminous,x,8.45,z);}
+    }
+    // Approximate entrance and a walkable straight stair connection.
+    b(8.4,.25,16,stone,0,-.25,15);
+    for(const side of [-1,1]) { b(.35,11.3,18,plaster,side*4.4,0,14);b(.16,1.7,18,stone,side*4.18,0,14); }
+    b(8.8,.25,18,plaster,0,11.3,14);b(8.8,11.3,.3,plaster,0,0,23);
+    for(let i=0;i<24;i++) b(7.8,(i+1)*.2,.42,stone,0,0,18-(i+.5)*.4166667);
+    b(8.4,.25,3.2,woodFloor,0,I.floor-.25,6.4);
+    // Handrails follow the stair pitch.
+    for(const side of [-1,1]) {
+      const a=new THREE.Vector3(side*3.8,1,18),c=new THREE.Vector3(side*3.8,5.8,8),v=c.clone().sub(a);
+      const r=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,v.length(),8),brass);r.position.copy(a.clone().add(c).multiplyScalar(.5));r.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());g.add(r);
+      for(let j=0;j<13;j++)b(.07,.95,.07,brass,side*3.8,j*.4,18-j*.83333);
+    }
+    b(2.8,3.4,.18,oak,0,0,22.75);sign('Ud til Rigsdagsgården',3.7,.65,0,3.9,22.6,Math.PI);
+    sign('Vandrehallen · 1. sal',4.5,.7,0,7.2,5.1);
+    const light=new THREE.HemisphereLight('#fff5dd','#a18d72',2.2);g.add(light);
+    bakeGroup(g);
+  }
+  function height(x,z) { return z<8?I.floor:z>18?0:Math.ceil((18-z)/.4166667)*.2; }
+  function fits(x,z) {
+    const hall=Math.abs(x)<39.25 && Math.abs(z)<4.2;
+    const entry=Math.abs(x)<3.7 && z>=3.6 && z<22.3;
+    return (hall||entry)&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
+  }
+  function enter() {
+    if(I.on||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;
+    build(); I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
+    I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
+    P.pos.set(I.x,0,21);P.face=Math.PI;cam.yaw=0;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
+    document.body.classList.add('inFolketing');showPoi(null);toast('Folketinget. Gå op ad trappen til Vandrehallen.');
+  }
+  function leave() {
+    I.on=false;g.visible=false;world.visible=true;dyn.visible=true;scene.fog=I.fog;scene.background=I.bg;evApplied=-1;applyEvening();
+    const p=FT.at(0,2.5);P.pos.set(p[0],1.2,p[1]);P.face=Math.atan2(FT.n[0],FT.n[1]);P.vel.set(0,0,0);cam.yaw=P.face+Math.PI;camInit=false;kid.root.position.copy(P.pos);
+    document.body.classList.remove('inFolketing');keys.clear();toast('Du er tilbage i Rigsdagsgården.');
+  }
+  // Separate indoor navigation avoids outdoor building, water and bounds collisions.
+  HOOKS.ride.unshift(dt=>{
+    if(!I.on)return false;
+    let f=0,t=0;
+    if(!paused){f=Number(keys.has('KeyW')||keys.has('ArrowUp'))-Number(keys.has('KeyS')||keys.has('ArrowDown'));t=Number(keys.has('KeyA')||keys.has('ArrowLeft'))-Number(keys.has('KeyD')||keys.has('ArrowRight'));if(joy.id!==null){f-=joy.y;t-=joy.x;}}
+    P.face+=Math.max(-1,Math.min(1,t))*dt*1.8;
+    if(drag.size)P.face=cam.yaw-Math.PI; else cam.yaw=P.face+Math.PI;
+    const speed=3*Math.max(-1,Math.min(1,f));const x=P.pos.x-I.x,z=P.pos.z,nx=x+Math.sin(P.face)*speed*dt,nz=z+Math.cos(P.face)*speed*dt;
+    if(fits(nx,z))P.pos.x=I.x+nx;if(fits(P.pos.x-I.x,nz))P.pos.z=nz;
+    P.pos.y=height(P.pos.x-I.x,P.pos.z);P.vel.set(0,0,0);P.onGround=true;jumpReq=false;return true;
+  });
+  HOOKS.frame.push(()=>{
+    if(!started)return;
+    if(!I.on){const p=FT.loc(P.pos.x,P.pos.z);if(!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy&&!FX.scooter?.active&&Math.abs(p[0])<4&&p[1]>.3&&p[1]<7)offerAction({id:'folketing-enter',label:'Gå ind i Folketinget',prio:8,run:enter});return;}
+    const x=P.pos.x-I.x,z=P.pos.z;
+    camera.position.set(P.pos.x,P.pos.y+1.7,z);const pitch=Math.max(-.55,Math.min(.65,cam.pitch));
+    camera.lookAt(P.pos.x+Math.sin(P.face)*Math.cos(pitch)*10,P.pos.y+1.7-Math.sin(pitch)*10,z+Math.cos(P.face)*Math.cos(pitch)*10);
+    kid.root.visible=false;
+    const name=z>8?'Trappen til Vandrehallen':Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen';
+    $('indoorName').textContent=name;
+    if(z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
+    if(z<5&&x<-18&&x>-30)offerAction({id:'grundlov-info',label:'Se grundlovene',prio:5,run:()=>toast('I Vandrehallen er kopier af grundlovene fra 1849, 1866, 1915 og 1953 udstillet.')});
+    if(z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
+    if(x>36||x< -36)offerAction({id:'sal-lukket',label:x>0?'Folketingssalen':'Landstingssalen',prio:5,run:()=>toast('Salen åbnes i et senere trin.')});
+  });
+  const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);
+  const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',leave);hud.appendChild(exit);
+  const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);
+  shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og vælg Gå ind i Folketinget.');});
+  I.enter=enter;I.leave=leave;I.fits=fits;I.height=height;FX.interior=I;return I;
+})();
+
 // ======================================================================== BOOT
 function boot(data) {
   data = data || {};
@@ -4483,7 +4645,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

@@ -159,5 +159,8 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
   - Par og familier deler rute og vender sammen. To små hunde går i snor med bevægelige ben og logrende hale. De nye figurer bruger den eksisterende sammenlægning af geometri og skjules på afstand.
   - Kontrolleret i Chromium: ingen JavaScript-fejl; alle gruppemedlemmers og hundes ruter er fri for vand, bygninger og trafik gennem hele turen i begge retninger. To skærmbilleder gennemset.
 
+## Nyt spor: interiør og voksenspil
+- [x] Første interiør (15. okt. 2026): indgang fra Rigsdagsgården, gangbar foreløbig trappe, Vandrehallen med Rigets midte, grundlovsmontrer og navngivne døre. Genvej til hovedtrappen på startskærmen. Realisme, kilder og resterende usikkerheder er beskrevet i `dev/INTERIOR.md`. Første trin handler om at kunne udforske rummene; voksenhistorien er endnu ikke indført.
+
 ## Næste idé
 - Følg statsministeren ind: en enkel Folketingssal bag døren i Rigsdagsgården, som pigen kan gå ind ad efter hende. Michel har bedt om at gemme den til senere.
