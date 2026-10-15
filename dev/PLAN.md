@@ -164,5 +164,8 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 
 - [x] Hoveddøren står nu permanent åben, også under ministerbilernes besøg. Går man hen til åbningen øverst på trappen, kommer man automatisk ind. Handlingsknappen er også bevaret.
 
+- [x] Mobilstyring (15. okt. 2026): analogt joystick med dødzone og gradvis ganghastighed. Udendørs går figuren i retningen i forhold til kameraet; indendørs kan man gå sidelæns uden at dreje blikket. Kameraet styres roligere med højre tommel og bliver stående i valgt retning under gang. Båd og løbehjul beholder deres kørestyring.
+  - Handlingsknap nederst til højre med stor trykflade, særskilt layout til stående og liggende telefon. Joystickhint vises også inde i Folketinget. Hjælp, tab af fokus og afbrudt berøring nulstiller input. Kontrolleret i Chromium med touch-events: dødzone, analog hastighed, retning i forhold til kamera, to fingre samtidig, sidelæns gang, pause og knapplacering i stående og liggende format. Ingen JavaScript-fejl.
+
 ## Næste idé
 - Følg statsministeren ind: en enkel Folketingssal bag døren i Rigsdagsgården, som pigen kan gå ind ad efter hende. Michel har bedt om at gemme den til senere.

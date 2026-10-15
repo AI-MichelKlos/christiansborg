@@ -123,6 +123,22 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .inFolketing #tools{top:auto;bottom:calc(18px + env(safe-area-inset-bottom))}
 .inFolketing #actBtn{bottom:calc(100px + env(safe-area-inset-bottom));font:600 16px var(--body);border-radius:5px;background:#eee5cf}
 @media(max-width:600px){#indoorBadge strong{font-size:14px}#indoorBadge span{font-size:10px}.inFolketing #tools .btn{font-size:11px;padding:6px}}
+
+/* Thumb controls stay clear of information cards and the phone safe area. */
+.touch #actBtn{left:auto;right:18px;bottom:calc(126px + env(safe-area-inset-bottom,0px));transform:none;animation:none;white-space:normal;justify-content:center;text-align:center;min-height:64px;width:164px;max-width:44vw;font-size:16px;touch-action:manipulation}
+.touch #jump{width:60px;height:60px;font-size:14px;right:20px;bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+.touch #kickBtn{right:96px;width:60px;height:60px}
+.touch #umb{bottom:calc(205px + env(safe-area-inset-bottom,0px))}
+.touch #touchHint{left:28px;bottom:calc(32px + env(safe-area-inset-bottom,0px));width:112px;height:112px;border-style:solid;border-color:rgba(42,34,56,.35);display:flex;flex-direction:column;justify-content:center;gap:5px}
+#touchHint span{font-size:38px;line-height:1}
+#lookHint{position:fixed;right:20px;bottom:calc(98px + env(safe-area-inset-bottom,0px));font:11px var(--body);pointer-events:none;opacity:.65}
+.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:28vh;overflow:auto}
+.touch.inFolketing #touchHint{display:flex!important}
+.touch.inFolketing #touchHint[hidden]{display:none!important}
+.touch.inFolketing #tools{top:calc(118px + env(safe-area-inset-top,0px));bottom:auto;right:14px}
+.touch.inFolketing #lookHint{bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+.touch.inFolketing #actBtn{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+@media(max-height:500px){.touch #actBtn{bottom:calc(92px + env(safe-area-inset-bottom,0px));min-height:54px}.touch #poi{bottom:160px;max-height:24vh}.touch #lookHint{bottom:92px}.touch.inFolketing #tools{top:18px;right:180px}.touch.inFolketing #actBtn{bottom:28px}.touch #touchHint{bottom:20px}}
 </style>
 </head>
 <body>
@@ -150,7 +166,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   <div id="guide" class="sticker" role="status" aria-live="off" hidden><span id="guideArrow" aria-hidden="true">↑</span><span id="guideText"></span></div>
   <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><p id="poiTask" hidden></p><div id="poiActions"><button id="poiMore" type="button">Læs mere</button><button id="poiRead" type="button">Læs op</button></div></div>
   <div id="toast" class="sticker" hidden></div>
-  <div id="touchHint" hidden>Træk her<br>for at gå</div>
+  <div id="touchHint" hidden><span>✥</span>Træk for at gå</div><div id="lookHint" hidden>Træk for at kigge</div>
   <div id="joy" hidden><div id="knob"></div></div>
   <button id="jump" class="sticker" type="button" hidden>Hop</button>
   <button id="actBtn" class="sticker" type="button" hidden><kbd>E</kbd><span id="actTxt"></span></button>
@@ -174,10 +190,10 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
       <span>Læs op-knappen</span><span>Tryk, så bliver teksterne læst højt. Tryk igen for at slå det fra.</span>
     </div>
     <div class="keys" id="keysTouch" hidden>
-      <span>Venstre tommel</span><span>Skub op for at gå, til siden for at dreje</span>
+      <span>Venstre tommel</span><span>Træk i den retning, du vil gå. Træk lidt for at gå langsomt</span>
       <span>Højre tommel</span><span>Træk for at kigge dig omkring</span>
       <span>Hop-knappen</span><span>Hop · stig af løbehjulet</span>
-      <span>Handlingsknappen</span><span>Tag løbehjulet på startpladsen</span>
+      <span>Handlingsknappen</span><span>Tryk for at undersøge, tale eller bruge ting</span>
       <span>Læs op-knappen</span><span>Tryk for at få teksterne læst højt</span>
     </div>
     <button class="go" id="goBtn" type="button" disabled>Henter Slotsholmen …</button>
@@ -3030,14 +3046,20 @@ function updPlayer(dt) {
     if (keys.has('KeyS') || keys.has('ArrowDown')) fwd -= 1;
     if (keys.has('KeyA') || keys.has('ArrowLeft')) turn += 1;
     if (keys.has('KeyD') || keys.has('ArrowRight')) turn -= 1;
-    if (joy.id !== null) { fwd += -joy.y; turn += -joy.x * 0.9; }
+    // Walking uses camera-relative analog input below.
   }
   fwd = Math.max(-1, Math.min(1, fwd)); turn = Math.max(-1, Math.min(1, turn)); turnIn = turn;
   const run = keys.has('ShiftLeft') || keys.has('ShiftRight') || (joy.id !== null && -joy.y > 0.92);
   const PM = P.mod || {};
-  const speed = (fwd > 0 ? (run ? 9.5 : 5.2) * fwd : 2.8 * fwd) * (PM.speed ?? 1);
+  let speed = (fwd > 0 ? (run ? 9.5 : 5.2) * fwd : 2.8 * fwd) * (PM.speed ?? 1);
   P.face += turn * (run && fwd > 0 ? 2.0 : 2.5) * dt * (PM.turn ?? 1);
-  const fx = Math.sin(P.face), fz = Math.cos(P.face);
+  let fx = Math.sin(P.face), fz = Math.cos(P.face);
+  if (!paused && joy.id !== null && Math.hypot(joy.x, joy.y) > 0) {
+    const v = touchWalk();
+    speed = 5.2 * Math.hypot(joy.x, joy.y) * (PM.speed ?? 1);
+    fx = v.x; fz = v.z;
+    P.face += angDiff(Math.atan2(fx, fz), P.face) * (1 - Math.exp(-dt * 14));
+  }
   const acc = (P.onGround ? 12 : 5) * (PM.acc ?? 1);
   P.vel.x += (fx * speed - P.vel.x) * Math.min(1, acc * dt); P.vel.z += (fz * speed - P.vel.z) * Math.min(1, acc * dt);
   P.pos.x += P.vel.x * dt; P.pos.z += P.vel.z * dt;
@@ -3225,8 +3247,8 @@ $('bSound').addEventListener('click', () => { setSound(!soundOn); if (soundOn) s
 $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
-  paused = true; keys.clear();
-  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Inde i Folketinget'; $('introLead').textContent = 'Gå op ad trappen og udforsk Vandrehallen. Brug de samme taster eller venstre tommel til at gå og dreje. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; $('taskBox').hidden = true; }
+  paused = true; keys.clear(); resetTouch();
+  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Inde i Folketinget'; $('introLead').textContent = 'Gå op ad trappen og udforsk Vandrehallen. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; $('taskBox').hidden = true; }
   else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
   intro.hidden = false; goBtn.focus();
 }
@@ -3237,7 +3259,7 @@ goBtn.addEventListener('click', () => {
   canvas.focus();
 });
 
-if (isTouch) { $('keysDesk').hidden = true; $('keysTouch').hidden = false; $('jump').hidden = false; $('touchHint').hidden = false; }
+if (isTouch) { $('keysDesk').hidden = true; $('keysTouch').hidden = false; $('jump').hidden = false; $('touchHint').hidden = false; $('lookHint').hidden = false; }
 
 // ======================================================================== INPUT
 const keys = new Set();
@@ -3257,10 +3279,23 @@ let jumpReq = false, lastDragEnd = -10, turnIn = 0;
 const cam = { yaw: Math.PI / 2, pitch: 0.3, dist: 7.5 };
 const drag = new Map();
 const joy = { id: null, ox: 0, oy: 0, x: 0, y: 0 };
+// Screen-up follows the camera, screen-right stays perpendicular to it.
+function touchWalk() {
+  const length = Math.hypot(joy.x, joy.y) || 1;
+  return { x: (Math.sin(cam.yaw)*joy.y - Math.cos(cam.yaw)*joy.x)/length,
+    z: (Math.cos(cam.yaw)*joy.y + Math.sin(cam.yaw)*joy.x)/length };
+}
+function resetTouch() {
+  joy.id = null; joy.x = joy.y = 0; drag.clear(); jumpReq = false;
+  $('joy').hidden = true; $('knob').style.transform = '';
+  $('touchHint').hidden = !isTouch;
+}
+window.addEventListener('blur', resetTouch);
+document.addEventListener('visibilitychange', () => { if (document.hidden) { keys.clear(); resetTouch(); } });
 canvas.addEventListener('pointerdown', e => {
   if (!started || paused) return;
   canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
-  if (e.pointerType !== 'mouse' && e.clientX < window.innerWidth * 0.45 && joy.id === null) {
+  if (e.pointerType !== 'mouse' && e.clientX < window.innerWidth * 0.45 && e.clientY > window.innerHeight * 0.45 && joy.id === null) {
     joy.id = e.pointerId; joy.ox = e.clientX; joy.oy = e.clientY; joy.x = 0; joy.y = 0;
     const j = $('joy'); j.style.left = e.clientX + 'px'; j.style.top = e.clientY + 'px'; j.hidden = false; $('knob').style.transform = ''; $('touchHint').hidden = true;
   } else drag.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -3268,15 +3303,16 @@ canvas.addEventListener('pointerdown', e => {
 canvas.addEventListener('pointermove', e => {
   if (e.pointerId === joy.id) {
     let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const l = Math.hypot(dx, dy), m = 46; if (l > m) { dx *= m / l; dy *= m / l; }
-    joy.x = dx / m; joy.y = dy / m; $('knob').style.transform = `translate(${dx}px,${dy}px)`; return;
+    const power = Math.max(0, (Math.min(l / m, 1) - .12) / .88);
+    joy.x = l ? dx / (Math.min(l, m) || 1) * power : 0; joy.y = l ? dy / (Math.min(l, m) || 1) * power : 0; $('knob').style.transform = `translate(${dx}px,${dy}px)`; return;
   }
   const d = drag.get(e.pointerId); if (!d) return;
-  const sens = e.pointerType === 'mouse' ? 0.0055 : 0.008;
+  const sens = e.pointerType === 'mouse' ? 0.0055 : 0.0045;
   cam.yaw -= (e.clientX - d.x) * sens; cam.pitch = Math.min(1.25, Math.max(FX.interior?.on ? -0.55 : 0.05, cam.pitch + (e.clientY - d.y) * sens * 0.75));
   d.x = e.clientX; d.y = e.clientY;
 });
-const endPtr = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; $('joy').hidden = true; } if (drag.delete(e.pointerId)) lastDragEnd = clockT; };
-canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
+const endPtr = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; $('joy').hidden = true; $('touchHint').hidden = !isTouch; } if (drag.delete(e.pointerId)) lastDragEnd = clockT; };
+canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr); canvas.addEventListener('lostpointercapture', endPtr);
 canvas.addEventListener('wheel', e => { if (!started) return; e.preventDefault(); cam.dist = Math.min(26, Math.max(3.2, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive: false });
 $('jump').addEventListener('pointerdown', e => { e.preventDefault(); if (FX.scooter?.active) FX.scooter.stop(); else jumpReq = true; });
 $('actBtn').addEventListener('click', () => { runAction(); $('c').focus(); });
@@ -3298,7 +3334,7 @@ let startBlend = -1;
 const orbitC = new THREE.Vector3(20, 0, 40);
 let camIn = 0;
 function camFollow(dt, out, look) {
-  if (drag.size === 0 && clockT - lastDragEnd > 0.8) {
+  if (drag.size === 0 && clockT - lastDragEnd > 0.8 && (!isTouch || MYBOAT.on || FX.scooter?.active)) {
     const moving = Math.hypot(P.vel.x, P.vel.z) > 0.4 || Math.abs(turnIn) > 0.05;
     cam.yaw += angDiff(P.face + Math.PI, cam.yaw) * Math.min(1, dt * (moving ? 6 : 1.6));
   }
@@ -3477,7 +3513,7 @@ function allCrowns() {
   [523, 659, 784, 1047, 784, 1047].forEach((f, k) => tone(f, f, k * 0.16, k === 5 ? 0.7 : 0.2, 0.08, 'triangle'));
   setCrownOnHead(true);
   let k = 0; const iv = setInterval(() => { const a = rand() * 6.28; firework(P.pos.x + Math.cos(a) * rr(3, 7), P.pos.y + rr(5, 9), P.pos.z + Math.sin(a) * rr(3, 7)); if (++k >= 9) clearInterval(iv); }, 300);
-  setTimeout(() => { if (found.size >= CROWNS.length && started) { paused = true; keys.clear(); $('finale').hidden = false; $('finOk').focus(); } }, 3300);
+  setTimeout(() => { if (found.size >= CROWNS.length && started) { paused = true; keys.clear(); resetTouch(); $('finale').hidden = false; $('finOk').focus(); } }, 3300);
 }
 function takeCrown(c) {
   c.got = true; c.fly = 0.7; c.beam.visible = false; found.add(c.i); save(); updCounter(true);
@@ -4293,7 +4329,7 @@ function taskAct(id) { for (const t of TASKS) if (t.act === id) completeTask(t);
 // the question card
 let quizT = null;
 function openQuiz(t) {
-  quizT = t; paused = true; keys.clear();
+  quizT = t; paused = true; keys.clear(); resetTouch();
   $('qText').textContent = t.t; $('qMsg').textContent = ''; const box = $('qOpts'); box.innerHTML = '';
   t.quiz.forEach((o, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'qopt'; b.textContent = o;
@@ -4597,10 +4633,12 @@ const INTERIOR = (() => {
   HOOKS.ride.unshift(dt=>{
     if(!I.on)return false;
     let f=0,t=0;
-    if(!paused){f=Number(keys.has('KeyW')||keys.has('ArrowUp'))-Number(keys.has('KeyS')||keys.has('ArrowDown'));t=Number(keys.has('KeyA')||keys.has('ArrowLeft'))-Number(keys.has('KeyD')||keys.has('ArrowRight'));if(joy.id!==null){f-=joy.y;t-=joy.x;}}
+    if(!paused){f=Number(keys.has('KeyW')||keys.has('ArrowUp'))-Number(keys.has('KeyS')||keys.has('ArrowDown'));t=Number(keys.has('KeyA')||keys.has('ArrowLeft'))-Number(keys.has('KeyD')||keys.has('ArrowRight'));}
     P.face+=Math.max(-1,Math.min(1,t))*dt*1.8;
-    if(drag.size)P.face=cam.yaw-Math.PI; else cam.yaw=P.face+Math.PI;
-    const speed=3*Math.max(-1,Math.min(1,f));const x=P.pos.x-I.x,z=P.pos.z,nx=x+Math.sin(P.face)*speed*dt,nz=z+Math.cos(P.face)*speed*dt;
+    if(isTouch){cam.yaw+=Math.max(-1,Math.min(1,t))*dt*1.8;P.face=cam.yaw-Math.PI;}else if(drag.size)P.face=cam.yaw-Math.PI; else cam.yaw=P.face+Math.PI;
+    let vx=Math.sin(P.face)*3*Math.max(-1,Math.min(1,f)),vz=Math.cos(P.face)*3*Math.max(-1,Math.min(1,f));
+    if(!paused&&joy.id!==null){const v=touchWalk(),power=Math.hypot(joy.x,joy.y);vx=v.x*3*power;vz=v.z*3*power;}
+    const x=P.pos.x-I.x,z=P.pos.z,nx=x+vx*dt,nz=z+vz*dt;
     if(fits(nx,z))P.pos.x=I.x+nx;if(fits(P.pos.x-I.x,nz))P.pos.z=nz;
     P.pos.y=height(P.pos.x-I.x,P.pos.z);P.vel.set(0,0,0);P.onGround=true;jumpReq=false;return true;
   });

@@ -21,3 +21,6 @@ På startskærmen kan du vælge "Start ved Folketingets indgang". Gå op ad trap
 - Kortdata: © OpenStreetMap-bidragydere, ODbL (https://www.openstreetmap.org/copyright).
 
 Udarbejdet med AI (Claude) og med begrænset mennesketjek.
+
+### Mobilstyring
+Træk med venstre tommel nederst til venstre for at gå i den ønskede retning på skærmen. Et lille træk giver langsom gang. Træk med højre tommel for at kigge dig omkring. Handlingsknappen nederst til højre viser, hvad du kan gøre tæt på. Inde i Folketinget kan du gå sidelæns, mens du kigger fremad. Båd og løbehjul bruger fortsat joysticket til fart og drejning.
