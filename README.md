@@ -8,7 +8,7 @@ Kongen har tabt 10 guldkroner rundt på Slotsholmen. Følg de gule lys og find d
 
 ## Nyt: gå ind i Folketinget
 
-På startskærmen kan du vælge "Start ved Folketingets indgang". Gå op ad trappen i Rigsdagsgården og vælg "Gå ind i Folketinget" (E på computer). Indenfor kan du gå op til Vandrehallen og udforske Rigets midte. "Ud i gården" bringer dig tilbage. Interiøret er første trin mod en mere voksen spiloplevelse. Det er en foreløbig fortolkning med anslået trappeforbindelse, ikke en præcis bygningsmodel. Se [kilder og begrænsninger](dev/INTERIOR.md).
+På startskærmen kan du vælge "Start ved Folketingets indgang". Gå op ad trappen i Rigsdagsgården og ind gennem den åbne hoveddør. Du kan også vælge "Gå ind i Folketinget" (E på computer). Indenfor kan du gå op til Vandrehallen og udforske Rigets midte. "Ud i gården" bringer dig tilbage. Interiøret er første trin mod en mere voksen spiloplevelse. Det er en foreløbig fortolkning med anslået trappeforbindelse, ikke en præcis bygningsmodel. Se [kilder og begrænsninger](dev/INTERIOR.md).
 
 ## Styring
 - Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe. Træk med musen for at kigge. N skifter mellem dag og aften, M viser eller skjuler kortet.

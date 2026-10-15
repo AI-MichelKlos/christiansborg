@@ -2553,7 +2553,7 @@ FT.loc = (x, z) => { const dx = x - FT.A[0], dz = z - FT.A[1]; return [dx * FT.u
     if (lx) { const d = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 3.8), toon('#ffffff', { map: TX.churchDoor })); d.position.set(lx, 1.2 + 1.9, 0.24); g.add(d); }
   }
   const hole = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 3.8), dark); hole.position.set(0, 3.1, 0.22); g.add(hole);
-  FT.leaves = [-1, 1].map(s => { const p = new THREE.Group(); p.position.set(s * 1.1, 1.2, 0.27); g.add(p); const b = box(1.1, 3.8, 0.08, wood, -s * 0.55, 0, 0, { parent: p, edges: true }); return p; });
+  FT.leaves = [-1, 1].map(s => { const p = new THREE.Group(); p.position.set(s * 1.1, 1.2, 0.27); p.rotation.y = s < 0 ? 1.45 : -1.45; p.userData.noMerge = true; g.add(p); const b = box(1.1, 3.8, 0.08, wood, -s * 0.55, 0, 0, { parent: p, edges: true }); return p; });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(7, 0.875), toon('#ffffff', { map: TX.ftSign })); sign.position.set(0, 6.5, 0.52); g.add(sign);
   box(7.2, 1.05, 0.18, tm('#1f3d33'), 0, 5.97, 0.42, { parent: g, cast: false });
   for (const s of [-1, 1]) { const [x, z] = FT.at(s * 6.3, 5.0); lamp(x, z, 4.2, false); }
@@ -2752,13 +2752,12 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
       once('c1b', T, 4.4, () => { door(C1, 1, false); goTo(GUARDS[2], [0.9, 6.8]); });
       if (T > 5.2 && !S.waved) { S.waved = true; if (Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16) { lookAtKid(PM); PM.wave = 2; } }   // she waves to the girl if she is close
       if (T > 7.2 && PM.on && !PM.path.length && PM.y < 0.5) { goTo(PM, [0, 3.0], [0, 0.9]); goTo(GUARDS[2], [0.9, 3.4], [0.6, 1.6]); goTo(GUARDS[0], [-1.2, 4.0], [-1.0, 2.0]); goTo(GUARDS[1], [1.6, 4.4], [1.4, 2.2]); }
-      const doorOpen = PM.on && Math.hypot(...FT.loc(PM.x, PM.z).map((v, i) => i ? v - 0.9 : v)) < 3.5 || (T > 8.7 && T < 16.7);
-      FT.leaves.forEach((p, i) => { const want = doorOpen ? (i ? -1.45 : 1.45) : 0; p.rotation.y += (want - p.rotation.y) * Math.min(1, dt * 4); });
+      // The public game entrance stays open throughout the motorcade scene.
       if (PM.on && FT.loc(PM.x, PM.z)[1] < 1.2 && T > 7.7) { PM.on = false; PM.g.visible = false; }
       if (!PM.on && T > 9.7) for (const [i, gd] of GUARDS.entries()) if (gd.on && !gd.path.length) { goTo(gd, [0, 0.9]); gd.inside = true; }
       for (const gd of GUARDS) if (gd.on && gd.inside && FT.loc(gd.x, gd.z)[1] < 1.2) { gd.on = false; gd.inside = false; gd.g.visible = false; }
       if (T > 9.7 && !PM.on && GUARDS.every(gd => !gd.on)) { S.phase = 'out'; S.t = 0; }
-    } else FT.leaves.forEach(p => { p.rotation.y += (0 - p.rotation.y) * Math.min(1, dt * 4); });
+    }
     for (const p of [PM, ...GUARDS]) upd(p, dt);
     if (kidWave > 0) { kidWave -= dt; kid.arms[1].rotation.z = 2.6 + Math.sin(t * 12) * 0.3; }
     if (PM.on && started && !paused && Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16)
@@ -4607,7 +4606,13 @@ const INTERIOR = (() => {
   });
   HOOKS.frame.push(()=>{
     if(!started)return;
-    if(!I.on){const p=FT.loc(P.pos.x,P.pos.z);if(!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy&&!FX.scooter?.active&&Math.abs(p[0])<4&&p[1]>.3&&p[1]<7)offerAction({id:'folketing-enter',label:'Gå ind i Folketinget',prio:8,run:enter});return;}
+    if(!I.on){
+      const p=FT.loc(P.pos.x,P.pos.z);
+      const canEnter=!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy&&!FX.scooter?.active;
+      if(canEnter && Math.abs(p[0])<1 && p[1]>.15 && p[1]<1.4 && P.onGround && P.pos.y>.8) { enter(); return; }
+      if(canEnter&&Math.abs(p[0])<4&&p[1]>.3&&p[1]<7)offerAction({id:'folketing-enter',label:'Gå ind i Folketinget',prio:8,run:enter});
+      return;
+    }
     const x=P.pos.x-I.x,z=P.pos.z;
     camera.position.set(P.pos.x,P.pos.y+1.7,z);const pitch=Math.max(-.55,Math.min(.65,cam.pitch));
     camera.lookAt(P.pos.x+Math.sin(P.face)*Math.cos(pitch)*10,P.pos.y+1.7-Math.sin(pitch)*10,z+Math.cos(P.face)*Math.cos(pitch)*10);
@@ -4622,7 +4627,7 @@ const INTERIOR = (() => {
   const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',leave);hud.appendChild(exit);
   const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);
-  shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og vælg Gå ind i Folketinget.');});
+  shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
   I.enter=enter;I.leave=leave;I.fits=fits;I.height=height;FX.interior=I;return I;
 })();
 

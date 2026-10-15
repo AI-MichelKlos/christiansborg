@@ -162,5 +162,7 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 ## Nyt spor: interiør og voksenspil
 - [x] Første interiør (15. okt. 2026): indgang fra Rigsdagsgården, gangbar foreløbig trappe, Vandrehallen med Rigets midte, grundlovsmontrer og navngivne døre. Genvej til hovedtrappen på startskærmen. Realisme, kilder og resterende usikkerheder er beskrevet i `dev/INTERIOR.md`. Første trin handler om at kunne udforske rummene; voksenhistorien er endnu ikke indført.
 
+- [x] Hoveddøren står nu permanent åben, også under ministerbilernes besøg. Går man hen til åbningen øverst på trappen, kommer man automatisk ind. Handlingsknappen er også bevaret.
+
 ## Næste idé
 - Følg statsministeren ind: en enkel Folketingssal bag døren i Rigsdagsgården, som pigen kan gå ind ad efter hende. Michel har bedt om at gemme den til senere.
