@@ -164,7 +164,7 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
   </button>
   </div>
   <div id="tools">
-    <button id="bMap" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
+    <button id="bMap" class="sticker btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
     <button id="bNight" class="sticker btn" type="button" aria-pressed="false"><svg id="iNight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span id="tNight">Aften</span></button>
     <button id="bSound" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="iWave" d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg><span>Lyd</span></button>
     <button id="bVoice" class="sticker btn" type="button" aria-pressed="false" title="Læs teksterne højt"><svg id="iVoice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v10H10l-4 4v-4H4z"/><path d="M8 9h8M8 12h5"/></svg><span>Læs op</span></button>
@@ -194,7 +194,7 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
       <span><kbd>Mellemrum</kbd></span><span>Hop · stig af løbehjulet</span>
       <span><kbd>E</kbd> ved løbehjulet</span><span>Tag det eller stil det fra dig</span>
       <span>Træk med musen</span><span>Kig dig omkring</span>
-      <span><kbd>N</kbd> <kbd>M</kbd></span><span>Dag eller aften · vis eller skjul kortet</span>
+      <span><kbd>N</kbd> <kbd>M</kbd></span><span>Dag eller aften · åbn oversigtskortet</span>
       <span>Læs op-knappen</span><span>Tryk, så bliver teksterne læst højt. Tryk igen for at slå det fra.</span>
     </div>
     <div class="keys" id="keysTouch" hidden>
@@ -3506,22 +3506,23 @@ function sizeMap() {
 }
 function mpx(x) { return (x - MX0) / (MX1 - MX0) * mapCv.width; }
 function mpz(z) { return (z - MZ0) / (MZ1 - MZ0) * mapCv.height; }
-function buildMapBase() {
-  const cv = document.createElement('canvas'); cv.width = mapCv.width; cv.height = mapCv.height; const g = cv.getContext('2d');
-  const k = mapCv.width / (MX1 - MX0);
+function makeMapBase(width=mapCv.width,height=mapCv.height) {
+  const cv = document.createElement('canvas'); cv.width = width; cv.height = height; const g = cv.getContext('2d');
+  const k = width / (MX1 - MX0),mx=x=>(x-MX0)/(MX1-MX0)*width,mz=z=>(z-MZ0)/(MZ1-MZ0)*height;
   g.fillStyle = '#d9d0bd'; g.fillRect(0, 0, cv.width, cv.height);
   const items = [...mapItems.filter(i => !i.tree), ...mapItems.filter(i => i.tree)];
   for (const it of items) {
     g.fillStyle = it.fill || '#999'; g.globalAlpha = it.tree ? 0.85 : 1;
-    if (it.k === 'r') { g.fillRect(mpx(it.x0), mpz(it.z0), (it.x1 - it.x0) * k, (it.z1 - it.z0) * k); if (it.line) { g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.strokeRect(mpx(it.x0), mpz(it.z0), (it.x1 - it.x0) * k, (it.z1 - it.z0) * k); } }
-    else if (it.k === 'e') { g.beginPath(); g.ellipse(mpx(it.x), mpz(it.z), it.rx * k, it.rz * k, 0, 0, Math.PI * 2); g.fill(); }
-    else if (it.k === 'c') { g.beginPath(); g.arc(mpx(it.x), mpz(it.z), Math.max(1, it.r * k), 0, Math.PI * 2); g.fill(); }
-    else if (it.k === 'p') { g.beginPath(); it.pts.forEach(([x, z], i) => i ? g.lineTo(mpx(x), mpz(z)) : g.moveTo(mpx(x), mpz(z))); g.closePath(); g.fill(); if (it.line) { g.strokeStyle = 'rgba(42,34,56,.55)'; g.lineWidth = 0.8; g.stroke(); } }
-    else if (it.k === 'l') { g.strokeStyle = it.stroke; g.lineCap = 'round'; g.lineWidth = Math.max(1, k * (it.w || 0.4)); g.beginPath(); g.moveTo(mpx(it.x0), mpz(it.z0)); g.lineTo(mpx(it.x1), mpz(it.z1)); g.stroke(); }
+    if (it.k === 'r') { g.fillRect(mx(it.x0), mz(it.z0), (it.x1 - it.x0) * k, (it.z1 - it.z0) * k); if (it.line) { g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.strokeRect(mx(it.x0), mz(it.z0), (it.x1 - it.x0) * k, (it.z1 - it.z0) * k); } }
+    else if (it.k === 'e') { g.beginPath(); g.ellipse(mx(it.x), mz(it.z), it.rx * k, it.rz * k, 0, 0, Math.PI * 2); g.fill(); }
+    else if (it.k === 'c') { g.beginPath(); g.arc(mx(it.x), mz(it.z), Math.max(1, it.r * k), 0, Math.PI * 2); g.fill(); }
+    else if (it.k === 'p') { g.beginPath(); it.pts.forEach(([x, z], i) => i ? g.lineTo(mx(x), mz(z)) : g.moveTo(mx(x), mz(z))); g.closePath(); g.fill(); if (it.line) { g.strokeStyle = 'rgba(42,34,56,.55)'; g.lineWidth = 0.8; g.stroke(); } }
+    else if (it.k === 'l') { g.strokeStyle = it.stroke; g.lineCap = 'round'; g.lineWidth = Math.max(1, k * (it.w || 0.4)); g.beginPath(); g.moveTo(mx(it.x0), mz(it.z0)); g.lineTo(mx(it.x1), mz(it.z1)); g.stroke(); }
   }
   g.globalAlpha = 1;
-  mapBase = cv;
+  return cv;
 }
+function buildMapBase(){mapBase=makeMapBase();}
 function drawMap() {
   if (!showMap || !mapBase) return;
   const g = mctx; g.drawImage(mapBase, 0, 0);
@@ -3538,7 +3539,7 @@ function drawMap() {
   g.fillStyle = '#ec8f33'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1.2, k * 0.6);
   g.beginPath(); g.moveTo(px + dx * s, pz + dz * s); g.lineTo(px - dx * s * 0.7 + dz * s * 0.65, pz - dz * s * 0.7 - dx * s * 0.65); g.lineTo(px - dx * s * 0.3, pz - dz * s * 0.3); g.lineTo(px - dx * s * 0.7 - dz * s * 0.65, pz - dz * s * 0.7 + dx * s * 0.65); g.closePath(); g.fill(); g.stroke();
 }
-function setMapVisible(v) { showMap = v; mapCv.hidden = !v; $('bMap').setAttribute('aria-pressed', String(v)); save(); }
+function setMapVisible(v) { showMap = v; mapCv.hidden = !v; $('bMap').setAttribute('data-mini-visible', String(v)); save(); }
 function setEvening(v) {
   evening = v; $('bNight').setAttribute('aria-pressed', String(v)); $('tNight').textContent = v ? 'Dag' : 'Aften';
   $('iNight').innerHTML = v ? '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke-linecap="round"/>' : '<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>';
@@ -3567,7 +3568,7 @@ function showPoi(p) {
 $('poiMore').addEventListener('click', () => { poiExpanded = !poiExpanded; renderPoiText(); });
 $('poiRead').addEventListener('click', () => { if (curPoi) say(`${curPoi.n}. ${curPoi.t} ${taskLine(curPoi)}`, true); });
 
-$('bMap').addEventListener('click', () => setMapVisible(!showMap));
+$('bMap').addEventListener('click', () => FX.mapView?.open());
 $('bVoice').addEventListener('click', () => setVoice(!voiceOn));
 $('bNight').addEventListener('click', () => setEvening(!evening));
 $('bSound').addEventListener('click', () => { setSound(!soundOn); if (soundOn) sparkleSound(); });
@@ -3597,7 +3598,7 @@ window.addEventListener('keydown', e => {
   if (MOVE_KEYS.includes(e.code)) { keys.add(e.code); e.preventDefault(); }
   if (e.code === 'Space' && !e.repeat) { if (FX.scooter?.active) FX.scooter.stop(); else jumpReq = true; }
   if (e.code === 'KeyN' && !e.repeat) setEvening(!evening);
-  if (e.code === 'KeyM' && !e.repeat) setMapVisible(!showMap);
+  if (e.code === 'KeyM' && !e.repeat) FX.mapView?.open();
   if (e.code === 'KeyE' && !e.repeat) runAction();
   for (const h of HOOKS.key) h(e);
 });
@@ -5973,6 +5974,55 @@ const WAYFIND=(()=>{
 })();
 FX.wayfinding=WAYFIND;
 
+
+// ======================================================================== NAMED OVERVIEW MAP
+// Markers show entrances in the game model, not surveyed public access routes.
+const MAPVIEW=(()=>{
+  const door=key=>{const d=MINISTRY_DOORS[key];return [d.x+d.nx*5,d.z+d.nz*5];};
+  const sites=[
+    {id:'folketing',name:'Folketingets indgang',at:FT.at(0,4),offset:[-4,15],text:'Fra Rigsdagsgården: gå op ad hovedtrappen og gennem den åbne dør.',rooms:'Indenfor: betjentstuen og Snapstinget ved indgangen. Trappen fører til Vandrehallen, Samtaleværelset, Kompaspartiets kontorer, Folketingssalen og Landstingssalen.'},
+    {id:'tower',name:'Tårnet ved Kongeporten',at:TOWER.door,offset:[0,12],text:'Gå til Kongeporten på Slotspladsen, og vælg Gå ind i tårnet.',rooms:'Elevatorhallen, restauranten og Udsigten forbindes via Vælg etage. Fra restauranten kan man også gå op ad sidetrappen.'},
+    {id:'pmEntry',name:'Statsministeriet',at:door('pmEntry'),offset:[-5,0],text:'Indgangen med nummer 11 ligger i Prins Jørgens Gård ved Højesteret.',rooms:'Døren fører til spillets forenklede forhal. Gå udenfor vender tilbage til samme indgang.'},
+    {id:'courtEntry',name:'Højesteret',at:COURT_ENTRY.at(0,8),offset:[-25,8],text:'Gå op ad den brede trappe mellem de fire søjler i Prins Jørgens Gård.',rooms:'Døren fører til spillets lille vindfang. Udgangen fører tilbage foran trappen.'},
+    {id:'finance',name:'Finansministeriet',at:door('finance'),offset:[14,12],text:'Den åbne indgang ligger i den røde bygning ved Slotspladsen og Slotsholmsgade.',rooms:'Foyer, garderobe, midtergang og forhandlingsrum. Gå tilbage gennem foyeren til udgangen.'},
+    {id:'reform',name:'Reformministeriet',at:door('reform'),offset:[26,-12],text:'Det fiktive ministerium ligger på Ved Stranden, på den modsatte side af kanalen.',rooms:'Foyer, gang, departementschefens kontor og printerområde. Sidedøren fører ud på bygningens anden side.'},
+    {id:'garden',name:'Bibliotekshaven',at:GARDEN.at(0,-35),offset:[10,10],text:'Følg Tøjhusgade og passagen mod Det Kongelige Bibliotek.',rooms:'Grusstierne fører rundt om bassinet, blomsterbedene og Kierkegaard-statuen.'},
+    {id:'stables',name:'De Kongelige Stalde',at:door('stables'),offset:[-8,6],text:'Gå til den åbne staldport fra Ridebanen.',rooms:'Følg den brede staldgang. Den samme port eller Gå udenfor fører tilbage til Ridebanen.'},
+    {id:'quay-slots',name:'Kajen ved Slotspladsen',at:QUAYS.find(q=>q.id==='slots').at(0,6.3),offset:[22,-18],text:'Stentrappen går fra Slotspladsens side ned til afsatsen over kanalen.',rooms:'Gå ned og op ad trinene. Båden kan lægge til ved afsatsen.'},
+    {id:'quay-reform',name:'Kajen ved Reformministeriet',at:QUAYS.find(q=>q.id==='reform').at(0,6.3),offset:[2,-23],text:'Kajtrappen ligger på Ved Stranden foran det fiktive Reformministerium.',rooms:'Trappen forbinder gaden med afsatsen over vandet.'},
+    {id:'press',name:'Slotspladsens presseområde',at:PRESS.at(0,0),offset:[30,12],text:'Tv-vognene, kameraerne og arbejdslysene står på Slotspladsen foran Finansministeriet.',rooms:'Der er passage mellem udstyret og rundt om vognene.'},
+    {id:'ride',name:'Ridebanen',at:[-140,85],offset:[0,-3],text:'Den store ridebane ligger mellem Marmorbroen og slottet.',rooms:'Staldindgangen ligger på Ridebanens vestside. Vejviseren forklarer vejen videre mod Tøjhusgade.'},
+    {id:'marmor',name:'Marmorbroen',at:[-206,140],offset:[-7,0],text:'Den brede stenbro fører over kanalen til Ridebanen.',rooms:'Bliv på slotsiden af kanalen, hvis du følger vejen rundt om staldenes sydside mod Tøjhusgade.'},
+    {id:'prins',name:'Prins Jørgens Gård',at:[-39,-76],offset:[-12,-22],text:'Fra Slotspladsen går man gennem porten i Kirkeløngangsbygningen.',rooms:'I gården ligger indgangene til Statsministeriet og Højesteret. Begge er markeret særskilt på kortet.'},
+    {id:'hoejbro',name:'Højbro',at:[-5,-167],offset:[-3,-8],text:'Broen forbinder Slotsholmen med Højbro Plads og Gammel Strand.',rooms:'Herfra kan man fortsætte mod Ved Stranden eller tilbage langs kanalen til Slotspladsen.'},
+    {id:'slots',name:'Slotspladsen',at:[85,-51],offset:[10,-12],text:'Pladsen foran slottet med rytterstatuen af Frederik 7.',rooms:'Her ligger Tårnets indgang, presseområdet og vejene til ministerierne. Vejviseren viser næste passage mod Rigsdagsgården og Prins Jørgens Gård.'}
+  ];
+  sites.forEach((s,i)=>s.number=i+1);
+  const dialog=document.createElement('dialog');dialog.id='overviewDialog';dialog.setAttribute('aria-labelledby','overviewTitle');
+  dialog.innerHTML='<header class="overviewHeader"><h2 id="overviewTitle">Slotsholmen · oversigtskort</h2><button id="overviewClose" class="sticker btn" type="button" aria-label="Luk oversigtskort">Luk kort</button></header><p id="overviewPosition"></p><p class="overviewHint">Vælg et nummer eller et stednavn. Kortet viser stederne i spillet.</p><label class="overviewMini"><input id="overviewMini" type="checkbox"> Vis minikort under gang</label><div class="overviewGrid"><section><div id="overviewMap"><canvas id="overviewCanvas" aria-hidden="true"></canvas><div id="overviewPins"></div></div><article id="overviewDetails" aria-live="polite"><h3 id="overviewPlace"></h3><p id="overviewAccess"></p><p id="overviewRooms"></p></article></section><nav id="overviewList" aria-label="Steder på Slotsholmen"></nav></div>';
+  document.body.appendChild(dialog);const side=document.createElement('section');side.append($('overviewDetails'),$('overviewList'));dialog.querySelector('.overviewGrid').appendChild(side);
+  const css=document.createElement('style');css.textContent='#overviewDialog{position:fixed;inset:12px;margin:auto;box-sizing:border-box;width:min(1040px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;border:3px solid #30283c;border-radius:20px;padding:0 20px 20px;background:#fff9eb;color:#30283c;font:16px/1.4 system-ui;box-shadow:5px 6px 0 #30283c}#overviewDialog::backdrop{background:rgba(20,24,23,.7)}.overviewHeader{display:flex;align-items:center;gap:16px;justify-content:space-between;position:sticky;top:0;background:#fff9eb;z-index:5;padding:18px 0 10px}.overviewHeader h2{font-size:24px;line-height:1.2;margin:0}.overviewHeader button{min-height:44px;flex-shrink:0}#overviewPosition{margin:5px 0;font-weight:650}.overviewHint{margin:6px 0;color:#596151}.overviewMini{display:flex;align-items:center;gap:8px;margin:10px 0 14px;font-size:15px}.overviewMini input{width:20px;height:20px}.overviewGrid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,1fr);gap:18px;align-items:start}.overviewGrid>section{min-width:0}#overviewMap{position:relative;width:100%;aspect-ratio:630/610;border:1px solid #817862;border-radius:12px;overflow:hidden;background:#d9d0bd}#overviewCanvas{width:100%;height:100%;display:block}#overviewPins{position:absolute;inset:0}#overviewPins button{position:absolute;transform:translate(-50%,-50%);width:29px;height:29px;padding:0;border-radius:50%;border:2px solid #fff9eb;background:#334c3c;color:#fff8df;font:bold 14px system-ui;box-shadow:0 1px 4px #30283c;cursor:pointer}#overviewPins button[aria-pressed=true]{background:#e68d30;color:#271f31;z-index:2}#overviewList{display:grid;gap:7px}.mapPlace{display:flex;align-items:center;gap:9px;min-height:46px;padding:7px 10px;border:1px solid #bcb49e;border-radius:9px;background:#f2eddc;color:#30283c;text-align:left;font:600 15px/1.25 system-ui;cursor:pointer;min-width:0;overflow-wrap:anywhere}.mapPlace span{display:grid;place-items:center;flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#334c3c;color:#fff8df;font-size:14px}.mapPlace[aria-pressed=true]{border:2px solid #9d601d;background:#ffe4b2}.mapPlace[aria-pressed=true] span{background:#e68d30;color:#271f31}#overviewDetails{border:1px solid #bcb49e;border-radius:12px;padding:14px;margin:0 0 12px;background:#f1ead7;scroll-margin-top:100px}#overviewDetails h3{margin:0 0 8px;font-size:21px;line-height:1.2}#overviewDetails p{margin:8px 0 0}#overviewRooms{color:#4b5749}#map{cursor:pointer}.inFolketing #bMap,.inTowerView #bMap{display:inline-flex!important}@media(max-width:650px){#overviewDialog{padding:0 12px 14px}.overviewHeader h2{font-size:20px}.overviewHeader{gap:8px}.overviewHeader button{font-size:13px;padding:8px 10px}.overviewGrid{grid-template-columns:minmax(0,1fr)}#overviewList{grid-template-columns:minmax(0,1fr)}.mapPlace{font-size:15px;min-height:48px;padding:7px 10px}.mapPlace span{width:23px;height:23px}.overviewHint{font-size:14px}#overviewDetails h3{font-size:20px}}';document.head.appendChild(css);
+  const field=$('overviewMap'),cv=$('overviewCanvas'),ctx=cv.getContext('2d');let selected=sites[0],wasPaused=false,pins=[];
+  function location(){if(INTERIOR.on){const id=INTERIOR.place.startsWith('tower')?'tower':INTERIOR.place;return sites.find(s=>s.id===id)||sites[0];}if(TOWER.on)return sites.find(s=>s.id==='tower');return null;}
+  function choose(site,fromList=false){selected=site;$('overviewPlace').textContent=site.number+'. '+site.name;$('overviewAccess').textContent=site.text;$('overviewRooms').textContent=site.rooms;for(const b of dialog.querySelectorAll('[data-place]'))b.setAttribute('aria-pressed',String(b.dataset.place===site.id));draw();if(fromList){const box=$('overviewDetails').getBoundingClientRect(),outer=dialog.getBoundingClientRect();dialog.scrollTo({top:Math.max(0,dialog.scrollTop+box.top-outer.top-dialog.querySelector('.overviewHeader').offsetHeight-12),behavior:'auto'});}}
+  for(const site of sites){
+    const pin=document.createElement('button');pin.type='button';pin.textContent=site.number;pin.dataset.place=site.id;pin.setAttribute('aria-label',site.number+'. '+site.name);pin.title=site.name;pin.addEventListener('click',()=>choose(site));$('overviewPins').appendChild(pin);
+    const row=document.createElement('button');row.type='button';row.className='mapPlace';row.dataset.place=site.id;const number=document.createElement('span');number.textContent=site.number;row.append(number,document.createTextNode(site.name));row.addEventListener('click',()=>choose(site,true));$('overviewList').appendChild(row);
+  }
+  function draw(){if(!dialog.open||field.clientWidth<10)return;const w=field.clientWidth,h=field.clientHeight,dpr=Math.min(2,devicePixelRatio||1);if(!cv._base||cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv._base=makeMapBase(cv.width,cv.height);}ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(cv._base,0,0);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='rgba(255,249,235,.12)';ctx.fillRect(0,0,w,h);
+    const project=p=>[(p[0]-MX0)/(MX1-MX0)*w,(p[1]-MZ0)/(MZ1-MZ0)*h];
+    pins=sites.map(site=>{const [ax,ay]=project(site.at);return {site,ax,ay,x:ax+site.offset[0],y:ay+site.offset[1]};});
+    for(let pass=0;pass<60;pass++)for(let i=0;i<pins.length;i++){const a=pins[i];for(let j=i+1;j<pins.length;j++){const b=pins[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.1;if(d<33){const m=(33-d)/2,ux=d===.1?1:dx/d,uy=d===.1?0:dy/d;a.x-=ux*m;a.y-=uy*m;b.x+=ux*m;b.y+=uy*m;}}a.x=Math.max(16,Math.min(w-16,a.x));a.y=Math.max(16,Math.min(h-16,a.y));}
+    pins.forEach(p=>{const active=p.site===selected;ctx.strokeStyle=active?'#a45f16':'#3c4d3c';ctx.lineWidth=active?2:1;ctx.beginPath();ctx.moveTo(p.ax,p.ay);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.fillStyle=active?'#e68d30':'#344b3b';ctx.beginPath();ctx.arc(p.ax,p.ay,active?4:2.5,0,Math.PI*2);ctx.fill();const b=$('overviewPins').querySelector('[data-place="'+p.site.id+'"]');b.style.left=p.x+'px';b.style.top=p.y+'px';});
+    const anchor=location(),at=anchor?anchor.at:[P.pos.x,P.pos.z],[px,py]=project(at);ctx.fillStyle='#f59b35';ctx.strokeStyle='#30283c';ctx.lineWidth=2;ctx.beginPath();if(anchor)ctx.arc(px,py,6,0,Math.PI*2);else {const a=P.face;ctx.moveTo(px+Math.sin(a)*8,py+Math.cos(a)*8);ctx.lineTo(px+Math.sin(a+2.5)*7,py+Math.cos(a+2.5)*7);ctx.lineTo(px+Math.sin(a-2.5)*7,py+Math.cos(a-2.5)*7);ctx.closePath();}ctx.fill();ctx.stroke();
+  }
+  function open(){if(dialog.open||!started)return;wasPaused=paused;paused=true;keys.clear();resetTouch();P.vel.set(0,0,0);jumpReq=false;const anchor=location();$('overviewPosition').textContent=anchor?(INTERIOR.on?'Inde: '+$('indoorName').textContent:'På Udsigten i Tårnet')+'. Kortet viser indgangen.':'Din position vises med en orange pil.';$('overviewMini').checked=showMap;dialog.showModal();dialog.scrollTop=0;$('bMap').setAttribute('aria-expanded','true');choose(anchor||sites.reduce((best,s)=>Math.hypot(P.pos.x-s.at[0],P.pos.z-s.at[1])<Math.hypot(P.pos.x-best.at[0],P.pos.z-best.at[1])?s:best));$('overviewClose').focus();requestAnimationFrame(draw);}
+  $('overviewMini').addEventListener('change',()=>setMapVisible($('overviewMini').checked));$('overviewClose').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>{paused=wasPaused;keys.clear();resetTouch();$('bMap').setAttribute('aria-expanded','false');canvas.focus();});dialog.addEventListener('keydown',e=>e.stopPropagation());dialog.addEventListener('pointerdown',e=>e.stopPropagation());dialog.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});new ResizeObserver(draw).observe(field);
+  $('bMap').setAttribute('aria-haspopup','dialog');$('bMap').setAttribute('aria-label','Åbn oversigtskort med stednavne');$('bMap').setAttribute('aria-expanded','false');mapCv.setAttribute('role','button');mapCv.tabIndex=0;mapCv.setAttribute('aria-label','Åbn oversigtskort med stednavne');mapCv.title='Tryk for kort med stednavne';mapCv.addEventListener('click',open);mapCv.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+  return {open,sites,get pins(){return pins;},get selected(){return selected.id;}};
+})();
+FX.mapView=MAPVIEW;
+
 // ======================================================================== BOOT
 function boot(data) {
   data = data || {};
@@ -5992,7 +6042,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

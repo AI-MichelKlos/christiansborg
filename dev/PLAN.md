@@ -193,4 +193,6 @@ Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner 
 
 - [x] Runde 10 (16. okt. 2026): Højesterets søjleportal med fire søjler, trekantgavl, buet overvindue, lanternestolper, brede lave trin, åbne døre og et forenklet vindfang. Fire udendørs vejvisere og to indvendige vægskilte med en mobiltilpasset læsevisning. Portalens mål, Statsministeriets justerede placering og skiltningens spiltilpasninger er dokumenteret i dev/INTERIOR.md.
 
-Forslag til næste to opgaver, afventer Michel: samlet gennemgang af rumforbindelser og tydeligere stednavne på oversigtskortet.
+- [x] Runde 11 (16. okt. 2026): 22 ruter gennem de åbne rum er kontrolleret i begge retninger med bevægelseskoden. Seks ind-/udgange og Tårnets etageskift er kontrolleret. Større oversigtskort med 16 navngivne steder, valg via nummer eller liste, oplysninger om adgang og rumforbindelser samt markering af bygningens indgang, når man er indenfor. Kortet er tilgængeligt på mobil, computer, indenfor og på Udsigten. Dokumentation i dev/INTERIOR.md.
+
+De planlagte fysiske steder foreligger nu i en første, gennemgået version. Næste fase kræver Michels valg, fordi historie og nye spilfunktioner hidtil har ventet: forslag om valg mellem børne-/voksenudgaven og en voksen hovedperson som de næste to opgaver.

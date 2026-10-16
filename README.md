@@ -11,7 +11,7 @@ Kongen har tabt 10 guldkroner rundt på Slotsholmen. Følg de gule lys og find d
 På startskærmen kan du vælge "Start ved Folketingets indgang". Gå op ad trappen i Rigsdagsgården og ind gennem den åbne hoveddør. Du kan også vælge "Gå ind i Folketinget" (E på computer). Indenfor kan du gå op til Vandrehallen og udforske Rigets midte. "Ud i gården" bringer dig tilbage. Interiøret er første trin mod en mere voksen spiloplevelse. Det er en foreløbig fortolkning med anslået trappeforbindelse, ikke en præcis bygningsmodel. Se [kilder og begrænsninger](dev/INTERIOR.md).
 
 ## Styring
-- Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe. Træk med musen for at kigge. N skifter mellem dag og aften, M viser eller skjuler kortet.
+- Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe. Træk med musen for at kigge. N skifter mellem dag og aften, M åbner oversigtskortet.
 - Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap.
 - Tårnet: gå hen til Kongeporten, og vælg Gå ind i tårnet. Vælg derefter etage til restauranten eller Udsigten. Deroppe drejer pilene eller tommelen dig rundt, og mellemrum eller knappen Kikkert zoomer ind.
 
@@ -57,3 +57,6 @@ Vælg Folketingssalen via Vandrehallen, og gå gennem den åbne dør. Der er fri
 
 ### Højesteret og vejvisere
 Vælg Højesterets indgang for at starte foran den brede trappe. Gå mellem de fire søjler og ind i det lille vindfang. Udgangen fører tilbage foran trappen. Vejvisere står på Slotspladsen, i Prins Jørgens Gård, Rigsdagsgården og på Ridebanen samt indenfor ved Folketingets indgang og i Vandrehallen. Stå tæt på og vælg Læs vejviser for at få anvisninger med stor tekst. Spillet står stille imens; luk med Tilbage til spillet eller Escape. Skiltene beskriver spillets model. Kilder og forenklinger står i `dev/INTERIOR.md`.
+
+### Oversigtskort med stednavne
+Kort-knappen, M eller et tryk på minikortet åbner et større oversigtskort med 16 navngivne steder. Vælg et nummer eller stednavn for at se indgang og forbindelser til rummene. Indenfor viser den orange positionsmarkering bygningens indgang, og teksten fortæller, hvilket rum man er i. Kort-knappen er også tilgængelig indenfor og på Udsigten. Vis minikort under gang kan slås til eller fra i kortvinduet. Spillet står stille, mens kortet er åbent. Luk kort eller Escape vender tilbage til gangstyringen.

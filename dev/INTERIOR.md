@@ -297,3 +297,25 @@ Pilene angiver den næste passage eller retning i spillets model. Henvisningerne
 Vejvisernes design, placering og ordlyd er lavet til spillet. De er ikke kopier af faktisk skiltning på Christiansborg. Fotoopslagene i denne runde vedrører Højesterets portal. Alle nye aktiver er geometri og proceduretegnede teksturer; referencefotos er ikke indsat i spillet. Der er ingen nye personer, spor, samtaler eller historiehændelser.
 
 Kontrol: Højesterets trappe og indgang er gået med den almindelige bevægelseskode; vindfang og retur foran trappen er kontrolleret. Statsministeriets flyttede indgang og retur er kontrolleret igen. Fem indvendige ruter forbinder vindfang, indgang, vejviser, begge sale og Kompaspartiets dør. Sammenhængende udendørs ruter gennem Kirkeløngangsbygningen og begge passager til Rigsdagsgården er kontrolleret mod spillets kollisioner. Ruten rundt om staldenes sydside er også kontrolleret med mellempositioner og begrænset højdeforskel mellem trinene i rutesøgningen. Fire udendørs skiltes omgivelser er kontrolleret for vand og bygninger. Læsevisningen er åbnet med handlingsknappen ude og inde på telefonstørrelse; pause, tekst, luk-knap, Escape og genoptaget touchgang med straks-stop er kontrolleret. Skærmbilleder af portalen på afstand og tæt på, telefonformat, vindfang samt skiltenes læsevisning er gennemset. Ingen JavaScript-fejl under kontrollerne.
+
+## Runde 11: rumforbindelser og navngivet oversigtskort (16. oktober 2026)
+
+### Gennemgang af rumforbindelser
+Der er fundet sammenhængende ruter til betjentstuen, begge døre til Samtaleværelset, begge sale, Kompaspartiets to kontorer, sekretariat og mødelokale, begge niveauer i Snapstinget, Finansministeriets garderobe og forhandlingsrum, Reformministeriets kontor, printerområde og sidedør, staldgangen, Tårnets elevatorhal og restaurant, sidetrappens repos, Statsministeriets forhal og Højesterets vindfang.
+
+De 22 ruter er gået frem og tilbage ved at anvende spillets almindelige bevægelseskode på ruter med gyldige kollisioner og højdeforskelle. Der blev ikke fundet en blokeret rumforbindelse, og derfor er rumgeometrien ikke ændret i denne runde. De synlige gallerier i salene er fortsat udsmykning uden gangbar adgang; dette er en dokumenteret afgrænsning fra de tidligere runder.
+
+Ind-/udgangstilstande og returpunkter er kontrolleret for Folketinget, Finansministeriet, Reformministeriet, staldene, Statsministeriet og Højesteret. Tårnet er kontrolleret fra elevatorhal til restaurant og Udsigten, tilbage til restaurant, videre til hallen og ud til Kongeporten. Den eksisterende sidedør i Reformministeriet indgår i rutekontrollen.
+
+### Oversigtskortet
+Kort-knappen, M og et tryk på minikortet åbner nu et større oversigtskort. Det har 16 navngivne steder: Folketingets indgang, Tårnet ved Kongeporten, Statsministeriet, Højesteret, Finansministeriet, det fiktive Reformministerium, Bibliotekshaven, staldene, begge kajer, presseområdet, Ridebanen, Marmorbroen, Prins Jørgens Gård, Højbro og Slotspladsen.
+
+Nummermarkører og en liste med stednavne vælger det samme sted. Oplysninger om adgang, udgang og de tilknyttede rum vises ved siden af kortet på stor skærm og under kortet på telefon. Markørerne forskydes ved behov for at undgå overlap; små streger peger tilbage på det tilknyttede punkt. Dette er ikke en målt afstands- eller rutevisning.
+
+Når man er indenfor, viser kortet bygningens udvendige indgang i stedet for det separate interiørs tekniske koordinater. Teksten fortæller det aktuelle rum og forklarer, at kortet viser indgangen. På Udsigten vises Tårnets indgang ved Kongeporten. Kort-knappen er gjort synlig i alle interiører og på Udsigten. Minikortet kan fortsat slås til eller fra; dette valg ligger i kortvinduet og gemmes som hidtil.
+
+Kortvinduet holder spilleren stille og nulstiller tast- og touchinput ved åbning og lukning. Escape eller Luk kort lukker vinduet. Luk-knappen bliver stående øverst, når man ruller. Valg fra stedlisten ruller kun inde i selve kortvinduet til stedets oplysninger. Mobilvisningen har én kolonne med fulde stednavne og ingen vandret rulning. Kortet er en oversigt over den eksisterende spilmodel med de tidligere dokumenterede anslåede placeringer, ikke en verificeret plantegning eller adgangsvejledning til virkelige besøg.
+
+Kontrol: alle 16 markører og stednavne er til stede og vælger korrekt indhold. Markørernes afstand og tekstens bredde er kontrolleret i telefonformat. Udendørs position, indendørs indgangsmarkering, Udsigten, minikort til/fra, M, tryk på minikort, pause, Escape, synlig luk-knap efter listevalg og genoptaget touchgang med straks-stop er kontrolleret. Skærmbilleder i stort format, stående telefonformat og liggende telefonformat er gennemset. Modulets syntaks og git diff --check er kontrolleret. Ingen JavaScript-fejl under kontrollerne.
+
+Ingen nye rum, personer, spor, samtaler eller historiehændelser er tilføjet. Der er ikke foretaget nye fotobaserede rekonstruktioner; kortet bygger på de eksisterende geometrier og indgange.
