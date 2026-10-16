@@ -116,3 +116,29 @@ Kontrolleret i Chromium ved 1280 x 800 og i touchkontekst ved 390 x 844. Gang in
 Joysticket er bevaret. Ved gang fremad eller til siden følger kameraet roligt gangretningen, højst 0,9 radian pr. sekund. Hver berøring fastholder en reference til kameraretningen ved berøringens start, så automatisk følge ikke skaber en spiral i gangretningen. Manuel kameratrækning på højre side har prioritet og opdaterer referencen; automatisk følge holder pause i 1,2 sekunder efter et manuelt træk. Baglæns gang vender ikke kameraet rundt. Kameraet bliver stående, når man slipper, og gangens vandrette hastighed nulstilles straks. Båd og løbehjul bevarer deres særskilte styring.
 
 Kontrolleret med touch-events i Chromium på 390 x 844, udendørs og indendørs: kameraet følger en bevægelse til siden uden at spiralere ved fortsat berøring; højst 0,03 radian pr. simuleret trin på 1/30 sekund. Ved slip var både efterfølgende distance og kamerapanorering nul. Baglæns gang drejer ikke kameraet. Manuel kameratrækning tilsidesætter automatisk følge. Ingen JavaScript-fejl. Syntakskontrol og git diff --check bestået.
+
+## Runde 4: Finansministeriet og Reformministeriet (16. oktober 2026)
+
+### Finansministeriet
+Den Røde Bygning har fået en særskilt model på den eksisterende OSM-grundplan: rødt murværk, stenfod, tre rækker hvide korspostvinduer, mørkt skifertag, gesimser og en rundbuet frontispice mod Børsen. Indgangen fra Slotspladsen har lys stenindfatning, skematiske putti og to permanent åbne dørfløje. Skulpturer og proportioner er forenklede.
+
+Indenfor er en foyer, en garderobe med knager og bænk, en midtergang og et forhandlingsrum med langt træbord og fletinspirerede stole. Hvide vægge, fyldningsdøre, høje vinduer, radiatorer og mørk/lys flisegulv i foyeren bygger på billedreferencer. Planen, garderobens placering og forbindelsen til møderummet er lavet til spillet. Den er ikke en opmåling af ministeriet. Møderummets parket og det lange bords størrelse er en fortolkning. Der er ikke indsat kopier af portrætter eller andre originale kunstværker.
+
+Visuelt gennemsete fotos, hentet 16. oktober 2026:
+- Bygningsstyrelsen, Finn Christoffersen: [ministeriebygningerne i Slotsholmsgade](https://bygst.dk/udlejning/ejendomsportefoeljen/historiske-ejendomme/ministeriebygningerne-i-slotsholmsgade/). Foto: `https://bygst.dk/media/5i2bo33u/kancellibygningen_18_fuld_foto_finn_christoffersen.jpg?height=630&v=1d61312d2ce1ab0&width=1200`. Viser murværk, skifertag, vinduesrækker, hovedindgang og frontispice.
+- Finansministeriet, [Økonomisk politik](https://fm.dk/arbejdsomraader/oekonomisk-politik/): `https://fm.dk/media/crdpvmzw/fm-6714.jpg`. Viser et møde ved blankt træbord, hvide vægge og hvid fyldningsdør med messinggreb. Fotoet dokumenterer ikke hele lokalets plan.
+- Finansministeriet, [About us](https://en.fm.dk/about-us): `https://en.fm.dk/media/we2h4pfq/fm-6726.jpg`. Viser høje hvide vinduer, radiatorer, træmøbler med fletryg og mørkt/lyst flisegulv. Det runde bord i billedet er ikke model for det fiktive lange forhandlingsbord.
+- Finansministeriets tekst om [Den Røde Bygning](https://fm.dk/ministeriet/finansministeriets-historie/den-roede-bygning/) dokumenterer indgangen fra Slotspladsen, putti, frontispicen mod Børsen og korridorsystemet.
+
+### Reformministeriet
+Reformministeriet er historiens fiktive institution ved Ved Stranden. Den eksisterende forenklede model af karréen er bevaret. Spillets indgang er flyttet mod hjørnet ved Boldhusgade og har åbne mørke fyldningsdøre og lys indfatning. Skiltet hedder nu Reformministeriet. Der er også en åben sidedør på karréens korte vestside. Denne sidedørs placering er opfundet til spillet.
+
+Indretningen er fiktiv: foyer med siddeplads, gang, departementschefens kontor med skrivebord, reol og lille mødebord, separat printerområde med kopimaskine og papir samt en gennemgående forbindelse til sidedøren. Den gamle udvendige karrémodel er fortsat grov og gengiver ikke hjørneejendommens præcise etageantal eller opdeling i selvstændige huse.
+
+Visuelt gennemsete fotos fra [Indenforvoldene: Admiralgade 28 / Holmens Kanal 42 / Ved Stranden 2-8 / Boldhusgade 1](https://www.indenforvoldene.dk/admiralgade-28-holmens-kanal-42-ved-stranden-2-8-boldhusgade-1), juli 2009:
+- Foto `...her-Ved-Stranden-8-6.jpg`: pudset lys facade, hvide vinduer og kvaderpudset stueetage.
+- Foto `...her-Ved-Stranden-8-7.jpg`: nærbillede af nr. 8 med mørk fyldningsdør, messinggreb, stenindfatning og trappetrin. Bruges som inspiration til portalens materialer, ikke som dokumentation for ministeriets indre eller præcis dørplacering i spillet.
+
+Alle nye flader og møbler er lavet med geometri og proceduretegnede teksturer. Referencefotos er ikke indsat som spilaktiver. Man kan starte ved begge hovedindgange via valget på startskærmen, gå ind automatisk gennem dørtærsklen eller vælge handlingsknappen, og gå tilbage til den rigtige gade. Sidedøren kan bruges begge veje. Der er ingen nye personer, spor, dialoger eller historiefunktioner.
+
+Kontrol: 10 sammenhængende ruter fundet gennem døre og omkring møbler, herunder garderobe, begge sider af forhandlingsbordet, kontor, printerområde og sidedør samt eksisterende Vandrehals-, Kompas- og Snapstingsruter. Alle tre udvendige dørtærskler og returrejser til den rigtige dør kontrolleret. Faktiske touch-events i Chromium kontrollerer gang og straks-stop; hovedindgangen er også testet ved at gå hen fra startvalget. Hjælp og sidedørens handlingsknap er kontrolleret. Skærmbilleder af interiører, begge hovedindgange samt stående og liggende telefonformat er gennemset. Ingen JavaScript-fejl under disse kontroller.

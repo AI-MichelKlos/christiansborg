@@ -36,3 +36,6 @@ Ved Vandrehallen mod Folketingssalen kan man gå ind i det fiktive Kompaspartiet
 
 ### Kamera på telefon
 Joysticket styrer gangretning og hastighed. Kameraet følger roligt gangretningen, og spilleren stopper straks, når joysticket slippes. Træk på højre side for selv at kigge; den manuelle kamerastyring får prioritet. Når man går baglæns, bliver kameraet i sin retning.
+
+### Finansministeriet og Reformministeriet
+På startskærmen kan du vælge et ministerium at starte ved. Finansministeriet ligger i Den Røde Bygning ved Slotspladsen og har foyer, garderobe og forhandlingsrum. Reformministeriet er fiktivt og ligger ved Ved Stranden. Her kan man udforske departementschefens kontor, printerområdet og sidedøren. Begge hoveddøre står åbne. Ved sidedøren bringer handlingsknappen dig ud på den side af bygningen. Indretningen og rummenes forbindelser er tilpasset spillet; billedreferencer og begrænsninger står i `dev/INTERIOR.md`.
