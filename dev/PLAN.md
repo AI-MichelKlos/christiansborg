@@ -181,10 +181,14 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 - [x] Runde 7 (16. okt. 2026): elevatorhal ved Kongeporten, restaurant med højt murstens-/betonrum, stort vindue, borde og gangbar sidetrappe. Etagevalg forbinder hal, restaurant ved 34 m og Udsigten ved 44 m med den eksisterende elevatorovergang. Udsigten har kikkert, supplerende glasafskærmning, orienteringstavle og tydelig adgang tilbage. Startvalg ved Tårnet. Billedreferencer og anslåede forbindelser dokumenteret i dev/INTERIOR.md.
 - [x] Runde 8 (16. okt. 2026): åben forbindelse fra Vandrehallen til Landstingssalen med hvide vægge, høje buede vinduer, kassetteloft, gyldne pendler, buede stolerækker, talerstol og syv frontpladser. Slotspladsens midlertidige presseområde med to tv-vogne, tre kameraer, arbejdslys og bord. Startvalg til begge steder. Referencer, forenklinger og kontrol dokumenteret i dev/INTERIOR.md.
 
-De otte runder med nødvendige fysiske steder er gennemført. Forslag til næste runde, afventer Michels valg: Folketingssalen og Statsministeriets indgang. Historie og nye spilfunktioner venter fortsat.
+De otte runder med nødvendige fysiske steder er gennemført. Runde 9 er efterfølgende godkendt og gennemført: Folketingssalen og Statsministeriets indgang. Historie og nye spilfunktioner venter fortsat.
 
 Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner venter.
 
 - [x] Mobilrettelse (15. okt. 2026): rettet fortegnet på joystickets sidelæns bevægelse. Venstre/højre var spejlet i forhold til kameraets faktiske højreakse, både ude og inde. Kontrolleret med faktiske touch-events mod renderkameraets højreakse: venstre og højre ved fire kameravinkler udendørs og indendørs, 16 beståede kontroller uden JavaScript-fejl.
 
 - [x] Automatisk mobilkamera (15. okt. 2026): beholdt joystick, roligt kamerafølge under gang, straks-stop ved slip og valgfrit manuelt kig. Fastholdt gangretning under samme berøring for at undgå spiral. Kontrolleret ude og inde med faktiske touch-events: begrænset drejehastighed, følge og stabil retning ved lang berøring, nul bevægelse og kamerapanorering efter slip, baglæns gang uden kameravending og manuel kamerastyring med prioritet. Ingen JavaScript-fejl.
+
+- [x] Runde 9 (16. okt. 2026): åben adgang fra Vandrehallen til Folketingssalen med grønne sæder, buede egetræsborde, formandsplads, talerstol, gallerier og tre høje vinduer. Statsministeriets indgang i Prins Jørgens Gård med lys stenramme, skilt, nummer 11, åbne fyldningsdøre, lamper, lave trin og en forenklet forhal. Startvalg til begge steder. Referencer og usikkerheder i dev/INTERIOR.md.
+
+Forslag til næste to opgaver, afventer Michel: Højesterets indgang og en samlet kontrol af skiltningen mellem stederne.

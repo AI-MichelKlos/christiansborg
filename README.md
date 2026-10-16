@@ -51,3 +51,6 @@ Vælg Tårnet ved Kongeporten som startsted, og gå ind via handlingsknappen. El
 
 ### Landstingssalen og presseområdet
 Vælg Landstingssalen via Vandrehallen som startsted, eller gå til hallens modsatte ende fra Folketingssalen. Døren står åben, og man kan gå mellem de buede stolerækker, rundt langs væggene og op til talerstolen og de syv frontpladser. Vælg Slotspladsens presseområde for at udforske opstillingen med tv-vogne, kameraer og arbejdslys. Møblering og presseopstilling er tilpasset spillet; referencer og usikkerheder står i `dev/INTERIOR.md`.
+
+### Folketingssalen og Statsministeriets indgang
+Vælg Folketingssalen via Vandrehallen, og gå gennem den åbne dør. Der er fri passage mellem de buede bordrækker og rundt til den lave platform ved talerstolen. Statsministeriets indgang kan vælges som startsted i Prins Jørgens Gård. Gå op over de lave trin og ind gennem de åbne fyldningsdøre til en lille forhal. Gå udenfor fører tilbage til samme indgang. Detaljer og forenklinger er dokumenteret i `dev/INTERIOR.md`.

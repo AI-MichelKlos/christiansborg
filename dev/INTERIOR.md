@@ -245,3 +245,31 @@ Visuelt gennemsete referencer:
 Alle nye genstande og flader er geometri eller proceduretegnede teksturer. Referencefotos er ikke indsat som spilaktiver. Kun fysiske steder er tilføjet i denne runde.
 
 Kontrol: dørpassagen fra Vandrehallen er gået med den almindelige bevægelseskode til den lave platform. Fem sammenhængende ruter kontrollerer midtergang, begge sider af stolerækkerne, platformen og hele vejen tilbage til Folketingets udgang. Faktiske touch-events kontrollerer gang og straks-stop i salen og på Slotspladsen. Fri midterpassage gennem presseområdet og vognkollision er kontrolleret. Skærmbilleder af begge steder i stort format og telefonformat samt presseområdet i aftentilstand er gennemset. Ingen JavaScript-fejl under kontrollerne.
+
+## Runde 9: Folketingssalen og Statsministeriets indgang (16. oktober 2026)
+
+### Folketingssalen
+Døren i Vandrehallens østlige ende står nu åben. Salen ligger i samme sammenhængende interiør som hallen og Landstingssalen. Startvalget "Folketingssalen via Vandrehallen" stiller spilleren foran døren.
+
+Salen har grønt tæppe, grønne polstrede egetræsstole, seks buede rækker af skriveborde med mikrofoner, en afrundet egetræsfront ved formandspladsen, en lavere talerstol, skærme, Dannebrog og tre høje buede vinduer. Trægallerier, balustrader, hvide pilastre, skematiske gipsfigurer, loftsfelter og gyldne pendler antyder det høje rum. To originale, proceduretegnede landskaber ved indgangen angiver de store maleriers placering uden at kopiere Olaf Rudes værker.
+
+De faktiske møbler og kunstværker er langt mere detaljerede. Spillet har færre sæder, bredere gangarealer og et fælles gulvniveau under rækkerne. Frontplatformen er kun ca. 15 cm høj. Gallerierne er synlige, men kan ikke betrædes. Højder, rummets rektangulære afgrænsning og forbindelsen til hallen er anslået. Der er ikke brugt en opmålt plantegning. Det er en genkendelig fortolkning til fri gang på mobil, ikke en pladsplan med alle Folketingets sæder.
+
+Visuelt gennemsete referencer, hentet 16. oktober 2026:
+- [Okholm Lighting: Folketinget, Christiansborg, København](https://www.okholm-lighting.dk/projekter/restaurering/folketinget-christiansborg-koebenhavn), [panoramafoto](https://www.okholm-lighting.dk/app/webroot/_resized/uploads/folketingssalen/skaermbillede-2025-01-21-kl--18-08-57-c8b34c4937d73f1458f2abaecc1c53c4.png). Viser frontens tre vinduer, sidegallerier, træbalustrader, hvide figurer og pendler. En supplerende detalje fra siden viser lampens konstruktion. Filnavnenes datoer er ikke behandlet som verificerede optagedatoer; fotograf ikke verificeret.
+- [Lex: Anny Berntsen](https://lex.dk/Anny_Berntsen), [foto af formandsplads og talerstol](https://media.lex.dk/media/181297/standard_Anny_Berntsen_Folketingets_talerstol.jpg). Bruges til den afrundede egetræsfront, formandsstolen, mikrofoner og den lavere talerstol. Fotograf og optagedato ikke verificeret.
+- [The Danish Club: Kunstomvisning i Folketinget](https://danishclub.dk/en/p/article/kunstomvisning-i-folketinget-og-middag-i-snapstinget), [foto](https://danishclub.dk/images/6676/lg.jpg). Viser buede bordrækker, grønne sæder, egetræspaneler, malerier ved indgangen og gallerier. Fotograf og optagedato ikke verificeret.
+- [Folketinget: Om Folketingssalen](https://www.ft.dk/folketingssalen/om-folketingssalen) er tekstlig reference til egetræsmøbler, kunst, figurer, flag og loger. Folketingets officielle foto set fra de centrale tilhørerpladser blev fundet, men billedfilen gav HTTP 403 ved lokal hentning og er ikke brugt som lokalt gennemset reference.
+
+### Statsministeriets indgang
+Indgangen fra Prins Jørgens Gård har en lys, retvinklet stenramme, skiltet STATSMINISTERIET, nummer 11, to mørke fyldningsdøre, to grønlige væglamper, lave stentrin og håndlister. Dørbladene står åbne i spillet. Gang hen over trinene eller handlingsknappen fører til en lille forhal. Udgangen vender tilbage til samme indgang. Startstedet kan vælges direkte.
+
+Den officielle adresse og gårdens side er verificeret. Placeringen langs spillets forenklede facade er anslået ud fra ministeriets kort, ved den vestlige del af palæfløjen mod Prins Jørgens Gård. Facadevinduer, der ellers ville overlappe dørens stenramme, er fjernet i stueetagen. Trinantal og mål er tilpasset spillet. Forhallen med en bænk er en spiltilpasning uden dokumenteret indretning. Ingen kontorer, sikkerhedsinstallationer eller interne adgangsveje er rekonstrueret.
+
+Visuelt gennemsete referencer:
+- [Statsministeriets engelske hjemmeside](https://english.stm.dk/the-prime-ministers-office/), [officielt foto af indgangen](https://english.stm.dk/media/o2jmlekj/statsministeriet-front.jpg), hentet 16. oktober 2026. Viser stenramme, skilt, nummer 11, lukkede mørke fyldningsdøre, parrede lamper og håndlister. Spillets åbne døre er en tilpasning til udforskning. Fotograf og optagedato ikke verificeret.
+- [Statsministeriet: Kontakt](https://stm.dk/statsministeriet/kontakt/), [kort over indgangen](https://stm.dk/media/tmihwj5r/kontakt-kort1.gif). Bekræfter adressen Prins Jørgens Gård 11 og angiver indgangen med en cirkel. Kortet er skematisk, ikke en opmåling.
+
+Alle nye møbler og flader er geometri eller proceduretegnede teksturer. Referencefotos er ikke indsat som spilaktiver. Der er ingen nye personer, historier, spor eller samtaler.
+
+Kontrol: almindelig gang gennem den nye saldør og videre ad midtergangen; seks sammenhængende ruter langs begge sider, til frontplatformen, til Landstingssalen og tilbage til Folketingets udgang. To ruter i Statsministeriets forhal er kontrolleret. Faktiske touch-events i telefonformat kontrollerer gang og straks-stop i Folketingssalen. Indgang over stentrinene og retur til samme side af Prins Jørgens Gård er kontrolleret med bevægelseskoden. Stort format og telefonformat samt den lille forhal er gennemset på skærmbilleder. Facaden er kontrolleret igen efter fjernelse af overlappende stuevinduer. Ingen JavaScript-fejl under kontrollerne. Modulets syntaks og git diff --check er også kontrolleret.

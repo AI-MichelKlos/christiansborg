@@ -1529,14 +1529,14 @@ function palaceWindowSurround(kind, x, y, z, ry, w, h, mat) {
         box(1.18, 0.5, 0.55, stoneM, x + e.nx * 0.23, 24.75, z + e.nz * 0.23, { ry: e.ry, cast: false });
       }
       if (k === n) continue;
-      const [cx, cz] = at((k + 0.5) / n), gate = GATES.some(([gx, gz]) => Math.hypot(cx - gx, cz - gz) < 4.5), ft = Math.hypot(cx - FT_DOOR[0], cz - FT_DOOR[1]) < 5.5;
-      for (const [y, h, kind] of ROWS) if (!(gate && y < 12) && !(ft && y < 6)) {
+      const [cx, cz] = at((k + 0.5) / n), gate = GATES.some(([gx, gz]) => Math.hypot(cx - gx, cz - gz) < 4.5), ft = Math.hypot(cx - FT_DOOR[0], cz - FT_DOOR[1]) < 5.5, pm = Math.hypot(cx+65.0925,cz+24.1431)<5.5;
+      for (const [y, h, kind] of ROWS) if (!(gate && y < 12) && !((ft||pm) && y < 6)) {
         const o = y < 5.4 ? 0.29 : WOFF, w = kind === 'arch' ? 1.8 : 1.6;
         const wx = cx + e.nx * o, wz = cz + e.nz * o;
         addWin(kind, wx, y, wz, e.ry, w, h, 0.6);
         if (e.len > 18) palaceWindowSurround(kind, wx, y, wz, e.ry, w, h, stoneM);
       }
-      if (!gate && !ft) mesh(head, faceM, cx + e.nx * 0.24, 5.05, cz + e.nz * 0.24, { ry: e.ry, cast: false });   // a famous Dane looks down
+      if (!gate && !ft && !pm) mesh(head, faceM, cx + e.nx * 0.24, 5.05, cz + e.nz * 0.24, { ry: e.ry, cast: false });   // a famous Dane looks down
       if (k % 2 === 0) {   // a dormer in the roof over every other bay
         const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = e.ry; world.add(g);
         box(1.7, 2.6, 2.0, stoneM, 0, 26.3, -1.4, { parent: g, edges: true });
@@ -2479,6 +2479,39 @@ function ministryPortal(key,e,title,t=.5) {
   const plaque=new THREE.Mesh(new THREE.PlaneGeometry(5.6,.75),toon('#ffffff',{map:tex}));plaque.position.set(0,4.45,.6);r.add(plaque);
   return r;
 }
+
+// Statsministeriet: the official map identifies the courtyard wing; the exact
+// position along the simplified OSM facade is estimated. No office plan is inferred.
+const PM_ENTRY=(()=>{
+  const main=PARTS.find(p=>p.h===38.6&&p.ring),target=[-65,-24];
+  const e=edgesOf(main.ring).sort((a,b)=>segDist(...target,...a.a,...a.b)-segDist(...target,...b.a,...b.b))[0];
+  const dx=e.b[0]-e.a[0],dz=e.b[1]-e.a[1],t=Math.max(0,Math.min(1,((target[0]-e.a[0])*dx+(target[1]-e.a[1])*dz)/(e.len*e.len)));
+  const x=e.a[0]+dx*t,z=e.a[1]+dz*t,d={x,z,nx:e.nx,nz:e.nz,ry:e.ry,title:'Statsministeriet'};MINISTRY_DOORS.pmEntry=d;
+  const at=(a,b)=>[x+Math.cos(e.ry)*a+e.nx*b,z-Math.sin(e.ry)*a+e.nz*b];
+  const r=new THREE.Group();r.position.set(x,0,z);r.rotation.y=e.ry;world.add(r);
+  const pale=tm('#d3c9b3'),dark=tm('#31312a'),trim=tm('#232822'),gold=tm('#b7a16a'),green=tm('#52635d'),glow=new THREE.MeshBasicMaterial({color:'#ffe9b3'});
+  const add=(w,h,d,m,a,y,b,parent=r)=>box(w,h,d,m,a,y,b,{parent,cast:false});
+  // The pale rectangular surround and paired wall lamps follow the official photo.
+  add(5.4,5.5,.22,pale,0,0,.35);add(2.9,3.8,.035,tm('#151917'),0,.48,.5);
+  for(const side of [-1,1]){
+    add(.42,4.25,.5,pale,side*1.72,.32,.55);
+    const leaf=new THREE.Group();leaf.position.set(side*1.35,.48,.62);leaf.rotation.y=side*1.48;r.add(leaf);
+    add(1.33,3.7,.14,dark,-side*.665,0,0,leaf);
+    for(const y of [.25,1.4,2.55]){add(1.05,.92,.06,trim,-side*.665,y,.1,leaf);add(.87,.73,.08,dark,-side*.665,y+.09,.13,leaf);}
+    add(.065,.22,.12,gold,-side*1.14,1.45,.22,leaf);
+    add(.1,.4,.18,green,side*2.08,3.32,.7);mesh(new THREE.ConeGeometry(.29,.22,12),green,side*2.08,3.4,.85,{parent:r,cast:false});
+    mesh(new THREE.SphereGeometry(.11,10,8),glow,side*2.08,3.25,.85,{parent:r,cast:false});
+    // Handrails flank the shallow stone steps.
+    for(const b of [1,2.7])add(.045,1.05,.045,trim,side*1.8,.15,b);
+    const rod=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.8,8),trim);rod.position.set(side*1.8,1.15,1.85);rod.rotation.x=Math.PI/2+.2;r.add(rod);
+  }
+  add(4,.22,.65,pale,0,4.5,.5);add(4.4,.2,.8,pale,0,4.75,.5);
+  function text(txt,w,h,a,y,b){const tex=ctex(txt==='11'?128:1024,160,(c,W,H)=>{c.fillStyle='#cfc4ab';c.fillRect(0,0,W,H);c.fillStyle='#4d4637';c.font=txt==='11'?'bold 100px Georgia':'bold 64px Georgia';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,W/2,H/2,W-25);},{wrap:false});const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),toon('#fff',{map:tex}));p.position.set(a,y,b);r.add(p);}
+  text('STATSMINISTERIET',3.8,.58,0,4.2,.8);text('11',.32,.4,-2.08,2.65,.81);
+  for(let k=1;k<=4;k++){const zz=3.35-k*.55;add(3.55,k*.12,.62,tm('#a7a69c'),0,0,zz);for(let a=-1.5;a<=1.51;a+=.45){const p=at(a,zz);colCirc(...p,.28,k*.12);}}
+  bakeGroup(r);return {...d,at};
+})();
+
 // Den Røde Bygning: red brick, pale window frames, slate roof and a rounded
 // frontispiece. Sculpture details are deliberately schematic.
 {
@@ -3491,7 +3524,7 @@ $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear(); resetTouch();
-  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. I den modsatte ende står døren til Landstingssalen åben. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; $('taskBox').hidden = true; }
+  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; $('taskBox').hidden = true; }
   else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';$('taskBox').hidden=true;}
   else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
   intro.hidden = false; goBtn.focus();
@@ -4820,6 +4853,7 @@ const PRESS=(()=>{
   for(const a of [-4,2.5,5]){const pts=[new THREE.Vector3(a,.035,.8),new THREE.Vector3(a,.035,3),new THREE.Vector3(a+1,.035,4.8)];r.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:'#353c36'})));}
   for(const a of [-9,9]){rod([a,0,-4.5],[a,1.6,-4.5],.045,steel);label('PRESSE',1.6,.45,a,1.65,-4.5,Math.PI);const p=at(a,-4.5);colCirc(p[0],p[1],.2,1.9);}
   bakeGroup(r);
+  POIS.push({n:'Statsministeriets indgang',quiet:true,t:'Indgangen fra Prins Jørgens Gård har mørke fyldningsdøre, en lys stenramme og nummer 11. I spillet fører døren til en lille, forenklet forhal.',x:PM_ENTRY.x+PM_ENTRY.nx*3,z:PM_ENTRY.z+PM_ENTRY.nz*3,r:6});
   POIS.push({n:'Slotspladsens presseområde',quiet:true,t:'En midlertidig opstilling med tv-vogne, kameraer, arbejdsbord og lys. Der er fri passage mellem udstyret og rundt om vognene.',x,z,r:13});
   return {at,loc:(px,pz)=>[c*(px-x)-sn*(pz-z),sn*(px-x)+c*(pz-z)],ry,x,z};
 })();
@@ -5184,6 +5218,85 @@ const INTERIOR = (() => {
   function towerFits(x,z){return x>392.35&&x<407.65&&z> -9.65&&z<9.65||x>430.35&&x<449.65&&z> -13.65&&z<13.65;}
   function towerHeight(x,z){if(x>447.3&&x<449.35&&z<7&&z> -8)return Math.min(30,Math.ceil((7-z)/.45-1e-7))*.17;return 0;}
 
+
+  function folkSalFits(x,z){return (x>40.4&&x<77.6&&Math.abs(z)<17.6)||(x>38.6&&x<40.8&&Math.abs(z)<1.12);}
+  function buildFolkSal(woodFloor){
+    const y=I.floor,ivory=material('#ece9dc'),light=material('#b28b56'),wood=material('#936738'),edge=material('#6f4d2d'),fabric=material('#3b5d4a'),white=material('#f1eee3'),glow=new THREE.MeshBasicMaterial({color:'#fff2ca'});
+    const carpetTex=ctex(128,128,(c,W,H)=>{c.fillStyle='#556653';c.fillRect(0,0,W,H);speckle(c,W,H,1400,.05,1);},{rep:.7});
+    b(38,.2,36,material('#fff',{map:carpetTex}),59,y-.2,0);b(38,.2,36,ivory,59,y+12,0);
+    for(const z of [-18,18]){b(38,12,.3,ivory,59,y,z);b(38,4.4,.16,wood,59,y,z-Math.sign(z)*.2);}
+    b(.3,12,36,ivory,78,y,0);b(.15,4.4,36,wood,77.78,y,0);
+    for(const [a,c]of[[-18,-1.5],[1.5,18]]){b(.3,12,c-a,ivory,40,y,(a+c)/2);b(.15,4.4,c-a,wood,40.22,y,(a+c)/2);}
+    b(.3,8.75,3,ivory,40,y+3.25,0);
+    for(const z of [-17.7,17.7])for(let x=41;x<78;x+=2.2){b(.09,4,.07,edge,x,y+.2,z);for(const h of [.3,2.05,4])b(1.85,.07,.08,edge,x+.92,y+h,z);}
+    for(const x of [40.3,77.7])for(let z=-16.5;z<17;z+=2.2){b(.07,4,.09,edge,x,y+.2,z);for(const h of [.3,2.05,4])b(.08,.07,1.85,edge,x,y+h,z+.92);}
+    // Three high windows behind the chair, with white plaster surrounds.
+    const winM=material('#d6e6e0',{emissive:'#d5e6df',emissiveIntensity:.45});
+    for(const z of [-10,0,10]){
+      const r=new THREE.Group();r.position.set(77.62,y+2,z);r.rotation.y=-Math.PI/2;g.add(r);
+      const sh=new THREE.Shape();sh.moveTo(-1.45,0);sh.lineTo(1.45,0);sh.lineTo(1.45,6.1);sh.absarc(0,6.1,1.45,0,Math.PI,false);sh.lineTo(-1.45,0);r.add(new THREE.Mesh(new THREE.ShapeGeometry(sh),winM));
+      for(const dx of [-1.45,0,1.45])box(.07,6.1,.1,white,dx,0,.07,{parent:r,cast:false});
+      for(let j=0;j<8;j++)box(2.9,.06,.1,white,0,j*.78,.07,{parent:r,cast:false});
+      archFrame(77.45,z,-Math.PI/2,y+2,2.95,6.1,.2);
+    }
+    // Side and rear galleries are visible above the room, with simplified seats.
+    for(const z of [-16.9,16.9]){
+      b(36,.23,2,light,59,y+4.4,z);b(36,.2,.26,edge,59,y+5.35,z-Math.sign(z)*.85);
+      for(let x=41;x<78;x+=.55){b(.09,.75,.09,light,x,y+4.6,z-Math.sign(z)*.85);mesh(new THREE.SphereGeometry(.12,6,4),light,x,y+4.95,z-Math.sign(z)*.85,{parent:g});}
+      for(let x=42;x<77;x+=1.4){b(.65,.13,.6,fabric,x,y+4.85,z);b(.65,.6,.1,light,x,y+5,z+Math.sign(z)*.3);}
+    }
+    b(2,.23,32,light,41.1,y+4.4,0);b(.23,.85,32,light,42,y+4.63,0);
+    for(const z of [-17.6,17.6])for(const x of [43,49,55,61,67,73,77]){
+      b(.65,7.3,.5,white,x,y+4.5,z);b(1,.25,.7,ivory,x,y+10.7,z);
+      b(.45,.22,.4,ivory,x,y+6.4,z-Math.sign(z)*.32);
+    }
+    // Original landscape silhouettes indicate the two large paintings by the entry.
+    for(const z of [-9.5,9.5]){
+      const tex=ctex(512,384,(c,W,H)=>{c.fillStyle='#b4c3bf';c.fillRect(0,0,W,H);c.fillStyle='#77916c';c.fillRect(0,H*.6,W,H*.4);c.strokeStyle='#5a5b4b';c.lineWidth=18;c.beginPath();c.moveTo(240,H);c.lineTo(225,125);c.lineTo(160,50);c.moveTo(225,140);c.lineTo(335,68);c.moveTo(226,185);c.lineTo(104,147);c.stroke();c.lineWidth=5;for(let j=0;j<9;j++){c.beginPath();c.moveTo(115+j*35,90+(j%3)*30);c.lineTo(88+j*38,20);c.stroke();}},{wrap:false});
+      b(.12,4.25,6.1,light,40.4,y+.6,z);const q=new THREE.Mesh(new THREE.PlaneGeometry(5.8,4),new THREE.MeshBasicMaterial({map:tex}));q.position.set(40.5,y+2.75,z);q.rotation.y=Math.PI/2;g.add(q);
+    }
+    function chair(x,z,ry,fy=y,large=false){
+      const r=new THREE.Group();r.position.set(x,fy,z);r.rotation.y=ry;g.add(r);const add=(w,h,d,m,a,b,c)=>box(w,h,d,m,a,b,c,{parent:r,cast:false});
+      const w=large?.85:.62;
+      for(const a of [-1,1])for(const c of [-1,1])add(.055,.47,.055,wood,a*(w/2-.05),0,c*.25);
+      add(w,.13,.62,fabric,0,.43,0);add(w,.6,.11,light,0,.55,.28);add(w-.1,.5,.13,fabric,0,.59,.27);
+      for(const a of [-1,1]){add(.065,.3,.55,light,a*w/2,.55,0);add(.055,.75,.06,light,a*w/2,.5,.3);}
+      add(w+.12,.07,.15,light,0,1.18,.29);obstacle(x,z,w+.18,.83);
+    }
+    // Reduced seat count and gaps between desk segments keep every aisle usable.
+    for(const radius of [9,12,15,18,21,24])for(let deg=-40;deg<=40;deg+=10){
+      if(deg===0)continue;const a=deg*Math.PI/180,x=72-radius*Math.cos(a),z=radius*Math.sin(a),ry=a-Math.PI/2;
+      chair(x,z,ry);const tx=x+Math.cos(a)*.9,tz=z-Math.sin(a)*.9;
+      b(.62,.78,1.05,wood,tx,y,tz).rotation.y=a;b(.72,.1,1.14,light,tx,y+.78,tz).rotation.y=a;
+      const w=Math.abs(Math.cos(a))*.72+Math.abs(Math.sin(a))*1.14,d=Math.abs(Math.sin(a))*.72+Math.abs(Math.cos(a))*1.14;obstacle(tx,tz,w,d);
+      b(.025,.22,.025,dark,tx-.12,y+.9,tz); // desk microphone
+    }
+    // Rounded oak rostrum, chair and lower lectern, interpreted from the close photo.
+    b(5.6,.15,12,woodFloor,75.2,y,0);b(2.8,1.2,7.2,wood,74.7,y+.15,0);b(3,.13,7.45,light,74.65,y+1.35,0);
+    for(const z of [-3.4,0,3.4]){mesh(new THREE.CylinderGeometry(.55,.55,1.25,24),wood,73.25,y+.78,z,{parent:g});mesh(new THREE.CylinderGeometry(.58,.58,.12,24),light,73.25,y+1.44,z,{parent:g});}
+    obstacle(74.2,0,4,8);chair(75.3,0,-Math.PI/2,y+.7,true);
+    b(1.2,.9,1.8,wood,72.1,y+.15,-2.9);b(1.4,.1,2,light,72.1,y+1.05,-2.9);obstacle(72.1,-2.9,1.5,2.1);
+    for(const z of [-2,0,2]){b(.035,.65,.035,dark,73.6,y+1.48,z);b(.08,.08,.15,dark,73.6,y+2.1,z);b(.08,.35,.55,dark,74,y+1.5,z);}
+    mesh(new THREE.CylinderGeometry(.12,.18,.13,14),dark,73.65,y+1.56,.7,{parent:g}); // small bell
+    // Neutral screens and a Danish flag beside the front wall.
+    for(const z of [-5,5]){b(.12,1.8,3.2,dark,77.45,y+4,z);b(.13,1.55,2.95,material('#304a64'),77.36,y+4.12,z);}
+    b(.045,4.7,.045,brass,76,y+.15,7);b(.035,1.5,2,material('#a92d35'),76,y+2.9,8);b(.05,.16,2,white,75.97,y+3.52,8);b(.05,1.5,.16,white,75.97,y+2.9,7.65);
+    // Four schematic white statues in the upper bays.
+    for(const z of [-17.35,17.35])for(const x of [49,69]){b(.7,.25,.6,ivory,x,y+6.5,z);mesh(new THREE.CapsuleGeometry(.24,.85,4,8),white,x,y+7.4,z,{parent:g});mesh(new THREE.SphereGeometry(.2,10,8),white,x,y+8.14,z,{parent:g});}
+    for(const x of [45,55,65,75])for(const z of [-9,9]){b(.035,2,.035,brass,x,y+9.6,z);mesh(new THREE.SphereGeometry(.5,16,10),glow,x,y+9.45,z,{parent:g});mesh(new THREE.TorusGeometry(.5,.06,6,24),brass,x,y+9.65,z,{parent:g,rx:Math.PI/2});}
+    for(const x of [41,53,65,77])b(.22,.22,35,ivory,x,y+11.6,0);
+    for(const z of [-17,-6,6,17])b(37,.22,.22,ivory,59,y+11.6,z);
+  }
+  function buildPMEntry(){
+    const pale=material('#e4e0d3'),tile=material('#a6a69b');
+    b(8,.2,8,tile,500,-.2,0);b(8,.2,8,pale,500,4.4,0);b(8,4.4,.3,pale,500,0,-4);
+    for(const x of [496,504])b(.3,4.4,8,pale,x,0,0);
+    for(const [a,c]of[[496,498.5],[501.5,504]])b(c-a,4.4,.3,pale,(a+c)/2,0,4);
+    b(3,1.15,.3,pale,500,3.25,4);openDoor(500,4,0,0,'Ud til Prins Jørgens Gård','Statsministeriet');
+    sign('Statsministeriet · forhal',4.8,.65,500,2.8,-3.8);b(3.2,.55,.65,oak,500,0,-3.25);obstacle(500,-3.25,3.4,.8);
+    b(2,.05,.6,new THREE.MeshBasicMaterial({color:'#fff1cb'}),500,4.1,0);
+  }
+
   function landstingFits(x,z){
     return (x> -65.6&&x< -40.4&&Math.abs(z)<11.6)||(x> -40.8&&x< -38.6&&Math.abs(z)<1.12);
   }
@@ -5524,10 +5637,11 @@ const INTERIOR = (() => {
         if(!(side===-1&&Math.abs(x+2.6)<4.8))b(.3,4.2,.3,plaster,x+2.6,I.floor+2.1,side*4.5);
       }
     }
-    b(.4,6.85,9.6,plaster,40,I.floor,0);
+    for(const z of [-3.15,3.15])b(.4,6.85,3.3,plaster,40,I.floor,z);
+    b(.4,3.6,3,plaster,40,I.floor+3.25,0);
     for(const z of [-3.15,3.15])b(.4,6.85,3.3,plaster,-40,I.floor,z);
     b(.4,3.6,3,plaster,-40,I.floor+3.25,0);
-    openDoor(-40,0,-Math.PI/2,I.floor,'Landstingssalen');door(39.7,0,-Math.PI/2,'Folketingssalen');
+    openDoor(-40,0,-Math.PI/2,I.floor,'Landstingssalen');openDoor(40,0,Math.PI/2,I.floor,'Folketingssalen');
     // Rigets midte: six Norwegian marble columns, fireplace and seating.
     const marbleTex=ctex(128,256,(c,W,H)=>{c.fillStyle='#a3a497';c.fillRect(0,0,W,H);for(let k=0;k<20;k++){c.strokeStyle=k%2?'#c1c0b0':'#7d877e';c.lineWidth=.7+(k%3)*.4;c.beginPath();for(let y=0;y<H;y+=8){let x=k*11-45+Math.sin(y/70+k)*6+y*.12;y?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}},{rep:1});
     const marble=material('#ffffff',{map:marbleTex});
@@ -5569,6 +5683,8 @@ const INTERIOR = (() => {
     buildStables();
     buildTowerRooms();
     buildLandsting(woodFloor);
+    buildFolkSal(woodFloor);
+    buildPMEntry();
     b(3,3.25,.35,plaster,24,I.floor+3.25,4.8);openDoor(24,4.8,0,I.floor,'Kompaspartiet');
     buildHallVaults();
     // Two aligned flights and a broad intermediate landing, based on the stair photograph.
@@ -5603,6 +5719,8 @@ const INTERIOR = (() => {
     bakeGroup(g);
   }
   function roomAt(x,z) {
+    if(x>40.4&&x<78&&Math.abs(z)<18)return 'folkesal';
+    if(x>495&&x<505)return 'pmEntry';
     if(x< -40.4&&Math.abs(z)<12)return 'landsting';
     if(x>390&&x<410)return 'towerLobby';if(x>429&&x<451)return 'towerRestaurant';
     if(x>290&&x<310)return 'stables';
@@ -5613,6 +5731,7 @@ const INTERIOR = (() => {
     return 'hall';
   }
   function height(x,z) {
+    if(x>72.4&&x<78&&Math.abs(z)<6)return I.floor+.15;
     if(x< -59.7&&Math.abs(z)<7)return I.floor+.18;
     if(x>429&&x<451)return towerHeight(x,z);
     if(x>80)return 0;
@@ -5634,14 +5753,14 @@ const INTERIOR = (() => {
     const samtaleDoor=(Math.abs(x-3)<1.15||Math.abs(x+3)<1.15)&&z< -3.8&&z> -5.5;
     const betjent=x>4.75&&x<12.05&&z>19.05&&z<25.15;
     const betjentDoor=x>3.5&&x<5.1&&Math.abs(z-20.4)<1.15;
-    return (landstingFits(x,z)||towerFits(x,z)||stableFits(x,z)||ministryFits(x,z)||hall||entry||lower||stairs||gallery||samtale||samtaleDoor||betjent||betjentDoor||roundThreeFits(x,z))&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
+    return (folkSalFits(x,z)||(x>496.35&&x<503.65&&z> -3.65&&z<3.65)||landstingFits(x,z)||towerFits(x,z)||stableFits(x,z)||ministryFits(x,z)||hall||entry||lower||stairs||gallery||samtale||samtaleDoor||betjent||betjentDoor||roundThreeFits(x,z))&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
   }
   function enter(place='folketing',side=false) {
     if(I.on||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;
     build(); I.place=place; I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
     I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
-    P.pos.set(I.x+(place==='towerLobby'?400:place==='towerRestaurant'?440:place==='finance'?100:place==='stables'?300:place==='reform'?(side?212:200):0),0,place==='towerLobby'?7:place==='towerRestaurant'?11:place==='folketing'?21:place==='stables'?18:side?-16:8);P.face=side?-Math.PI/2:Math.PI;cam.yaw=P.face+Math.PI;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
-    document.body.classList.add('inFolketing');document.body.classList.toggle('inTowerRooms',place.startsWith('tower'));$('indoorExit').textContent=place==='towerRestaurant'?'Til elevatorhallen':place==='folketing'?'Ud i gården':'Gå udenfor';showPoi(null);toast(place==='towerLobby'?'Gå hen til elevatoren eller vælg en etage.':place==='towerRestaurant'?'Udforsk restauranten. Trappen og etagevalget fører til Udsigten.':place==='stables'?'Følg den brede staldgang mellem marmorsøjlerne.':place==='finance'?'Garderoben er til venstre. Forhandlingsrummet ligger lige fremme.':place==='reform'?'Udforsk kontoret, printerområdet og gangen til sidedøren.':'Snapstinget er til venstre og betjentstuen til højre. Kompaspartiet ligger ved Vandrehallen.');
+    P.pos.set(I.x+(place==='towerLobby'?400:place==='towerRestaurant'?440:place==='pmEntry'?500:place==='finance'?100:place==='stables'?300:place==='reform'?(side?212:200):0),0,place==='towerLobby'?7:place==='towerRestaurant'?11:place==='folketing'?21:place==='pmEntry'?2:place==='stables'?18:side?-16:8);P.face=side?-Math.PI/2:Math.PI;cam.yaw=P.face+Math.PI;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
+    document.body.classList.add('inFolketing');document.body.classList.toggle('inTowerRooms',place.startsWith('tower'));$('indoorExit').textContent=place==='towerRestaurant'?'Til elevatorhallen':place==='folketing'?'Ud i gården':'Gå udenfor';showPoi(null);toast(place==='towerLobby'?'Gå hen til elevatoren eller vælg en etage.':place==='towerRestaurant'?'Udforsk restauranten. Trappen og etagevalget fører til Udsigten.':place==='stables'?'Følg den brede staldgang mellem marmorsøjlerne.':place==='pmEntry'?'Du er i spillets forenklede forhal. Udgangen fører til Prins Jørgens Gård.':place==='finance'?'Garderoben er til venstre. Forhandlingsrummet ligger lige fremme.':place==='reform'?'Udforsk kontoret, printerområdet og gangen til sidedøren.':'Snapstinget er til venstre og betjentstuen til højre. Kompaspartiet ligger ved Vandrehallen.');
   }
   function leave(side=false,transfer=false) {
     if(!I.on)return;
@@ -5649,7 +5768,7 @@ const INTERIOR = (() => {
     I.on=false;g.visible=false;world.visible=true;dyn.visible=true;scene.fog=I.fog;scene.background=I.bg;evApplied=-1;applyEvening();
     const d=I.place.startsWith('tower')?{x:TOWER.door[0],z:TOWER.door[1],nx:TOWER.OUT[0],nz:TOWER.OUT[1],ry:Math.atan2(...TOWER.OUT)}:I.place==='folketing'?null:MINISTRY_DOORS[I.place==='reform'&&side?'reformSide':I.place];
     const p=d?[d.x+d.nx*3,d.z+d.nz*3]:FT.at(0,2.5);P.pos.set(p[0],d?0:1.2,p[1]);P.face=d?d.ry:Math.atan2(FT.n[0],FT.n[1]);P.vel.set(0,0,0);cam.yaw=P.face+Math.PI;camInit=false;kid.root.position.copy(P.pos);
-    document.body.classList.remove('inFolketing','inTowerRooms');keys.clear();if(!transfer)toast(I.place.startsWith('tower')?'Du er tilbage ved Kongeporten.':I.place==='folketing'?'Du er tilbage i Rigsdagsgården.':I.place==='finance'?'Du er tilbage på Slotspladsen.':I.place==='stables'?'Du er tilbage ved Ridebanen.':'Du er tilbage ved Reformministeriet.');
+    document.body.classList.remove('inFolketing','inTowerRooms');keys.clear();if(!transfer)toast(I.place.startsWith('tower')?'Du er tilbage ved Kongeporten.':I.place==='folketing'?'Du er tilbage i Rigsdagsgården.':I.place==='pmEntry'?'Du er tilbage i Prins Jørgens Gård.':I.place==='finance'?'Du er tilbage på Slotspladsen.':I.place==='stables'?'Du er tilbage ved Ridebanen.':'Du er tilbage ved Reformministeriet.');
   }
   // Separate indoor navigation avoids outdoor building, water and bounds collisions.
   HOOKS.ride.unshift(dt=>{
@@ -5674,9 +5793,9 @@ const INTERIOR = (() => {
       const canEnter=!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy&&!FX.scooter?.active;
       if(canEnter&&P.onGround&&P.pos.y<.8)for(const [key,d] of Object.entries(MINISTRY_DOORS)){
         const dx=P.pos.x-d.x,dz=P.pos.z-d.z,depth=dx*d.nx+dz*d.nz,across=dx*d.nz-dz*d.nx;
-        const go=()=>enter(key==='finance'?'finance':key==='stables'?'stables':'reform',key==='reformSide');
+        const go=()=>enter(key==='pmEntry'?'pmEntry':key==='finance'?'finance':key==='stables'?'stables':'reform',key==='reformSide');
         if(Math.abs(across)<1.05&&depth>.65&&depth<1.65){go();return;}
-        if(Math.abs(across)<4&&depth>.5&&depth<7&&Math.cos(P.face-d.ry)<-.25)offerAction({id:'ministry-'+key,label:'Gå ind i '+(key==='finance'?'Finansministeriet':key==='stables'?'De Kongelige Stalde':'Reformministeriet'),prio:9,run:go});
+        if(Math.abs(across)<4&&depth>.5&&depth<7&&Math.cos(P.face-d.ry)<-.25)offerAction({id:'ministry-'+key,label:'Gå ind i '+(key==='pmEntry'?'Statsministeriet':key==='finance'?'Finansministeriet':key==='stables'?'De Kongelige Stalde':'Reformministeriet'),prio:9,run:go});
       }
       if(canEnter && Math.abs(p[0])<1 && p[1]>.15 && p[1]<1.4 && P.onGround && P.pos.y>.8) { enter(); return; }
       if(canEnter&&Math.abs(p[0])<4&&p[1]>.3&&p[1]<7)offerAction({id:'folketing-enter',label:'Gå ind i Folketinget',prio:8,run:()=>enter()});
@@ -5688,25 +5807,25 @@ const INTERIOR = (() => {
     kid.root.visible=false;
     const room=roomAt(x,z);
     const annexNames={kompas:'Kompaspartiet · gangen',office1:'Kompaspartiet · kontor 1',office2:'Kompaspartiet · kontor 2',secretariat:'Kompaspartiet · sekretariatet',meeting:'Kompaspartiet · mødelokalet',snap:'Snapstinget',snapgang:'Gangen til Snapstinget'};
-    const name=room==='landsting'?'Landstingssalen':room==='towerLobby'?'Tårnet · elevatorhallen':room==='towerRestaurant'?'Restauranten i Tårnet · 34 m':room==='stables'?'De Kongelige Stalde':ministryRooms.find(r=>r.id===room)?.name||annexNames[room]|| (room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>7.5?(Math.abs(x)>3.2?'Vandrehallen · trappegalleriet':'Trappen til Vandrehallen'):Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen');
+    const name=room==='folkesal'?'Folketingssalen':room==='pmEntry'?'Statsministeriet · forhal':room==='landsting'?'Landstingssalen':room==='towerLobby'?'Tårnet · elevatorhallen':room==='towerRestaurant'?'Restauranten i Tårnet · 34 m':room==='stables'?'De Kongelige Stalde':ministryRooms.find(r=>r.id===room)?.name||annexNames[room]|| (room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>7.5?(Math.abs(x)>3.2?'Vandrehallen · trappegalleriet':'Trappen til Vandrehallen'):Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen');
     $('indoorName').textContent=name;
     if(I.place==='towerLobby'&&z< -4)offerAction({id:'tower-restaurant',label:'Kør til restauranten',prio:12,run:()=>liftTo('towerRestaurant')});
     if(I.place==='towerRestaurant'&&x>447.3&&z< -6.4&&P.pos.y>4.9)offerAction({id:'tower-view',label:'Fortsæt til Udsigten',prio:12,run:()=>liftTo('view')});
     if(I.place!=='folketing'&&!I.place.startsWith('tower')){
       const side=I.place==='reform'&&x>211&&z< -14;
-      if((I.place==='stables'?z>17:(z>7&&x<(I.place==='finance'?102:202)))||side)offerAction({id:'ministry-exit',label:side?'Gå ud gennem sidedøren':'Gå udenfor',prio:10,run:()=>leave(side)});
+      if((I.place==='pmEntry'?z>2.5:I.place==='stables'?z>17:(z>7&&x<(I.place==='finance'?102:202)))||side)offerAction({id:'ministry-exit',label:side?'Gå ud gennem sidedøren':'Gå udenfor',prio:10,run:()=>leave(side)});
     }
     if(room==='hall'&&z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
     if(room==='hall'&&z<5&&x<-18&&x>-30)offerAction({id:'grundlov-info',label:'Se grundlovene',prio:5,run:()=>toast('I Vandrehallen er kopier af grundlovene fra 1849, 1866, 1915 og 1953 udstillet.')});
     if(room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
-    if(room==='hall'&&x>36)offerAction({id:'sal-lukket',label:'Folketingssalen',prio:5,run:()=>toast('Salen åbnes i et senere trin.')});
+
   });
   const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);if(isTouch)badge.querySelector('span').textContent='Kameraet følger · slip for at stoppe';
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',()=>I.place==='towerRestaurant'?liftTo('towerLobby'):leave());hud.appendChild(exit);
   const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);
   shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
-  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Vælg et startsted');destinations.innerHTML='<option value="">Vælg et startsted…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option><option value="quay-reform">Kajen ved Reformministeriet</option><option value="quay-slots">Kajen ved Slotspladsen</option><option value="garden">Bibliotekshaven</option><option value="stables">De Kongelige Stalde</option><option value="tower">Tårnet ved Kongeporten</option><option value="landsting">Landstingssalen via Vandrehallen</option><option value="press">Slotspladsens presseområde</option>';shortcut.after(destinations);
-  destinations.addEventListener('change',()=>{const key=destinations.value;destinations.value='';if(!key||!window.__gameReady||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();if(I.on)leave();if(key==='landsting'){enter();P.pos.set(I.x-36,I.floor,0);P.face=-Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Landstingssalen.');return;}if(key==='press'){const p=PRESS.at(0,-8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=PRESS.ry;cam.yaw=P.face+Math.PI;cam.pitch=.3;camInit=false;startBlend=1;toast('Gå rundt mellem kameraerne og tv-vognene på Slotspladsen.');return;}if(key==='tower'){P.pos.set(TOWER.door[0]+TOWER.OUT[0]*3,0,TOWER.door[1]+TOWER.OUT[1]*3);P.vel.set(0,0,0);P.face=Math.atan2(-TOWER.OUT[0],-TOWER.OUT[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Vælg Gå ind i tårnet ved Kongeporten.');return;}if(key==='garden'){const p=GARDEN.at(0,-35);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=.582;cam.yaw=P.face+Math.PI;cam.pitch=.35;camInit=false;startBlend=1;toast('Følg grusstierne til bassinet og Kierkegaard-statuen.');return;}if(key.startsWith('quay-')){const q=QUAYS.find(q=>q.id===key.slice(5)),p=q.at(0,6.3);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.onGround=true;P.face=Math.atan2(-q.nx,-q.nz);cam.yaw=P.face+Math.PI;cam.pitch=.4;camInit=false;startBlend=1;toast('Gå ned ad trappen til kajens afsats.');return;}const d=MINISTRY_DOORS[key];P.pos.set(d.x+d.nx*5,0,d.z+d.nz*5);P.face=d.ry+Math.PI;cam.yaw=d.ry;camInit=false;startBlend=1;toast('Gå hen til den åbne dør i '+d.title+'.');});
+  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Vælg et startsted');destinations.innerHTML='<option value="">Vælg et startsted…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option><option value="quay-reform">Kajen ved Reformministeriet</option><option value="quay-slots">Kajen ved Slotspladsen</option><option value="garden">Bibliotekshaven</option><option value="stables">De Kongelige Stalde</option><option value="tower">Tårnet ved Kongeporten</option><option value="pmEntry">Statsministeriets indgang</option><option value="folkesal">Folketingssalen via Vandrehallen</option><option value="landsting">Landstingssalen via Vandrehallen</option><option value="press">Slotspladsens presseområde</option>';shortcut.after(destinations);
+  destinations.addEventListener('change',()=>{const key=destinations.value;destinations.value='';if(!key||!window.__gameReady||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();if(I.on)leave();if(key==='folkesal'){enter();P.pos.set(I.x+36,I.floor,0);P.face=Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Folketingssalen.');return;}if(key==='landsting'){enter();P.pos.set(I.x-36,I.floor,0);P.face=-Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Landstingssalen.');return;}if(key==='press'){const p=PRESS.at(0,-8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=PRESS.ry;cam.yaw=P.face+Math.PI;cam.pitch=.3;camInit=false;startBlend=1;toast('Gå rundt mellem kameraerne og tv-vognene på Slotspladsen.');return;}if(key==='tower'){P.pos.set(TOWER.door[0]+TOWER.OUT[0]*3,0,TOWER.door[1]+TOWER.OUT[1]*3);P.vel.set(0,0,0);P.face=Math.atan2(-TOWER.OUT[0],-TOWER.OUT[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Vælg Gå ind i tårnet ved Kongeporten.');return;}if(key==='garden'){const p=GARDEN.at(0,-35);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=.582;cam.yaw=P.face+Math.PI;cam.pitch=.35;camInit=false;startBlend=1;toast('Følg grusstierne til bassinet og Kierkegaard-statuen.');return;}if(key.startsWith('quay-')){const q=QUAYS.find(q=>q.id===key.slice(5)),p=q.at(0,6.3);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.onGround=true;P.face=Math.atan2(-q.nx,-q.nz);cam.yaw=P.face+Math.PI;cam.pitch=.4;camInit=false;startBlend=1;toast('Gå ned ad trappen til kajens afsats.');return;}const d=MINISTRY_DOORS[key];P.pos.set(d.x+d.nx*5,0,d.z+d.nz*5);P.face=d.ry+Math.PI;cam.yaw=d.ry;camInit=false;startBlend=1;toast('Gå hen til den åbne dør i '+d.title+'.');});
   function liftTo(place){
     if(TOWER.busy||!I.on||!I.place.startsWith('tower')||I.place===place)return;
     const from=I.place==='towerRestaurant'?34+P.pos.y:0;
@@ -5738,7 +5857,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
