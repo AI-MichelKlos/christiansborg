@@ -13,7 +13,7 @@ På startskærmen kan du vælge "Start ved Folketingets indgang". Gå op ad trap
 ## Styring
 - Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe. Træk med musen for at kigge. N skifter mellem dag og aften, M viser eller skjuler kortet.
 - Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap.
-- Tårnet: gå hen til Kongeporten, og tryk på E for at køre op. Deroppe drejer pilene eller tommelen dig rundt, og mellemrum eller knappen Kikkert zoomer ind.
+- Tårnet: gå hen til Kongeporten, og vælg Gå ind i tårnet. Vælg derefter etage til restauranten eller Udsigten. Deroppe drejer pilene eller tommelen dig rundt, og mellemrum eller knappen Kikkert zoomer ind.
 
 ## Om spillet
 - Én fil (`index.html`) med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
@@ -45,3 +45,6 @@ Under "Vælg et startsted…" kan du starte ved kajen på Ved Stranden foran Ref
 
 ### Bibliotekshaven og staldene
 Vælg Bibliotekshaven på startskærmen for at gå ad grusstierne mellem blomsterbede til bassinet og den siddende Kierkegaard-statue. Man kan gå hele vejen rundt om statuen. De Kongelige Stalde kan også vælges som startsted: gå gennem den åbne port fra Ridebanen og udforsk den brede gang mellem marmorsøjler og spiltove med hvide heste. Gå tilbage til porten eller vælg Gå udenfor for at vende tilbage til Ridebanen. Referencer og de anslåede mål står i `dev/INTERIOR.md`.
+
+### Tårnet indvendig og Udsigten
+Vælg Tårnet ved Kongeporten som startsted, og gå ind via handlingsknappen. Elevatorhallen, restauranten ved 34 m og Udsigten ved 44 m er forbundet gennem Vælg etage. I restauranten kan du gå mellem bordene og op ad sidetrappen, hvor du kan fortsætte til Udsigten. Her drejer du blikket og bruger Kikkert. Etagevalget fører tilbage til restauranten eller elevatorhallen, og fra hallen kan du gå ud til Kongeporten. Rummenes indretning bygger på billedreferencer; mål og forbindelser er tilpasset spillet.

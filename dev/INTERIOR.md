@@ -190,3 +190,31 @@ Interiørets længde, antal spiltove, placeringen af hestene og forbindelsen fra
 Alle nye overflader, figurer og møbler er lavet med geometri og proceduretegnede teksturer. Referencefotos er ikke indsat som spilaktiver.
 
 Kontrol: fem sammenhængende udendørs ruter mellem havens startpunkt, statuefront, bagside, bassinets sider og den modsatte del af haven. Ruterne undgår vand, bygninger, statuen og bænkene. Den eksisterende bevægelseskode er brugt til at gå fra startpunktet gennem staldporten, gennem staldgangen og tilbage til den korrekte side af Ridebanen. Fri passage i tre spor langs midtergangen er kontrolleret. Faktiske touch-events kontrollerer gang og straks-stop inde i stalden; hjælpetekst og udgangsknap er også kontrolleret. Skærmbilleder af have, statue, stald og telefonformat er gennemset. Ingen JavaScript-fejl under kontrollerne.
+
+## Runde 7: Tårnets indre og Udsigten (16. oktober 2026)
+
+### Forbindelse gennem Tårnet
+Ved Kongeporten kan man nu vælge "Gå ind i tårnet" og komme ind i en elevatorhal. Et etagevalg forbinder elevatorhallen i gadeniveau, restauranten ved 34 m og den eksisterende Udsigt ved 44 m. Etageskift bruger den eksisterende elevatorovergang med højdetæller. Etagevalget kan også bruges på Udsigten til at komme tilbage til restauranten eller elevatorhallen. Udgangen i elevatorhallen fører tilbage til Kongeporten. Tårnet kan vælges som startsted.
+
+Elevatorhallens mål og placeringen af dør, skranke, bænk og elevator er lavet til spillet. Der er ikke fundet en verificeret plantegning af ankomsthallen. Etageskiftene er en forenkling af den virkelige adgang, hvor Folketinget beskriver elevator til niveau 2 og en trappe det sidste stykke. Spillets sidetrappe i restauranten stiger ca. 5 m til en lille repos, hvor man kan fortsætte til Udsigten gennem samme overgang. Den er ikke en fuld kopi af den virkelige trappeforbindelse.
+
+### Restauranten
+Et højt lokale med gulligt/brunt murværk, rå betonbjælker, et stort sprossevindue, mørke stole, lyse bordflader, væglamper og en gangbar betontrappe med mørke håndlister. To skematiske gipsfigurer står ved vinduet; reliefferne på væggene er abstrakte former. De er ikke præcise reproduktioner af de originale kunstværker. Bordantal, møblering, trappens placering og rummets mål er tilpasset spillet. Den virkelige restaurant har langt flere pladser.
+
+Vinduet har et proceduretegnet motiv af tage og en fjern silhuet. Det er en illustration, ikke en præcis udsigt fra restauranten. På Udsigten vises fortsat selve spillets 3D-model af Slotsholmen med de eksisterende stednavne og kikkertzoom.
+
+Visuelt gennemsete fotos, hentet 16. oktober 2026:
+- [Storbycruise: Smørbrødene i Tårnet](https://storbycruise.no/2016/04/08/smorbrodene-i-tarnet/), 8. april 2016. [Direkte foto](https://storbycruise.no/content/uploads/2016/03/SAM_0526-1024x683.jpg). Viser gult/brunt murværk, højt betonloft, den diagonale betontrappe med mørkt gelænder, lyse vinduesnicher, dekorative modeller og restaurantmøbler. Billedet dokumenterer indretning i 2016, ikke nødvendigvis nutidens bordopstilling.
+- [VisitCopenhagen: Tårnet](https://www.visitcopenhagen.com/copenhagen/planning/the-tower-christiansborg-palace-gdk917422), [direkte foto ved restaurantens store vindue](https://files.guidedanmark.org/files/382/231865_Meyers_i_Trnet_2.jpg). Viser det store rektangulære sprossevindue, murværket og to store gipsmodeller. Det er et billede fra restauranten, ikke fra den udvendige udsigtsplatform. Fotograf og optagedato ikke verificeret.
+
+Tekstlige og supplerende referencer:
+- [Folketinget: Restauranten](https://www.ft.dk/taarnet/restauranten/), [Udsigten](https://www.ft.dk/taarnet/udsigten) og [Planlæg dit besøg](https://www.ft.dk/taarnet/besoeg). Beskriver restaurantens store vindue, Udsigten ved 44 m og adgangen via elevator og trappe.
+- [Troldtekt: Restaurant Tårnet](https://www.troldtekt.dk/referencer/hotel-restaurant/restaurant-taarnet/) beskriver det ca. 11 m høje rum og beton-/akustikfladerne. Fotografierne kunne ikke hentes til det lokale billedgennemsyn.
+- [Glaseksperten: Tårnet, Christiansborg](https://www.glaseksperten.dk/referencer/taarnet-christiansborg/) og Folketingets offentlige billedresultater er supplerende referencer til glas ved adgang og udsigt. Disse billedfiler kunne heller ikke hentes lokalt. Udsigtens eksisterende balustrade er bevaret og suppleret med en enkel glasafskærmning og en orienteringstavle; dette er en skematisk fortolkning med anslåede mål.
+
+### Afgrænsning
+Udsigten beholder den eksisterende panoramastyring og kikkert, hvor man drejer blikket frem for at gå frit rundt på platformen. Etagevalg, højde og knapper er gjort tydelige på telefon. Indendørs bruger man den almindelige gangstyring, også op ad sidetrappen. Elevatorovergangen nulstiller input og holder spilleren stille under kørslen. Der er ingen gæster, politiske personer, morgenmøde, spor, samtaler eller nye historiehændelser.
+
+Alle nye overflader og dekorationer er modelleret med geometri og proceduretegnede teksturer. Referencefotos er ikke indsat i spillet.
+
+Kontrol: sammenhængende gangruter gennem elevatorhallen, rundt mellem restaurantens borde og til vindue og sidetrappe. Trappen er gået med spillets almindelige bevægelseskode til reposen ca. 5,1 m oppe. Etageskift mellem alle tre niveauer, korrekt højdetæller fra restaurant til hal, kikkertzoom, retur fra Udsigten og udgang ved Kongeporten er kontrolleret. Faktiske touch-events i telefonformat kontrollerer gang og straks-stop. Skærmbilleder af hal, restaurant, Udsigten og telefonformat er gennemset. Ingen JavaScript-fejl under kontrollerne.
