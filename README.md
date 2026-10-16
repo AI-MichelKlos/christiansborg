@@ -54,3 +54,6 @@ Vælg Landstingssalen via Vandrehallen som startsted, eller gå til hallens mods
 
 ### Folketingssalen og Statsministeriets indgang
 Vælg Folketingssalen via Vandrehallen, og gå gennem den åbne dør. Der er fri passage mellem de buede bordrækker og rundt til den lave platform ved talerstolen. Statsministeriets indgang kan vælges som startsted i Prins Jørgens Gård. Gå op over de lave trin og ind gennem de åbne fyldningsdøre til en lille forhal. Gå udenfor fører tilbage til samme indgang. Detaljer og forenklinger er dokumenteret i `dev/INTERIOR.md`.
+
+### Højesteret og vejvisere
+Vælg Højesterets indgang for at starte foran den brede trappe. Gå mellem de fire søjler og ind i det lille vindfang. Udgangen fører tilbage foran trappen. Vejvisere står på Slotspladsen, i Prins Jørgens Gård, Rigsdagsgården og på Ridebanen samt indenfor ved Folketingets indgang og i Vandrehallen. Stå tæt på og vælg Læs vejviser for at få anvisninger med stor tekst. Spillet står stille imens; luk med Tilbage til spillet eller Escape. Skiltene beskriver spillets model. Kilder og forenklinger står i `dev/INTERIOR.md`.

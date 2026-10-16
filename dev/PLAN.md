@@ -191,4 +191,6 @@ Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner 
 
 - [x] Runde 9 (16. okt. 2026): åben adgang fra Vandrehallen til Folketingssalen med grønne sæder, buede egetræsborde, formandsplads, talerstol, gallerier og tre høje vinduer. Statsministeriets indgang i Prins Jørgens Gård med lys stenramme, skilt, nummer 11, åbne fyldningsdøre, lamper, lave trin og en forenklet forhal. Startvalg til begge steder. Referencer og usikkerheder i dev/INTERIOR.md.
 
-Forslag til næste to opgaver, afventer Michel: Højesterets indgang og en samlet kontrol af skiltningen mellem stederne.
+- [x] Runde 10 (16. okt. 2026): Højesterets søjleportal med fire søjler, trekantgavl, buet overvindue, lanternestolper, brede lave trin, åbne døre og et forenklet vindfang. Fire udendørs vejvisere og to indvendige vægskilte med en mobiltilpasset læsevisning. Portalens mål, Statsministeriets justerede placering og skiltningens spiltilpasninger er dokumenteret i dev/INTERIOR.md.
+
+Forslag til næste to opgaver, afventer Michel: samlet gennemgang af rumforbindelser og tydeligere stednavne på oversigtskortet.
