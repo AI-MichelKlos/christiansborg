@@ -27,14 +27,6 @@ html,body{height:100%}
 body{margin:0;overflow:hidden;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:15px;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
 .sticker{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;box-shadow:3px 4px 0 var(--ink)}
-#counters{position:fixed;left:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-.ctr{display:flex;align-items:center;gap:10px;padding:7px 14px 7px 9px;color:var(--ink);font:inherit;text-align:left}
-button.ctr{cursor:pointer}
-.ctr svg{width:34px;height:34px;flex:none}
-.ctr .lbl{display:block;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;opacity:.72}
-.ctr.bump{animation:bump .45s ease-out}
-@keyframes bump{40%{transform:scale(1.18)}}
-.num{display:block;font-family:var(--display);font-weight:800;font-size:22px;line-height:1.05;font-variant-numeric:tabular-nums}
 #tools{position:fixed;right:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;gap:8px}
 .btn{font:600 13px var(--body);color:var(--ink);display:inline-flex;align-items:center;gap:6px;padding:7px 11px;cursor:pointer;transition:transform .08s,box-shadow .08s}
 .btn:hover{transform:translate(-1px,-1px);box-shadow:4px 5px 0 var(--ink)}
@@ -49,19 +41,8 @@ button.ctr{cursor:pointer}
 #poiActions{display:flex;gap:8px;margin-top:7px}
 #poiActions button{font:700 12px var(--body);border:1.5px solid var(--ink);border-radius:9px;background:var(--paper-2);color:var(--ink);padding:4px 9px;cursor:pointer;pointer-events:auto}
 #poiActions button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
-.chipsHead{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;opacity:.72;margin:0 0 7px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
-.chip{font:600 12.5px var(--body);padding:2px 10px;border:2px solid var(--ink);border-radius:999px;background:var(--paper-2);opacity:.6}
-.chip.on{background:var(--leaf);opacity:1}
 #poi b{font-family:var(--display);font-size:20px;font-weight:800;display:block;margin-bottom:3px;text-wrap:balance}
 #poi p{margin:0;font-size:14px;line-height:1.5}
-#poi #poiTask{margin-top:7px;font-weight:700}
-.star{color:#e0a63a;font-size:17px}
-.qopts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:8px 0 12px}
-.qopt{font:800 30px var(--display);min-width:88px;padding:12px 16px;border:2.5px solid var(--ink);border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:3px 4px 0 var(--ink);cursor:pointer}
-.qopt:disabled{opacity:.3;cursor:default}
-.qopt.ok{outline:4px solid var(--leaf);outline-offset:3px;opacity:1}
-#qMsg{min-height:1.5em;text-align:center;font-weight:700;margin:0 0 6px}
 #lift{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff3df;opacity:0;pointer-events:none;transition:opacity .45s}
 #lift.on{opacity:1}
 #lift .sticker{padding:16px 28px;text-align:center}
@@ -107,10 +88,6 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 @media (max-width:600px){
   .btn span{display:none}
   .btn{padding:7px 8px}
-  .ctr{padding:5px 11px 5px 7px}
-  .ctr svg{width:28px;height:28px}
-  .ctr .lbl{display:none}
-  .num{font-size:19px}
   .card{padding:18px 18px 20px}
 }
 @media (prefers-reduced-motion:reduce){#poi,#toast{animation:none}.btn{transition:none}}
@@ -119,7 +96,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .inFolketing #indoorBadge{display:flex;position:fixed;left:18px;top:calc(18px + env(safe-area-inset-top));flex-direction:column;gap:5px;color:#f7edcf;background:rgba(33,43,36,.94);padding:13px 18px;border:1px solid #b9a36b;border-radius:5px;max-width:calc(100% - 160px);pointer-events:none}
 #indoorBadge strong{font:600 18px var(--body)}#indoorBadge span{font:12px var(--body);opacity:.8}
 .inFolketing #indoorExit{display:block;position:fixed;right:14px;top:calc(70px + env(safe-area-inset-top));background:#eee5cf}
-.inFolketing #counters,.inFolketing #guide,.inFolketing #map,.inFolketing #poi,.inFolketing #bMap,.inFolketing #bNight,.inFolketing #jump,.inFolketing #touchHint{display:none!important}
+.inFolketing #guide,.inFolketing #map,.inFolketing #poi,.inFolketing #bMap,.inFolketing #bNight,.inFolketing #jump,.inFolketing #touchHint{display:none!important}
 .inFolketing #tools{top:auto;bottom:calc(18px + env(safe-area-inset-bottom))}
 .inFolketing #actBtn{bottom:calc(100px + env(safe-area-inset-bottom));font:600 16px var(--body);border-radius:5px;background:#eee5cf}
 @media(max-width:600px){#indoorBadge strong{font-size:14px}#indoorBadge span{font-size:10px}.inFolketing #tools .btn{font-size:11px;padding:6px}}
@@ -145,7 +122,7 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 #towerFloors{display:none;position:fixed;right:14px;top:168px;width:210px;max-width:55vw;background:#eee5cf}
 .inTowerRooms #towerFloors,.inTowerView #towerFloors{display:block}
 .inTowerView #towerFloors{top:78px}
-.inTowerView #counters,.inTowerView #guide,.inTowerView #poi,.inTowerView #map,.inTowerView #bMap,.inTowerView #bNight{display:none!important}
+.inTowerView #guide,.inTowerView #poi,.inTowerView #map,.inTowerView #bMap,.inTowerView #bNight{display:none!important}
 @media(max-height:500px){.inTowerRooms #towerFloors{top:112px}}
 </style>
 </head>
@@ -153,26 +130,15 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 <canvas id="c" tabindex="0" aria-label="3D-verden: Christiansborg og Slotsholmen"></canvas>
 
 <div id="hud" hidden>
-  <div id="counters">
-  <div id="counter" class="sticker ctr" role="status" aria-live="polite">
-    <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 29L4 11l9 8 7-12 7 12 9-8-2 18z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/><rect x="6" y="29" width="28" height="6" rx="1.5" fill="#e0a63a" stroke="#2a2238" stroke-width="2.4"/><circle cx="20" cy="22" r="2.8" fill="#d9534f" stroke="#2a2238" stroke-width="1.6"/></svg>
-    <div><span class="lbl">Kroner fundet</span><span id="cnt" class="num">0 af 10</span></div>
-  </div>
-  <button id="stars" class="sticker ctr" type="button" aria-label="Stjerner for opgaver. Tryk for at se opgaverne.">
-    <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l4.7 10.2 11.1 1.2-8.3 7.5 2.3 11L20 28.3l-9.8 5.6 2.3-11-8.3-7.5 11.1-1.2z" fill="#f2c14e" stroke="#2a2238" stroke-width="2.4" stroke-linejoin="round"/></svg>
-    <div><span class="lbl">Stjerner</span><span id="scnt" class="num">0 af 18</span></div>
-  </button>
-  </div>
   <div id="tools">
     <button id="bMap" class="sticker btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
     <button id="bNight" class="sticker btn" type="button" aria-pressed="false"><svg id="iNight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span id="tNight">Aften</span></button>
     <button id="bSound" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="iWave" d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg><span>Lyd</span></button>
-    <button id="bVoice" class="sticker btn" type="button" aria-pressed="false" title="Læs teksterne højt"><svg id="iVoice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v10H10l-4 4v-4H4z"/><path d="M8 9h8M8 12h5"/></svg><span>Læs op</span></button>
     <button id="bHelp" class="sticker btn" type="button" aria-label="Hjælp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-1 .7-1.6 1.2-1.6 2.4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg><span>Hjælp</span></button>
   </div>
   <canvas id="map" class="sticker" aria-label="Kort over Slotsholmen"></canvas>
   <div id="guide" class="sticker" role="status" aria-live="off" hidden><span id="guideArrow" aria-hidden="true">↑</span><span id="guideText"></span></div>
-  <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><p id="poiTask" hidden></p><div id="poiActions"><button id="poiMore" type="button">Læs mere</button><button id="poiRead" type="button">Læs op</button></div></div>
+  <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><div id="poiActions"><button id="poiMore" type="button">Læs mere</button></div></div>
   <div id="toast" class="sticker" hidden></div>
   <div id="touchHint" hidden><span>✥</span>Træk for at gå</div><div id="lookHint" hidden>Kig rundt (valgfrit)</div>
   <div id="joy" hidden><div id="knob"></div></div>
@@ -182,50 +148,27 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 
 <div id="intro" class="overlay">
   <div class="card sticker">
-    <div class="eyebrow">København · en gåtur i 3D</div>
-    <h1 id="introTitle">Christiansborg</h1>
-    <p class="lead" id="introLead">Gå på opdagelse på Slotsholmen! Kongen har tabt 10 guldkroner. Følg de gule lys. Du kan tage et løbehjul på startpladsen.</p>
-    <div id="taskBox" hidden><div class="chipsHead">Opgaver</div><div class="chips" id="taskChips"></div></div>
+    <div class="eyebrow">Christiansborg · en mordgåde i 3D</div>
+    <h1 id="introTitle">Mord i Rigets midte</h1>
+    <p class="lead" id="introLead">En politiker er fundet død i Vandrehallen natten før et stort pressemøde. Gåden er under opbygning. Indtil videre kan du gå rundt på Slotsholmen og i de rum, hvor historien skal foregå.</p>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
       <span><kbd>A</kbd><kbd>D</kbd> <kbd>←</kbd><kbd>→</kbd></span><span>Drej</span>
       <span><kbd>Shift</kbd></span><span>Løb</span>
-      <span><kbd>Mellemrum</kbd></span><span>Hop · stig af løbehjulet</span>
-      <span><kbd>E</kbd> ved løbehjulet</span><span>Tag det eller stil det fra dig</span>
+      <span><kbd>Mellemrum</kbd></span><span>Hop</span>
+      <span><kbd>E</kbd></span><span>Gå ind, undersøg eller brug det, knappen viser</span>
       <span>Træk med musen</span><span>Kig dig omkring</span>
       <span><kbd>N</kbd> <kbd>M</kbd></span><span>Dag eller aften · åbn oversigtskortet</span>
-      <span>Læs op-knappen</span><span>Tryk, så bliver teksterne læst højt. Tryk igen for at slå det fra.</span>
     </div>
     <div class="keys" id="keysTouch" hidden>
       <span>Venstre tommel</span><span>Træk i den retning, du vil gå. Træk lidt for at gå langsomt. Slip for at stoppe</span>
       <span>Kamera</span><span>Følger roligt med. Træk på højre side for selv at kigge</span>
-      <span>Hop-knappen</span><span>Hop · stig af løbehjulet</span>
+      <span>Hop-knappen</span><span>Hop</span>
       <span>Handlingsknappen</span><span>Tryk for at undersøge, tale eller bruge ting</span>
-      <span>Læs op-knappen</span><span>Tryk for at få teksterne læst højt</span>
     </div>
     <button class="go" id="goBtn" type="button" disabled>Henter Slotsholmen …</button>
     <p class="foot">Kortdata: © OpenStreetMap-bidragydere (ODbL). Mange huse er stadig enkle klodser. Placeringer og detaljer er forenklede.</p>
-  </div>
-</div>
-
-<div id="finale" class="overlay" hidden>
-  <div class="card sticker">
-    <div class="eyebrow">Kronejagten er slut</div>
-    <h2>Du fandt alle 10 kroner!</h2>
-    <p class="lead">Hurra! Kongen er glad, og nu har du selv en guldkrone på. Du kan gå videre rundt på Slotsholmen.</p>
-    <button class="go" id="finOk" type="button">Gå videre rundt</button>
-    <button class="go alt" id="finAgain" type="button">Gem kronerne igen</button>
-  </div>
-</div>
-
-<div id="quiz" class="overlay" hidden>
-  <div class="card sticker">
-    <div class="eyebrow">Opgave</div>
-    <h2 id="qText"></h2>
-    <div class="qopts" id="qOpts"></div>
-    <p id="qMsg"></p>
-    <button class="go alt" id="qClose" type="button">Luk</button>
   </div>
 </div>
 
@@ -238,6 +181,7 @@ setTimeout(function(){ if(!window.__gameReady){ var e=document.getElementById('l
 import * as THREE from 'three';
 
 const $ = id => document.getElementById(id);
+const TESTMODE = /(^|[?&#])test\b/.test(location.search + location.hash);   // ?test shows the start-place shortcuts
 const isTouch = (window.matchMedia && matchMedia('(pointer: coarse)').matches) || (('ontouchstart' in window) && navigator.maxTouchPoints > 0);
 if (isTouch) document.body.classList.add('touch');
 const reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -1198,11 +1142,6 @@ const MERMAN = { g: new THREE.Group(), kids: [], wave: 0 };
     if (MERMAN.wave > 0) MERMAN.wave -= dt;
     const amp = MERMAN.wave > 0 ? 0.6 : 0.12, sp = MERMAN.wave > 0 ? 6 : 0.8;
     MERMAN.kids.forEach((k, i) => k.arms.forEach((a, j) => { a.rotation.x = Math.sin(t * sp + i * 0.9 + j * 1.6) * amp; }));
-    // on the bridge, near the spot: a button to look down at them
-    if (started && !paused && archH(P.pos.x, P.pos.z) > 0.05 && Math.hypot(P.pos.x - POOL.x, P.pos.z - POOL.z) < 13) offerAction({ id: 'havmand', label: 'Kig efter havmanden', prio: 1, run: () => {
-      cam.yaw = Math.atan2(P.pos.x - POOL.x, P.pos.z - POOL.z); cam.pitch = 0.7; lastDragEnd = clockT + 5; MERMAN.wave = 4; MERMAN.look = 5;
-      sparkleSound(); toast('Der ligger havmanden og hans syv sønner. De vinker!');
-    } });
     if (MERMAN.look > 0) { MERMAN.look -= dt; if (MERMAN.look <= 0) cam.pitch = 0.3; }
   });
 }
@@ -1849,8 +1788,6 @@ const HORSES = [];
   }
   const C = [-133, 88], R = 17;
   [['#8a5a3c', '#3a2a22', 0, true], ['#f1ece2', '#cfc6b8', 2.1, false], ['#3a2f2b', '#1f1a18', 4.2, false]].forEach(([c, m, a, rider]) => HORSES.push({ ...makeHorse(c, m, rider), a, ph: rand() * 6, pat: 0, near: false }));
-  const PATS = ['Hesten kan godt lide dig.', 'Hesten siger tak.', 'Hesten vrinsker glad.'];
-  let patN = 0;
   HOOKS.frame.push((dt, t) => {
     let best = null, bd = 3.4;
     for (const h of HORSES) {
@@ -1876,9 +1813,6 @@ const HORSES = [];
       if (started && d < 1.6 && d > 1e-4) { P.pos.x = x + dx / d * 1.6; P.pos.z = z + dz / d * 1.6; kid.root.position.copy(P.pos); }
       if (near && d < bd) { bd = d; best = h; }
     }
-    if (best) offerAction({ id: 'hest', label: 'Klap hesten', prio: 2, run: () => {
-      best.pat = 1.1; neigh(); best.head.getWorldPosition(tmpB); burst(tmpB); sparkleSound(); toast(PATS[patN++ % PATS.length]);
-    } });
   });
 }
 function neigh() { for (let i = 0; i < 7; i++) { const f = 1050 - i * 75 + (i % 2) * 140; tone(f, f * 0.9, i * 0.06, 0.08, 0.05, 'triangle'); } tone(320, 230, 0.46, 0.2, 0.035, 'sawtooth'); }
@@ -2284,17 +2218,6 @@ TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 
     colCirc(x, z, 1.1, 1.3);
     const [mx, mz] = wp(side, -(W / 2 + 6.2)); CANNONS.push({ x, z, mx, mz });
   }
-  HOOKS.frame.push(() => {
-    if (!started || paused) return;
-    for (const c of CANNONS) if (Math.hypot(P.pos.x - c.x, P.pos.z - c.z) < 3.2) {
-      offerAction({ id: 'kanon', label: 'Skyd med konfetti', prio: 1, run: () => {
-        tone(120, 50, 0, 0.35, 0.2, 'sawtooth'); tone(900, 1400, 0.05, 0.2, 0.05, 'triangle');
-        for (let k = 0; k < 4; k++) burst(new THREE.Vector3(c.mx, 1.0 + k * 0.4, c.mz));
-        toast('Bum! Konfetti!');
-      } });
-      break;
-    }
-  });
 }
 
 // ======================================================================== HOLMENS KIRKE (anchor forge from 1563, a church since 1619)
@@ -2425,8 +2348,6 @@ function makeBoat(kind, hullCol) {
   [['#24508a', 0], ['#b8322c', CR.len * 0.36], ['#2f6f4f', CR.len * 0.7]].forEach(([c, s0], i) => BOATS.push({ ...makeBoat('canal', c), R: CR, s: s0, dir: i % 2 ? -1 : 1, speed: 3.2, head: 0, wave: 0, ph: rand() * 6 }));
   BOATS.push({ ...makeBoat('bus'), big: true, R: HR, s: HR.len * 0.3, dir: 1, speed: 4.5, head: 0, wave: 0, ph: 1 });
   for (const b of BOATS) { const [x, z, h] = routeAt(b.R, b.s); b.head = b.dir > 0 ? h : h + Math.PI; b.g.position.set(x, WL, z); b.g.rotation.y = b.head; }
-  let kidWave = 0;
-  const horn = () => { tone(196, 190, 0, 0.45, 0.09, 'sawtooth'); tone(247, 240, 0, 0.45, 0.05, 'triangle'); tone(196, 190, 0.6, 0.6, 0.09, 'sawtooth'); tone(247, 240, 0.6, 0.6, 0.05, 'triangle'); };
   HOOKS.frame.push((dt, t) => {
     let near = null, nd = 22;
     for (const b of BOATS) {
@@ -2444,10 +2365,6 @@ function makeBoat(kind, hullCol) {
       b.arms.forEach((a, i) => { a.rotation.z = b.wave > 0 ? 2.6 + Math.sin(t * 12 + i) * 0.35 : 0.2; });
       const d = Math.hypot(P.pos.x - x, P.pos.z - z); if (d < nd) { nd = d; near = b; }
     }
-    if (kidWave > 0) { kidWave -= dt; kid.arms[1].rotation.z = 2.6 + Math.sin(t * 12) * 0.3; }
-    if (near && started && !paused) offerAction({ id: 'baad', label: 'Vink til båden', prio: 1, run: () => {
-      near.wave = 3.5; kidWave = 2.5; horn(); toast(near.R === HR ? 'Havnebussen siger tuut! Folkene vinker til dig.' : 'Folkene i båden vinker til dig!');
-    } });
   });
 }
 
@@ -2756,7 +2673,7 @@ const VEHICLES = [];
       const waiting = started && !MYBOAT.on && along > 0 && along < (v.kind === 'car' ? 9 : 6) && side < (v.kind === 'car' ? 2.0 : 1.4);
       if (waiting) {
         target = 0;
-        if (v.waitT <= 0 && Math.hypot(dx, dz) < 12) { if (v.kind === 'car') beep(); else bell(); if (clockT - saidT > 20) { saidT = clockT; toast(v.kind === 'car' ? 'Bilen holder stille og venter på dig.' : 'Ring ring! Cyklen venter på dig.'); } }
+        if (v.waitT <= 0 && Math.hypot(dx, dz) < 12) { if (v.kind === 'car') beep(); else bell(); if (clockT - saidT > 20) { saidT = clockT; toast(v.kind === 'car' ? 'Bilen holder stille og venter på dig.' : 'Cyklisten venter på dig.'); } }
         v.waitT = 4;
       } else if (v.waitT > 0) v.waitT -= dt;
       for (const o of VEHICLES) {
@@ -2952,12 +2869,11 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
     p.g.position.set(p.x, p.y, p.z); p.g.rotation.y = p.h;
   }
   const lookAtKid = p => { p.h = Math.atan2(P.pos.x - p.x, P.pos.z - p.z); };
-  let kidWave = 0;
   HOOKS.frame.push((dt, t) => {
     const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && Math.hypot(P.pos.x - ex, P.pos.z - ez) < 45;
     if (S.phase === 'idle') {
       if (S.cool > 0) S.cool -= dt;
-      else if (near) { S.phase = 'in'; S.s = GAP + 0.5; S.v = 6; S.ev = {}; FT_CARS.forEach(c => { c.g.visible = true; c.fresh = true; c.want = [0, 0]; c.doors.forEach(d => { d.userData.a = 0; d.rotation.y = 0; }); }); toast('Der kommer nogle sorte biler. Hvem sidder mon i dem?'); }
+      else if (near) { S.phase = 'in'; S.s = GAP + 0.5; S.v = 6; S.ev = {}; FT_CARS.forEach(c => { c.g.visible = true; c.fresh = true; c.want = [0, 0]; c.doors.forEach(d => { d.userData.a = 0; d.rotation.y = 0; }); }); toast('Tre sorte biler kører ind i Rigsdagsgården.'); }
     }
     const v0 = S.v;
     if (S.phase === 'in' || S.phase === 'out') {
@@ -2999,7 +2915,7 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
       once('pm', T, 3.0, () => {
         spawn(PM, l1[0] + 0.6, l1[1] - 0.6); goTo(PM, [l1[0] + 0.75, l1[1] - 2.2], [0, 6.2]);
         const close = Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16;
-        toast(close ? 'Se! Det er statsministeren. Hun skal ind i Folketinget.' : 'Statsministeren er kommet. Hun skal ind i Folketinget.');
+        toast(close ? 'Statsministeren stiger ud og går op ad trappen.' : 'Statsministeren er ankommet til Folketinget.');
       });
       once('c1b', T, 4.4, () => { door(C1, 1, false); goTo(GUARDS[2], [0.9, 6.8]); });
       if (T > 5.2 && !S.waved) { S.waved = true; if (Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16) { lookAtKid(PM); PM.wave = 2; } }   // she waves to the girl if she is close
@@ -3011,9 +2927,6 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
       if (T > 9.7 && !PM.on && GUARDS.every(gd => !gd.on)) { S.phase = 'out'; S.t = 0; }
     }
     for (const p of [PM, ...GUARDS]) upd(p, dt);
-    if (kidWave > 0) { kidWave -= dt; kid.arms[1].rotation.z = 2.6 + Math.sin(t * 12) * 0.3; }
-    if (PM.on && started && !paused && Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16)
-      offerAction({ id: 'pm', label: 'Vink til statsministeren', prio: 3, run: () => { kidWave = 2.5; lookAtKid(PM); PM.wave = 2.5; toast('Statsministeren vinker tilbage til dig!'); } });
   });
 }
 
@@ -3091,41 +3004,41 @@ function rayPoly(a, b, best) {
 
 // ======================================================================== POIs: the names are shown and read aloud when she comes near
 const POIS = [
-  { n: 'Christiansborg Slot', t: 'Et kæmpe slot midt i byen. Her mødes Folketinget, som bestemmer over Danmark. Kongen holder også fest her. Muren er lavet af granitsten fra hele Danmark, og over vinduerne nederst sidder ansigter af kendte danskere.', x: 0, z: 40, r: 80 },
-  { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt. Det er det højeste tårn i København. På toppen sidder tre kroner af guld. Man kan køre op i tårnet med en elevator og kigge ud over byen. Indgangen er her ved Kongeporten.', x: 44, z: -27, r: 16 },
-  { n: 'Prins Jørgens Gård', t: 'Gården foran Dronningeporten. Her står fire statuer på høje sokler. En af dem er Herkules med sin kølle.', x: -36, z: -62, r: 16 },
-  { n: 'Reformministeriet', t: 'Et fiktivt ministerium i spillets historie. Gå ind ved den åbne dør på Ved Stranden og udforsk gangen, kontoret og printerområdet.', x: 120, z: -110, r: 20 },
-  { n: 'Finansministeriet', t: 'Den Røde Bygning har røde mursten og lyse vinduer. Gå ind fra Slotspladsen og se spillets foyer, garderobe og forhandlingsrum.', x: 110, z: 42, r: 15 },
+  { n: 'Christiansborg Slot', t: 'Det tredje Christiansborg på stedet. De to første brændte i 1794 og 1884, og det nuværende slot blev bygget fra 1907 til 1928. Her har Folketinget, Statsministeriet og Højesteret til huse, og kongehuset bruger repræsentationslokalerne. Facaden er beklædt med granit, og over vinduerne i stueetagen sidder hoveder af kendte danskere.', x: 0, z: 40, r: 80 },
+  { n: 'Tårnet', t: 'Slottets tårn er 106 meter højt og det højeste i København. Øverst sidder tre kroner. Udsigten ligger 44 meter oppe, og elevatoren går fra Kongeporten.', x: 44, z: -27, r: 16 },
+  { n: 'Prins Jørgens Gård', t: 'Gården mellem slottet og Slotskirken. Her står fire bronzestatuer på høje sokler, blandt dem Herkules med køllen. Fra gården er der indgang til Statsministeriet og De Kongelige Repræsentationslokaler.', x: -36, z: -62, r: 16 },
+  { n: 'Reformministeriet', t: 'Et opdigtet ministerium i gådens historie. Indgangen ligger mod hjørnet ved Boldhusgade, og der er en sidedør på husets korte side.', x: 120, z: -110, r: 20 },
+  { n: 'Finansministeriet', t: 'Den Røde Bygning blev opført 1716-21 til enevældens centraladministration. I dag bruger Finansministeriet den. Indgangen er fra Slotspladsen.', x: 110, z: 42, r: 15 },
   ...QUAYS.map(q=>({n:q.name,quiet:true,t:'Gå ned ad stentrappen til afsatsen over vandet.',x:q.x,z:q.z,r:8})),
-  { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her kører ministrene ind i sorte biler, og politikerne går op ad den store trappe og ind i Folketinget.', x: 36, z: 72, r: 26 },
-  { n: 'Slotspladsen', t: 'En stor plads foran slottet. Her rider kong Frederik den Syvende på sin hest. Han gav Danmark grundloven.', x: 100, z: -20, r: 28 },
-  { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste. Gå hen til en hest og klap den.', x: -140, z: 85, r: 42 },
-  { n: 'De Kongelige Stalde', t: 'Her bor kongens heste. Over staldene ligger et lille gammelt teater, hvor kongen så skuespil.', x: -105, z: 135, r: 20 },
-  { n: 'Christian den Niende', t: 'Kong Christian den Niende sidder på sin hest foran slottet. Han var konge for over hundrede år siden.', x: -73, z: 50, r: 14 },
-  { n: 'Slotskirken', t: 'Slottets egen kirke. Foran står der hvide søjler under en trekant, og på taget er der en flad kuppel af kobber. I 1992 ramte en raket taget, og kirken brændte. Nu er den bygget smuk igen.', x: -30, z: -105, r: 30 },
-  { n: 'Kirkeløngangsbygningen', t: 'En gammel bygning, der forbinder slottet med Slotskirken. Den er fra det første Christiansborg for næsten 300 år siden. Gennem porten kan du gå fra Slotspladsen ind i Prins Jørgens Gård.', x: -5.5, z: -86.5, r: 14 },
-  { n: 'Thorvaldsens Museum', t: 'Et gult museum fyldt med hvide statuer, som Thorvaldsen lavede for længe siden. Rundt om huset er der malet mennesker, der byder ham velkommen hjem fra en lang rejse med skib. På taget kører en gudinde med fire heste.', x: -100, z: -72, r: 32 },
-  { n: 'Børsen', t: 'Et meget gammelt hus, som kong Christian den Fjerde byggede. Her købte og solgte man varer. Spiret er fire drager, der snor halerne sammen, og øverst sidder tre kroner. Her ser Børsen ud, som den gjorde før branden i 2024. Nu bliver den bygget op igen.', x: 250, z: 65, r: 50 },
-  { n: 'Holmens Kirke', t: 'En gammel kirke af røde mursten med et grønt spir. Her gik sømændene i kirke, og der hænger et skib fra loftet. Dronning Margrethe blev gift her. I muren sidder en gammel kanonkugle.', x: 215, z: -45, r: 32 },
-  { n: 'Proviantpassagen', t: 'En port gennem huset. Den går fra Rigsdagsgården til Proviantgården.', x: 82, z: 74, r: 8 },
-  { n: 'Proviantgården', t: 'Gamle huse omkring en gård. Her gemte man mad til kongens skibe.', x: 138, z: 128, r: 28 },
-  { n: 'Bibliotekshaven', quiet:true,t:'Følg grusstierne mellem blomsterbedene til bassinet. Ved siden af står den siddende Søren Kierkegaard. Her er bænke under træerne.', x:GARDEN.cx,z:GARDEN.cz,r:40 },
-  { n: 'Tøjhusmuseet', t: 'Et meget langt hus af røde mursten, som Christian den Fjerde byggede. Her lå kongens kanoner og våben. Nu er det et museum, hvor man kan se kanoner og rustninger. Kanonerne ved døren skyder kun med konfetti.', x: 20, z: 205, r: 40 },
-  { n: 'Det Kongelige Bibliotek', t: 'Det gamle bibliotek af røde mursten. Det er over hundrede år gammelt. Her er der flere bøger, end du kan tælle.', x: 125, z: 250, r: 30 },
-  { n: 'Den Sorte Diamant', t: 'Den nye del af biblioteket. Den er sort og blank som en diamant og læner sig ud over vandet. I midten er der en stor væg af glas, og en glasbro går over vejen til det gamle bibliotek.', x: 215, z: 255, r: 45 },
-  { n: 'Inderhavnen', t: 'Den store havn. Her sejler havnebussen frem og tilbage. Vink til den, så siger den tuut.', x: 290, z: 245, r: 55 },
-  { n: 'Søren Kierkegaards Plads', t: 'En plads ved havnen lige ved siden af Den Sorte Diamant.', x: 40, z: 330, r: 35 },
-  { n: 'Christian den Fjerdes Bryghus', t: 'Et gammelt bryggeri med tykke mure. Kong Christian den Fjerde lod det bygge.', x: -25, z: 315, r: 30 },
-  { n: 'Frederiksholms Kanal', t: 'Kanalen på den anden side af slottet. Den løber ud i havnen.', x: -103, z: 280, r: 28 },
-  { n: 'Slotsholmskanalen', t: 'Vandet går hele vejen rundt om Slotsholmen. Slotsholmen er en ø. Kanalbådene sejler forbi. Vink til dem!', x: 60, z: -125, r: 25 },
-  { n: 'Højbro Plads', t: 'En plads ved kanalen. Her står Absalon på sin hest. Han byggede den første borg her.', x: -5, z: -235, r: 30 },
-  { n: 'Gammel Strand', t: 'Her solgte fiskerkonerne fisk i gamle dage. I dag sejler kanalbådene herfra.', x: -95, z: -150, r: 40 },
-  { n: 'Højbro', t: 'Den første bro over til slottet. Den er lavet af stål og står på granit. Kig ned i vandet ved siden af broen. Der ligger en havmand af bronze med sine syv sønner. De savner deres mor, Agnete.', x: -5, z: -167, r: 14 },
-  { n: 'Holmens Bro', t: 'En bro over kanalen ved Holmens Kirke. Bådene sejler ind under den.', x: 150, z: -52, r: 14 },
-  { n: 'Børsbroen', t: 'En bro over vandet lige ved Børsen.', x: 298, z: 22, r: 15 },
-  { n: 'Marmorbroen', t: 'En flot gammel bro af lys sandsten med en høj bue. Den går hen til Ridebanen, og bådene sejler ind under den.', x: -206, z: 140, r: 15 },
-  { n: 'Prinsens Bro', t: 'En bro af sten over Frederiksholms Kanal.', x: -152, z: 214, r: 15 },
-  { n: 'Stormbroen', t: 'En bro over kanalen ved Nationalmuseet.', x: -262, z: 57, r: 15 },
+  { n: 'Rigsdagsgården', t: 'Gården foran Folketingets indgang. Navnet kommer fra Rigsdagen, Danmarks parlament fra 1849 til 1953. Ministerbilerne kører ind fra Tøjhusgade og holder ved trappen.', x: 36, z: 72, r: 26 },
+  { n: 'Slotspladsen', t: 'Den store plads foran slottet. Rytterstatuen forestiller Frederik 7., der underskrev grundloven i 1849.', x: 100, z: -20, r: 28 },
+  { n: 'Ridebanen', t: 'Ridebanen og fløjene omkring den er fra det første Christiansborg og overlevede begge brande. Her motioneres de kongelige heste.', x: -140, z: 85, r: 42 },
+  { n: 'De Kongelige Stalde', t: 'Staldene huser stadig de kongelige heste. Over dem ligger det gamle Hofteater.', x: -105, z: 135, r: 20 },
+  { n: 'Christian den Niende', t: 'Rytterstatuen af Christian 9., der var konge fra 1863 til 1906.', x: -73, z: 50, r: 14 },
+  { n: 'Slotskirken', t: 'Slotskirken er tegnet af C.F. Hansen og indviet i 1826. Den brændte i 1992, da en raket fra et fyrværkeri ramte taget, og er siden genopført.', x: -30, z: -105, r: 30 },
+  { n: 'Kirkeløngangsbygningen', t: 'Bygningen forbinder slottet med Slotskirken og er fra det første Christiansborg. Gennem porten går man fra Slotspladsen til Prins Jørgens Gård.', x: -5.5, z: -86.5, r: 14 },
+  { n: 'Thorvaldsens Museum', t: 'Museet for Bertel Thorvaldsens skulpturer åbnede i 1848. Frisen på facaden viser hans hjemkomst fra Rom, og på taget kører sejrsgudinden i en firspand.', x: -100, z: -72, r: 32 },
+  { n: 'Børsen', t: 'Christian 4.s børsbygning fra 1600-tallet med det berømte dragespir. Børsen brændte i april 2024 og bliver genopbygget. Her ses den, som den så ud før branden.', x: 250, z: 65, r: 50 },
+  { n: 'Holmens Kirke', t: 'Flådens kirke, indrettet i en ankersmedje under Christian 4. Dronning Margrethe og prins Henrik blev gift her i 1967.', x: 215, z: -45, r: 32 },
+  { n: 'Proviantpassagen', t: 'En port gennem huset fra Rigsdagsgården til Proviantgården. Den bruges som servicevej.', x: 82, z: 74, r: 8 },
+  { n: 'Proviantgården', t: 'Gården omkring det gamle provianthus, hvor flådens forråd blev opbevaret.', x: 138, z: 128, r: 28 },
+  { n: 'Bibliotekshaven', quiet:true,t:'Haven ligger, hvor flådens gamle havn var. Søren Kierkegaard sidder i bronze ved bassinet, og springvandet springer hver hele time.', x:GARDEN.cx,z:GARDEN.cz,r:40 },
+  { n: 'Tøjhusmuseet', t: 'Christian 4.s lange tøjhus fra omkring 1600. I dag er det museum for våben og krigshistorie.', x: 20, z: 205, r: 40 },
+  { n: 'Det Kongelige Bibliotek', t: 'Den gamle biblioteksbygning af røde mursten fra omkring 1900.', x: 125, z: 250, r: 30 },
+  { n: 'Den Sorte Diamant', t: 'Bibliotekets udvidelse fra 1999 i sort granit og glas. Den læner sig ud over havnen og er forbundet med den gamle bygning med en glasbro.', x: 215, z: 255, r: 45 },
+  { n: 'Inderhavnen', t: 'Københavns inderhavn. Havnebussen sejler her frem og tilbage.', x: 290, z: 245, r: 55 },
+  { n: 'Søren Kierkegaards Plads', t: 'Pladsen ved havnen foran Den Sorte Diamant.', x: 40, z: 330, r: 35 },
+  { n: 'Christian den Fjerdes Bryghus', t: 'Det gamle bryghus med de tykke mure fra Christian 4.s tid.', x: -25, z: 315, r: 30 },
+  { n: 'Frederiksholms Kanal', t: 'Kanalen på slottets vestside. Den løber ud i havnen.', x: -103, z: 280, r: 28 },
+  { n: 'Slotsholmskanalen', t: 'Kanalerne gør Slotsholmen til en ø. Kanalbådene sejler forbi her.', x: 60, z: -125, r: 25 },
+  { n: 'Højbro Plads', t: 'Pladsen ved kanalen med rytterstatuen af biskop Absalon, der grundlagde den første borg på Slotsholmen i 1167.', x: -5, z: -235, r: 30 },
+  { n: 'Gammel Strand', t: 'Den gamle fiskerkaj. I dag sejler kanalbådene herfra.', x: -95, z: -150, r: 40 },
+  { n: 'Højbro', t: 'Broen over Slotsholmskanalen. På bunden ved siden af broen ligger skulpturen Agnete og havmanden: havmanden og hans syv sønner i bronze.', x: -5, z: -167, r: 14 },
+  { n: 'Holmens Bro', t: 'Broen over kanalen ved Holmens Kirke.', x: 150, z: -52, r: 14 },
+  { n: 'Børsbroen', t: 'Broen over vandet ved Børsen.', x: 298, z: 22, r: 15 },
+  { n: 'Marmorbroen', t: 'Broen af lys sandsten fra 1700-tallet fører over til Ridebanen.', x: -206, z: 140, r: 15 },
+  { n: 'Prinsens Bro', t: 'Stenbroen over Frederiksholms Kanal.', x: -152, z: 214, r: 15 },
+  { n: 'Stormbroen', t: 'Broen ved Nationalmuseet.', x: -262, z: 57, r: 15 },
 ];
 function poiAt(x, z) { if(FX.press){const [a,b]=FX.press.loc(x,z);if(Math.abs(a)<10.5&&b> -10&&b<12.5)return POIS.find(p=>p.n==='Slotspladsens presseområde');}for(const q of QUAYS){const [s,d]=q.loc(x,z);if(Math.abs(s)<3&&d>q.bottom&&d<7.5)return POIS.find(p=>p.n===q.name);}let best = null, bs = 1; for (const p of POIS) { const s = Math.hypot(x - p.x, z - p.z) / p.r; if (s < bs) { bs = s; best = p; } } return best; }
 
@@ -3182,42 +3095,43 @@ const KIDCOL = { hair: '#7b4527', pants: '#2f6f73' };   // her hair and trousers
 function drawDots(g, w, h) { g.fillStyle = KIDCOL.pants; g.fillRect(0, 0, w, h); g.fillStyle = '#e9f3ef'; for (const [x, y] of [[8, 8], [40, 8], [24, 24], [56, 24], [8, 40], [40, 40], [24, 56], [56, 56]]) { g.beginPath(); g.arc(x, y, 3.2, 0, Math.PI * 2); g.fill(); } }
 TX.dots = ctex(64, 64, drawDots, {});
 TX.dots.repeat.set(3, 2);
-function buildKid() {
+function buildKid() {   // Ida, 24: a young woman in a yellow raincoat with a green backpack (the code still calls her "kid")
   const g = new THREE.Group();
-  const coat = toon('#f3c531'), skin = toon('#f6cfb0'), hair = toon(KIDCOL.hair), bag = toon('#4e8c6b'), eye = new THREE.MeshBasicMaterial({ color: '#231a22' }), cheek = toon('#f19c8f');
-  const leggings = toon('#ffffff', { map: TX.dots }), sock = toon('#f6f3ec'), shoeM = toon('#e0483c'), sole = toon('#f8f6f0'), lace = toon('#ffffff');
+  const coat = toon('#f3c531'), skin = toon('#f2c9a8'), hair = toon('#5b3a24'), bag = toon('#4e8c6b'), strap = toon('#3f7558'), eye = new THREE.MeshBasicMaterial({ color: '#231a22' });
+  const leggings = toon('#2f3d57'), shoeM = toon('#e0483c'), sole = toon('#f8f6f0'), lace = toon('#ffffff');
   const outline = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide });
   const part = (geo, mat, parent, x, y, z, ol = 1.06) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); if (ol) { const o = new THREE.Mesh(geo, outline); o.scale.setScalar(ol); m.add(o); } return m; };
-  part(new THREE.CapsuleGeometry(0.29, 0.32, 6, 16), coat, g, 0, 0.88, 0);
-  part(new THREE.CylinderGeometry(0.3, 0.37, 0.24, 16), coat, g, 0, 0.67, 0, 1.05);
-  const head = new THREE.Group(); head.position.set(0, 1.52, 0); g.add(head);
-  part(new THREE.SphereGeometry(0.33, 24, 18), skin, head, 0, 0, 0, 1.05);
-  const hm = part(new THREE.SphereGeometry(0.35, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.52), hair, head, 0, 0.02, -0.02, 1.04); hm.rotation.x = -0.45;
-  for (const s of [-1, 1]) { part(new THREE.SphereGeometry(0.12, 12, 10), hair, head, s * 0.33, -0.06, -0.12, 1.08); part(new THREE.SphereGeometry(0.045, 8, 6), toon('#e2574c'), head, s * 0.27, -0.01, -0.1, 0); }
-  for (const s of [-1, 1]) { part(new THREE.SphereGeometry(0.045, 10, 8), eye, head, s * 0.11, 0.03, 0.29, 0); const ch = part(new THREE.SphereGeometry(0.05, 10, 8), cheek, head, s * 0.19, -0.07, 0.25, 0); ch.scale.set(1, 0.6, 0.4); }
-  const smile = part(new THREE.TorusGeometry(0.06, 0.014, 6, 14, Math.PI), eye, head, 0, -0.1, 0.305, 0); smile.rotation.z = Math.PI;
-  part(new THREE.SphereGeometry(0.035, 8, 6), skin, head, 0, -0.02, 0.33, 0);
-  const collar = part(new THREE.TorusGeometry(0.2, 0.06, 8, 18), coat, g, 0, 1.22, 0, 0); collar.rotation.x = Math.PI / 2;
-  part(new THREE.BoxGeometry(0.44, 0.48, 0.2), bag, g, 0, 0.94, -0.32, 1.06);
-  part(new THREE.BoxGeometry(0.46, 0.18, 0.07), toon('#3f7558'), g, 0, 1.08, -0.43, 0);
+  // the raincoat: upper body and a skirt that reaches the thighs
+  part(new THREE.CapsuleGeometry(0.19, 0.36, 6, 16), coat, g, 0, 1.3, 0);
+  part(new THREE.CylinderGeometry(0.2, 0.25, 0.34, 16), coat, g, 0, 0.92, 0, 1.05);
+  part(new THREE.CylinderGeometry(0.055, 0.06, 0.12, 10), skin, g, 0, 1.62, 0, 0);   // neck
+  const head = new THREE.Group(); head.position.set(0, 1.76, 0); g.add(head);
+  part(new THREE.SphereGeometry(0.135, 24, 18), skin, head, 0, 0, 0, 1.05);
+  const hm = part(new THREE.SphereGeometry(0.145, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), hair, head, 0, 0.015, -0.012, 1.04); hm.rotation.x = -0.4;
+  const tail = part(new THREE.CapsuleGeometry(0.045, 0.16, 4, 10), hair, head, 0, -0.07, -0.15, 1.08); tail.rotation.x = 0.35;   // ponytail
+  part(new THREE.SphereGeometry(0.03, 8, 6), toon('#e2574c'), head, 0, 0.03, -0.142, 0);   // hair tie
+  for (const s of [-1, 1]) part(new THREE.SphereGeometry(0.018, 8, 6), eye, head, s * 0.045, 0.015, 0.126, 0);
+  const smile = part(new THREE.TorusGeometry(0.025, 0.006, 6, 12, Math.PI), eye, head, 0, -0.045, 0.128, 0); smile.rotation.z = Math.PI;
+  part(new THREE.SphereGeometry(0.016, 8, 6), skin, head, 0, -0.01, 0.136, 0);   // nose
+  const collar = part(new THREE.TorusGeometry(0.1, 0.035, 8, 18), coat, g, 0, 1.56, 0, 0); collar.rotation.x = Math.PI / 2;
+  part(new THREE.BoxGeometry(0.34, 0.42, 0.16), bag, g, 0, 1.28, -0.27, 1.06);   // the backpack
+  part(new THREE.BoxGeometry(0.36, 0.14, 0.06), strap, g, 0, 1.43, -0.36, 0);
+  for (const s of [-1, 1]) part(new THREE.BoxGeometry(0.035, 0.36, 0.03), strap, g, s * 0.1, 1.34, 0.185, 0);   // the straps over her shoulders
   const legs = [], arms = [];
   for (const s of [-1, 1]) {
-    const hip = new THREE.Group(); hip.position.set(s * 0.12, 0.6, 0); g.add(hip);
-    part(new THREE.CapsuleGeometry(0.088, 0.13, 4, 14), leggings, hip, 0, -0.14, 0);
-    const knee = new THREE.Group(); knee.position.set(0, -0.29, 0); hip.add(knee);
-    part(new THREE.CapsuleGeometry(0.074, 0.15, 4, 14), leggings, knee, 0, -0.13, 0);
-    part(new THREE.CylinderGeometry(0.08, 0.08, 0.075, 14), sock, knee, 0, -0.19, 0, 1.04);
-    const shoe = new THREE.Group(); shoe.position.set(0, -0.31, 0); knee.add(shoe);
-    const up = part(new THREE.CapsuleGeometry(0.07, 0.12, 4, 14), shoeM, shoe, 0, 0.062, 0.04, 1.06); up.rotation.x = Math.PI / 2; up.scale.set(1.08, 1, 0.62);
-    part(new THREE.BoxGeometry(0.155, 0.04, 0.29), sole, shoe, 0, 0.02, 0.04, 1.04);
-    part(new THREE.SphereGeometry(0.066, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), sole, shoe, 0, 0.035, 0.12, 0).scale.set(1.08, 0.55, 0.9);
-    for (const lz of [0.02, 0.06]) part(new THREE.BoxGeometry(0.085, 0.014, 0.018), lace, shoe, 0, 0.104, lz, 0);
-    part(new THREE.BoxGeometry(0.07, 0.06, 0.02), sole, shoe, 0, 0.07, -0.09, 0);
+    const hip = new THREE.Group(); hip.position.set(s * 0.1, 0.84, 0); g.add(hip);
+    part(new THREE.CapsuleGeometry(0.075, 0.27, 4, 14), leggings, hip, 0, -0.2, 0);
+    const knee = new THREE.Group(); knee.position.set(0, -0.42, 0); hip.add(knee);
+    part(new THREE.CapsuleGeometry(0.062, 0.27, 4, 14), leggings, knee, 0, -0.19, 0);
+    const shoe = new THREE.Group(); shoe.position.set(0, -0.4, 0); knee.add(shoe);
+    const up = part(new THREE.CapsuleGeometry(0.06, 0.11, 4, 14), shoeM, shoe, 0, 0.055, 0.04, 1.06); up.rotation.x = Math.PI / 2; up.scale.set(1.05, 1, 0.6);
+    part(new THREE.BoxGeometry(0.13, 0.035, 0.26), sole, shoe, 0, 0.018, 0.04, 1.04);
+    for (const lz of [0.02, 0.06]) part(new THREE.BoxGeometry(0.07, 0.012, 0.016), lace, shoe, 0, 0.095, lz, 0);
     legs.push({ hip, knee, shoe });
-    const sh = new THREE.Group(); sh.position.set(s * 0.34, 1.12, 0); g.add(sh);
-    part(new THREE.CapsuleGeometry(0.085, 0.28, 4, 10), coat, sh, 0, -0.2, 0);
-    part(new THREE.SphereGeometry(0.08, 10, 8), skin, sh, 0, -0.42, 0);
-    sh.rotation.z = s * 0.12; arms.push(sh);
+    const sh = new THREE.Group(); sh.position.set(s * 0.25, 1.52, 0); g.add(sh);
+    part(new THREE.CapsuleGeometry(0.06, 0.46, 4, 10), coat, sh, 0, -0.3, 0);
+    part(new THREE.SphereGeometry(0.055, 10, 8), skin, sh, 0, -0.6, 0);
+    sh.rotation.z = s * 0.08; arms.push(sh);
   }
   const root = new THREE.Group(); g.scale.setScalar(0.92); root.add(g);
   return { root, g, head, legs, arms, coat, hair, leggings };
@@ -3396,7 +3310,7 @@ function updPlayer(dt) {
   // the water stops her (she can still walk along the quay)
   if (waterAt(P.pos.x, P.pos.z)) {
     if (!waterAt(P.pos.x, oz)) P.pos.z = oz; else if (!waterAt(ox, P.pos.z)) P.pos.x = ox; else { P.pos.x = ox; P.pos.z = oz; }
-    if (splashT <= 0 && Math.hypot(P.vel.x, P.vel.z) > 2) { splashT = 6; toast('Stop! Her er vand. Find en bro.'); }
+    if (splashT <= 0 && Math.hypot(P.vel.x, P.vel.z) > 2) { splashT = 6; toast('Her er vand. Find en bro.'); }
   }
   if (splashT > 0) splashT -= dt;
   resolve(P.pos); resolvePoly(P.pos);resolveQuays(P.pos,ox,oz);
@@ -3497,7 +3411,7 @@ const seenPoi = new Set();
 // ======================================================================== UI
 const hud = $('hud'), intro = $('intro'), goBtn = $('goBtn');
 const mapCv = $('map'), mctx = mapCv.getContext('2d');
-let mapBase = null, guideTarget = null; const MX0 = -300, MX1 = 330, MZ0 = -265, MZ1 = 345;
+let mapBase = null; const MX0 = -300, MX1 = 330, MZ0 = -265, MZ1 = 345;
 function sizeMap() {
   const cssW = window.innerWidth < 600 ? 112 : 170; const cssH = Math.round(cssW * (MZ1 - MZ0) / (MX1 - MX0));
   mapCv.style.width = cssW + 'px'; mapCv.style.height = cssH + 'px';
@@ -3529,8 +3443,6 @@ function drawMap() {
   const k = mapCv.width / (MX1 - MX0);
   const px = mpx(P.pos.x), pz = mpz(P.pos.z);
   if (!MYBOAT.on) { g.fillStyle = '#d9534f'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(MYBOAT.x), mpz(MYBOAT.z), Math.max(3, k * 2.4), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the little boat
-  for (const c of CROWNS) if (!c.got) { g.fillStyle = '#ffd34d'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(c.x), mpz(c.z), Math.max(3.5, k * 3) * (1 + 0.18 * Math.sin(clockT * 5)), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the crowns that are still out there
-  if (guideTarget && !guideTarget.got) { g.strokeStyle = '#fffaf0'; g.lineWidth = Math.max(2, k * 1.5); g.beginPath(); g.arc(mpx(guideTarget.x), mpz(guideTarget.z), Math.max(7, k * 5), 0, Math.PI * 2); g.stroke(); }
   const cy = cam.yaw; const fx = -Math.sin(cy), fz = -Math.cos(cy); const L = 22 * k;
   g.fillStyle = 'rgba(255,250,240,.35)'; g.beginPath(); g.moveTo(px, pz);
   g.lineTo(px + (fx * Math.cos(0.5) - fz * Math.sin(0.5)) * L, pz + (fz * Math.cos(0.5) + fx * Math.sin(0.5)) * L);
@@ -3547,7 +3459,7 @@ function setEvening(v) {
 }
 function setSound(v) { soundOn = v; $('bSound').setAttribute('aria-pressed', String(v)); $('iWave').style.display = v ? '' : 'none'; save(); }
 let toastTimer = 0;
-function toast(msg) { sayToast(msg); const t = $('toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; toastTimer = 3.4; }
+function toast(msg) { const t = $('toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; toastTimer = 3.4; }
 let curPoi = null, poiExpanded = false;
 function shortPoi(text) { const end = text.search(/[.!?]\s/); return end < 0 ? text : text.slice(0, end + 1); }
 function renderPoiText() {
@@ -3555,30 +3467,28 @@ function renderPoiText() {
   $('poiText').textContent = poiExpanded ? curPoi.t : shortPoi(curPoi.t);
   $('poiMore').hidden = shortPoi(curPoi.t) === curPoi.t;
   $('poiMore').textContent = poiExpanded ? 'Vis mindre' : 'Læs mere';
-  updTaskCard(); setPoiH();
+  setPoiH();
 }
 function showPoi(p) {
   if (p === curPoi) return;
   curPoi = p; poiExpanded = false; const el = $('poi');
-  if (p && !seenPoi.has(p.n)) { seenPoi.add(p.n); if(!p.quiet){popLabel(p.n, kid.root.position, 1.3); burst(kid.root.position); sparkleSound();} }
+  if (p) seenPoi.add(p.n);
   if (!p) { el.hidden = true; setPoiH(); return; }
-  sayPoi(p); $('poiName').textContent = p.n; $('poiRead').hidden = !('speechSynthesis' in window);
+  $('poiName').textContent = p.n;
   el.hidden = false; renderPoiText();
 }
 $('poiMore').addEventListener('click', () => { poiExpanded = !poiExpanded; renderPoiText(); });
-$('poiRead').addEventListener('click', () => { if (curPoi) say(`${curPoi.n}. ${curPoi.t} ${taskLine(curPoi)}`, true); });
 
 $('bMap').addEventListener('click', () => FX.mapView?.open());
-$('bVoice').addEventListener('click', () => setVoice(!voiceOn));
 $('bNight').addEventListener('click', () => setEvening(!evening));
 $('bSound').addEventListener('click', () => { setSound(!soundOn); if (soundOn) sparkleSound(); });
 $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear(); resetTouch();
-  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; $('taskBox').hidden = true; }
-  else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';$('taskBox').hidden=true;}
-  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = `Du har fundet ${found.size} af 10 kroner og fået ${tasksDone.size} af ${TASKS.length} stjerner. Følg de gule lys for at finde kronerne. Mange steder har en lille opgave, som giver en stjerne.`; renderTasks(); $('taskBox').hidden = false; }
+  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
+  else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';}
+  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk M for oversigtskortet. Personer, spor og ting kommer i de næste trin af gåden.'; }
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
@@ -3596,7 +3506,7 @@ const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'Arro
 window.addEventListener('keydown', e => {
   if (!started || paused) return;
   if (MOVE_KEYS.includes(e.code)) { keys.add(e.code); e.preventDefault(); }
-  if (e.code === 'Space' && !e.repeat) { if (FX.scooter?.active) FX.scooter.stop(); else jumpReq = true; }
+  if (e.code === 'Space' && !e.repeat) jumpReq = true;
   if (e.code === 'KeyN' && !e.repeat) setEvening(!evening);
   if (e.code === 'KeyM' && !e.repeat) FX.mapView?.open();
   if (e.code === 'KeyE' && !e.repeat) runAction();
@@ -3622,7 +3532,7 @@ function followTouchCamera(dt) {
   cam.yaw+=Math.max(-dt*.9,Math.min(dt*.9,change));
 }
 function stopTouchWalking() {
-  if(!MYBOAT.on&&!TOWER.on&&!FX.scooter?.active&&!P.ride&&!P.swing){P.vel.x=P.vel.z=0;}
+  if(!MYBOAT.on&&!TOWER.on&&!P.ride&&!P.swing){P.vel.x=P.vel.z=0;}
 }
 function resetTouch() {
   joy.id = null; joy.x = joy.y = 0; drag.clear(); jumpReq = false; stopTouchWalking();
@@ -3655,7 +3565,7 @@ canvas.addEventListener('pointermove', e => {
 const endPtr = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; stopTouchWalking(); $('joy').hidden = true; $('touchHint').hidden = !isTouch; } if (drag.delete(e.pointerId)) {lastDragEnd=clockT;lastManualLookAt=performance.now();} };
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr); canvas.addEventListener('lostpointercapture', endPtr);
 canvas.addEventListener('wheel', e => { if (!started) return; e.preventDefault(); cam.dist = Math.min(26, Math.max(3.2, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive: false });
-$('jump').addEventListener('pointerdown', e => { e.preventDefault(); if (FX.scooter?.active) FX.scooter.stop(); else jumpReq = true; });
+$('jump').addEventListener('pointerdown', e => { e.preventDefault(); jumpReq = true; });
 $('actBtn').addEventListener('click', () => { runAction(); $('c').focus(); });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -3675,7 +3585,7 @@ let startBlend = -1;
 const orbitC = new THREE.Vector3(20, 0, 40);
 let camIn = 0;
 function camFollow(dt, out, look) {
-  if (drag.size === 0 && clockT - lastDragEnd > 0.8 && (!isTouch || MYBOAT.on || FX.scooter?.active)) {
+  if (drag.size === 0 && clockT - lastDragEnd > 0.8 && (!isTouch || MYBOAT.on)) {
     const moving = Math.hypot(P.vel.x, P.vel.z) > 0.4 || Math.abs(turnIn) > 0.05;
     cam.yaw += angDiff(P.face + Math.PI, cam.yaw) * Math.min(1, dt * (moving ? 6 : 1.6));
   }
@@ -3711,40 +3621,13 @@ function onResize() { const w = window.innerWidth, h = window.innerHeight; rende
 window.addEventListener('resize', onResize);
 camera.fov = window.innerWidth / window.innerHeight < 0.8 ? 70 : 55; camera.updateProjectionMatrix();
 
-// ---------------- reading the texts aloud in Danish
-let voiceOn = false, daVoice = null, toastSaidAt = -99, pendingPoi = null;
-const lastPoiSaid = new Map();
-function pickVoice() { try { const vs = speechSynthesis.getVoices(); daVoice = vs.find(v => /^da/i.test(v.lang)) || null; } catch (e) { daVoice = null; } }
-if ('speechSynthesis' in window) { pickVoice(); try { speechSynthesis.addEventListener('voiceschanged', pickVoice); } catch (e) {} }
-function say(text, force = false) {
-  if ((!voiceOn && !force) || !('speechSynthesis' in window)) return;
-  try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text.replace(/·/g, ',').replace(/MÅL!/g, 'Mål!').replace(/\bS\b/g, 'S'));
-    u.lang = 'da-DK'; if (daVoice) u.voice = daVoice; u.rate = 0.95; u.pitch = 1.1;
-    speechSynthesis.speak(u);
-  } catch (e) {}
-}
-function sayToast(msg) { if (!started) return; toastSaidAt = clockT; say(msg); }
-function sayPoi(p) {
-  if (!p || !started) return;
-  if (clockT - toastSaidAt < 3.5) { pendingPoi = p; return; }
-  const last = lastPoiSaid.get(p.n) ?? -999; if (clockT - last < 90) return;
-  lastPoiSaid.set(p.n, clockT); say(`${p.n}. ${shortPoi(p.t)}`);
-}
-function updVoice() { if (pendingPoi && clockT - toastSaidAt >= 3.5) { const p = pendingPoi; pendingPoi = null; if (p === curPoi) sayPoi(p); } }
-function setVoice(v) {   // reading aloud is off from the start; the "Læs op" button turns it on and off
-  voiceOn = !!v; $('bVoice').setAttribute('aria-pressed', String(voiceOn)); $('iVoice').style.opacity = voiceOn ? 1 : 0.35;
-  if (!voiceOn) { try { speechSynthesis.cancel(); } catch (e) {} }
-  save();
-}
 
 // ======================================================================== ACTION BUTTON
 // A feature calls offerAction({ id, label, run, prio }) every frame while the player can do something there.
-// The best offer is shown as a big button ("E  Dans") and read aloud once; E or a click runs it.
-const ACT = { offers: [], cur: null, said: new Map() };
+// The best offer is shown as a big button ("E  Gå ind"); E or a click runs it.
+const ACT = { offers: [], cur: null };
 function offerAction(o) { ACT.offers.push(o); }
-function runAction() { if (!started || paused || !ACT.cur) return; const c = ACT.cur; c.run(); taskAct(c.id); ACT.shownId = null; }
+function runAction() { if (!started || paused || !ACT.cur) return; const c = ACT.cur; c.run(); ACT.shownId = null; }
 function updActions() {
   let best = null; for (const o of ACT.offers) if (!best || (o.prio || 0) > (best.prio || 0)) best = o;
   ACT.offers.length = 0; if (!started || paused || P.ride || P.swing || FX.tower?.busy) best = null;
@@ -3753,26 +3636,24 @@ function updActions() {
   if (!best) { if (!el.hidden) el.hidden = true; ACT.shownId = null; return; }
   if (ACT.shownId !== best.id + '|' + best.label) {
     ACT.shownId = best.id + '|' + best.label; $('actTxt').textContent = best.label; el.hidden = false;
-    const last = ACT.said.get(best.label) ?? -999; if (clockT - last > 45 && clockT - toastSaidAt > 2.5) { ACT.said.set(best.label, clockT); say(best.label); }
   }
 }
 
 // ======================================================================== STATE / STORAGE
 let soundOn = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
-const SKEY = 'christiansborg3d';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap, readAloud: voiceOn, crowns: [...found], tasks: [...tasksDone] })); } catch (e) {} }
+const SKEY = 'mordIRigetsMidte';
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap })); } catch (e) {} }
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
-HOOKS.start.push(() => setTimeout(() => !FX.interior?.on && toast(found.size === 0 ? 'Kongen har tabt 10 guldkroner. Kan du finde dem?' : found.size === 9 ? 'Find den sidste krone.' : found.size < 10 ? `Find de sidste ${10 - found.size} kroner.` : 'Gå over broen hen til slottet.'), 1200));
+HOOKS.start.push(() => setTimeout(() => !FX.interior?.on && toast('Velkommen til Slotsholmen. Kortet viser stederne i spillet.'), 1200));
 
 // ======================================================================== MAIN LOOP
-let last = performance.now(), clockT = 0, poiT = 0, mapT = 0, guideT = 0;
+let last = performance.now(), clockT = 0, poiT = 0, mapT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; clockT += dt;
   ev += ((evening ? 1 : 0) - ev) * Math.min(1, dt * 1.6); applyEvening();
   if (started) updPlayer(dt);
   updCamera(dt, clockT);
   if (window.__camFix) { camera.position.fromArray(window.__camFix[0]); camera.lookAt(...window.__camFix[1]); }   // for testing only
-  updVoice();
   for (const h of HOOKS.frame) h(dt, clockT);
   updActions();
   updEffects(dt);
@@ -3785,105 +3666,12 @@ function frame(now) {
   if (started) {
     poiT -= dt; if (poiT < 0) { poiT = 0.25; showPoi(paused ? null : poiAt(P.pos.x, P.pos.z)); }
     mapT -= dt; if (mapT < 0) { mapT = 1 / 30; drawMap(); }
-    guideT -= dt; if (guideT < 0) { guideT = 0.25; updGuide(); }
     if (toastTimer > 0) { toastTimer -= dt; if (toastTimer <= 0) $('toast').hidden = true; }
   }
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
 
-// ======================================================================== THE KING'S 10 GOLD CROWNS AND THE DUCKS
-// Ten gold crowns lie around Slotsholmen, each with a soft yellow light over it that can be seen from far away
-// (and a gold dot on the map). She takes a crown by walking into it. When she has all ten, there are fireworks,
-// she gets a little crown on her head, and a card says well done. The crowns she has found are remembered.
-// Two duck families swim in the canals. Near the water she can throw bread to them, and they come and eat it.
-const CROWN_SPOTS = [[-6, -205], [-25, -148], [-120, -95], [-35, -60], [100, -30], [130, -95], [300, 50], [40, 180], [-140, 85], [-206, 140]];
-const found = new Set();
-{ const st = load(); for (const i of st.crowns || []) if (i >= 0 && i < CROWN_SPOTS.length) found.add(i); }
-const BEAM_M = (() => {
-  const cv = document.createElement('canvas'); cv.width = 4; cv.height = 128; const g = cv.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 128);
-  gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 128);
-  return new THREE.MeshBasicMaterial({ color: '#ffd34d', map: new THREE.CanvasTexture(cv), transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide });
-})();
-const CROWNS = CROWN_SPOTS.map(([x, z], i) => {
-  const y0 = archH(x, z), g = new THREE.Group(), c = new THREE.Group();
-  crownAt(c, 0, 0, 0, 0.5);
-  mesh(new THREE.SphereGeometry(0.11, 10, 8), tm('#d9534f'), 0, -0.06, 0.48, { parent: c });   // a red jewel in front
-  bakeGroup(c); g.add(c); g.position.set(x, y0 + 1.1, z);
-  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffd34d', transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending }));
-  glow.scale.setScalar(2.4); g.add(glow); dyn.add(g);
-  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 18, 16, 1, true), BEAM_M); beam.position.set(x, y0 + 9, z); dyn.add(beam);
-  const got = found.has(i); g.visible = beam.visible = !got;
-  return { i, x, z, y0, g, c, beam, got, fly: 0, ph: i * 0.7 };
-});
-function updGuide() {
-  guideTarget = null; let best = Infinity;
-  for (const c of CROWNS) if (!c.got) {
-    const d = Math.hypot(P.pos.x - c.x, P.pos.z - c.z);
-    if (d < best) { best = d; guideTarget = c; }
-  }
-  const el = $('guide'); el.hidden = !guideTarget;
-  if (!guideTarget) return;
-  const a = Math.atan2(guideTarget.x - P.pos.x, guideTarget.z - P.pos.z) - P.face;
-  $('guideArrow').style.transform = `rotate(${a}rad)`;
-  $('guideText').textContent = `Nærmeste krone · ${Math.round(best)} m`;
-  el.setAttribute('aria-label', `Nærmeste krone, ${Math.round(best)} meter væk`);
-}
-let headCrown = null;
-function setCrownOnHead(on) {
-  if (on && !headCrown) { headCrown = new THREE.Group(); crownAt(headCrown, 0, 0, 0, 0.2); headCrown.position.set(0, 0.43, -0.02); headCrown.rotation.x = -0.15; kid.head.add(headCrown); }
-  if (headCrown) headCrown.visible = on;
-}
-function updCounter(bump) {
-  $('cnt').textContent = `${found.size} af ${CROWNS.length}`;
-  if (bump) { const el = $('counter'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
-}
-updCounter(); setCrownOnHead(found.size >= CROWNS.length);
-function firework(x, y, z) {
-  const col = pick(['#ffd34d', '#ff9fb2', '#9fd3ff', '#b7f0a0', '#ffffff']);
-  for (let i = 0; i < 26; i++) {
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: col, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
-    sp.scale.setScalar(rr(0.5, 0.85)); sp.position.set(x, y, z); dyn.add(sp);
-    const a = rand() * 6.28, b = rr(-1, 1), v = rr(3, 5.5), h = Math.sqrt(1 - b * b);
-    effects.push({ sp, t: 0, life: rr(1.1, 1.6), vx: Math.cos(a) * h * v, vz: Math.sin(a) * h * v, vy: b * v + 2 });
-  }
-  tone(200, 90, 0, 0.25, 0.08, 'triangle');
-}
-function allCrowns() {
-  toast('Hurra! Du fandt alle kongens kroner!');
-  [523, 659, 784, 1047, 784, 1047].forEach((f, k) => tone(f, f, k * 0.16, k === 5 ? 0.7 : 0.2, 0.08, 'triangle'));
-  setCrownOnHead(true);
-  let k = 0; const iv = setInterval(() => { const a = rand() * 6.28; firework(P.pos.x + Math.cos(a) * rr(3, 7), P.pos.y + rr(5, 9), P.pos.z + Math.sin(a) * rr(3, 7)); if (++k >= 9) clearInterval(iv); }, 300);
-  setTimeout(() => { if (found.size >= CROWNS.length && started) { paused = true; keys.clear(); resetTouch(); $('finale').hidden = false; $('finOk').focus(); } }, 3300);
-}
-function takeCrown(c) {
-  c.got = true; c.fly = 0.7; c.beam.visible = false; found.add(c.i); save(); updCounter(true);
-  const n = found.size;
-  burst(new THREE.Vector3(c.x, c.y0 + 0.6, c.z)); rewardRipple(c.x, c.y0, c.z); popLabel(`${n} af ${CROWNS.length}`, kid.root.position, 1.3);
-  [784, 988, 1175, 1568].forEach((f, k) => tone(f, f, k * 0.09, 0.25, 0.06, 'triangle'));
-  if (n >= CROWNS.length) { allCrowns(); return; }
-  toast(n === 1 ? 'Du fandt en guldkrone! Følg de gule lys til de andre.' : n === CROWNS.length - 1 ? 'Kun én krone mangler!' : `Flot! Der mangler ${CROWNS.length - n} kroner.`);
-}
-const _cv = new THREE.Vector3();
-HOOKS.frame.push((dt, t) => {
-  for (const c of CROWNS) {
-    if (c.got) {
-      if (c.fly > 0) {   // the crown flies to her and gets small
-        c.fly -= dt; c.g.position.lerp(_cv.set(P.pos.x, P.pos.y + 2.0, P.pos.z), Math.min(1, dt * 8)); c.g.scale.setScalar(0.25 + 0.75 * Math.max(0, c.fly / 0.7)); c.c.rotation.y += dt * 9;
-        if (c.fly <= 0) c.g.visible = false;
-      }
-      continue;
-    }
-    c.c.rotation.y += dt * 1.6; c.g.position.y = c.y0 + 1.1 + Math.sin(t * 2.2 + c.ph) * 0.15;
-    if (started && !paused && Math.hypot(P.pos.x - c.x, P.pos.z - c.z) < 1.7 && Math.abs(P.pos.y - c.y0) < 2.4) takeCrown(c);
-  }
-});
-$('finOk').addEventListener('click', () => { $('finale').hidden = true; paused = false; canvas.focus(); });
-$('finAgain').addEventListener('click', () => {
-  found.clear(); save(); setCrownOnHead(false); updCounter();
-  for (const c of CROWNS) { c.got = false; c.fly = 0; c.g.visible = c.beam.visible = true; c.g.scale.setScalar(1); c.g.position.set(c.x, c.y0 + 1.1, c.z); }
-  $('finale').hidden = true; paused = false; canvas.focus(); toast('Kronerne er gemt igen. Kan du finde dem?');
-});
 // ---------------- Slotspladsen: granite spheres and a handful of visitors
 // The spheres follow the street side of the forecourt. Their spacing leaves room
 // to pass between them, and a few are omitted at the street crossings.
@@ -4152,12 +3940,10 @@ HOOKS.frame.push((dt, t) => {
     w.root.rotation.y = Math.atan2(w.b[0] - w.a[0], w.b[1] - w.a[1]) + (Math.cos(a) < 0 ? Math.PI : 0);
     animateWalkingCompany(w, t, moving);
     const d = Math.hypot(P.pos.x - x, P.pos.z - z);
-    if (d < 4.5 && !w.greeted) { w.greeted = true; popLabel('Hej!', w.root.position, 1.6); tone(630, 780, 0, 0.13, 0.025, 'triangle'); }
-    if (d > 12) w.greeted = false;
   }
 });
 
-// ---------------- the ducks: a mother duck with four yellow ducklings in a line behind her
+// ---------------- the ducks: a mother duck with four yellow ducklings in a line behind her (city life only)
 function makeDuck(kind) {   // 'mor' (brown) or 'baby' (yellow); the beak points to +z
   const g = new THREE.Group(), s = kind === 'baby' ? 0.5 : 1, body = tm(kind === 'baby' ? '#f6d55c' : '#9a7350'), headM = tm(kind === 'baby' ? '#f6d55c' : '#7d5a3c');
   mesh(new THREE.SphereGeometry(0.3 * s, 12, 10), body, 0, 0.12 * s, 0, { parent: g }).scale.set(1, 0.75, 1.45);
@@ -4176,69 +3962,31 @@ const FAMILIES = [[-70, -152], [215, -15]].map(([hx, hz]) => {
   hideWhenFar([mom.g, ...kids.map(k => k.g)], hx, hz, 110);
   return { hx, hz, mom, kids, tx: hx, tz: hz, timer: 0, quackT: rr(3, 8) };
 });
-const CRUMBS = [], crumbGeo = new THREE.SphereGeometry(0.08, 6, 5), crumbM = tm('#d9b27a');
 const quack = () => { tone(640, 430, 0, 0.11, 0.09, 'sawtooth'); tone(620, 410, 0.16, 0.11, 0.08, 'sawtooth'); };
 const peep = () => tone(2500, 3000, 0, 0.07, 0.035);
-function throwBread() {
-  const fx = Math.sin(kid.root.rotation.y), fz = Math.cos(kid.root.rotation.y);
-  let d = 6.5; while (d > 3 && !rawWater(P.pos.x + fx * d, P.pos.z + fz * d)) d -= 0.5;
-  for (let i = 0; i < 6; i++) {
-    const m = new THREE.Mesh(crumbGeo, crumbM); m.position.set(P.pos.x + fx * 0.4, P.pos.y + 1.1, P.pos.z + fz * 0.4); dyn.add(m);
-    const tx = P.pos.x + fx * d + rr(-1.3, 1.3), tz = P.pos.z + fz * d + rr(-1.3, 1.3), T = rr(0.8, 1.0);
-    CRUMBS.push({ m, vx: (tx - m.position.x) / T, vz: (tz - m.position.z) / T, vy: (WL - m.position.y + 4.9 * T * T) / T, at: 'air', age: 0, ph: rand() * 6 });
-  }
-  tone(500, 900, 0, 0.12, 0.04, 'triangle');
-}
-let fedOnce = false;
-function eatCrumb(k, big) { const c = CRUMBS[k]; dyn.remove(c.m); CRUMBS.splice(k, 1); if (big) quack(); else peep(); }
 function swim(d, tx, tz, speed, dt) {   // turn toward the target and swim forward (only on water)
   const want = Math.atan2(tx - d.x, tz - d.z); d.h += angDiff(want, d.h) * Math.min(1, dt * 3);
   const nx = d.x + Math.sin(d.h) * speed * dt, nz = d.z + Math.cos(d.h) * speed * dt;
   if (rawWater(nx, nz)) { d.x = nx; d.z = nz; return true; } return false;
 }
 HOOKS.frame.push((dt, t) => {
-  // bread in the air falls down, bread on the water floats
-  for (let k = CRUMBS.length - 1; k >= 0; k--) {
-    const c = CRUMBS[k], p = c.m.position; c.age += dt;
-    if (c.at === 'air') {
-      c.vy -= 9.8 * dt; p.x += c.vx * dt; p.y += c.vy * dt; p.z += c.vz * dt;
-      const wet = rawWater(p.x, p.z), floor = wet ? WL + 0.03 : archH(p.x, p.z) + 0.05;
-      if (p.y <= floor) { p.y = floor; c.at = wet ? 'water' : 'land'; c.age = 0; }
-    } else if (c.at === 'water') p.y = WL + 0.03 + Math.sin(t * 2 + c.ph) * 0.02;
-    if (c.age > (c.at === 'land' ? 3 : 40)) { dyn.remove(c.m); CRUMBS.splice(k, 1); }
-  }
-  const floating = CRUMBS.filter(c => c.at === 'water');
   for (const F of FAMILIES) {
     const m = F.mom;
-    let food = null, fd = 45;
-    for (const c of floating) { const d = Math.hypot(c.m.position.x - m.x, c.m.position.z - m.z); if (d < fd) { fd = d; food = c; } }
-    if (food) { F.tx = food.m.position.x; F.tz = food.m.position.z; F.timer = 4; }
-    else {
-      F.timer -= dt;
-      if (F.timer <= 0 || Math.hypot(F.tx - m.x, F.tz - m.z) < 0.8) {   // swim to a new spot near home
-        for (let k = 0; k < 20; k++) { const a = rand() * 6.28, r = rr(3, 16), x = F.hx + Math.cos(a) * r, z = F.hz + Math.sin(a) * r; if (waterOk(x, z) && pathOk(m.x, m.z, x, z)) { F.tx = x; F.tz = z; break; } }
-        F.timer = rr(6, 12);
-      }
+    F.timer -= dt;
+    if (F.timer <= 0 || Math.hypot(F.tx - m.x, F.tz - m.z) < 0.8) {   // swim to a new spot near home
+      for (let k = 0; k < 20; k++) { const a = rand() * 6.28, r = rr(3, 16), x = F.hx + Math.cos(a) * r, z = F.hz + Math.sin(a) * r; if (waterOk(x, z) && pathOk(m.x, m.z, x, z)) { F.tx = x; F.tz = z; break; } }
+      F.timer = rr(6, 12);
     }
-    if (!swim(m, F.tx, F.tz, food ? 2.3 : 0.8, dt)) F.timer = 0;
+    if (!swim(m, F.tx, F.tz, 0.8, dt)) F.timer = 0;
     let prev = m;
     for (const d of F.kids) {
       const dist = Math.hypot(prev.x - d.x, prev.z - d.z);
       if (dist > 0.75) swim(d, prev.x, prev.z, Math.min(3.2, (dist - 0.75) * 3 + 0.3), dt); else d.h += angDiff(prev.h, d.h) * Math.min(1, dt * 2);
       prev = d;
     }
-    for (const d of [m, ...F.kids]) {
-      d.g.position.set(d.x, WL + Math.sin(t * 2.4 + d.x) * 0.03, d.z); d.g.rotation.y = d.h;
-      for (let k = CRUMBS.length - 1; k >= 0; k--) { const c = CRUMBS[k]; if (c.at === 'water' && Math.hypot(c.m.position.x - d.x, c.m.position.z - d.z) < (d === m ? 0.7 : 0.45)) eatCrumb(k, d === m); }
-    }
-    F.quackT -= dt;   // now and then the mother says rap rap, if she is close
+    for (const d of [m, ...F.kids]) { d.g.position.set(d.x, WL + Math.sin(t * 2.4 + d.x) * 0.03, d.z); d.g.rotation.y = d.h; }
+    F.quackT -= dt;   // now and then the mother quacks, if she is close
     if (F.quackT <= 0) { F.quackT = rr(5, 12); if (started && Math.hypot(P.pos.x - m.x, P.pos.z - m.z) < 16) quack(); }
-  }
-  // near the water, with ducks close by: throw bread
-  if (started && !paused) {
-    const fx = Math.sin(kid.root.rotation.y), fz = Math.cos(kid.root.rotation.y), ax = P.pos.x + fx * 4, az = P.pos.z + fz * 4;
-    if (rawWater(ax, az) && floating.length < 8 && FAMILIES.some(F => Math.hypot(F.mom.x - ax, F.mom.z - az) < 45))
-      offerAction({ id: 'brod', label: 'Giv ænderne brød', prio: 1, run: () => { throwBread(); if (!fedOnce) { fedOnce = true; setTimeout(() => toast('Rap rap! Ænderne kommer svømmende.'), 700); } } });
   }
 });
 
@@ -4270,9 +4018,8 @@ const SWANS = (() => {
   F.all = [F.mom, F.dad, ...F.kids]; hideWhenFar(F.all.map(d => d.g), hx, hz, 120);
   return F;
 })();
-POIS.push({ n: 'Svanerne', t: 'To hvide svaner og deres grå unger bor i havnen her. Svaneungerne er grå det første år og bliver hvide, når de bliver store.', x: 228, z: 290, r: 14 });
+POIS.push({ n: 'Svanerne', t: 'En svanefamilie bor i havnen foran Den Sorte Diamant. Ungerne er grå det første år.', x: 228, z: 290, r: 14 });
 {
-  let kidWave = 0, wavedOnce = false;
   HOOKS.frame.push((dt, t) => {
     const F = SWANS;
     F.timer -= dt; if (F.call > 0) F.call -= dt;
@@ -4299,17 +4046,6 @@ POIS.push({ n: 'Svanerne', t: 'To hvide svaner og deres grå unger bor i havnen 
       const up = d.lift > 0 ? Math.min(1, d.lift * 2, (2.2 - d.lift) * 3) : 0;   // the wings go up and come down again
       d.wings.forEach((w, i) => { const sx = i ? 1 : -1; w.rotation.z = sx * (0.25 + up * 0.75); w.rotation.x = -up * 0.35; });
     }
-    if (kidWave > 0) { kidWave -= dt; kid.arms[1].rotation.z = 2.6 + Math.sin(t * 12) * 0.3; }
-    if (!started || paused || MYBOAT.on) return;
-    const near = Math.hypot(P.pos.x - F.mom.x, P.pos.z - F.mom.z) < 26;
-    const fx = Math.sin(kid.root.rotation.y), fz = Math.cos(kid.root.rotation.y);
-    if (near && [3, 5, 7, 9].some(d => rawWater(P.pos.x + fx * d, P.pos.z + fz * d)))
-      offerAction({ id: 'svane', label: 'Vink til svanerne', prio: 1, run: () => {
-        kidWave = 2.5; F.mom.lift = F.dad.lift = 2.2; flutterSound(); [0, 0.25, 0.5].forEach(d => setTimeout(peep, d * 1000));
-        let gx = P.pos.x + fx * 4, gz = P.pos.z + fz * 4; for (let k = 0; k < 12 && !waterOk(gx, gz); k++) { gx += fx; gz += fz; }
-        F.goal = [gx, gz]; F.call = 7;
-        if (!wavedOnce) { wavedOnce = true; setTimeout(() => toast('Svanerne løfter vingerne og svømmer hen til dig.'), 600); }
-      } });
   });
 }
 
@@ -4388,7 +4124,7 @@ const MYBOAT = { x: -37.5, z: -170.6, h: -1.27, v: 0, on: false, duck: 0, putT: 
   // white foam behind the boat when it sails
   MYBOAT.foam = Array.from({ length: 14 }, () => { const m = new THREE.Mesh(new THREE.CircleGeometry(0.25, 12), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.visible = false; dyn.add(m); return { m, t: 9 }; });
 }
-POIS.push({ n: 'Den lille båd', t: 'Her ligger en lille rød båd. Gå hen til den, og tryk på knappen. Så kan du selv sejle i kanalen.', x: MYBOAT.x, z: MYBOAT.z, r: 9 });
+POIS.push({ n: 'Den lille båd', t: 'En lille rød båd ved kajen. Gå hen til den for at sejle i kanalen.', x: MYBOAT.x, z: MYBOAT.z, r: 9 });
 const BOAT_POI = POIS[POIS.length - 1];
 function lowAt(x, z) {   // under the low ends of an arched bridge
   for (const F of ARCHES) { const dx = x - F.cx, dz = z - F.cz, s = dx * F.ux + dz * F.uz; if (Math.abs(s) >= F.L / 2) continue; if (Math.abs(dx * F.vx + dz * F.vz) < F.W / 2 + 0.4 && archSoffit(F, s) < WL + 2.0) return true; }
@@ -4422,7 +4158,7 @@ let sailedOnce = false;
 function boardBoat() {
   MYBOAT.on = true; MYBOAT.v = 0; MYBOAT.hinted = false; BOAT_POI.x = BOAT_POI.z = 1e6; P.vel.set(0, 0, 0); jumpReq = false;
   cam.yaw = MYBOAT.h + Math.PI; $('jump').textContent = 'Dyt'; hop();
-  toast(sailedOnce ? 'Du sejler igen!' : `Nu sejler du! Styr båden, ligesom når du går. ${isTouch ? 'Tryk på Dyt' : 'Tryk på mellemrum'} for at dytte.`); sailedOnce = true;
+  toast(sailedOnce ? 'Du sejler igen.' : `Du sejler. Styr båden, som når du går. ${isTouch ? 'Tryk på Dyt' : 'Tryk på mellemrum'} for at dytte.`); sailedOnce = true;
 }
 function leaveBoat(spot) {
   const B = MYBOAT; B.on = false; B.v = 0; BOAT_POI.x = B.x; BOAT_POI.z = B.z;
@@ -4463,7 +4199,7 @@ HOOKS.ride.push(dt => {
   B.duck += ((under ? 0.45 : 0) - B.duck) * Math.min(1, dt * 5);
   const [sx, sz] = seatOf(B.x, B.z, B.h);
   P.pos.set(sx, WL + 0.18 - B.duck + Math.sin(clockT * 1.6) * 0.04, sz); P.face = B.h; P.vel.set(Math.sin(B.h) * B.v, 0, Math.cos(B.h) * B.v); P.onGround = true;
-  kid.root.position.copy(P.pos); kid.root.rotation.y = B.h; kid.g.position.y = 0;
+  kid.root.position.copy(P.pos); kid.root.rotation.y = B.h; kid.g.position.y = -0.2;
   const L = kid.legs, A = kid.arms;
   for (const l of L) { l.hip.rotation.x = -1.5; l.knee.rotation.x = 1.45; l.shoe.rotation.x = 0; }
   A[0].rotation.x = -1.2 + turn * 0.2; A[1].rotation.x = -1.2 - turn * 0.2; A[0].rotation.z = -0.25; A[1].rotation.z = 0.25;
@@ -4596,12 +4332,12 @@ const TOWER = (() => {
       if (ride.t > 2.6) {
         const up = ride.up,room=ride.room; ride = null; T.busy = false;
         if(room)toast(room==='towerRestaurant'?'Du er i restauranten, 34 meter over gaden.':'Du er i elevatorhallen ved Kongeporten.');
-        else if (up) { toast(firstUp ? `Du er 44 meter oppe! Drej rundt, og kig ud over byen. ${isTouch ? 'Tryk på Kikkert' : 'Tryk på mellemrum'} for at kigge langt.` : 'Du er oppe i tårnet igen!'); firstUp = false; }
+        else if (up) { toast(firstUp ? `Du er 44 meter oppe. Drej rundt og kig ud over byen. ${isTouch ? 'Tryk på Kikkert' : 'Tryk på mellemrum'} for at kigge langt.` : 'Du er oppe i tårnet igen.'); firstUp = false; }
         else toast('Nu er du nede igen.');
       }
     }
     if (!started || paused) return;
-    if (!T.on && !T.busy && !MYBOAT.on && !FX.scooter?.active && P.onGround && Math.hypot(P.pos.x - T.door[0], P.pos.z - T.door[1]) < 4.5)
+    if (!T.on && !T.busy && !MYBOAT.on && P.onGround && Math.hypot(P.pos.x - T.door[0], P.pos.z - T.door[1]) < 4.5)
       offerAction({ id: 'taarnop', label: 'Gå ind i tårnet', prio: 8, run: () => FX.interior.enter('towerLobby') });
     if (T.on && !T.busy) offerAction({ id: 'taarnned', label: 'Til elevatorhallen', prio: 4, run: () => go(false,'towerLobby') });
   });
@@ -4617,94 +4353,13 @@ const TOWER = (() => {
     const base = window.innerWidth / window.innerHeight < 0.8 ? 70 : 55, want = T.zoom ? base * 0.36 : base;
     if (Math.abs(camera.fov - want) > 0.05) { camera.fov += (want - camera.fov) * Math.min(1, dt * 6); camera.updateProjectionMatrix(); }
   });
-  POIS.push({ n: 'Udsigten', t: 'Du er 44 meter oppe i tårnet. Herfra kan du se ud over hele Slotsholmen, havnen og byen. Drej rundt, og find de steder, du har været.', x: C[0], z: C[1], r: 6 });
+  POIS.push({ n: 'Udsigten', t: 'Du står 44 meter oppe i tårnet med udsigt over Slotsholmen, havnen og byen.', x: C[0], z: C[1], r: 6 });
   T.go=go;T.leave=leave;T.enter=enter;
   return T;
 })();
 
-// ======================================================================== SMALL TASKS (a star for each)
-// Many places have a small task: do something (the same E actions as always), go somewhere, or answer a question
-// with three big buttons. The task stands on the place's card (and is read aloud with it). A star for each; the stars
-// are counted under the crowns, and a tap on the stars shows the list. The tasks she has done are remembered.
-const TASKS = [
-  { id: 'havmand', s: 'Havmanden', at: ['Højbro', 'Højbro Plads'], t: 'Kig efter havmanden under Højbro.', act: 'havmand' },
-  { id: 'taarn', s: 'Tårnets kroner', at: ['Tårnet', 'Christiansborg Slot'], t: 'Hvor mange guldkroner sidder der på toppen af tårnet?', quiz: ['1', '2', '3'], ok: 2 },
-  { id: 'hest', s: 'Klap en hest', at: ['Ridebanen', 'De Kongelige Stalde'], t: 'Klap en af hestene.', act: 'hest' },
-  { id: 'brod', s: 'Ænderne', at: ['Gammel Strand'], t: 'Giv ænderne brød.', act: 'brod' },
-  { id: 'kanon', s: 'Konfetti', at: ['Tøjhusmuseet'], t: 'Skyd med konfetti fra kanonen.', act: 'kanon' },
-  { id: 'vink', s: 'Vink til en båd', at: ['Slotsholmskanalen', 'Frederiksholms Kanal'], t: 'Vink til en kanalbåd.', act: 'baad' },
-  { id: 'sejl', s: 'Sejl under Højbro', at: ['Den lille båd'], t: 'Sejl under Højbro med den lille båd.', test: () => MYBOAT.on && Math.hypot(MYBOAT.x + 3, MYBOAT.z + 165) < 5 },
-  { id: 'borsen', s: 'Børsens drager', at: ['Børsen'], t: 'Hvor mange drager er der på Børsens spir?', quiz: ['2', '3', '4'], ok: 2 },
-  { id: 'thorvaldsen', s: 'Heste på taget', at: ['Thorvaldsens Museum'], t: 'Hvor mange heste er der på museets tag?', quiz: ['2', '4', '6'], ok: 1 },
-  { id: 'holmen', s: 'Kirkens spir', at: ['Holmens Kirke'], t: 'Hvilken farve har kirkens spir?', quiz: ['Rød', 'Grøn', 'Blå'], cols: ['#d9534f', '#4f9a68', '#4a7bd0'], ok: 1 },
-  { id: 'marmor', s: 'Marmorbroen', at: ['Marmorbroen'], t: 'Gå op på toppen af Marmorbroen.', test: () => !MYBOAT.on && archH(P.pos.x, P.pos.z) > 1.2 && Math.hypot(P.pos.x + 203, P.pos.z - 134) < 14 },
-  { id: 'kirke', s: 'Kirkens søjler', at: ['Slotskirken'], t: 'Hvor mange søjler står der foran kirken?', quiz: ['2', '4', '6'], ok: 1 },
-  { id: 'port', s: 'Gennem porten', at: ['Kirkeløngangsbygningen'], t: 'Gå gennem porten i den gamle bygning.', test: () => { const { C, u, v } = LOENGANG, dx = P.pos.x - C[0], dz = P.pos.z - C[1]; return Math.abs(dx * u[0] + dz * u[1]) < 1.6 && Math.abs(dx * v[0] + dz * v[1]) < 1.5; } },
-  { id: 'pm', s: 'Statsministeren', at: ['Rigsdagsgården'], t: 'Vink til statsministeren, når hun kommer i sin sorte bil.', act: 'pm' },
-  { id: 'svaner', s: 'Svanerne', at: ['Svanerne'], t: 'Vink til svanerne i havnen.', act: 'svane' },
-  { id: 'springvand', s: 'Springvandet', at: ['Bibliotekshaven'], t: 'Start springvandet i dammen.', act: 'springvand' },
-  { id: 'udsigt', s: 'Udsigten', at: ['Udsigten'], t: 'Drej rundt, til du kan se Børsens drager.', test: () => TOWER.sees(253, 65) },
-  { id: 'herkules', s: 'Herkules', at: ['Prins Jørgens Gård'], t: 'Find Herkules med køllen, og gå hen til ham.', test: () => Math.hypot(P.pos.x + 20.3, P.pos.z + 61) < 3.2 },
-];
-const tasksDone = new Set();
-{ const st = load(); for (const id of st.tasks || []) if (TASKS.some(t => t.id === id)) tasksDone.add(id); }
-const taskOf = p => p ? TASKS.find(t => t.at.includes(p.n)) : null;
-function taskLine(p) { const t = taskOf(p); return !t ? '' : tasksDone.has(t.id) ? 'Opgave klaret!' : 'Opgave: ' + t.t; }
-function updTaskCard() {
-  const el = $('poiTask'), line = taskLine(curPoi);
-  el.hidden = !poiExpanded || !line; if (line) el.innerHTML = '<span class="star">★</span> ' + line;
-  setPoiH();
-}
-function setPoiH() { const el = $('poi'); document.documentElement.style.setProperty('--poiH', (el.hidden ? 0 : Math.round(window.innerHeight - el.getBoundingClientRect().top)) + 'px'); }   // the E button stays above the place card
-function updStars(bump) {
-  $('scnt').textContent = `${tasksDone.size} af ${TASKS.length}`;
-  if (bump) { const el = $('stars'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
-}
-function renderTasks() {
-  $('taskChips').innerHTML = TASKS.map(t => `<span class="chip${tasksDone.has(t.id) ? ' on' : ''}">${tasksDone.has(t.id) ? '✓ ' : ''}${t.s}</span>`).join('');
-}
-updStars();
-function completeTask(t) {
-  if (tasksDone.has(t.id)) return;
-  tasksDone.add(t.id); save(); updStars(true); updTaskCard();
-  burst(kid.root.position); rewardRipple(P.pos.x, P.pos.y, P.pos.z); popLabel('Godt klaret!', kid.root.position, 1.3);
-  [880, 1109, 1319, 1760].forEach((f, k) => tone(f, f, 0.1 + k * 0.08, 0.3, 0.06, 'triangle'));
-  if (tasksDone.size >= TASKS.length) setTimeout(() => {
-    toast('Du har klaret alle opgaverne! Nu kender du Slotsholmen.');
-    for (let k = 0; k < 6; k++) setTimeout(() => { const a = rand() * 6.28; firework(P.pos.x + Math.cos(a) * 5, P.pos.y + 7, P.pos.z + Math.sin(a) * 5); }, k * 300);
-  }, 1200);
-  else setTimeout(() => toast(`Du fik en stjerne! Nu har du ${tasksDone.size}.`), 2600);
-}
-function taskAct(id) { for (const t of TASKS) if (t.act === id) completeTask(t); }
-// the question card
-let quizT = null;
-function openQuiz(t) {
-  quizT = t; paused = true; keys.clear(); resetTouch();
-  $('qText').textContent = t.t; $('qMsg').textContent = ''; const box = $('qOpts'); box.innerHTML = '';
-  t.quiz.forEach((o, i) => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'qopt'; b.textContent = o;
-    if (t.cols) { b.style.background = t.cols[i]; b.style.color = '#ffffff'; }
-    b.addEventListener('click', () => answer(i, b)); box.appendChild(b);
-  });
-  $('quiz').hidden = false; box.firstChild.focus(); say(`${t.t} ${t.quiz.join(', ')}?`);
-}
-function closeQuiz() { $('quiz').hidden = true; quizT = null; paused = false; canvas.focus(); }
-function answer(i, b) {
-  const t = quizT; if (!t) return;
-  if (i === t.ok) {
-    b.classList.add('ok'); for (const o of $('qOpts').children) o.disabled = o !== b;
-    $('qMsg').textContent = 'Rigtigt!'; say('Rigtigt!'); sparkleSound();
-    setTimeout(() => { if (quizT === t) { closeQuiz(); completeTask(t); } }, 1200);
-  } else { b.disabled = true; $('qMsg').textContent = 'Næsten! Kig godt efter, og prøv igen.'; say('Næsten! Prøv igen.'); tone(330, 250, 0, 0.25, 0.06, 'triangle'); }
-}
-$('qClose').addEventListener('click', closeQuiz);
-$('stars').addEventListener('click', () => openIntro(true));
-HOOKS.frame.push(() => {
-  if (!started || paused) return;
-  for (const t of TASKS) if (t.test && !tasksDone.has(t.id) && t.test()) completeTask(t);
-  const t = taskOf(curPoi);
-  if (t && t.quiz && !tasksDone.has(t.id)) offerAction({ id: 'quiz', label: 'Svar på opgaven', prio: 2, run: () => openQuiz(t) });
-});
+// the action button stays above the place card
+function setPoiH() { const el = $('poi'); document.documentElement.style.setProperty('--poiH', (el.hidden ? 0 : Math.round(window.innerHeight - el.getBoundingClientRect().top)) + 'px'); }
 
 // ---------------- pedestrian lights at the Vindebrogade crossing after Højbro
 const HOJBRO_LIGHT = (() => {
@@ -4748,7 +4403,7 @@ const HOJBRO_LIGHT = (() => {
     const green = isGreen();
     if (green !== wasGreen) {
       for (const face of faces) { face.red.material = green ? redOff : redOn; face.green.material = green ? greenOn : greenOff; }
-      if (green && waiting && started && Math.hypot(P.pos.x - x, P.pos.z - z) < 10) toast('Grønt lys! Nu kan du gå over.');
+      if (green && waiting && started && Math.hypot(P.pos.x - x, P.pos.z - z) < 10) toast('Grønt lys. Nu kan du gå over.');
       if (green) waiting = false;
       wasGreen = green;
     }
@@ -4757,107 +4412,6 @@ const HOJBRO_LIGHT = (() => {
 })();
 FX.hojbroLight = HOJBRO_LIGHT;
 
-// ---------------- a kick scooter to borrow on Højbro Plads
-// It uses the walking controls, but keeps the girl on land and lets her park it anywhere safe.
-const SCOOTER = (() => {
-  const root = new THREE.Group(); dyn.add(root);
-  const frameMat = tm('#58a9bd'), metal = tm('#d2d7d5'), rubber = tm('#30323c'), grip = tm('#444452');
-  const wheels = [];
-  const rod = (a, b, radius, mat) => {
-    const av = new THREE.Vector3(...a), bv = new THREE.Vector3(...b), v = bv.clone().sub(av);
-    const m = mesh(new THREE.CylinderGeometry(radius, radius, v.length(), 8), mat, ...av.clone().add(bv).multiplyScalar(0.5).toArray(), { parent: root });
-    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.normalize());
-    return m;
-  };
-  mesh(new THREE.BoxGeometry(0.28, 0.085, 0.78), frameMat, 0, 0.16, -0.02, { parent: root });
-  mesh(new THREE.BoxGeometry(0.22, 0.012, 0.62), grip, 0, 0.21, -0.03, { parent: root });
-  for (const z of [-0.36, 0.42]) {
-    const wheel = new THREE.Group(); wheel.position.set(0, 0.11, z); root.add(wheel);
-    mesh(new THREE.TorusGeometry(0.09, 0.025, 7, 18), rubber, 0, 0, 0, { parent: wheel, ry: Math.PI / 2 });
-    mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.22, 10), metal, 0, 0, 0, { parent: wheel, rz: Math.PI / 2 });
-    wheels.push(wheel);
-  }
-  rod([0, 0.14, 0.42], [0, 0.99, 0.40], 0.025, metal);
-  rod([-0.34, 0.99, 0.40], [0.34, 0.99, 0.40], 0.024, grip);
-  mesh(new THREE.SphereGeometry(0.045, 10, 8), tm('#f1c94c'), -0.23, 1.02, 0.4, { parent: root });
-  const marker = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffe28a', transparent: true, opacity: 0.48, depthWrite: false }));
-  marker.position.set(0, 1.25, 0); marker.scale.set(1.4, 1.4, 1); root.add(marker);
-  root.position.set(-9.5, groundAt(-9.5, -225.5, 2), -225.5);
-  const R = { root, wheels, marker, active: false, phase: 0 };
-  const safe = (x, z) => x >= BOUNDS[0] && x <= BOUNDS[1] && z >= BOUNDS[2] && z <= BOUNDS[3] && !waterAt(x, z) && !inBuilding(x, z);
-  R.stop = () => {
-    if (!R.active) return;
-    R.active = false; R.marker.visible = true; root.position.copy(P.pos); root.rotation.y = P.face;
-    const sideX = Math.cos(P.face), sideZ = -Math.sin(P.face);
-    for (const side of [1, -1]) {
-      const x = P.pos.x + side * sideX * 0.9, z = P.pos.z + side * sideZ * 0.9;
-      if (safe(x, z)) { P.pos.set(x, groundAt(x, z, P.pos.y + STEP), z); break; }
-    }
-    P.vel.set(0, 0, 0); P.onGround = true; jumpReq = false;
-    kid.g.position.set(0, 0, 0); kid.g.rotation.z = 0; kid.root.position.copy(P.pos);
-    $('jump').textContent = 'Hop'; tone(440, 310, 0, 0.12, 0.035, 'triangle');
-    toast('Du parkerer løbehjulet.');
-  };
-  R.take = () => {
-    if (!started || paused || R.active || MYBOAT.on || !P.onGround || P.pos.distanceTo(root.position) > 2.8) return;
-    P.pos.set(root.position.x, groundAt(root.position.x, root.position.z, 2), root.position.z);
-    P.face = root.rotation.y; P.vel.set(0, 0, 0); P.onGround = true; jumpReq = false;
-    R.active = true; R.phase = 0; R.marker.visible = false;
-    $('jump').textContent = 'Stig af'; tone(440, 680, 0, 0.14, 0.045, 'triangle');
-    toast(isTouch ? 'Du kører på løbehjul! Skub med venstre tommel, og tryk Stig af for at parkere.' : 'Du kører på løbehjul! Brug de samme taster som når du går. Tryk E eller Mellemrum for at stige af.');
-  };
-  const candidate = new THREE.Vector3();
-  HOOKS.ride.unshift(dt => {
-    if (!R.active) return false;
-    if (MYBOAT.on) { R.stop(); return false; }
-    if (paused) { P.vel.set(0, 0, 0); return true; }
-    let forward = 0, turn = 0;
-    if (keys.has('KeyW') || keys.has('ArrowUp')) forward++;
-    if (keys.has('KeyS') || keys.has('ArrowDown')) forward--;
-    if (keys.has('KeyA') || keys.has('ArrowLeft')) turn++;
-    if (keys.has('KeyD') || keys.has('ArrowRight')) turn--;
-    if (joy.id !== null) { forward -= joy.y; turn -= joy.x * 0.9; }
-    forward = Math.max(-1, Math.min(1, forward)); turn = Math.max(-1, Math.min(1, turn)); turnIn = turn;
-    P.face += turn * 2.15 * dt;
-    const speed = forward * (forward < 0 ? 2.6 : 10.8);
-    const ease = 1 - Math.exp(-dt * (forward === 0 ? 11 : 5));
-    P.vel.x += (Math.sin(P.face) * speed - P.vel.x) * ease;
-    P.vel.z += (Math.cos(P.face) * speed - P.vel.z) * ease;
-    const steps = Math.max(1, Math.ceil(Math.hypot(P.vel.x, P.vel.z) * dt / 0.25));
-    for (let i = 0; i < steps; i++) {
-      candidate.copy(P.pos); candidate.x += P.vel.x * dt / steps; candidate.z += P.vel.z * dt / steps;
-      if (HOJBRO_LIGHT.blocks(P.pos.x, P.pos.z, candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
-      if (!safe(candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
-      resolve(candidate); resolvePoly(candidate);
-      if (!safe(candidate.x, candidate.z)) { P.vel.x = P.vel.z = 0; break; }
-      const h = groundAt(candidate.x, candidate.z, P.pos.y + STEP);
-      if (h > P.pos.y + STEP) { P.vel.x = P.vel.z = 0; break; }
-      P.pos.copy(candidate); P.pos.y = h;
-    }
-    P.vel.y = 0; P.onGround = true; jumpReq = false;
-    root.position.copy(P.pos); root.rotation.y = P.face;
-    const roll = P.vel.x * Math.sin(P.face) + P.vel.z * Math.cos(P.face);
-    R.phase += roll * dt / 0.11;
-    for (const wheel of wheels) wheel.rotation.x = R.phase;
-    kid.root.position.copy(P.pos); kid.root.rotation.y = P.face;
-    kid.g.position.y = 0.22; kid.g.rotation.z = -turn * 0.055;
-    kid.arms[0].rotation.set(-1.16, 0, -0.08); kid.arms[1].rotation.set(-1.16, 0, 0.08);
-    kid.legs[0].hip.rotation.x = -0.04; kid.legs[0].knee.rotation.x = 0.08;
-    kid.legs[1].hip.rotation.x = Math.sin(R.phase * 0.42) * Math.min(0.42, Math.abs(roll) * 0.045);
-    kid.legs[1].knee.rotation.x = Math.max(0, kid.legs[1].hip.rotation.x) * 0.5;
-    for (const leg of kid.legs) leg.shoe.rotation.x = -(leg.hip.rotation.x + leg.knee.rotation.x) * 0.55;
-    return true;
-  });
-  HOOKS.frame.push((dt, t) => {
-    marker.material.opacity = 0.38 + Math.sin(t * 2.2) * 0.1;
-    if (!started || paused) return;
-    if (R.active) offerAction({ id: 'scooter-stop', label: 'Stig af', prio: 10, run: R.stop });
-    else if (P.onGround && !MYBOAT.on && P.pos.distanceTo(root.position) < 2.8)
-      offerAction({ id: 'scooter-take', label: 'Tag løbehjulet', prio: 3, run: R.take });
-  });
-  return R;
-})();
-FX.scooter = SCOOTER;
 
 
 // ======================================================================== SLOTSPLADSEN PRESS SETUP
@@ -5824,7 +5378,7 @@ const INTERIOR = (() => {
     return ((x>535.35&&x<544.65&&z> -4.65&&z<4.65)||folkSalFits(x,z)||(x>496.35&&x<503.65&&z> -3.65&&z<3.65)||landstingFits(x,z)||towerFits(x,z)||stableFits(x,z)||ministryFits(x,z)||hall||entry||lower||stairs||gallery||samtale||samtaleDoor||betjent||betjentDoor||roundThreeFits(x,z))&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
   }
   function enter(place='folketing',side=false) {
-    if(I.on||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;
+    if(I.on||MYBOAT.on||TOWER.on||TOWER.busy)return;
     build(); I.place=place; I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
     I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
     P.pos.set(I.x+(place==='towerLobby'?400:place==='towerRestaurant'?440:place==='courtEntry'?540:place==='pmEntry'?500:place==='finance'?100:place==='stables'?300:place==='reform'?(side?212:200):0),0,place==='towerLobby'?7:place==='towerRestaurant'?11:place==='folketing'?21:place==='courtEntry'?3:place==='pmEntry'?2:place==='stables'?18:side?-16:8);P.face=side?-Math.PI/2:Math.PI;cam.yaw=P.face+Math.PI;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
@@ -5858,7 +5412,7 @@ const INTERIOR = (() => {
     if(!started)return;
     if(!I.on){
       const p=FT.loc(P.pos.x,P.pos.z);
-      const canEnter=!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy&&!FX.scooter?.active;
+      const canEnter=!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy;
       if(canEnter&&P.onGround&&P.pos.y<.8)for(const [key,d] of Object.entries(MINISTRY_DOORS)){
         const dx=P.pos.x-d.x,dz=P.pos.z-d.z,depth=dx*d.nx+dz*d.nz,across=dx*d.nz-dz*d.nx;
         const go=()=>enter(key==='courtEntry'?'courtEntry':key==='pmEntry'?'pmEntry':key==='finance'?'finance':key==='stables'?'stables':'reform',key==='reformSide');
@@ -5890,10 +5444,10 @@ const INTERIOR = (() => {
   });
   const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);if(isTouch)badge.querySelector('span').textContent='Kameraet følger · slip for at stoppe';
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',()=>I.place==='towerRestaurant'?liftTo('towerLobby'):leave());hud.appendChild(exit);
-  const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);
-  shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
-  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Vælg et startsted');destinations.innerHTML='<option value="">Vælg et startsted…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option><option value="quay-reform">Kajen ved Reformministeriet</option><option value="quay-slots">Kajen ved Slotspladsen</option><option value="garden">Bibliotekshaven</option><option value="stables">De Kongelige Stalde</option><option value="tower">Tårnet ved Kongeporten</option><option value="courtEntry">Højesterets indgang</option><option value="pmEntry">Statsministeriets indgang</option><option value="folkesal">Folketingssalen via Vandrehallen</option><option value="landsting">Landstingssalen via Vandrehallen</option><option value="press">Slotspladsens presseområde</option>';shortcut.after(destinations);
-  destinations.addEventListener('change',()=>{const key=destinations.value;destinations.value='';if(!key||!window.__gameReady||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();if(I.on)leave();if(key==='courtEntry'){const d=COURT_ENTRY,p=d.at(0,8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=d.ry+Math.PI;cam.yaw=d.ry;cam.pitch=.2;camInit=false;startBlend=1;toast('Gå op ad trappen mellem de fire søjler.');return;}if(key==='folkesal'){enter();P.pos.set(I.x+36,I.floor,0);P.face=Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Folketingssalen.');return;}if(key==='landsting'){enter();P.pos.set(I.x-36,I.floor,0);P.face=-Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Landstingssalen.');return;}if(key==='press'){const p=PRESS.at(0,-8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=PRESS.ry;cam.yaw=P.face+Math.PI;cam.pitch=.3;camInit=false;startBlend=1;toast('Gå rundt mellem kameraerne og tv-vognene på Slotspladsen.');return;}if(key==='tower'){P.pos.set(TOWER.door[0]+TOWER.OUT[0]*3,0,TOWER.door[1]+TOWER.OUT[1]*3);P.vel.set(0,0,0);P.face=Math.atan2(-TOWER.OUT[0],-TOWER.OUT[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Vælg Gå ind i tårnet ved Kongeporten.');return;}if(key==='garden'){const p=GARDEN.at(0,-35);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=.582;cam.yaw=P.face+Math.PI;cam.pitch=.35;camInit=false;startBlend=1;toast('Følg grusstierne til bassinet og Kierkegaard-statuen.');return;}if(key.startsWith('quay-')){const q=QUAYS.find(q=>q.id===key.slice(5)),p=q.at(0,6.3);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.onGround=true;P.face=Math.atan2(-q.nx,-q.nz);cam.yaw=P.face+Math.PI;cam.pitch=.4;camInit=false;startBlend=1;toast('Gå ned ad trappen til kajens afsats.');return;}const d=MINISTRY_DOORS[key];P.pos.set(d.x+d.nx*5,0,d.z+d.nz*5);P.face=d.ry+Math.PI;cam.yaw=d.ry;camInit=false;startBlend=1;toast('Gå hen til den åbne dør i '+d.title+'.');});
+  const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);if(!TESTMODE)shortcut.style.display='none';
+  shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
+  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Vælg et startsted');destinations.innerHTML='<option value="">Vælg et startsted…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option><option value="quay-reform">Kajen ved Reformministeriet</option><option value="quay-slots">Kajen ved Slotspladsen</option><option value="garden">Bibliotekshaven</option><option value="stables">De Kongelige Stalde</option><option value="tower">Tårnet ved Kongeporten</option><option value="courtEntry">Højesterets indgang</option><option value="pmEntry">Statsministeriets indgang</option><option value="folkesal">Folketingssalen via Vandrehallen</option><option value="landsting">Landstingssalen via Vandrehallen</option><option value="press">Slotspladsens presseområde</option>';shortcut.after(destinations);if(!TESTMODE)destinations.style.display='none';
+  destinations.addEventListener('change',()=>{const key=destinations.value;destinations.value='';if(!key||!window.__gameReady||MYBOAT.on||TOWER.on||TOWER.busy)return;goBtn.click();if(I.on)leave();if(key==='courtEntry'){const d=COURT_ENTRY,p=d.at(0,8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=d.ry+Math.PI;cam.yaw=d.ry;cam.pitch=.2;camInit=false;startBlend=1;toast('Gå op ad trappen mellem de fire søjler.');return;}if(key==='folkesal'){enter();P.pos.set(I.x+36,I.floor,0);P.face=Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Folketingssalen.');return;}if(key==='landsting'){enter();P.pos.set(I.x-36,I.floor,0);P.face=-Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Landstingssalen.');return;}if(key==='press'){const p=PRESS.at(0,-8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=PRESS.ry;cam.yaw=P.face+Math.PI;cam.pitch=.3;camInit=false;startBlend=1;toast('Gå rundt mellem kameraerne og tv-vognene på Slotspladsen.');return;}if(key==='tower'){P.pos.set(TOWER.door[0]+TOWER.OUT[0]*3,0,TOWER.door[1]+TOWER.OUT[1]*3);P.vel.set(0,0,0);P.face=Math.atan2(-TOWER.OUT[0],-TOWER.OUT[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Vælg Gå ind i tårnet ved Kongeporten.');return;}if(key==='garden'){const p=GARDEN.at(0,-35);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=.582;cam.yaw=P.face+Math.PI;cam.pitch=.35;camInit=false;startBlend=1;toast('Følg grusstierne til bassinet og Kierkegaard-statuen.');return;}if(key.startsWith('quay-')){const q=QUAYS.find(q=>q.id===key.slice(5)),p=q.at(0,6.3);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.onGround=true;P.face=Math.atan2(-q.nx,-q.nz);cam.yaw=P.face+Math.PI;cam.pitch=.4;camInit=false;startBlend=1;toast('Gå ned ad trappen til kajens afsats.');return;}const d=MINISTRY_DOORS[key];P.pos.set(d.x+d.nx*5,0,d.z+d.nz*5);P.face=d.ry+Math.PI;cam.yaw=d.ry;camInit=false;startBlend=1;toast('Gå hen til den åbne dør i '+d.title+'.');});
   function liftTo(place){
     if(TOWER.busy||!I.on||!I.place.startsWith('tower')||I.place===place)return;
     const from=I.place==='towerRestaurant'?34+P.pos.y:0;
@@ -5969,7 +5523,7 @@ const WAYFIND=(()=>{
       {name:'Trappen · Snapstinget · ud',next:[0,8],text:'Gå tilbage til den brede trappe midt på hallens indgangsside. Gå ned ad begge trappeløb.'}
     ],true,true);
   }
-  HOOKS.frame.push(()=>{if(!started||paused||dialog.open||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;let best=null,bd=3.5;for(const sign of items){if(sign.inside!==INTERIOR.on||sign.inside&&INTERIOR.place!=='folketing'||Math.abs(P.pos.y-sign.y)>2.5)continue;const d=Math.hypot(P.pos.x-sign.x,P.pos.z-sign.z);if(d<bd){best=sign;bd=d;}}if(best)offerAction({id:'read-wayfinding',label:'Læs vejviser',prio:4,run:()=>show(best)});});
+  HOOKS.frame.push(()=>{if(!started||paused||dialog.open||MYBOAT.on||TOWER.on||TOWER.busy)return;let best=null,bd=3.5;for(const sign of items){if(sign.inside!==INTERIOR.on||sign.inside&&INTERIOR.place!=='folketing'||Math.abs(P.pos.y-sign.y)>2.5)continue;const d=Math.hypot(P.pos.x-sign.x,P.pos.z-sign.z);if(d<bd){best=sign;bd=d;}}if(best)offerAction({id:'read-wayfinding',label:'Læs vejviser',prio:4,run:()=>show(best)});});
   return {items,indoor,show,arrow,gates:{slots:slotsGate,toej:toejGate}};
 })();
 FX.wayfinding=WAYFIND;
@@ -6027,7 +5581,6 @@ FX.mapView=MAPVIEW;
 function boot(data) {
   data = data || {};
   const st = load();
-  setVoice(st.readAloud === true);
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
   setEvening(typeof data.evening === 'boolean' ? data.evening : !!st.ev); ev = evening ? 1 : 0;
@@ -6042,7 +5595,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

@@ -1,29 +1,37 @@
-# Christiansborg
+# Christiansborg: Mord i Rigets midte
 
-En hyggelig 3D-gåtur i tegnefilmsstil på Christiansborg og Slotsholmen i København. Lavet til børn på omkring 5 år. Teksterne kan læses højt på dansk: tryk på knappen Læs op for at slå det til og fra (det er slået fra fra start).
+En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Gåden er under opbygning. Slotsholmen og de rum, hvor historien skal foregå, kan allerede udforskes. Personer, spor, ting og selve gåden kommer trin for trin.
 
 Spil det her: https://ai-michelklos.github.io/christiansborg/
 
-Kongen har tabt 10 guldkroner rundt på Slotsholmen. Følg de gule lys og find dem alle. På Slotspladsen letter duerne i flok, når man nærmer sig dem. Ved kanalerne kan man give ænderne brød. Ved Gammel Strand ligger en lille rød båd, som man selv kan sejle i. Mange steder har en lille opgave, som giver en stjerne. Man kan køre op i tårnet og kigge ud over byen. I havnen ved Den Sorte Diamant bor en svanefamilie, og i Bibliotekshaven er der et springvand. I Rigsdagsgården kommer statsministeren i en sort bil. Bilerne holder ved trappen, dørene åbner, og hun stiger ud og går op ad trappen til Folketinget.
+## Historien
+En politiker findes død i Vandrehallen natten før et stort pressemøde. Ida, en historiestuderende med rygsæk, skal finde morderen mellem kl. 06 og pressemødet kl. 10. Planen for gåden står i [dev/MORDGAADE.md](dev/MORDGAADE.md).
 
-## Nyt: gå ind i Folketinget
+## Det kan du allerede
+Gå rundt på Slotsholmen og ind i Folketinget, Finansministeriet, det fiktive Reformministerium, De Kongelige Stalde, Tårnet og indgangene til Statsministeriet og Højesteret. Ved Gammel Strand ligger en lille rød båd, som man selv kan sejle i. Byen lever med duer, ænder, svaner, heste, kanalbåde, trafik og gående, og i Rigsdagsgården kommer statsministeren i en sort bil.
 
-På startskærmen kan du vælge "Start ved Folketingets indgang". Gå op ad trappen i Rigsdagsgården og ind gennem den åbne hoveddør. Du kan også vælge "Gå ind i Folketinget" (E på computer). Indenfor kan du gå op til Vandrehallen og udforske Rigets midte. "Ud i gården" bringer dig tilbage. Interiøret er første trin mod en mere voksen spiloplevelse. Det er en foreløbig fortolkning med anslået trappeforbindelse, ikke en præcis bygningsmodel. Se [kilder og begrænsninger](dev/INTERIOR.md).
+Gå op ad trappen i Rigsdagsgården og ind gennem den åbne hoveddør, eller vælg Gå ind i Folketinget (E på computer). Indenfor fører trappen op til Vandrehallen, og Ud i gården bringer dig tilbage. Rummene er fortolkninger efter billeder, ikke præcise bygningsmodeller. Se [kilder og begrænsninger](dev/INTERIOR.md).
+
+## Startsteder til test
+Skriv `?test` efter adressen, altså https://ai-michelklos.github.io/christiansborg/?test, for at få genveje på startskærmen til Folketingets indgang og de andre startsteder, som afsnittene nedenfor nævner. Spillere ser ikke genvejene.
+
+## Børneudgaven
+Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsning og løbehjul. Det blev fjernet 16. oktober 2026, da spillet blev til en mordgåde. Den sidste børneudgave ligger i grenen [boerneudgave](https://github.com/AI-MichelKlos/christiansborg/tree/boerneudgave).
 
 ## Styring
-- Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe. Træk med musen for at kigge. N skifter mellem dag og aften, M åbner oversigtskortet.
-- Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap.
+- Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe og E for at gå ind, undersøge eller bruge det, knappen viser. Træk med musen for at kigge. N skifter mellem dag og aften, M åbner oversigtskortet.
+- Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap og en handlingsknap.
 - Tårnet: gå hen til Kongeporten, og vælg Gå ind i tårnet. Vælg derefter etage til restauranten eller Udsigten. Deroppe drejer pilene eller tommelen dig rundt, og mellemrum eller knappen Kikkert zoomer ind.
 
 ## Om spillet
 - Én fil (`index.html`) med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
-- Husene er enkle klodser med den rigtige grundplan. Spillet bygges op lidt efter lidt. Planen står i `dev/PLAN.md`.
+- Husene er enkle klodser med den rigtige grundplan. Spillet bygges op lidt efter lidt. Tjeklisten står i `dev/PLAN.md`, og planen for gåden i `dev/MORDGAADE.md`.
 - Kortdata: © OpenStreetMap-bidragydere, ODbL (https://www.openstreetmap.org/copyright).
 
 Udarbejdet med AI (Claude) og med begrænset mennesketjek.
 
 ### Mobilstyring
-Træk med venstre tommel nederst til venstre for at gå i den ønskede retning på skærmen. Et lille træk giver langsom gang. Træk med højre tommel for at kigge dig omkring. Handlingsknappen nederst til højre viser, hvad du kan gøre tæt på. Inde i Folketinget kan du gå sidelæns, mens du kigger fremad. Båd og løbehjul bruger fortsat joysticket til fart og drejning.
+Træk med venstre tommel nederst til venstre for at gå i den ønskede retning på skærmen. Et lille træk giver langsom gang. Træk med højre tommel for at kigge dig omkring. Handlingsknappen nederst til højre viser, hvad du kan gøre tæt på. Inde i Folketinget kan du gå sidelæns, mens du kigger fremad. Båden bruger fortsat joysticket til fart og drejning.
 
 ### Første to siderum i Folketinget
 Betjentstuen er åben til højre ved foden af den indvendige trappe. Samtaleværelset har to åbne døre midt i Vandrehallen og har salonindretning med grønne vægge, mørke paneler og blå stole. Billedreferencer og forskellen mellem dokumenterede træk og anslået indretning står i `dev/INTERIOR.md`.

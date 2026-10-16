@@ -3,7 +3,7 @@
 Skrevet 5. oktober 2026.
 Udarbejdet med AI (Claude) og med begrænset mennesketjek.
 
-Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 5 år. Teksterne i spillet er korte, enkle og bliver læst højt. Ingen tankestreger, kun bindestreg.
+Et 3D-spil i browseren på Christiansborg og Slotsholmen. Det begyndte som en gåtur for børn på omkring 5 år og er fra 16. oktober 2026 ved at blive mordgåden "Mord i Rigets midte" for voksne. Planen for gåden står i `dev/MORDGAADE.md`. Ingen tankestreger, kun bindestreg.
 
 ## Sådan arbejder vi
 - Ét trin pr. samtale. Stop efter trinnet og vent på, at Michel skriver "fortsæt".
@@ -167,8 +167,6 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 - [x] Mobilstyring (15. okt. 2026): analogt joystick med dødzone og gradvis ganghastighed. Udendørs går figuren i retningen i forhold til kameraet; indendørs kan man gå sidelæns uden at dreje blikket. Kameraet styres roligere med højre tommel og bliver stående i valgt retning under gang. Båd og løbehjul beholder deres kørestyring.
   - Handlingsknap nederst til højre med stor trykflade, særskilt layout til stående og liggende telefon. Joystickhint vises også inde i Folketinget. Hjælp, tab af fokus og afbrudt berøring nulstiller input. Kontrolleret i Chromium med touch-events: dødzone, analog hastighed, retning i forhold til kamera, to fingre samtidig, sidelæns gang, pause og knapplacering i stående og liggende format. Ingen JavaScript-fejl.
 
-## Næste idé
-- Følg statsministeren ind: en enkel Folketingssal bag døren i Rigsdagsgården, som pigen kan gå ind ad efter hende. Michel har bedt om at gemme den til senere.
 
 
 ## Mord i Rigets midte: fysiske steder, to ad gangen
@@ -196,3 +194,16 @@ Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner 
 - [x] Runde 11 (16. okt. 2026): 22 ruter gennem de åbne rum er kontrolleret i begge retninger med bevægelseskoden. Seks ind-/udgange og Tårnets etageskift er kontrolleret. Større oversigtskort med 16 navngivne steder, valg via nummer eller liste, oplysninger om adgang og rumforbindelser samt markering af bygningens indgang, når man er indenfor. Kortet er tilgængeligt på mobil, computer, indenfor og på Udsigten. Dokumentation i dev/INTERIOR.md.
 
 De planlagte fysiske steder foreligger nu i en første, gennemgået version. Næste fase kræver Michels valg, fordi historie og nye spilfunktioner hidtil har ventet: forslag om valg mellem børne-/voksenudgaven og en voksen hovedperson som de næste to opgaver.
+
+## Mord i Rigets midte: gåden
+Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, og vent på, at Michel skriver "fortsæt".
+- [x] Børneudgaven fjernet (16. okt. 2026, første del af trin 2)
+  - Den sidste børneudgave er gemt i grenen `boerneudgave` (git-tags kan ikke pushes herfra).
+  - Fjernet: kronejagten med tæller, gule lys, fyrværkeri og krone på hovedet; stjerneopgaver og spørgsmål; oplæsning (Læs op); løbehjulet; knapperne Klap hesten, Giv ænderne brød, Vink til båden, Vink til statsministeren, Vink til svanerne, Kig efter havmanden og Skyd med konfetti; brødet til ænderne; "Hej!" fra de gående; stjerner og navn over hovedet første gang man kommer til et sted. Filen er 33 KB mindre.
+  - Bevaret som byliv: heste, ænder, svaner, duer, havmanden, kanoner, både, trafik, ministerbilerne og springvandet ("Start springvandet" findes stadig).
+  - Pigen er blevet til Ida (`buildKid`): en ung kvinde på ca. 1,7 m i gul regnjakke med grøn rygsæk, hestehale og mørke bukser. I båden sidder hun 0,2 m lavere (`kid.g.position.y = -0.2`).
+  - Ny startskærm: "Mord i Rigets midte" med en kort tekst om, at gåden er under opbygning. Genvejene til startstederne vises kun med `?test` i adressen (`TESTMODE`).
+  - Stedteksterne (`POIS`) er skrevet om til voksne. Beskeder i en voksen tone. Gemmes under en ny nøgle (`mordIRigetsMidte`) med kun dag/aften, lyd og minikort.
+  - `setPoiH` er bevaret fra opgavekoden, så handlingsknappen stadig står over stedkortet. `#guide` er bevaret skjult til et senere "Næste spor".
+  - Kontrolleret i Chromium på computer og telefonstørrelse: ingen JavaScript-fejl, ingen børneknapper ved Ridebanen, Tøjhusmuseet, Højbro, Gammel Strand og svanerne, gang ude og inde (`__cb.step`), båden, ministerbilerne, hjælpekortet og kortet. Bemærk: testbrowseren kører kun 1-2 billeder i sekundet, så gang skal testes med `__cb.step`, ikke med tastetryk i realtid.
+- [ ] Resten af trin 2 og trin 1 (manuskriptet) følger efter planen.
