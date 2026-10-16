@@ -48,3 +48,6 @@ Vælg Bibliotekshaven på startskærmen for at gå ad grusstierne mellem blomste
 
 ### Tårnet indvendig og Udsigten
 Vælg Tårnet ved Kongeporten som startsted, og gå ind via handlingsknappen. Elevatorhallen, restauranten ved 34 m og Udsigten ved 44 m er forbundet gennem Vælg etage. I restauranten kan du gå mellem bordene og op ad sidetrappen, hvor du kan fortsætte til Udsigten. Her drejer du blikket og bruger Kikkert. Etagevalget fører tilbage til restauranten eller elevatorhallen, og fra hallen kan du gå ud til Kongeporten. Rummenes indretning bygger på billedreferencer; mål og forbindelser er tilpasset spillet.
+
+### Landstingssalen og presseområdet
+Vælg Landstingssalen via Vandrehallen som startsted, eller gå til hallens modsatte ende fra Folketingssalen. Døren står åben, og man kan gå mellem de buede stolerækker, rundt langs væggene og op til talerstolen og de syv frontpladser. Vælg Slotspladsens presseområde for at udforske opstillingen med tv-vogne, kameraer og arbejdslys. Møblering og presseopstilling er tilpasset spillet; referencer og usikkerheder står i `dev/INTERIOR.md`.

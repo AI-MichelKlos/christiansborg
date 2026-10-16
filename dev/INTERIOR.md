@@ -218,3 +218,30 @@ Udsigten beholder den eksisterende panoramastyring og kikkert, hvor man drejer b
 Alle nye overflader og dekorationer er modelleret med geometri og proceduretegnede teksturer. Referencefotos er ikke indsat i spillet.
 
 Kontrol: sammenhængende gangruter gennem elevatorhallen, rundt mellem restaurantens borde og til vindue og sidetrappe. Trappen er gået med spillets almindelige bevægelseskode til reposen ca. 5,1 m oppe. Etageskift mellem alle tre niveauer, korrekt højdetæller fra restaurant til hal, kikkertzoom, retur fra Udsigten og udgang ved Kongeporten er kontrolleret. Faktiske touch-events i telefonformat kontrollerer gang og straks-stop. Skærmbilleder af hal, restaurant, Udsigten og telefonformat er gennemset. Ingen JavaScript-fejl under kontrollerne.
+
+## Runde 8: Landstingssalen og Slotspladsens presseområde (16. oktober 2026)
+
+### Landstingssalen
+Den tidligere lukkede dør i Vandrehallens vestlige ende står nu åben. Man går direkte gennem døren uden rumskift og kan bevæge sig mellem stolerækkerne, rundt langs væggene, op på den lave frontplatform og tilbage til hallen. Startvalget "Landstingssalen via Vandrehallen" stiller spilleren foran den åbne dør i hallen.
+
+Rummet har hvide vægge, profilerede pilastre, gesimser, et forenklet kassetteloft, høje rundbuede sprossevinduer, gyldne pendler, mørke stole, en talerstol og en synlig bagloge med skematiske tolkebokse. Dokumentets halvcirkel er fortolket som let buede stolerækker med en bred midtergang. Syv stole med små borde står på en lav platform til den senere fortælling. De gennemsete fotos viser en anden, tættere konferenceopstilling; spillets møblering og alle mål er tilpasset fri passage og dokumentet. Ingen verificeret plantegning er brugt. Forbindelsen til Vandrehallen følger spillets eksisterende akse, ikke en opmålt plan.
+
+Fire store farvefelter med originale, proceduretegnede blomstermotiver og ni lyse stregpaneler antyder udsmykningens skala. De gengiver ikke Erik A. Frandsens konkrete værker. Den virkelige udsmykning er beskrevet af Folketinget. Logen er kun synlig og har ikke en gangbar adgang.
+
+Visuelt gennemsete referencer:
+- [Arkitekt Johnny Gere: Landstingssalen](https://gereark.dk/portfolio-items/landstingssalen/), hentet 16. oktober 2026. [Oversigt](https://gereark.dk/wp-content/uploads/11-12.jpg) viser hvide vægge, buede vinduer, kassetteloft, gyldne lamper og møblering. [Detaljer](https://gereark.dk/wp-content/uploads/15-3.jpg) viser mørke stole på metalben, den lave platform, paneler og den modsatte loge. [Tolkebokse](https://gereark.dk/wp-content/uploads/13-5.jpg) viser mørke sæder bag en glasafskærmning. Siden beskriver renovering og integrerede tolkebokse. Siden har et tidsstempel fra maj 2023; de enkelte fotos' optagedatoer og fotograf er ikke verificeret.
+- [Folketingets lokaler](https://www.ft.dk/da/folkestyret/folketinget-og-christiansborg/folketingets-lokaler) er tekstlig reference til salens hvide barokpræg, de fire store malerier og ni kultegninger samt forbindelsen gennem Vandrehallen. [Folketingets billedgalleri](https://www.ft.dk/da/billeder_fra_christiansborg/landstingssalen/01), fotograf David Kahr, er fundet som supplerende billedkilde. Det er arkitektens fotos ovenfor, der er gennemset lokalt.
+
+### Presseområdet
+En midlertidig opstilling på den eksisterende Slotsplads: to tv-vogne med paraboler, tre kameraer på stativer, to arbejdslys, et bord med computer og mikrofon, kabeltromler og PRESSE-skilte. Kameraer og lys har kollision; vognene har drejede kollisionsflader. Kablerne ligger fladt i belægningen. Der er fri passage gennem midten og rundt om vognene. Startvalget "Slotspladsens presseområde" fører til den åbne side af opstillingen. Der er ikke indsat journalister, politiske personer, radioindslag eller nye handlinger.
+
+Placering, antal og udformning af udstyr er lavet til historien. Der er ikke fundet dokumentation for et fast presseområde på netop denne del af Slotspladsen. Opstillingen er ikke en kopi af en faktisk permanent installation. Vogne og skilte har neutrale betegnelser.
+
+Visuelt gennemsete referencer:
+- [AV CENTER: udlejning til valg og politiske arrangementer](https://www.avcenter.dk/udlejning/av-udlejning-til-valg-valgmoder-og-politiske-arrangementer/), [foto](https://www.avcenter.dk/media/zmkjdrvc/folketinget-med-avcenter-lastbil.jpg?width=1000), hentet 16. oktober 2026. Viser en stor arrangements-/AV-lastbil og lyse varevogne foran Christiansborg. Det er en reference til køretøjer og stedets skala, ikke dokumentation for sendevogne eller et fast presseområde. Fotograf og optagedato ikke verificeret.
+- [Rasmus Flindt Pedersen: Covering the opening of the Danish Parliament](https://www.flindtpedersen.com/blog/2013/9/30/covering-the-opening-of-the-danish-parliament), september 2013, [foto](https://images.squarespace-cdn.com/content/v1/51aded31e4b0481a941e5672/1380708493672-QUDGV2B1J5DVFQ7UHLXR/_RFP5427%2Bcopy.JPG). Viser et professionelt tv-kamera, reportermikrofon og kabel ved Folketingets trappe. Fotoet er fra Rigsdagsgården, ikke fra Slotspladsen; det bruges alene som model for kamera og udstyr.
+- [Folketinget: Slotspladsen](https://www.ft.dk/da/folkestyret/folketinget-og-christiansborg/slotspladsen) er supplerende reference til pladsen og dens omgivelser.
+
+Alle nye genstande og flader er geometri eller proceduretegnede teksturer. Referencefotos er ikke indsat som spilaktiver. Kun fysiske steder er tilføjet i denne runde.
+
+Kontrol: dørpassagen fra Vandrehallen er gået med den almindelige bevægelseskode til den lave platform. Fem sammenhængende ruter kontrollerer midtergang, begge sider af stolerækkerne, platformen og hele vejen tilbage til Folketingets udgang. Faktiske touch-events kontrollerer gang og straks-stop i salen og på Slotspladsen. Fri midterpassage gennem presseområdet og vognkollision er kontrolleret. Skærmbilleder af begge steder i stort format og telefonformat samt presseområdet i aftentilstand er gennemset. Ingen JavaScript-fejl under kontrollerne.

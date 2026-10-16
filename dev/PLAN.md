@@ -179,7 +179,9 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen, til børn på omkring 
 - [x] Runde 5 (16. okt. 2026): to kajer med gangbare stentrapper, håndlister, afsatser over vandet, fortøjningsringe, belægning og skilte. Afrundede stenpiller og jernstænger ved Slotspladsen. Grund, kajmur og vej-/fortovsflader er skåret fri, så trapperne kan bruges under gadeniveau. Begge kajer kan vælges som startsted. Den eksisterende båds kollision og landgang tager hensyn til afsatserne. Billedreferencer og tilpasninger dokumenteret i dev/INTERIOR.md.
 - [x] Runde 6 (16. okt. 2026): Bibliotekshaven med grusstier, blomsterbede, bænke, fri passage rundt om den siddende Kierkegaard-statue og forbedret søjle/skål på springvandet. Åben indgang fra Ridebanen til et staldinteriør med marmorsøjler, hvælv, træskillerum, krybber og fire hvide heste. Startvalg til haven og staldindgangen. Billedreferencer og anslåede forbindelser dokumenteret i dev/INTERIOR.md.
 - [x] Runde 7 (16. okt. 2026): elevatorhal ved Kongeporten, restaurant med højt murstens-/betonrum, stort vindue, borde og gangbar sidetrappe. Etagevalg forbinder hal, restaurant ved 34 m og Udsigten ved 44 m med den eksisterende elevatorovergang. Udsigten har kikkert, supplerende glasafskærmning, orienteringstavle og tydelig adgang tilbage. Startvalg ved Tårnet. Billedreferencer og anslåede forbindelser dokumenteret i dev/INTERIOR.md.
-- [ ] Runde 8: Landstingssalen og Slotspladsens presseområde.
+- [x] Runde 8 (16. okt. 2026): åben forbindelse fra Vandrehallen til Landstingssalen med hvide vægge, høje buede vinduer, kassetteloft, gyldne pendler, buede stolerækker, talerstol og syv frontpladser. Slotspladsens midlertidige presseområde med to tv-vogne, tre kameraer, arbejdslys og bord. Startvalg til begge steder. Referencer, forenklinger og kontrol dokumenteret i dev/INTERIOR.md.
+
+De otte runder med nødvendige fysiske steder er gennemført. Forslag til næste runde, afventer Michels valg: Folketingssalen og Statsministeriets indgang. Historie og nye spilfunktioner venter fortsat.
 
 Kun fysiske steder i denne fase. Historie, personer, spor og nye spilfunktioner venter.
 
