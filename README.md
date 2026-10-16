@@ -39,3 +39,6 @@ Joysticket styrer gangretning og hastighed. Kameraet følger roligt gangretninge
 
 ### Finansministeriet og Reformministeriet
 På startskærmen kan du vælge et ministerium at starte ved. Finansministeriet ligger i Den Røde Bygning ved Slotspladsen og har foyer, garderobe og forhandlingsrum. Reformministeriet er fiktivt og ligger ved Ved Stranden. Her kan man udforske departementschefens kontor, printerområdet og sidedøren. Begge hoveddøre står åbne. Ved sidedøren bringer handlingsknappen dig ud på den side af bygningen. Indretningen og rummenes forbindelser er tilpasset spillet; billedreferencer og begrænsninger står i `dev/INTERIOR.md`.
+
+### To kajer med trapper
+Under "Vælg et startsted…" kan du starte ved kajen på Ved Stranden foran Reformministeriet eller ved kajen på den modsatte bred ved Slotspladsen. Gå ned ad stentrappen til afsatsen over vandet, stop op undervejs og gå op igen. Der er håndlister, fortøjningsringe og forskellige detaljer på de to bredder. Den eksisterende båd kan lægge til ved afsatserne. Materialer og kajkanter bygger på fotos; trappernes placering og mål er tilpasset spillet. Se `dev/INTERIOR.md`.

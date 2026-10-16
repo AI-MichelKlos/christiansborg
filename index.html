@@ -132,13 +132,13 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .touch #touchHint{left:28px;bottom:calc(32px + env(safe-area-inset-bottom,0px));width:112px;height:112px;border-style:solid;border-color:rgba(42,34,56,.35);display:flex;flex-direction:column;justify-content:center;gap:5px}
 #touchHint span{font-size:38px;line-height:1}
 #lookHint{position:fixed;right:20px;bottom:calc(98px + env(safe-area-inset-bottom,0px));font:11px var(--body);pointer-events:none;opacity:.65}
-.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:28vh;overflow:auto}
+body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:28vh;overflow:auto}
 .touch.inFolketing #touchHint{display:flex!important}
 .touch.inFolketing #touchHint[hidden]{display:none!important}
 .touch.inFolketing #tools{top:calc(118px + env(safe-area-inset-top,0px));bottom:auto;right:14px}
 .touch.inFolketing #lookHint{bottom:calc(48px + env(safe-area-inset-bottom,0px))}
 .touch.inFolketing #actBtn{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-@media(max-height:500px){.touch #actBtn{bottom:calc(92px + env(safe-area-inset-bottom,0px));min-height:54px}.touch #poi{bottom:160px;max-height:24vh}.touch #lookHint{bottom:92px}.touch.inFolketing #tools{top:18px;right:180px}.touch.inFolketing #actBtn{bottom:28px}.touch #touchHint{bottom:20px}}
+@media(max-height:500px){.touch #actBtn{bottom:calc(92px + env(safe-area-inset-bottom,0px));min-height:54px}body.touch #poi{bottom:160px;max-height:24vh}.touch #lookHint{bottom:92px}.touch.inFolketing #tools{top:18px;right:180px}.touch.inFolketing #actBtn{bottom:28px}.touch #touchHint{bottom:20px}}
 </style>
 </head>
 <body>
@@ -328,6 +328,7 @@ function topAt(c, x, z) { if (c.t === 'r') { const f = c.ax === 'z' ? (z - c.z0)
 const mounds = [];
 function moundH(x, z) { let h = 0; for (const m of mounds) { const d = Math.hypot(x - m.x, z - m.z); if (d < m.r) h = Math.max(h, m.h * 0.5 * (1 + Math.cos(Math.PI * d / m.r))); } return h; }
 function groundAt(x, z, maxY) {
+  const quay=quaySurfaceAt(x,z);if(quay)return quay.y;
   let g = moundH(x, z); const ah = archH(x, z); if (ah <= maxY && ah > g) g = ah;   // the arched deck of Højbro
   for (const c of cols) {
     const top = topAt(c, x, z); if (top > maxY || top <= g) continue;
@@ -953,7 +954,32 @@ const WL = -2.4;      // the water level in the canals and the harbour (the quay
 const ARCHES = [];   // the arched bridges (see BRIDGES below)
 // the canals and the harbour merged into one outline (from the W rows, merged with shapely in Python)
 const WATER_U = [[-274,50],[-159,222],[-46,384],[-2,434],[210,434],[304.8,330.2],[322,345],[327,340],[311.2,324.9],[349.9,293.1],[362,296],[375,284.1],[389,297],[394,292],[381.2,278.8],[452,219],[452,111],[414,149],[369,183],[349,202],[317,213],[222,283],[226.8,293.1],[141.2,349.8],[137,344],[132,348],[134.8,352.2],[45.3,421.8],[42,417],[22.5,430.7],[22.4,430.2],[26,427],[-29,366],[-251.9,37.1],[-248,30],[-135,-93],[-80,-130],[-58,-142],[-42,-150],[-14.9,-158],[4.1,-154],[160,-44],[232,13],[283,33],[310,35],[421,79],[422.3,75.1],[452,86],[452,25],[309,6],[264,-4],[262.8,-2.2],[214,-34],[181,-63],[170.9,-58.1],[52,-153],[34,-164],[12,-174],[2,-173],[-15,-178],[-33,-174],[-64,-164],[-95,-150],[-119,-135],[-147,-112],[-267,21],[-274,37]];
-{ const sh = new THREE.Shape([new THREE.Vector2(-1500, -1500), new THREE.Vector2(1500, -1500), new THREE.Vector2(1500, 1500), new THREE.Vector2(-1500, 1500)]); sh.holes.push(new THREE.Path(WATER_U.map(([x, z]) => new THREE.Vector2(x, -z))));
+// Round 5: two small landings. Their placement and stairs are adapted for the
+// game; the edge follows the real canal outline already used by the world.
+const QUAYS = [
+  {id:'reform',name:'Kajen ved Reformministeriet',a:[170.9,-58.1],b:[52,-153],x:112,half:2.6,top:5.4,bottom:-2.0},
+  {id:'slots',name:'Kajen ved Slotspladsen',a:[4.1,-154],b:[160,-44],x:100,half:2.6,top:5.4,bottom:-2.0}
+].map(q=>{
+  const e=edgesOf(WATER_U).find(e=>Math.hypot(e.a[0]-q.a[0],e.a[1]-q.a[1])<.01&&Math.hypot(e.b[0]-q.b[0],e.b[1]-q.b[1])<.01);
+  const t=(q.x-e.a[0])/(e.b[0]-e.a[0]);q.z=e.a[1]+(e.b[1]-e.a[1])*t;q.ux=(e.b[0]-e.a[0])/e.len;q.uz=(e.b[1]-e.a[1])/e.len;q.nx=e.nx;q.nz=e.nz;
+  q.at=(s,d)=>[q.x+q.ux*s+q.nx*d,q.z+q.uz*s+q.nz*d];
+  q.loc=(x,z)=>{const dx=x-q.x,dz=z-q.z;return [dx*q.ux+dz*q.uz,dx*q.nx+dz*q.nz];};
+  q.height=d=>d>=q.top?0:d<=1.2?-1.8:-Math.min(12,Math.ceil((q.top-d)/.35-1e-7))*.15;
+  return q;
+});
+function quaySurfaceAt(x,z) {
+  for(const q of QUAYS){const [s,d]=q.loc(x,z);if(Math.abs(s)<q.half&&d>q.bottom&&d<q.top+.08)return {q,s,d,y:q.height(d)};}
+  return null;
+}
+// Notch the land mesh as well as the vertical quay wall: no invisible street
+// surface or capstone remains over the descending stairs.
+const GROUND_WATER_RING=[];
+for(const e of edgesOf(WATER_U)){
+  GROUND_WATER_RING.push(e.a);
+  const q=QUAYS.find(q=>Math.hypot(q.a[0]-e.a[0],q.a[1]-e.a[1])<.01);
+  if(q)GROUND_WATER_RING.push(q.at(-q.half,0),q.at(-q.half,q.top),q.at(q.half,q.top),q.at(q.half,0));
+}
+{ const sh = new THREE.Shape([new THREE.Vector2(-1500, -1500), new THREE.Vector2(1500, -1500), new THREE.Vector2(1500, 1500), new THREE.Vector2(-1500, 1500)]); sh.holes.push(new THREE.Path(GROUND_WATER_RING.map(([x, z]) => new THREE.Vector2(x, -z))));
   const g = new THREE.ShapeGeometry(sh); g.rotateX(-Math.PI / 2); worldUV(g, 0, 0); mesh(g, M.ground, 0, -0.02, 0, { cast: false }); }
 for (const a of DATA.A) {
   if (a.k === 'square') flatPoly([a.ring], M.square, 0, '#e8dfcb');
@@ -983,7 +1009,7 @@ function onBridge(x, z) {
   for (const s of BRIDGE_SEGS) if (segDist(x, z, s[0], s[1], s[2], s[3]) < s[4]) return true;
   return false;
 }
-function waterAt(x, z) { return rawWater(x, z) && !onBridge(x, z); }
+function waterAt(x, z) { return rawWater(x, z) && !onBridge(x, z) && !quaySurfaceAt(x,z); }
 TX.quayWall = ctex(128, 128, (g, w, h) => { g.fillStyle = '#5f5a52'; g.fillRect(0, 0, w, h); for (let r = 0; r < 4; r++) { const off = (r % 2) * 32; for (let c = -1; c < 3; c++) { g.fillStyle = jit('#948e83', 0.08); g.fillRect(c * 64 + off + 2, r * 32 + 2, 60, 28); } } g.fillStyle = 'rgba(40,70,60,.35)'; g.fillRect(0, h - 22, w, 22); }, { rep: 1 / 2 });
 {
   flatPoly([WATER_U, circleRing(POOL)], M.water, WL, null); mapItems.push({ k: 'p', pts: WATER_U, fill: '#7fb6e0' });
@@ -991,7 +1017,13 @@ TX.quayWall = ctex(128, 128, (g, w, h) => { g.fillStyle = '#5f5a52'; g.fillRect(
   // stone quay walls down to the water, and a row of capstones along the edge
   const wallM = toon('#ffffff', { map: TX.quayWall, side: THREE.DoubleSide }), y1 = WL - 0.4;
   let u = 0;
-  for (const e of edgesOf(WATER_U)) {
+  const shoreEdges=[];
+  for(const e of edgesOf(WATER_U)){
+    const q=QUAYS.find(q=>Math.hypot(q.a[0]-e.a[0],q.a[1]-e.a[1])<.01);
+    if(!q){shoreEdges.push(e);continue;}
+    for(const [a,b] of [[e.a,q.at(-q.half-.1,0)],[q.at(q.half+.1,0),e.b]])shoreEdges.push({...e,a,b,len:Math.hypot(b[0]-a[0],b[1]-a[1])});
+  }
+  for (const e of shoreEdges) {
     if (e.len < 0.2) continue;
     const g = new THREE.BufferGeometry(), [ax, az] = e.a, [bx, bz] = e.b;
     g.setAttribute('position', new THREE.Float32BufferAttribute([ax, 0, az, bx, 0, bz, bx, y1, bz, ax, y1, az], 3));
@@ -999,6 +1031,62 @@ TX.quayWall = ctex(128, 128, (g, w, h) => { g.fillStyle = '#5f5a52'; g.fillRect(
     g.setIndex([0, 2, 1, 0, 3, 2]); g.computeVertexNormals(); u += e.len;
     mesh(g, wallM, 0, 0, 0, { cast: false });
     ribbon([[ax + e.nx * 0.4, az + e.nz * 0.4], [bx + e.nx * 0.4, bz + e.nz * 0.4]], 0.8, M.quay, 0.012, null);
+  }
+}
+
+// ======================================================================== TWO CANAL LANDINGS
+{
+  const graniteTex=ctex(128,128,(c,W,H)=>{c.fillStyle='#9a978d';c.fillRect(0,0,W,H);speckle(c,W,H,1800,.17,1.6);},{rep:.7});
+  const granite=toon('#ffffff',{map:graniteTex}),pale=tm('#b4aa94'),iron=tm('#4b4a42'),rust=tm('#88634b'),wood=tm('#8b6c44');
+  function beam(r,a,c,radius,m){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...c),v=B.clone().sub(A);const o=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,v.length(),8),m);o.position.copy(A).add(B).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());r.add(o);}
+  for(const q of QUAYS){
+    const r=new THREE.Group();r.userData.quaySurface=true;r.position.set(q.x,0,q.z);r.rotation.y=Math.atan2(q.nx,q.nz);world.add(r);
+    // Local +z points inland; local +x follows the canal edge.
+    const add=(w,h,d,m,x,y,z)=>box(w,h,d,m,x,y,z,{parent:r,cast:false});
+    add(5.2,.3,3.2,granite,0,-2.1,-.4); // landing: top -1.8, 0.6 above water
+    for(let i=0;i<12;i++){
+      const d=q.top-(i+.5)*.35,y=-(i+1)*.15;
+      add(4.8,y+2.2,.35,granite,0,-2.2,d);
+      add(4.8,.035,.07,pale,0,y+.007,d-.14);
+    }
+    // Deep stone cheeks retain the pavement beside the recess.
+    for(const side of [-1,1]){
+      add(.3,2.55,5.4,granite,side*2.55,-2.45,2.7);
+      add(.42,.14,5.5,pale,side*2.55,0,2.7);
+      add(.3,.9,2,granite,side*2.55,-2.1,-1);
+      beam(r,[side*2.17,-.8,.9],[side*2.17,1,5.6],.055,iron);
+      for(const d of [1.3,3.3,5.3])beam(r,[side*2.17,q.height(d)+.12,d],[side*2.17,q.height(d)+1,d],.045,iron);
+      beam(r,[side*2.17,-.8,-1.8],[side*2.17,-.8,1.2],.055,iron);
+      for(const d of [-1.6,.6])beam(r,[side*2.17,-1.8,d],[side*2.17,-.8,d],.045,iron);
+    }
+    // Top-level paving strips avoid the stair opening and retain a clear path.
+    for(const side of [-1,1]){
+      add(7.6,.04,4.5,granite,side*6.6,-.01,2.5);
+      for(const z of [.4,4.6])add(7.6,.045,.12,pale,side*6.6,.03,z);
+    }
+    add(6,.04,1.7,granite,0,-.01,6.3);
+    // Rounded granite posts and iron crossbars model the Slotsplads photo.
+    if(q.id==='slots')for(const side of [-1,1]){
+      for(const x of [3.4,6.6,9.8]){
+        mesh(new THREE.CylinderGeometry(.23,.3,.82,12),pale,side*x,.45,.4,{parent:r});
+        mesh(new THREE.SphereGeometry(.23,12,8),pale,side*x,.86,.4,{parent:r});const p=q.at(side*x,.4);colCirc(p[0],p[1],.3,1.1);
+      }
+      beam(r,[side*3.4,.7,.4],[side*9.8,.7,.4],.045,rust);
+    }
+    // Mooring ring, inset into a stone on the landing; no boat or story prop.
+    add(.7,.14,.6,pale,1.65,-1.8,-1.1);
+    mesh(new THREE.TorusGeometry(.21,.045,8,24),rust,1.65,-1.615,-1.1,{parent:r,rx:-Math.PI/2});
+    for(const x of [-1.25,1.25]){add(.18,.48,.18,wood,x,-2.4,-2.08);add(.35,.12,.2,iron,x,-1.95,-2.08);}
+    // A small bench on the city promenade leaves the route from both doors free.
+    if(q.id==='reform'){
+      for(const x of [-8.4,-6.2]){add(.09,.46,.75,iron,x,0,3.2);add(.09,.9,.08,iron,x,0,3.55);}
+      for(let i=0;i<4;i++)add(2.6,.07,.14,wood,-7.3,.46,2.92+i*.17);
+      for(let i=0;i<3;i++)add(2.6,.11,.07,wood,-7.3,.6+i*.14,3.55);
+    }
+    const tex=ctex(1024,224,(c,W,H)=>{c.fillStyle='#2d4039';c.fillRect(0,0,W,H);c.strokeStyle='#c6b47c';c.lineWidth=8;c.strokeRect(7,7,W-14,H-14);c.fillStyle='#f3e8c6';c.font='48px Georgia';c.textAlign='center';c.textBaseline='middle';c.fillText(q.name,W/2,H*.37,W-45);c.font='33px Georgia';c.fillText('Trappe til vandet',W/2,H*.74,W-45);},{wrap:false});
+    // Face inland so the sign can be read when approaching the stairs.
+    const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.7,.81),toon('#ffffff',{map:tex}));sign.position.set(4,1.2,5.1);r.add(sign);add(3.7,.81,.05,tm('#2d4039'),4,.795,5.06);add(.07,1.2,.07,iron,4,0,5.1);
+    mapItems.push({k:'p',pts:[q.at(-2.6,-2),q.at(-2.6,5.4),q.at(2.6,5.4),q.at(2.6,-2)],fill:'#b1a58c',line:true});
   }
 }
 
@@ -2863,6 +2951,7 @@ const POIS = [
   { n: 'Prins Jørgens Gård', t: 'Gården foran Dronningeporten. Her står fire statuer på høje sokler. En af dem er Herkules med sin kølle.', x: -36, z: -62, r: 16 },
   { n: 'Reformministeriet', t: 'Et fiktivt ministerium i spillets historie. Gå ind ved den åbne dør på Ved Stranden og udforsk gangen, kontoret og printerområdet.', x: 120, z: -110, r: 20 },
   { n: 'Finansministeriet', t: 'Den Røde Bygning har røde mursten og lyse vinduer. Gå ind fra Slotspladsen og se spillets foyer, garderobe og forhandlingsrum.', x: 110, z: 42, r: 15 },
+  ...QUAYS.map(q=>({n:q.name,quiet:true,t:'Gå ned ad stentrappen til afsatsen over vandet.',x:q.x,z:q.z,r:8})),
   { n: 'Rigsdagsgården', t: 'Gården foran Folketinget. Her kører ministrene ind i sorte biler, og politikerne går op ad den store trappe og ind i Folketinget.', x: 36, z: 72, r: 26 },
   { n: 'Slotspladsen', t: 'En stor plads foran slottet. Her rider kong Frederik den Syvende på sin hest. Han gav Danmark grundloven.', x: 100, z: -20, r: 28 },
   { n: 'Ridebanen', t: 'En stor bane med sand. Her træner kongens heste. Gå hen til en hest og klap den.', x: -140, z: 85, r: 42 },
@@ -2893,7 +2982,7 @@ const POIS = [
   { n: 'Prinsens Bro', t: 'En bro af sten over Frederiksholms Kanal.', x: -152, z: 214, r: 15 },
   { n: 'Stormbroen', t: 'En bro over kanalen ved Nationalmuseet.', x: -262, z: 57, r: 15 },
 ];
-function poiAt(x, z) { let best = null, bs = 1; for (const p of POIS) { const s = Math.hypot(x - p.x, z - p.z) / p.r; if (s < bs) { bs = s; best = p; } } return best; }
+function poiAt(x, z) { for(const q of QUAYS){const [s,d]=q.loc(x,z);if(Math.abs(s)<3&&d>q.bottom&&d<7.5)return POIS.find(p=>p.n===q.name);}let best = null, bs = 1; for (const p of POIS) { const s = Math.hypot(x - p.x, z - p.z) / p.r; if (s < bs) { bs = s; best = p; } } return best; }
 
 
 // ======================================================================== SKY & LIGHT
@@ -3000,6 +3089,29 @@ for (const k in WIN) {
   }
 }
 
+// Cut the same recess out of street/pavement overlays, which otherwise cover
+// the opening in the base land mesh. Only flat meshes near street level qualify.
+function cutQuayPavement(){
+  world.updateMatrixWorld(true);
+  const rectangles=QUAYS.map(q=>{const ps=[q.at(-q.half,-.05),q.at(q.half,-.05),q.at(q.half,q.top),q.at(-q.half,q.top)];return {q,x0:Math.min(...ps.map(p=>p[0])),x1:Math.max(...ps.map(p=>p[0])),z0:Math.min(...ps.map(p=>p[1])),z1:Math.max(...ps.map(p=>p[1]))};});
+  world.traverse(o=>{
+    if(!o.isMesh||o.isInstancedMesh)return;for(let p=o;p;p=p.parent)if(p.userData.quaySurface)return;
+    o.geometry.computeBoundingBox();const bb=o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);
+    if(bb.min.y<-.05||bb.max.y>.16||bb.max.y-bb.min.y>.06)return;
+    const qs=rectangles.filter(r=>bb.max.x>r.x0&&bb.min.x<r.x1&&bb.max.z>r.z0&&bb.min.z<r.z1).map(r=>r.q);if(!qs.length)return;
+    const src=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone(),attrs=Object.entries(src.attributes),output=Object.fromEntries(attrs.map(([k])=>[k,[]]));
+    const lerp=(a,b,t)=>({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t,v:a.v.map((v,i)=>v.map((n,j)=>n+(b.v[i][j]-n)*t))});
+    function split(poly,dist){const yes=[],no=[];for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],da=dist(a),db=dist(b);(da>=0?yes:no).push(a);if((da>=0)!==(db>=0)){const p=lerp(a,b,da/(da-db));yes.push(p);no.push(p);}}return [yes,no];}
+    for(let i=0;i<src.attributes.position.count;i+=3){
+      let polys=[Array.from({length:3},(_,j)=>{const v=attrs.map(([k,a])=>Array.from({length:a.itemSize},(_,c)=>a.array[(i+j)*a.itemSize+c]));const p=new THREE.Vector3().fromBufferAttribute(src.attributes.position,i+j).applyMatrix4(o.matrixWorld);return {v,x:p.x,z:p.z};})];
+      for(const q of qs){const next=[];for(const poly of polys){let inside=poly;const edges=[p=>q.loc(p.x,p.z)[0]+q.half,p=>q.half-q.loc(p.x,p.z)[0],p=>q.loc(p.x,p.z)[1]+.05,p=>q.top-q.loc(p.x,p.z)[1]];for(const edge of edges){if(inside.length<3)break;const [yes,no]=split(inside,edge);if(no.length>=3)next.push(no);inside=yes;}}polys=next;}
+      for(const poly of polys)for(let j=1;j<poly.length-1;j++)for(const p of [poly[0],poly[j],poly[j+1]])attrs.forEach(([k],a)=>output[k].push(...p.v[a]));
+    }
+    const geo=new THREE.BufferGeometry();for(const [k,a]of attrs)geo.setAttribute(k,new THREE.Float32BufferAttribute(output[k],a.itemSize));geo.computeBoundingSphere();o.geometry=geo;src.dispose();
+  });
+}
+cutQuayPavement();
+
 // ======================================================================== freeze static world
 world.traverse(o => { o.updateMatrix(); o.matrixAutoUpdate = false; });
 world.updateMatrixWorld(true);
@@ -3087,6 +3199,23 @@ function resolvePoly(p) {
     else if (d < RAD && d > 1e-6) { p.x = bx + (p.x - bx) / d * RAD; p.z = bz + (p.z - bz) / d * RAD; }
   }
 }
+function resolveQuays(p,ox,oz) {
+  for(const q of QUAYS){
+    let [s,d]=q.loc(p.x,p.z);const [os,od]=q.loc(ox,oz);
+    if(d<q.bottom-.4||d>q.top+.45||Math.abs(s)>q.half+.55)continue;
+    const wasInside=Math.abs(os)<q.half&&od>q.bottom&&od<q.top+.1;
+    if(wasInside){
+      s=Math.max(-2.0,Math.min(2.0,s));
+      d=Math.max(q.bottom+.38,d);
+      if(d<q.top+.1){const w=q.at(s,d);p.x=w[0];p.z=w[1];}
+    }else if(d<q.top+.25&&Math.abs(s)<q.half+.35){
+      if(od>=q.top-.05&&d>q.top-.65&&Math.abs(s)<2)continue;
+      // The only entrance from street level is the head of the stair.
+      if(Math.abs(os)>=q.half){const w=q.at(Math.sign(os)*(q.half+.36),d);p.x=w[0];p.z=w[1];}
+      else {p.x=ox;p.z=oz;}
+    }
+  }
+}
 let splashT = 0, lastStep = 0;
 function updPlayer(dt) {
   for (const h of HOOKS.ride) if (h(dt)) return;
@@ -3118,13 +3247,14 @@ function updPlayer(dt) {
   if (FX.hojbroLight?.blocks(ox, oz, P.pos.x, P.pos.z)) {
     P.pos.x = ox; P.pos.z = oz; P.vel.x = P.vel.z = 0;
   }
+  resolveQuays(P.pos,ox,oz);
   // the water stops her (she can still walk along the quay)
   if (waterAt(P.pos.x, P.pos.z)) {
     if (!waterAt(P.pos.x, oz)) P.pos.z = oz; else if (!waterAt(ox, P.pos.z)) P.pos.x = ox; else { P.pos.x = ox; P.pos.z = oz; }
     if (splashT <= 0 && Math.hypot(P.vel.x, P.vel.z) > 2) { splashT = 6; toast('Stop! Her er vand. Find en bro.'); }
   }
   if (splashT > 0) splashT -= dt;
-  resolve(P.pos); resolvePoly(P.pos);
+  resolve(P.pos); resolvePoly(P.pos);resolveQuays(P.pos,ox,oz);
   if (waterAt(P.pos.x, P.pos.z)) { P.pos.x = ox; P.pos.z = oz; }
   P.pos.x = Math.min(BOUNDS[1], Math.max(BOUNDS[0], P.pos.x)); P.pos.z = Math.min(BOUNDS[3], Math.max(BOUNDS[2], P.pos.z));
   if (jumpReq && P.onGround && !paused) { P.vel.y = 7.4; P.onGround = false; hop(); }
@@ -3284,7 +3414,7 @@ function renderPoiText() {
 function showPoi(p) {
   if (p === curPoi) return;
   curPoi = p; poiExpanded = false; const el = $('poi');
-  if (p && !seenPoi.has(p.n)) { seenPoi.add(p.n); popLabel(p.n, kid.root.position, 1.3); burst(kid.root.position); sparkleSound(); }
+  if (p && !seenPoi.has(p.n)) { seenPoi.add(p.n); if(!p.quiet){popLabel(p.n, kid.root.position, 1.3); burst(kid.root.position); sparkleSound();} }
   if (!p) { el.hidden = true; setPoiH(); return; }
   sayPoi(p); $('poiName').textContent = p.n; $('poiRead').hidden = !('speechSynthesis' in window);
   el.hidden = false; renderPoiText();
@@ -3410,7 +3540,7 @@ function camFollow(dt, out, look) {
   tmpB.copy(look).add(tmpA);
   const t = rayHit(look, tmpB);
   if (t < 1) tmpB.copy(look).addScaledVector(tmpA, Math.max(0.12, t - 0.06));
-  tmpB.y = Math.max(tmpB.y, 0.4);
+  tmpB.y = Math.max(tmpB.y, quaySurfaceAt(P.pos.x,P.pos.z)?P.pos.y+.5:.4);
   out.copy(tmpB);
 }
 const followPos = new THREE.Vector3(), followLook = new THREE.Vector3(), orbitPos = new THREE.Vector3();
@@ -4122,7 +4252,7 @@ function boatFits(x, z, h, boats = true) {
   const c = Math.cos(h), s = Math.sin(h);
   for (const [lx, lz] of HULL_PTS) {
     const px = x + lx * c + lz * s, pz = z - lx * s + lz * c;
-    if (!rawWater(px, pz) || lowAt(px, pz)) return false;
+    if (!rawWater(px, pz) || lowAt(px, pz) || quaySurfaceAt(px,pz)) return false;
     if (boats) for (const b of BOATS) {   // the big boats
       const bx = px - b.g.position.x, bz = pz - b.g.position.z, fx = Math.sin(b.head), fz = Math.cos(b.head), L = b.big ? 11.6 : 7.4, W = b.big ? 3.5 : 2.3;
       if (Math.abs(bx * fx + bz * fz) < L && Math.abs(bx * fz - bz * fx) < W) return false;
@@ -4135,7 +4265,7 @@ function landSpot() {   // a free spot on the quay next to the boat
   const B = MYBOAT, c = Math.cos(B.h), s = Math.sin(B.h);
   for (const d of [2.4, 3.0, 3.6, 4.2]) for (const side of [1, -1]) for (const a of [-1.2, 0.4, 2.0]) {
     const lx = side * d, x = B.x + lx * c + a * s, z = B.z - lx * s + a * c;
-    if (!rawWater(x, z) && !inBuilding(x, z) && groundAt(x, z, 99) - archH(x, z) < 0.3 && x > BOUNDS[0] && x < BOUNDS[1] && z > BOUNDS[2] && z < BOUNDS[3]) return [x, z];
+    if (!waterAt(x, z) && !inBuilding(x, z) && groundAt(x, z, 99) - archH(x, z) < 0.3 && x > BOUNDS[0] && x < BOUNDS[1] && z > BOUNDS[2] && z < BOUNDS[3]) return [x, z];
   }
   return null;
 }
@@ -4205,7 +4335,7 @@ HOOKS.frame.push((dt, t) => {
   for (const f of B.foam) if (f.t <= 1.6) { f.t += dt; f.m.scale.setScalar(0.6 + f.t * 0.9); f.m.material.opacity = Math.max(0, 0.6 * (1 - f.t / 1.6)); if (f.t > 1.6) f.m.visible = false; }
   if (!started || paused) return;
   if (!B.on) {
-    if (Math.hypot(P.pos.x - B.x, P.pos.z - B.z) < 5.5 && !rawWater(P.pos.x, P.pos.z)) offerAction({ id: 'sejl', label: 'Sejl med båden', prio: 3, run: boardBoat });
+    if (Math.hypot(P.pos.x - B.x, P.pos.z - B.z) < 5.5 && !waterAt(P.pos.x, P.pos.z)) offerAction({ id: 'sejl', label: 'Sejl med båden', prio: 3, run: boardBoat });
   } else {
     const spot = landSpot(); if (spot) offerAction({ id: 'land', label: 'Gå i land', prio: 2, run: () => leaveBoat(spot) });
     B.stillT = !spot && Math.abs(B.v) < 0.3 ? (B.stillT || 0) + dt : 0;   // she stops out on the water: tell her how to get ashore (once each trip)
@@ -5207,7 +5337,7 @@ const INTERIOR = (() => {
         const dx=P.pos.x-d.x,dz=P.pos.z-d.z,depth=dx*d.nx+dz*d.nz,across=dx*d.nz-dz*d.nx;
         const go=()=>enter(key==='finance'?'finance':'reform',key==='reformSide');
         if(Math.abs(across)<1.05&&depth>.65&&depth<1.65){go();return;}
-        if(Math.abs(across)<4&&depth>.5&&depth<7)offerAction({id:'ministry-'+key,label:'Gå ind i '+(key==='finance'?'Finansministeriet':'Reformministeriet'),prio:9,run:go});
+        if(Math.abs(across)<4&&depth>.5&&depth<7&&Math.cos(P.face-d.ry)<-.25)offerAction({id:'ministry-'+key,label:'Gå ind i '+(key==='finance'?'Finansministeriet':'Reformministeriet'),prio:9,run:go});
       }
       if(canEnter && Math.abs(p[0])<1 && p[1]>.15 && p[1]<1.4 && P.onGround && P.pos.y>.8) { enter(); return; }
       if(canEnter&&Math.abs(p[0])<4&&p[1]>.3&&p[1]<7)offerAction({id:'folketing-enter',label:'Gå ind i Folketinget',prio:8,run:()=>enter()});
@@ -5234,8 +5364,8 @@ const INTERIOR = (() => {
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',leave);hud.appendChild(exit);
   const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);
   shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
-  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Start ved et ministerium');destinations.innerHTML='<option value="">Start ved et ministerium…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option>';shortcut.after(destinations);
-  destinations.addEventListener('change',()=>{const key=destinations.value;destinations.value='';if(!key||!window.__gameReady)return;goBtn.click();if(I.on)leave();const d=MINISTRY_DOORS[key];P.pos.set(d.x+d.nx*5,0,d.z+d.nz*5);P.face=d.ry+Math.PI;cam.yaw=d.ry;camInit=false;startBlend=1;toast('Gå hen til den åbne dør i '+d.title+'.');});
+  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Start ved et ministerium eller en kaj');destinations.innerHTML='<option value="">Vælg et startsted…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option><option value="quay-reform">Kajen ved Reformministeriet</option><option value="quay-slots">Kajen ved Slotspladsen</option>';shortcut.after(destinations);
+  destinations.addEventListener('change',()=>{const key=destinations.value;destinations.value='';if(!key||!window.__gameReady||MYBOAT.on||TOWER.on||TOWER.busy||FX.scooter?.active)return;goBtn.click();if(I.on)leave();if(key.startsWith('quay-')){const q=QUAYS.find(q=>q.id===key.slice(5)),p=q.at(0,6.3);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.onGround=true;P.face=Math.atan2(-q.nx,-q.nz);cam.yaw=P.face+Math.PI;cam.pitch=.4;camInit=false;startBlend=1;toast('Gå ned ad trappen til kajens afsats.');return;}const d=MINISTRY_DOORS[key];P.pos.set(d.x+d.nx*5,0,d.z+d.nz*5);P.face=d.ry+Math.PI;cam.yaw=d.ry;camInit=false;startBlend=1;toast('Gå hen til den åbne dør i '+d.title+'.');});
   I.enter=enter;I.leave=leave;I.doors=MINISTRY_DOORS;I.fits=fits;I.height=height;I.roomAt=roomAt;FX.interior=I;return I;
 })();
 
@@ -5258,7 +5388,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, TASKS, tasksDone, taskAct, openQuiz, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, CROWNS, FAMILIES, CRUMBS, found, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
