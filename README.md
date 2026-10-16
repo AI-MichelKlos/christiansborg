@@ -42,3 +42,6 @@ På startskærmen kan du vælge et ministerium at starte ved. Finansministeriet 
 
 ### To kajer med trapper
 Under "Vælg et startsted…" kan du starte ved kajen på Ved Stranden foran Reformministeriet eller ved kajen på den modsatte bred ved Slotspladsen. Gå ned ad stentrappen til afsatsen over vandet, stop op undervejs og gå op igen. Der er håndlister, fortøjningsringe og forskellige detaljer på de to bredder. Den eksisterende båd kan lægge til ved afsatserne. Materialer og kajkanter bygger på fotos; trappernes placering og mål er tilpasset spillet. Se `dev/INTERIOR.md`.
+
+### Bibliotekshaven og staldene
+Vælg Bibliotekshaven på startskærmen for at gå ad grusstierne mellem blomsterbede til bassinet og den siddende Kierkegaard-statue. Man kan gå hele vejen rundt om statuen. De Kongelige Stalde kan også vælges som startsted: gå gennem den åbne port fra Ridebanen og udforsk den brede gang mellem marmorsøjler og spiltove med hvide heste. Gå tilbage til porten eller vælg Gå udenfor for at vende tilbage til Ridebanen. Referencer og de anslåede mål står i `dev/INTERIOR.md`.
