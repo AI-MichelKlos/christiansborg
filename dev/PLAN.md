@@ -12,7 +12,7 @@ Et 3D-spil i browseren på Christiansborg og Slotsholmen. Det begyndte som en g�
 - Motoren er kopieret fra `skolen-paa-duevej`: pigen, kameraet bag hende, styring på computer og telefon, kortet i hjørnet, læs op, knapperne og sammenlægningen af statiske ting ("freeze static world").
 - Nye ting kan bruge `HOOKS` (frame, ride, key, start), `FX` og handlingsknappen `offerAction({ id, label, run, prio })`.
 - Commit som "Michel Klos". Når et trin er færdigt: opdater tjeklisten herunder med korte noter.
-- Artefakt med spillet: https://claude.ai/artifact/G1qjW6PW6Rxo8TMneLCwsY (fra 13. okt. 2026; den gamle artefakt RxC5FdxMhs3NH9xdf7zzej er ikke opdateret). Opdater den ved at give url'en til Artifact-værktøjet. Artefaktens kopi af `index.html` skal være uden `<!doctype>`, `<html>`, `<head>` og `<body>`.
+- Artefakt med spillet: https://claude.ai/artifact/G1qjW6PW6Rxo8TMneLCwsY (fra 13. okt. 2026; den gamle artefakt RxC5FdxMhs3NH9xdf7zzej er ikke opdateret). Opdater den ved at give url'en til Artifact-værktøjet. Artefaktens kopi af `index.html` skal være uden `<!doctype>`, `<html>`, `<head>` og `<body>`. Fra 17. okt. 2026 skal `mordgaade.js` med som ekstra fil. Artefakten viser stadig udgaven fra 13. okt., fordi den gamle kopi er for stor til at blive læst igennem før en opdatering. Spil i stedet på GitHub Pages, eller lav en ny artefakt.
 
 ## Koordinater og data
 - 1 enhed = 1 meter. x går mod øst, z går mod syd. (0, 0) er 55.6761 N, 12.5800 E, midt i Christiansborg.
