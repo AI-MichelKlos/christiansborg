@@ -1851,41 +1851,76 @@ const RIDE = DATA.A.find(a => a.n === 'Christiansborg Ridebane').ring;
   if(entry){const [x,z,nx,nz]=entry;STABLE_ENTRY={x,z,nx,nz,ry:Math.atan2(nx,nz)};}
   // horses looking out over every other stable door
   const COATS = [['#8a5a3c', '#3a2a22'], ['#f1ece2', '#cfc6b8'], ['#3a2f2b', '#1f1a18'], ['#b0703f', '#5a3420']];
+  // The upper half of those doors stands open (dark), so the horse's head comes out of the stall, not through glass.
+  const opening = toon('#1a1411'), frameM = toon('#3f6b4f'), heads = [];
   doors.filter((d, i) => i % 2 === 0 && (!STABLE_ENTRY || Math.hypot(d[0]-STABLE_ENTRY.x,d[1]-STABLE_ENTRY.z)>2)).slice(0, 8).forEach(([x, z, nx, nz], i) => {
-    const [c, m] = COATS[i % COATS.length], g = new THREE.Group(); g.position.set(x + nx * 0.15, 2.05, z + nz * 0.15); g.rotation.y = Math.atan2(nx, nz); world.add(g);
-    mesh(new THREE.CapsuleGeometry(0.17, 0.42, 4, 10), tm(c), 0, -0.05, 0.3, { parent: g, rx: 2.0, edges: 40 });
-    mesh(new THREE.BoxGeometry(0.06, 0.12, 0.3), tm(m), 0, 0.2, 0.05, { parent: g });
-    for (const s of [-1, 1]) { mesh(new THREE.ConeGeometry(0.05, 0.16, 6), tm(c), s * 0.09, 0.2, 0.06, { parent: g }); mesh(new THREE.SphereGeometry(0.03, 6, 5), M.dark, s * 0.13, 0.06, 0.28, { parent: g }); }
+    const [c, m] = COATS[i % COATS.length], g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = Math.atan2(nx, nz); dyn.add(g);
+    box(1.52, 1.22, 0.05, opening, 0, 1.64, WOFF + 0.02, { parent: g, cast: false });
+    box(1.62, 0.09, 0.12, frameM, 0, 1.58, WOFF + 0.05, { parent: g, cast: false });   // the top of the lower half-door
+    const h = buildHorse(c, m, { hoved: true, blaze: i % 2 === 1, nose: c === '#f1ece2' ? '#c9b8ae' : '#6b5a52' });
+    h.neck.position.set(0, 1.5, -0.12); h.neck.rotation.x = 0.3; h.head.rotation.x = 0.35; g.add(h.g); h.ph = rand() * 6; heads.push(h);
   });
+  HOOKS.frame.push((dt, t) => { for (const h of heads) { h.head.rotation.x = 0.35 + Math.sin(t * 0.7 + h.ph) * 0.1; h.neck.rotation.y = Math.sin(t * 0.33 + h.ph * 2) * 0.3; } });
 }
 
+// A cartoon horse in the same style as the people: a round body with a higher rump, a tapering neck with a mane,
+// a head with a muzzle, nostrils and ears, legs with knees and hooves, and a full tail.
+// o.hoved: only the neck and the head (a horse looking out over a stable door). o.rider: a rider in a red jacket.
+function buildHorse(col, maneCol, o = {}) {
+  const ol = buildHorse.ol || (buildHorse.ol = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide }));
+  const coat = toon(col), mane = toon(maneCol), nose = toon(o.nose || '#6b5a52'), hoofM = toon('#3a302c'), eye = new THREE.MeshBasicMaterial({ color: '#1b1416' });
+  const part = (geo, mat, parent, x, y, z, s = 1.05) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); if (s) { const q = new THREE.Mesh(geo, ol); q.scale.setScalar(s); m.add(q); } return m; };
+  const g = new THREE.Group(), body = new THREE.Group(); g.add(body);
+  if (!o.hoved) {
+    part(new THREE.CapsuleGeometry(0.4, 1.0, 6, 16), coat, body, 0, 1.32, 0).rotation.x = Math.PI / 2;
+    part(new THREE.SphereGeometry(0.43, 18, 14), coat, body, 0, 1.36, 0.52).scale.set(0.95, 1, 0.9);   // chest
+    part(new THREE.SphereGeometry(0.44, 18, 14), coat, body, 0, 1.43, -0.55).scale.set(1, 1, 0.95);    // rump
+  }
+  const neck = new THREE.Group(); neck.position.set(0, o.hoved ? 0 : 1.55, o.hoved ? 0 : 0.72); g.add(neck);
+  part(new THREE.CylinderGeometry(0.15, 0.27, 0.85, 14), coat, neck, 0, 0.33, 0.17).rotation.x = 0.62;
+  part(new THREE.BoxGeometry(0.07, 0.72, 0.15), mane, neck, 0, 0.44, 0.02, 0).rotation.x = 0.62;
+  const head = new THREE.Group(); head.position.set(0, 0.72, 0.42); neck.add(head);
+  part(new THREE.SphereGeometry(0.16, 16, 12), coat, head, 0, 0, 0).scale.set(0.9, 0.95, 1.15);
+  part(new THREE.CapsuleGeometry(0.105, 0.24, 4, 12), coat, head, 0, -0.12, 0.2).rotation.x = 1.2;
+  part(new THREE.SphereGeometry(0.105, 12, 10), nose, head, 0, -0.2, 0.33).scale.set(1, 0.85, 1);
+  for (const s of [-1, 1]) {
+    part(new THREE.SphereGeometry(0.022, 6, 5), eye, head, s * 0.045, -0.2, 0.425, 0);   // nostrils
+    part(new THREE.SphereGeometry(0.03, 8, 6), eye, head, s * 0.135, 0.03, 0.08, 0);     // eyes
+    const ear = part(new THREE.ConeGeometry(0.045, 0.16, 6), coat, head, s * 0.075, 0.18, -0.04, 1.06); ear.rotation.z = -s * 0.2;
+  }
+  part(new THREE.ConeGeometry(0.06, 0.14, 6), mane, head, 0, 0.13, 0.08, 0).rotation.x = 0.9;   // forelock
+  if (o.blaze) part(new THREE.BoxGeometry(0.05, 0.02, 0.3), toon('#f4efe6'), head, 0, 0.03, 0.2, 0).rotation.x = -0.5;
+  const legs = [], tail = new THREE.Group();
+  if (!o.hoved) {
+    for (const [lx, lz] of [[-0.2, 0.52], [0.2, -0.52], [0.2, 0.52], [-0.2, -0.52]]) {
+      const hip = new THREE.Group(); hip.position.set(lx, 1.05, lz); g.add(hip);
+      part(new THREE.CylinderGeometry(0.095, 0.07, 0.52, 10), coat, hip, 0, -0.25, 0);
+      part(new THREE.SphereGeometry(0.07, 8, 6), coat, hip, 0, -0.51, 0, 0);
+      part(new THREE.CylinderGeometry(0.058, 0.055, 0.42, 8), coat, hip, 0, -0.72, 0);
+      part(new THREE.CylinderGeometry(0.075, 0.088, 0.11, 10), hoofM, hip, 0, -0.995, 0.01);
+      legs.push(hip);
+    }
+    tail.position.set(0, 1.55, -0.95); g.add(tail);
+    part(new THREE.CapsuleGeometry(0.08, 0.32, 4, 8), mane, tail, 0, -0.18, -0.07).rotation.x = -0.45;
+    part(new THREE.CapsuleGeometry(0.12, 0.5, 4, 10), mane, tail, 0, -0.62, -0.2).rotation.x = -0.12;
+  }
+  if (o.rider) {   // a rider from the royal stables in a red jacket and a black helmet
+    const red = toon('#b8322c'), skin = toon('#f6cfb0'), black = toon('#2a2530');
+    part(new THREE.CapsuleGeometry(0.2, 0.36, 4, 10), red, body, 0, 2.08, -0.05);
+    part(new THREE.SphereGeometry(0.17, 12, 10), skin, body, 0, 2.55, -0.02, 1.05);
+    part(new THREE.SphereGeometry(0.18, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), black, body, 0, 2.6, -0.04, 1.04);
+    for (const s of [-1, 1]) { part(new THREE.CapsuleGeometry(0.08, 0.45, 3, 8), black, body, s * 0.36, 1.55, 0.05, 1.05).rotation.z = s * 0.25; part(new THREE.CapsuleGeometry(0.07, 0.3, 3, 8), red, body, s * 0.22, 2.0, 0.15, 1.05).rotation.x = -0.8; }
+  }
+  return { g, body, neck, head, tail, legs };
+}
 // ---------------- three of kongens heste walk round and round on the sand. Go close, and they stop; press E to pat one.
 const HORSES = [];
 {
   const outline = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide });
   const part = (geo, mat, parent, x, y, z, ol = 1.06) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); if (ol) { const o = new THREE.Mesh(geo, outline); o.scale.setScalar(ol); m.add(o); } return m; };
   function makeHorse(col, maneCol, rider) {
-    const g = new THREE.Group(), coat = toon(col), mane = toon(maneCol), hoof = toon('#3a302c'), eye = new THREE.MeshBasicMaterial({ color: '#231a22' });
-    part(new THREE.CapsuleGeometry(0.42, 1.2, 6, 14), coat, g, 0, 1.3, 0).rotation.x = Math.PI / 2;
-    const neck = new THREE.Group(); neck.position.set(0, 1.5, 0.72); g.add(neck);
-    part(new THREE.CapsuleGeometry(0.22, 0.6, 4, 10), coat, neck, 0, 0.3, 0.12).rotation.x = 0.55;
-    part(new THREE.BoxGeometry(0.08, 0.55, 0.5), mane, neck, 0, 0.42, -0.04, 0).rotation.x = 0.55;
-    const head = new THREE.Group(); head.position.set(0, 0.72, 0.34); neck.add(head);
-    part(new THREE.CapsuleGeometry(0.17, 0.42, 4, 10), coat, head, 0, -0.06, 0.22).rotation.x = 1.9;
-    for (const s of [-1, 1]) { part(new THREE.ConeGeometry(0.06, 0.18, 6), coat, head, s * 0.1, 0.17, 0.0, 0); part(new THREE.SphereGeometry(0.035, 8, 6), eye, head, s * 0.15, 0.05, 0.2, 0); }
-    const tail = new THREE.Group(); tail.position.set(0, 1.45, -0.95); g.add(tail);
-    part(new THREE.CapsuleGeometry(0.08, 0.6, 3, 6), mane, tail, 0, -0.35, -0.12, 0).rotation.x = -0.35;
-    const legs = [];
-    for (const [lx, lz] of [[-0.2, 0.55], [0.2, -0.55], [0.2, 0.55], [-0.2, -0.55]]) { const hip = new THREE.Group(); hip.position.set(lx, 1.05, lz); g.add(hip); part(new THREE.CylinderGeometry(0.08, 0.06, 0.95, 8), coat, hip, 0, -0.47, 0); part(new THREE.CylinderGeometry(0.075, 0.085, 0.12, 8), hoof, hip, 0, -0.98, 0, 0); legs.push(hip); }
-    if (rider) {   // a rider from the royal stables in a red jacket and a black helmet
-      const red = toon('#b8322c'), skin = toon('#f6cfb0'), black = toon('#2a2530');
-      part(new THREE.CapsuleGeometry(0.2, 0.36, 4, 10), red, g, 0, 2.08, -0.05);
-      part(new THREE.SphereGeometry(0.17, 12, 10), skin, g, 0, 2.55, -0.02, 1.05);
-      part(new THREE.SphereGeometry(0.18, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), black, g, 0, 2.6, -0.04, 1.04);
-      for (const s of [-1, 1]) { part(new THREE.CapsuleGeometry(0.08, 0.45, 3, 8), black, g, s * 0.36, 1.55, 0.05, 1.05).rotation.z = s * 0.25; part(new THREE.CapsuleGeometry(0.07, 0.3, 3, 8), red, g, s * 0.22, 2.0, 0.15, 1.05).rotation.x = -0.8; }
-    }
-    dyn.add(g);
-    return { g, neck, head, tail, legs };
+    const h = buildHorse(col, maneCol, { rider, blaze: col !== '#f1ece2' }); dyn.add(h.g);
+    return h;
   }
   const C = [-133, 88], R = 17;
   [['#8a5a3c', '#3a2a22', 0, true], ['#f1ece2', '#cfc6b8', 2.1, false], ['#3a2f2b', '#1f1a18', 4.2, false]].forEach(([c, m, a, rider]) => HORSES.push({ ...makeHorse(c, m, rider), a, ph: rand() * 6, pat: 0, near: false }));
@@ -1903,7 +1938,7 @@ const HORSES = [];
       h.g.rotation.y = Math.atan2(-Math.sin(h.a), Math.cos(h.a));   // along the circle
       const s = walking ? Math.sin(h.ph) * 0.45 : 0;
       h.legs[0].rotation.x = s; h.legs[1].rotation.x = s; h.legs[2].rotation.x = -s; h.legs[3].rotation.x = -s;
-      h.g.children[0].position.y = 1.3 + (walking ? Math.abs(Math.cos(h.ph)) * 0.04 : 0);
+      h.body.position.y = walking ? Math.abs(Math.cos(h.ph)) * 0.04 : 0;
       h.tail.rotation.z = Math.sin(t * 2.2 + h.ph) * 0.3;
       // the head turns to look at her, and nods when she pats it
       const look = near ? Math.max(-0.8, Math.min(0.8, angDiff(Math.atan2(dx, dz), h.g.rotation.y))) : 0;
@@ -5203,18 +5238,9 @@ const INTERIOR = (() => {
     for(const z of [-18,-12,-6,0,6,12,18])archFrame(300,z,0,0,5,4,.62);
     for(const z of [-15,-3,9]){b(.045,1,.045,iron,300,4.2,z);mesh(new THREE.CylinderGeometry(.3,.38,.22,12),iron,300,4.05,z,{parent:g});mesh(new THREE.CircleGeometry(.3,16),glow,300,3.93,z,{parent:g,rx:Math.PI/2});}
     function horse(x,z,ry){
-      const r=new THREE.Group();r.position.set(x,0,z);r.rotation.y=ry;g.add(r);
-      const coat=material('#e6e4da'),mane=material('#cac9be'),black=material('#3b3a33');
-      mesh(new THREE.CapsuleGeometry(.4,1.15,5,12),coat,0,1.27,0,{parent:r,rx:Math.PI/2});
-      mesh(new THREE.CapsuleGeometry(.22,.65,4,10),coat,0,1.76,.75,{parent:r,rx:.55});
-      mesh(new THREE.CapsuleGeometry(.17,.42,4,10),coat,0,2.15,1.12,{parent:r,rx:1.9});
-      for(const a of [-1,1]){mesh(new THREE.ConeGeometry(.06,.2,6),coat,a*.1,2.42,.95,{parent:r});mesh(new THREE.SphereGeometry(.03,8,6),black,a*.17,2.24,1.12,{parent:r});}
-      for(const dx of [-.22,.22])for(const dz of [-.58,.58]){box(.12,1.1,.13,coat,dx,.12,dz,{parent:r});box(.16,.13,.2,black,dx,0,dz,{parent:r});}
-      mesh(new THREE.CapsuleGeometry(.075,.8,4,8),mane,0,.88,-1,{parent:r,rx:-.2});
-      box(.08,.5,.45,mane,0,1.65,.53,{parent:r});
+      const h=buildHorse('#e9e6dc','#cfcabd',{nose:'#cbbcb1'});h.g.position.set(x,0,z);h.g.rotation.y=ry;h.g.userData.keep=true;g.add(h.g);
       // A simple bridle is furnishing, not a new interaction or character.
-      box(.38,.045,.05,black,0,2.27,1.15,{parent:r});box(.36,.05,.05,black,0,2.06,1.39,{parent:r});
-      bakeColored(r,false);
+      const strap=toon('#3b3a33');box(.27,.03,.04,strap,0,.02,.12,{parent:h.head,cast:false});box(.25,.03,.04,strap,0,-.17,.33,{parent:h.head,cast:false});
     }
     for(const [x,z,ry]of[[295.1,-9,Math.PI/2],[295.1,9,Math.PI/2],[304.9,-3,-Math.PI/2],[304.9,9,-Math.PI/2]])horse(x,z,ry);
     // Small tack alcove by the entrance with blank hooks and leather loops.

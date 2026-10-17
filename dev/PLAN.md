@@ -247,4 +247,7 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Historiens åbningstider er slået til (`HISTORIE_LAASE = true`): Snapstinget og Tårnet åbner i akt 2, Reformministeriet i akt 3.
   - Den gamle "Se grundlovene"-besked er erstattet af manuskriptets.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele akt 1 fra start til akt 2 med de rigtige spor, lukket tårn og Snapstinget i akt 1 og åbent Snapstinget i akt 2.
+- [x] Pænere heste (17. okt. 2026, efter ønske fra Michel)
+  - Én fælles hestemodel (`buildHorse`) bruges på Ridebanen, i staldene og over staldenes døre: rundere krop med bryst og højere kryds, en nakke, der bliver smallere opad, med manke, et hoved med mule, næsebor, øjne, ører og pandelok, ben med knæ og hove og en fyldigere hale. De brune heste har en hvid blis.
+  - Over staldenes døre er den øverste halvdel nu åben og mørk, og hesten læner hoved og hals ud over den nederste halvdør i stedet for at stikke hovedet gennem glasset. Hovederne drejer og nikker lidt.
 - [ ] Trin 6: akt 2.
