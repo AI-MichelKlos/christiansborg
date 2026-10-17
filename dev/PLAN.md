@@ -221,4 +221,15 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Dag/aften-knappen og N for aften er fjernet. Lyset er dag, indtil uret styrer lyset i det sidste trin.
   - Testgenveje i konsollen: `__cb.gaade.giv(['spor:3','+ting:briller'])`, `.akt(3)`, `.saetKl('08.15')`, `.moed('bente')`, `.alt()`, `.nulstil()`, `.paused`.
   - Kontrolleret i Chromium på computer (1280 x 800) og telefon (390 x 844 med touch) uden JavaScript-fejl: start, indstillinger, Nyt spil, uret under gang, notesbog og rygsæk tomme og fyldte, skift mellem dem med N og R, aktkort, gang efter lukning, Fortsæt efter genindlæsning og knapperne inde i Folketinget.
-- [ ] Trin 3: låse og ting.
+- [x] Trin 3: låse og ting (17. okt. 2026)
+  - Blokken `LAAS` i `index.html` siger, hvor manuskriptets låste steder og ting at undersøge er i spillet. Tekster, betingelser og virkninger står i `mordgaade.js`.
+  - Låste døre: Samtaleværelset (nøgle), Kompaspartiets sekretariat (kortlæser, Kaspers gamle kort), Finansministeriet efter foyeren (vagten vil se gæstekortet) og departementschefens kontor i Reformministeriet (kodelås, 1849). Ida kan ikke gå ind i et låst rum, men altid ud af det. Ved døren viser handlingsknappen "Døren er låst" eller, med den rigtige ting, fx "Lås op med nøglen". Tingen kan også bruges fra rygsækken (knappen Brug ... ved døren). En åbnet dør forbliver åben (`G.laast`).
+  - Kodelåsen har et tastatur med fire cifre og kan bruges med mus, berøring og tastatur.
+  - Manuskriptets laas har fået felterne knap, aabnet og forkert (teksten på knappen, når døren går op, og ved forkert kode).
+  - Historiens egne lukketider (aaben: Folketinget først efter Bente, Snapstinget og Tårnet kl. 7, Reformministeriet kl. 8.30) er bygget, men slået fra (`HISTORIE_LAASE = false`), indtil personerne og akterne kan nås i trin 4.
+  - Ting at undersøge: et punkt i verden viser manuskriptets navn på handlingsknappen, når betingelserne er opfyldt. Teksten vises på et kort med personernes navne, og virkningen (spor, ting, flag) sker, når kortet lukkes. Uret går 2 minutter.
+  - Ting at samle op, med små modeller, der forsvinder, når de er taget: Bentes briller på en ny bænk ved Kierkegaard-statuen, Jonas' telefon i Kompaspartiets mødelokale, 50.000-rapporten på kopimaskinen, Kaspers kort i en vandpyt ved en sidedør med kortlæser i Proviantpassagen (først efter kommissæren) og bådnøglen i sejlerjakken på kontoret (efter "Se dig om på kontoret"). Kontoret har også fået knobtavle, stumtjener med jakke og kodelås ved døren.
+  - Med `?test` kan alle låse åbnes med et flueben på startkortet. Konsol: `__cb.gaade.aabnAlle()`, `__cb.laas.status('sekretariatet')`.
+  - At give ting til personer kommer med samtalerne i trin 4.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: alle fire låse, kodelås med forkert og rigtig kode, Brug fra rygsækken, opsamling af telefon, bådnøgle og briller, vandpytten og at Ida ikke kan gå ind i garderoben uden gæstekort.
+- [ ] Trin 4: personer og samtaler.

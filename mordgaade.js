@@ -61,6 +61,8 @@ const AKTER = [
 
 // spil: hvor stedet findes i index.html ("inde: <rum>" eller "ude: <stednavn>").
 // status: "bygget" eller "skal bygges". laas og aaben er betingelser for at komme ind.
+// aaben er historien (fx tidspunktet). laas er en lås, som Ida kan åbne med en ting eller en kode:
+// knap er teksten på knappen, aabnet vises, når døren går op, og forkert vises ved en forkert kode.
 const STEDER = {
   marmorbroen:      { navn: "Marmorbroen", spil: "ude: Marmorbroen", status: "bygget" },
   ridebanen:        { navn: "Ridebanen", spil: "ude: Ridebanen", status: "bygget" },
@@ -73,12 +75,14 @@ const STEDER = {
   vandrehallen:     { navn: "Vandrehallen og Rigets midte", inde_i: "folketinget", spil: "inde: folketing/hall", status: "bygget" },
   betjentstuen:     { navn: "Betjentstuen", inde_i: "folketinget", spil: "inde: folketing/betjent", status: "bygget" },
   samtalevaerelset: { navn: "Samtaleværelset", inde_i: "folketinget", spil: "inde: folketing/samtale", status: "bygget",
-                      laas: { kraever: ["ting:noegle_samtale"], tekst: "Døren er låst. Bente låser den på sin runde kl. 3, som hun plejer." } },
+                      laas: { kraever: ["ting:noegle_samtale"], tekst: "Døren er låst. Bente låser den på sin runde kl. 3, som hun plejer.",
+                              knap: "Lås op med nøglen", aabnet: "Nøglen passer. Døren til Samtaleværelset går op." } },
   kompas_gang:      { navn: "Kompaspartiets gang", inde_i: "folketinget", spil: "inde: folketing/kompas", status: "bygget" },
   kompas_kontor:    { navn: "Kompaspartiets kontor", inde_i: "kompas_gang", spil: "inde: folketing/office1", status: "bygget" },
   kompas_moedelokale: { navn: "Kompaspartiets mødelokale", inde_i: "kompas_gang", spil: "inde: folketing/meeting", status: "bygget" },
   sekretariatet:    { navn: "Kompaspartiets sekretariat", inde_i: "kompas_gang", spil: "inde: folketing/secretariat", status: "bygget",
-                      laas: { kraever: ["ting:kaspers_kort"], tekst: "Døren har en kortlæser. Studiekortet virker ikke her." } },
+                      laas: { kraever: ["ting:kaspers_kort"], tekst: "Døren har en kortlæser. Studiekortet virker ikke her.",
+                              knap: "Brug Kaspers gamle kort", aabnet: "Kortlæseren blinker grønt. Kaspers gamle kort virker stadig." } },
   snapstinget:      { navn: "Snapstinget", inde_i: "folketinget", spil: "inde: folketing/snap", status: "bygget",
                       aaben: ["akt>=2"], lukketTekst: "Snapstinget åbner kl. 7 til morgenmad." },
   landstingssalen:  { navn: "Landstingssalen", inde_i: "folketinget", spil: "inde: folketing/landsting", status: "bygget" },
@@ -92,13 +96,15 @@ const STEDER = {
   riddersalen:      { navn: "Riddersalen", spil: "inde: riddersalen", status: "skal bygges",
                       aaben: ["akt>=3"], lukketTekst: "Riddersalen åbner kl. 8.30, når hoffet begynder at dække op til aftenens gallamiddag." },
   finansministeriet: { navn: "Finansministeriet", spil: "inde: finance", status: "bygget",
-                      laas: { kraever: ["ting:gaestekort_fm"], tekst: "En vagt i foyeren: »Kun med adgangskort i dag. Forhandlingerne er ikke slut.«" } },
+                      laas: { kraever: ["ting:gaestekort_fm"], tekst: "En vagt i foyeren: »Kun med adgangskort i dag. Forhandlingerne er ikke slut.«",
+                              knap: "Vis vagten gæstekortet", aabnet: "Vagten ser Ditte Rosenvinges initialer på kortet og lukker Ida ind." } },
   fm_garderoben:    { navn: "Finansministeriets garderobe", inde_i: "finansministeriet", spil: "inde: finance/fm-wardrobe", status: "bygget" },
   fm_forhandlingsrummet: { navn: "Finansministeriets forhandlingsrum", inde_i: "finansministeriet", spil: "inde: finance/fm-meeting", status: "bygget" },
   reformministeriet: { navn: "Reformministeriet", spil: "inde: reform", status: "bygget",
                       aaben: ["akt>=3"], lukketTekst: "Hoveddøren er låst. Ministeriet åbner kl. 8.30." },
   valdorfs_kontor:  { navn: "Departementschefens kontor", inde_i: "reformministeriet", spil: "inde: reform/rm-office", status: "bygget",
-                      laas: { kode: "1849", kraever: ["flag:kode_hint"], tekst: "En kodelås med fire cifre. Ida ved ikke, hvad koden er." } },
+                      laas: { kode: "1849", kraever: ["flag:kode_hint"], tekst: "En kodelås med fire cifre. Ida ved ikke, hvad koden er.",
+                              knap: "Tast koden", aabnet: "Låsen klikker. Døren til departementschefens kontor går op.", forkert: "Lampen blinker rødt. Forkert kode." } },
   rm_printeren:     { navn: "Reformministeriets printerområde", inde_i: "reformministeriet", spil: "inde: reform/rm-print", status: "bygget" },
   rm_sidedoeren:    { navn: "Reformministeriets sidedør", inde_i: "reformministeriet", spil: "inde: reform/rm-side", status: "bygget" },
   kajen_reform:     { navn: "Kajen ved Reformministeriet", spil: "ude: Kajen ved Reformministeriet", status: "bygget" },
