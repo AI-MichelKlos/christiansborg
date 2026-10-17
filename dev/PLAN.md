@@ -240,4 +240,11 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Folketinget er lukket, til Ida har mødt Bente (`HISTORIE_LAASE` har nu "folketinget"). De andre åbningstider slås til i trin 5.
   - "Se på Mørkeberg" (spor 1) er lagt ind allerede nu, fordi åbningsscenen bygger på det.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: Bente i døren og lukket dør, de tre begivenheder, samtale med Hald, giv brillerne til Bente og få nøglen, hint og Gry på Ridebanen.
-- [ ] Trin 5: akt 1.
+- [x] Trin 5: akt 1 (17. okt. 2026). Akt 1 kan nu spilles fra Marmorbroen til kortet "Akt 2 · De mistænkte".
+  - Nye ting at undersøge med modeller: koppen med læbestift på bordet ved Mørkebergs sofa (spor 2), notesbogen under sofaen (med mobilens lygte), grundlovene, adgangsloggens skærm, nøgleskabet og Bentes farfars radio i betjentstuen, Samtaleværelset med kafferand, våde fodspor og to stole trukket ud (spor 5), Kierkegaard-statuen, fodspor i gruset bag statuen, bassinet, papirerne ved bassinkanten (først i akt 3), den gamle fortøjningsring ved dammen og Ridebanen.
+  - Undersøg-visning: "Gnid blyanten over notesbogen" åbner siden fra notesbogen. Spilleren gnider med mus eller finger, og ordene kommer frem som lyse streger i det grå (spor 6). Knappen "Gnid hele siden" gør det samme med tastatur.
+  - Ting, der giver noget nyt, vises før samtaler og før ting, man allerede har set, når flere står samme sted.
+  - Historiens åbningstider er slået til (`HISTORIE_LAASE = true`): Snapstinget og Tårnet åbner i akt 2, Reformministeriet i akt 3.
+  - Den gamle "Se grundlovene"-besked er erstattet af manuskriptets.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele akt 1 fra start til akt 2 med de rigtige spor, lukket tårn og Snapstinget i akt 1 og åbent Snapstinget i akt 2.
+- [ ] Trin 6: akt 2.

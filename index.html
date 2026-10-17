@@ -185,6 +185,11 @@ body.storTekst .keys{font-size:16px}
 .padKey:active{transform:translate(1px,2px);box-shadow:1px 1px 0 var(--ink)}
 .padKey:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .testLaas{font-size:14px;margin-top:6px}
+#gnidCv{display:block;width:100%;max-width:360px;margin:0 auto;aspect-ratio:360/440;border-radius:8px;box-shadow:0 2px 0 var(--ink);border:2px solid var(--ink);touch-action:none;cursor:crosshair}
+#gnidTekst p{margin:10px 0 0;line-height:1.5}
+#gnidTekst .ida b{color:var(--leaf-deep)}
+.gnidKnapper{display:flex;gap:10px;margin-top:12px;align-items:center}
+.gnidKnapper .go{margin:0}
 .sHoved{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;margin:0 0 12px}
 .sHoved .gdNum{width:44px;height:44px;font-size:15px}
 .sHoved p{margin:0}
@@ -5537,8 +5542,7 @@ const INTERIOR = (() => {
       if((I.place==='courtEntry'?z>3.5:I.place==='pmEntry'?z>2.5:I.place==='stables'?z>17:(z>7&&x<(I.place==='finance'?102:202)))||side)offerAction({id:'ministry-exit',label:side?'Gå ud gennem sidedøren':'Gå udenfor',prio:10,run:()=>leave(side)});
     }
     if(room==='hall'&&z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
-    if(room==='hall'&&z<5&&x<-18&&x>-30)offerAction({id:'grundlov-info',label:'Se grundlovene',prio:5,run:()=>toast('I Vandrehallen er kopier af grundlovene fra 1849, 1866, 1915 og 1953 udstillet.')});
-    if(room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
+        if(room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
 
   });
   const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);if(isTouch)badge.querySelector('span').textContent='Kameraet følger · slip for at stoppe';
@@ -6050,8 +6054,8 @@ const GAADE = (() => {
 // Story conditions ("aaben", e.g. "Snapstinget opens at 7") are switched on when the people are in the game.
 const LAAS = (() => {
   const M = GAADE.M, I = INTERIOR;
-  // The story's own opening hours that are switched on. The rest follow when act 1 can be played to the end (trin 5).
-  const HISTORIE_LAASE = new Set(['folketinget']);
+  // The story's own opening hours (aaben in mordgaade.js), e.g. Snapstinget and the tower open at 7, are switched on.
+  const HISTORIE_LAASE = true;
   // Places with a lock or a story condition, and where their doors are (interior coordinates, x without I.x).
   const RUM = {
     samtalevaerelset:  { place: 'folketing', rooms: ['samtale'], doors: [[3, -4.4], [-3, -4.4]] },
@@ -6060,7 +6064,7 @@ const LAAS = (() => {
     finansministeriet: { place: 'finance', rooms: ['fm-wardrobe', 'fm-corridor', 'fm-meeting'], doors: [[98.6, 6], [100, 2.6]] },
     valdorfs_kontor:   { place: 'reform', rooms: ['rm-office'], doors: [[198.6, -11]] },
   };
-  const BYGNING = { folketing: 'folketinget', reform: 'reformministeriet' };   // whole buildings, checked at the front door
+  const BYGNING = { folketing: 'folketinget', reform: 'reformministeriet', towerLobby: 'taarnet' };   // whole buildings, checked at the front door
   const rumSted = {}; for (const [id, r] of Object.entries(RUM)) for (const room of r.rooms) rumSted[r.place + '/' + room] = id;
   let alleAabne = false;   // ?test: a checkbox on the start card opens every lock
 
@@ -6068,7 +6072,7 @@ const LAAS = (() => {
   function status(id) {
     const s = M.steder[id], G = GAADE.G;
     if (!s || alleAabne) return { aaben: true };
-    if (HISTORIE_LAASE.has(id) && s.aaben && !GAADE.ok(s.aaben)) return { aaben: false, tekst: s.lukketTekst || 'Her er lukket.' };
+    if (HISTORIE_LAASE && s.aaben && !GAADE.ok(s.aaben)) return { aaben: false, tekst: s.lukketTekst || 'Her er lukket.' };
     if (s.inde_i) { const st = status(s.inde_i); if (!st.aaben) return st; }
     if (!s.laas || G.laast.includes(id)) return { aaben: true };
     const ting = (s.laas.kraever || []).map(k => (k.match(/^ting:(\w+)$/) || [])[1]).find(Boolean);
@@ -6138,8 +6142,26 @@ const LAAS = (() => {
 
   // ---- things to examine: where each one is in the game (from the manuscript's UNDERSOEG by id)
   const PASSAGE = (s, d) => [-23.4 + 0.840 * s + 0.543 * d, 86.5 - 0.543 * s + 0.840 * d];   // Proviantpassagen's frame (see passageHouse)
+  // The pond in Bibliotekshaven: its edge between the statue and the middle, and a point on the far side for the old ring.
+  const pondEdge = (fx, fz, tx, tz) => { const a = GARDEN.at(fx, fz), b = GARDEN.at(tx, tz); let k = 0; while (k < 1 && !waterAt(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k)) k += 0.01; return [a[0] + (b[0] - a[0]) * (k - 0.01), a[1] + (b[1] - a[1]) * (k - 0.01)]; };
+  const kant = pondEdge(-23, 8, 0, 0), ringP = pondEdge(0, 30, 0, 0);
+  const toward = (p, q, d) => { const l = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; return [p[0] + (q[0] - p[0]) / l * d, p[1] + (q[1] - p[1]) / l * d]; };
   const FUND = {
-    liget:      { place: 'folketing', at: [8, -2.1], r: 2.4 },
+    liget:      { place: 'folketing', at: [8, -2.6], r: 1.9 },
+    bordet:     { place: 'folketing', at: [8, -1.5], r: 2.3 },
+    under_sofaen: { place: 'folketing', at: [8, -2.6], r: 2.1 },
+    blyanten:   { place: 'folketing', at: [8, -2.2], r: 2.3 },
+    grundlovene: { place: 'folketing', at: [-24, 3.1], r: 2.4 },
+    skaermen:   { place: 'folketing', at: [7.2, 21.9], r: 1.1 },
+    noegleskabet: { place: 'folketing', at: [6.6, 24.4], r: 0.9 },
+    radioen:    { place: 'folketing', at: [5.3, 23.7], r: 0.9 },
+    rummet:     { place: 'folketing', at: [1.5, -9.2], r: 2.4 },
+    statuen:    { ude: GARDEN.at(-20.6, 7.1), r: 2.2 },
+    gruset:     { ude: GARDEN.at(-25.5, 8.9), r: 2 },
+    bassinet:   { ude: toward(kant, GARDEN.at(-23, 8), 0.9), r: 2.2 },
+    papirerne:  { ude: toward(kant, GARDEN.at(-23, 8), 0.9), r: 2.2 },
+    ringen:     { ude: toward(ringP, GARDEN.at(0, 30), 1), r: 2 },
+    ridebanen:  { ude: [-140, 85], r: 7 },
     baenken:    { ude: GARDEN.at(-23, 12.5), r: 3 },
     vandpytten: { ude: PASSAGE(94.2, 47.5), r: 2.2 },
     rapporten:  { place: 'folketing', at: [28.1, 11.2], r: 2.1 },
@@ -6151,8 +6173,81 @@ const LAAS = (() => {
   function stedNavn(u) { return M.steder[u.sted]?.navn || ''; }
   function undersoeg(u) {
     GAADE.tid(M.ur.minutterPrUndersoeg);
+    if (VIS[u.id]) return VIS[u.id](u);
     GAADE.scene({ eyebrow: stedNavn(u), title: u.navn, lines: u.replikker, efter: () => GAADE.giv(u.giver) });
   }
+  // Does a thing to examine still have something new to give? New things come before talk and before old things.
+  function nyt(giver) {
+    const G = GAADE.G;
+    return (giver || []).some(raw => {
+      const m = String(raw).match(/^([+-]?)(spor|ting|flag):(\w+)$/); if (!m) return false;
+      const [, sign, kind, v] = m;
+      if (kind === 'spor') return !G.spor.includes(+v);
+      if (kind === 'ting') return sign === '-' ? G.ting.includes(v) : !G.ting.includes(v);
+      return sign === '-' ? G.flag.includes(v) : !G.flag.includes(v);
+    });
+  }
+
+  // ---- a close look: rubbing the pencil over the page after the torn-out one. The hidden words come out as light lines.
+  const gnidD = document.createElement('dialog'); gnidD.id = 'gnidDialog'; gnidD.className = 'gd gdSmall'; gnidD.setAttribute('aria-labelledby', 'gnidTitle');
+  gnidD.innerHTML = '<header class="gdHead"><h2 id="gnidTitle">Notesbogen</h2><button class="sticker btn gdClose" type="button">Luk</button></header><div class="gdBody"><p class="gdIntro" id="gnidInfo">Gnid blyanten hen over siden. Træk med musen eller fingeren.</p><canvas id="gnidCv" width="360" height="440" aria-label="Siden i Mørkebergs notesbog"></canvas><div id="gnidTekst" aria-live="polite"></div><div class="gnidKnapper"><button class="sticker btn" id="gnidAlt" type="button">Gnid hele siden</button><button class="go" id="gnidVidere" type="button" hidden>Videre</button></div></div>';
+  document.body.appendChild(gnidD);
+  const gcv = $('gnidCv'), gctx = gcv.getContext('2d');
+  const graf = document.createElement('canvas'); graf.width = 360; graf.height = 440; const grc = graf.getContext('2d');
+  const maske = document.createElement('canvas'); maske.width = 360; maske.height = 440; const mc = maske.getContext('2d');
+  const tmp = document.createElement('canvas'); tmp.width = 360; tmp.height = 440; const tc = tmp.getContext('2d');
+  let gnidU = null, gnidWas = false, gnidLukket = true, gnidFaerdig = false; const gnidCeller = new Set();
+  function papir(c) { c.fillStyle = '#f6efdc'; c.fillRect(0, 0, 360, 440); c.strokeStyle = 'rgba(80,110,160,.25)'; c.lineWidth = 1; for (let y = 60; y < 440; y += 26) { c.beginPath(); c.moveTo(18, y); c.lineTo(342, y); c.stroke(); } c.strokeStyle = 'rgba(190,70,60,.35)'; c.beginPath(); c.moveTo(48, 0); c.lineTo(48, 440); c.stroke(); }
+  function tegnGnid() {
+    papir(gctx);
+    tc.clearRect(0, 0, 360, 440); tc.globalCompositeOperation = 'source-over'; tc.drawImage(graf, 0, 0);
+    tc.globalCompositeOperation = 'destination-out'; tc.drawImage(maske, 0, 0); tc.globalCompositeOperation = 'source-over';
+    gctx.drawImage(tmp, 0, 0);
+    gctx.globalAlpha = 0.07; gctx.drawImage(maske, 0, 0); gctx.globalAlpha = 1;   // the pressed lines can just be seen before rubbing
+  }
+  let sidste = null;
+  function gnidStreg(x, y, ny) {
+    const [ax, ay] = ny || !sidste ? [x - 1, y] : sidste;
+    grc.strokeStyle = 'rgba(64,64,70,.42)'; grc.lineCap = 'round'; grc.lineWidth = 24;
+    grc.beginPath(); grc.moveTo(ax, ay); grc.lineTo(x, y); grc.stroke();
+    sidste = [x, y];
+    const n = Math.max(1, Math.ceil(Math.hypot(x - ax, y - ay) / 15));
+    for (let i = 0; i <= n; i++) gnidCeller.add(Math.floor((ax + (x - ax) * i / n) / 30) + ',' + Math.floor((ay + (y - ay) * i / n) / 30));
+    if (!gnidFaerdig && gnidCeller.size > 0.55 * 12 * 15) gnidSlut();
+  }
+  function gnidSlut() {
+    gnidFaerdig = true; $('gnidAlt').hidden = true; $('gnidVidere').hidden = false;
+    $('gnidTekst').replaceChildren(...gnidU.replikker.map(([w, t]) => { const p = document.createElement('p'); p.className = 'replik' + (w === 'ida' ? ' ida' : ''); const n = GAADE.hvem(w); if (n) { const b = document.createElement('b'); b.textContent = n + ': '; p.append(b, t); } else p.textContent = t; return p; }));
+    $('gnidVidere').focus();
+  }
+  function gnid(u) {
+    gnidU = u; gnidFaerdig = false; gnidCeller.clear(); grc.clearRect(0, 0, 360, 440);
+    // the words pressed into the page: the quoted line of the manuscript
+    const q = (u.replikker.map(r => r[1]).find(t => t.includes('»')) || '').replace(/[»«]/g, '');
+    mc.clearRect(0, 0, 360, 440); mc.fillStyle = '#000'; mc.font = 'italic 25px Georgia, serif'; mc.textBaseline = 'alphabetic';
+    let line = '', y = 104; for (const w of q.split(' ')) { if (mc.measureText(line + w).width > 290 && line) { mc.fillText(line, 58, y); line = ''; y += 52; } line += w + ' '; } mc.fillText(line, 58, y);
+    $('gnidTekst').replaceChildren(); $('gnidAlt').hidden = false; $('gnidVidere').hidden = true;
+    tegnGnid();
+    gnidWas = paused; gnidLukket = false; paused = true; keys.clear(); resetTouch(); P.vel.set(0, 0, 0);
+    gnidD.showModal(); $('gnidAlt').focus();
+  }
+  function lukGnid(done) {
+    if (gnidD.open) gnidD.close();
+    if (gnidLukket) return; gnidLukket = true; paused = gnidWas; keys.clear(); resetTouch(); canvas.focus();
+    if (done) GAADE.giv(gnidU.giver);
+  }
+  let gnidNed = false;
+  const gpos = e => { const r = gcv.getBoundingClientRect(); return [(e.clientX - r.left) * 360 / r.width, (e.clientY - r.top) * 440 / r.height]; };
+  gcv.addEventListener('pointerdown', e => { gnidNed = true; gcv.setPointerCapture(e.pointerId); gnidStreg(...gpos(e), true); tegnGnid(); e.preventDefault(); });
+  gcv.addEventListener('pointermove', e => { if (!gnidNed) return; gnidStreg(...gpos(e)); tegnGnid(); });
+  gcv.addEventListener('pointerup', () => { gnidNed = false; });
+  $('gnidAlt').addEventListener('click', () => { for (let y = 12; y < 440; y += 18) { gnidStreg(8, y, true); gnidStreg(352, y + 6); } tegnGnid(); if (!gnidFaerdig) gnidSlut(); });
+  $('gnidVidere').addEventListener('click', () => lukGnid(true));
+  gnidD.querySelector('.gdClose').addEventListener('click', () => lukGnid(gnidFaerdig));
+  gnidD.addEventListener('cancel', () => lukGnid(gnidFaerdig)); gnidD.addEventListener('close', () => lukGnid(gnidFaerdig));
+  gnidD.addEventListener('keydown', e => e.stopPropagation());
+  gnidD.addEventListener('pointerdown', e => e.stopPropagation()); gnidD.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+  const VIS = { blyanten: gnid };
   function her(f) {
     if (f.ude) return !I.on && !MYBOAT.on && !FX.tower?.on && Math.hypot(P.pos.x - f.ude[0], P.pos.z - f.ude[1]) < f.r;
     return I.on && I.place === f.place && Math.hypot(P.pos.x - I.x - f.at[0], P.pos.z - f.at[1]) < f.r;
@@ -6201,6 +6296,33 @@ const LAAS = (() => {
     const lock = new THREE.Group(); lock.position.set(198.14, 1.35, -12.55); lock.rotation.y = Math.PI / 2; inde.add(lock);
     box(.16, .24, .04, std('#2b2f33'), 0, 0, 0, { parent: lock, cast: false }); box(.05, .03, .045, std('#d9534f', { emissive: '#d9534f', emissiveIntensity: .8 }), 0, .17, 0, { parent: lock, cast: false });
     I.obstacles.push([196.85, 197.55, -15.95, -15.25]);   // the coat stand
+    // Act 1. The cup with lipstick on the table by Mørkeberg's sofa, and his notebook under the sofa
+    const cup = new THREE.Group(); cup.position.set(7.55, I.floor + .77, -1.35); inde.add(cup);
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(.09, .08, .012, 16), std('#f4f1ea')); cup.add(disc);
+    const mug = new THREE.Mesh(new THREE.CylinderGeometry(.05, .04, .085, 14), std('#f7f4ec')); mug.position.y = .05; cup.add(mug);
+    const mark = new THREE.Mesh(new THREE.BoxGeometry(.026, .012, .008), std('#c0392b')); mark.position.set(.035, .087, .03); mark.rotation.y = .9; cup.add(mark);
+    cup.scale.setScalar(1.5);
+    const bog = new THREE.Mesh(new THREE.BoxGeometry(.11, .02, .16), std('#1b1b1d')); bog.position.set(8.6, I.floor + .015, -3.15); bog.rotation.y = .5; bog.scale.setScalar(1.5); inde.add(bog);
+    ting.under_sofaen = bog;
+    // Samtaleværelset: two chairs pulled out close together, a large coffee ring and wet footprints under the table
+    for (const [x, z, ry] of [[.45, -10.7, .6], [2.55, -10.75, -.6]]) {
+      const ch = new THREE.Group(); ch.position.set(x, I.floor, z); ch.rotation.y = ry; inde.add(ch);
+      for (const dx of [-.22, .22]) for (const dz of [-.2, .2]) box(.05, .45, .05, std('#453020'), dx, 0, dz, { parent: ch, cast: false });
+      box(.55, .12, .55, std('#293d51'), 0, .45, 0, { parent: ch, cast: false }); box(.55, .55, .1, std('#293d51'), 0, .57, -.24, { parent: ch, cast: false });
+    }
+    const rand = new THREE.Mesh(new THREE.TorusGeometry(.1, .012, 6, 24), std('#5a3a1e')); rand.rotation.x = Math.PI / 2; rand.position.set(1.75, I.floor + .915, -9.0); inde.add(rand);
+    const sole = std('#3b4a5a', { transparent: true, opacity: .55 });
+    for (const [x, z, ry] of [[1.1, -9.9, .3], [1.6, -10.3, .2], [2.0, -9.6, -.2], [1.3, -8.6, .1]]) { const f = new THREE.Mesh(new THREE.CircleGeometry(1, 14), sole); f.rotation.x = -Math.PI / 2; f.rotation.z = ry; f.scale.set(.06, .14, 1); f.position.set(x, I.floor + .012, z); inde.add(f); }
+    // Betjentstuen: Bente's grandfather's old radio on a small table by the door
+    const rad = new THREE.Group(); rad.position.set(5.25, 0, 24.75); inde.add(rad);
+    box(.7, .72, .45, std('#5a3d26'), 0, 0, 0, { parent: rad, cast: false });
+    box(.55, .36, .3, std('#3a2617'), 0, .72, 0, { parent: rad, cast: false }); box(.36, .16, .02, std('#d9c58a'), 0, .86, -.16, { parent: rad, cast: false });
+    const knob = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .03, 12), std('#2b1d12')); knob.rotation.x = Math.PI / 2; knob.position.set(.18, .8, -.16); rad.add(knob);
+    I.obstacles.push([4.85, 5.65, 24.5, 25.1]);
+    // Bibliotekshaven: wet footprints in the gravel from the passage to behind the statue, and the old mooring ring by the pond
+    const spor = toon('#6d6252');
+    for (let i = 0; i < 7; i++) { const p = GARDEN.at(-30 + i * .75, 10.6 - i * .28 + (i % 2) * .22), f = new THREE.Mesh(new THREE.CircleGeometry(1, 12), spor); f.rotation.x = -Math.PI / 2; f.rotation.z = .9; f.scale.set(.07, .15, 1); f.position.set(p[0], .05, p[1]); ude.add(f); }
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(.16, .035, 8, 18), toon('#3a3a36')); ring.position.set(ringP[0], .25, ringP[1]); ring.rotation.y = Math.atan2(GARDEN.cx - ringP[0], GARDEN.cz - ringP[1]); ude.add(ring);
   }
 
   // ---- every frame: what Ida can do where she stands
@@ -6216,7 +6338,7 @@ const LAAS = (() => {
     }
     for (const [id, f] of Object.entries(FUND)) {
       const u = U[id]; if (!u || !her(f) || !GAADE.ok(u.kraever)) continue;
-      offerAction({ id: 'fund-' + id, label: u.navn, prio: f.prio || 7, run: () => undersoeg(u) });
+      offerAction({ id: 'fund-' + id, label: u.navn, prio: nyt(u.giver) ? 10 : (f.prio || 6), run: () => undersoeg(u) });
     }
   });
   // From the backpack: a key or a card used on the locked door Ida stands at.
@@ -6310,9 +6432,9 @@ const PERSONER = (() => {
   const SPOT = {
     bente: {
       doer: { ude: FT.at(0, 1.7), face: Math.atan2(FT.n[0], FT.n[1]), r: 0 },   // in the door until Ida has met her
-      betjentstuen: { place: 'folketing', at: [10.5, 24.5], face: Math.PI, r: 3.9 },
+      betjentstuen: { place: 'folketing', at: [10.5, 24.5], face: Math.PI, r: 3.5 },
     },
-    kommissaer: { vandrehallen: { place: 'folketing', at: [10.6, -1.2], face: -Math.PI / 2, r: 3 } },
+    kommissaer: { vandrehallen: { place: 'folketing', at: [11.4, -0.3], face: -Math.PI / 2, r: 2.6 } },
     statsminister: { restauranten: { place: 'towerRestaurant', at: [446.6, -4.6], face: -Math.PI / 2, r: 3, foelge: [[-0.9, -1.3], [0.9, -1.3]] } },
     gry: {
       ridebanen: { ude: [se.x + se.nx * 5, se.z + se.nz * 5], face: Math.atan2(se.nx, se.nz), r: 3.2 },
