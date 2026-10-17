@@ -888,13 +888,13 @@ const UNDERSOEG = [
 // Begivenheder sker af sig selv, så snart naar er opfyldt. Hver sker kun én gang.
 // kl er det klokkeslæt, uret springer frem til, hvis det er bagud.
 const BEGIVENHEDER = [
-  { id: "moede_bente", kl: "06.10", naar: ["sted:rigsdagsgaarden"], giver: ["flag:moedt_bente"], replikker: [
+  { id: "moede_bente", titel: "Bente i døren", kl: "06.10", naar: ["sted:rigsdagsgaarden"], giver: ["flag:moedt_bente"], replikker: [
     ["fortaeller", "Bente står i døren til Folketinget. Hun er bleg og holder om en kop kaffe, hun har glemt at drikke."],
     ["bente", "Ida? Du kommer på en dårlig dag."],
     ["bente", "Aksel Mørkeberg er død. Rengøringen fandt ham for tyve minutter siden i sofaen ved Rigets midte. Politiet er på vej."],
     ["bente", "Kom indenfor. Men rør ikke ved noget."],
   ] },
-  { id: "kommissaeren", kl: "06.20", naar: ["spor:1"], giver: ["flag:kommissaer_kommet"], replikker: [
+  { id: "kommissaeren", titel: "Kommissæren kommer", kl: "06.20", naar: ["spor:1"], giver: ["flag:kommissaer_kommet"], replikker: [
     ["fortaeller", "En mand i våd trenchcoat kommer op ad trappen med en kaffe i papkrus."],
     ["kommissaer", "Hald, Københavns Politi. Og hvem er De?"],
     ["ida", "Ida. Jeg læser historie. Jeg skriver om huset."],
@@ -902,7 +902,7 @@ const BEGIVENHEDER = [
     ["kommissaer", "Sikkerhedsafdelingen har sendt mig nattens log. Kasper Lindveds gamle kort gik ind kl. 01.30. Han blev fyret af Mørkeberg sidste år. Det er nok til mig."],
     ["kommissaer", "Og alle taler om en forsvundet termokande. Termokander forsvinder hver dag på Christiansborg."],
   ] },
-  { id: "statsministeren", kl: "06.30", naar: ["flag:kommissaer_kommet"], giver: ["flag:bente_beder"], replikker: [
+  { id: "statsministeren", titel: "Statsministeren", kl: "06.30", naar: ["flag:kommissaer_kommet"], giver: ["flag:bente_beder"], replikker: [
     ["fortaeller", "Tre sorte biler kører ind i Rigsdagsgården. Lidt efter står statsministeren i Vandrehallen med to livvagter bag sig."],
     ["statsminister", "Hald. Hvad ved vi?"],
     ["kommissaer", "Vi har vores mand. Kasper Lindved. Jeg kan sige det på pressemødet kl. 10."],
@@ -911,30 +911,30 @@ const BEGIVENHEDER = [
     ["bente", "Kasper er en klovn, men han er ikke en morder. Jeg har kendt ham, siden han var praktikant."],
     ["bente", "Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10."],
   ] },
-  { id: "valdorf_kommer", kl: "07.30", naar: ["akt>=2", "spor:7|spor:8|spor:10|spor:18"], giver: ["flag:valdorf_her"], replikker: [
+  { id: "valdorf_kommer", titel: "Departementschefen", kl: "07.30", naar: ["akt>=2", "spor:7|spor:8|spor:10|spor:18"], giver: ["flag:valdorf_her"], replikker: [
     ["fortaeller", "En mand i gråt jakkesæt kommer op ad trappen med en mappe under armen. Han nikker venligt til alle."],
     ["valdorf", "Henrik Valdorf, departementschef i Reformministeriet. Ministeren har bedt mig hjælpe politiet med alt, hvad de har brug for."],
   ] },
-  { id: "retsmed", kl: "08.30", naar: ["akt>=3"], giver: ["flag:retsmed"], replikker: [
+  { id: "retsmed", titel: "Retsmedicineren", kl: "08.30", naar: ["akt>=3"], giver: ["flag:retsmed"], replikker: [
     ["fortaeller", "Kommissæren lægger sin telefon fra sig i Vandrehallen og hæver stemmen."],
     ["kommissaer", "Retsmedicineren har ringet. Mørkeberg fik noget i kaffen og døde mellem kl. 2 og 3. Ingen siger et ord til pressen."],
     ["fortaeller", "Reformministeriet åbner, og hoffet begynder at dække op i Riddersalen."],
   ] },
-  { id: "springvandet", kl: "09.00", naar: ["akt>=3", "sted:bibliotekshaven"], giver: ["flag:springvand_09"], replikker: [
+  { id: "springvandet", titel: "Springvandet", kl: "09.00", naar: ["akt>=3", "sted:bibliotekshaven"], giver: ["flag:springvand_09"], replikker: [
     ["fortaeller", "Springvandet i Bibliotekshaven springer for første gang i dag. Vandet løber ned over skålen og ud i bassinet."],
     ["fortaeller", "Ved kanten af bassinet flyder noget hvidt op."],
   ] },
-  { id: "valdorf_venter", kl: "09.30", naar: ["akt>=4"], giver: ["flag:valdorf_venter"], replikker: [
+  { id: "valdorf_venter", titel: "En opringning", kl: "09.30", naar: ["akt>=4"], giver: ["flag:valdorf_venter"], replikker: [
     ["fortaeller", "Idas mobil ringer. Det er Bente."],
     ["bente", "Departementschefen spørger efter dig. Han venter på Udsigten i tårnet. Han siger, han vil hjælpe."],
   ] },
-  { id: "pressemoedet", kl: "09.55", naar: ["spor:16"], giver: ["flag:pressemoede"], replikker: [
+  { id: "pressemoedet", titel: "Pressemødet", kl: "09.55", naar: ["spor:16"], giver: ["flag:pressemoede"], replikker: [
     ["fortaeller", "Idas mobil summer. En sms fra Bente: »Pressemødet begynder om fem minutter i Landstingssalen. Kommissæren har sit papir klar.«"],
   ] },
-  { id: "orden_paamindelse", kl: null, naar: ["akt>=4", "ting:elefantorden"], giver: [], replikker: [
+  { id: "orden_paamindelse", titel: "Hoffet tæller elefanter", kl: null, naar: ["akt>=4", "ting:elefantorden"], giver: [], replikker: [
     ["fortaeller", "Elefantordenen ligger stadig i Idas rygsæk. Hoffoureren tæller elefanter, og Riddersalen er stadig åben."],
   ] },
-  { id: "kongen_rider", kl: null, lag1942: true, naar: ["lag1942", "flag:i_1942", "sted:ridebanen_1942"], giver: ["flag:handske_tabt"], replikker: [
+  { id: "kongen_rider", titel: "Kongen rider forbi", kl: null, lag1942: true, naar: ["lag1942", "flag:i_1942", "sted:ridebanen_1942"], giver: ["flag:handske_tabt"], replikker: [
     ["fortaeller", "En høj, ældre rytter kommer ridende uden følge. Folk på fortovet løfter hatten, og han hilser igen."],
     ["fortaeller", "Ved Ridebanen glider en handske ned fra hans hånd og lander i gruset."],
   ] },

@@ -367,7 +367,7 @@ Gåden kan bygges i ti trin, ét trin ad gangen som resten af spillet. Manuskrip
 1. **Manuskript.** Alle replikker, sportekster, ting og afsløringen skrives færdige og tjekkes for huller i logikken, så hver ting kan findes, før den skal bruges (gjort 17. oktober 2026).
 2. **Oprydning og ramme.** Børnetingene fjernes, Ida med rygsæk og ny startskærm (gjort 16. oktober 2026). Derefter uret, en tom notesbog, rygsækken, den samlede tekstblok og gemning (gjort 17. oktober 2026).
 3. **Låse og ting.** Låste døre med nøgle, kort og kode i de rum, der allerede er bygget. Ting, der kan samles op, ses på, gives væk og bruges (gjort 17. oktober 2026, undtagen at give ting væk, som kommer med samtalerne).
-4. **Personer og samtaler.** Bente, kommissæren, statsministeren og Gry, "Giv" og "Vis" i samtalerne og åbningsscenen kl. 06.20-06.30.
+4. **Personer og samtaler.** Bente, kommissæren, statsministeren og Gry, "Giv" og "Vis" i samtalerne og åbningsscenen kl. 06.20-06.30 (gjort 17. oktober 2026).
 5. **Akt 1.** Liget, koppen, brillerne i Bibliotekshaven, nøglen, sporene i Samtaleværelset, blyanten på notesbogen og undersøg-visningen. Nu kan akt 1 spilles.
 6. **Akt 2.** De fire mistænkte, Kaspers kort i Proviantpassagen, 50.000-rapporten, Bodil og Kasper i Snapstinget, Dittes bord i tårnet og Pernille på Slotspladsen. Akt 2 kan spilles.
 7. **Riddersalen.** Det eneste rum, der skal bygges fra bunden: salen, etuiet med Elefantordenen og hoffourerens bog, plus Mogens i Landstingssalen.

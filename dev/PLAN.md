@@ -232,4 +232,12 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Med `?test` kan alle låse åbnes med et flueben på startkortet. Konsol: `__cb.gaade.aabnAlle()`, `__cb.laas.status('sekretariatet')`.
   - At give ting til personer kommer med samtalerne i trin 4.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: alle fire låse, kodelås med forkert og rigtig kode, Brug fra rygsækken, opsamling af telefon, bådnøgle og briller, vandpytten og at Ida ikke kan gå ind i garderoben uden gæstekort.
-- [ ] Trin 4: personer og samtaler.
+- [x] Trin 4: personer og samtaler (17. okt. 2026)
+  - Blokken `PERSONER` i `index.html` laver personerne som figurer i samme tegnestil som Ida (`figur()` med tøj, hår og ting i hånden) og stiller dem efter manuskriptets steder pr. akt. `SPOT` siger, hvor hvert sted er i spillet. Personerne drejer sig mod Ida, når hun er tæt på. Bygget nu: Bente (i døren til Folketinget, til hun har mødt Ida, derefter i betjentstuen), kommissær Hald (Vandrehallen fra kl. 06.20), statsministeren med to livvagter (restauranten i tårnet fra akt 2) og Gry (Ridebanen i akt 1, staldene i akt 2-3). Aksel Mørkeberg sidder død i en grøn sofa ved Rigets midte i akt 1-2.
+  - Samtaler: "Tal med ..." åbner et vindue med personens emner fra manuskriptet. Et emne vises, når betingelserne er opfyldt. "Giv" og "Vis" har tingens billede, og en ting, der gives væk, forsvinder fra rygsækken. Et nyt emne tager 5 minutter. Spurgte emner er markeret. Bentes "Hvad skal jeg gøre nu?" giver det første hint, der passer, og tæller hint til stjernerne.
+  - Begivenheder: manuskriptets begivenheder sker én gang, når betingelserne er opfyldt (flag `beg_<id>`), og flytter uret frem til deres klokkeslæt. Åbningsscenen: Bente i døren (kl. 06.10, når Ida kommer ind i Rigsdagsgården), kommissæren (kl. 06.20, når Ida har set på Mørkeberg) og statsministeren (kl. 06.30), hvor Bente beder Ida om hjælp. Begivenhederne har fået en titel i manuskriptet.
+  - `GAADE.sted` ved nu, hvor Ida står (rum indenfor, områder udenfor), så betingelser som "sted:rigsdagsgaarden" virker.
+  - Folketinget er lukket, til Ida har mødt Bente (`HISTORIE_LAASE` har nu "folketinget"). De andre åbningstider slås til i trin 5.
+  - "Se på Mørkeberg" (spor 1) er lagt ind allerede nu, fordi åbningsscenen bygger på det.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: Bente i døren og lukket dør, de tre begivenheder, samtale med Hald, giv brillerne til Bente og få nøglen, hint og Gry på Ridebanen.
+- [ ] Trin 5: akt 1.

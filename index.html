@@ -176,6 +176,7 @@ body.storTekst .keys{font-size:16px}
 #setDone{margin-top:12px}
 #scene .card{max-width:560px}
 #scene .replik b{font-weight:700}
+#scene .ida b{color:var(--leaf-deep)}
 .gdBrug{margin-top:6px;background:#ffe08a}
 #padShow{display:block;text-align:center;font:800 34px/1.2 var(--display);letter-spacing:.12em;padding:10px;margin:4px 0 6px;background:#24302b;color:#c9f2c6;border-radius:12px}
 #padMsg{min-height:1.4em;margin:0 0 8px;text-align:center;font-weight:700;color:#a3361c}
@@ -184,6 +185,23 @@ body.storTekst .keys{font-size:16px}
 .padKey:active{transform:translate(1px,2px);box-shadow:1px 1px 0 var(--ink)}
 .padKey:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .testLaas{font-size:14px;margin-top:6px}
+.sHoved{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;margin:0 0 12px}
+.sHoved .gdNum{width:44px;height:44px;font-size:15px}
+.sHoved p{margin:0}
+.sUdse{font-style:italic;color:#5d5368;font-size:calc(14px * var(--ts))}
+.sLog{background:var(--paper-2);border-radius:14px;padding:12px 14px;margin:0 0 12px;min-height:48px}
+.sLog p{margin:0 0 8px;line-height:1.5}
+.sLog p:last-child{margin-bottom:0}
+.sLog .fort{font-style:italic;color:#4d4558}
+.sLog .ida b{color:var(--leaf-deep)}
+.sEmner{display:grid;gap:8px}
+.sEmne{display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 12px;border:2px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);font:600 calc(14.5px * var(--ts))/1.3 var(--body);text-align:left;cursor:pointer;box-shadow:2px 3px 0 var(--ink)}
+.sEmne svg{width:32px;height:32px;flex:none}
+.sEmne.spurgt{background:var(--paper);box-shadow:none;color:#5d5368}
+.sEmne.spurgt span::after{content:" (spurgt)";font-weight:400;font-size:.9em}
+.sEmne.sTing{background:#ffe8c4}
+.sEmne.sHjaelp{background:#fff1b8}
+.sEmne:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 @media(max-width:600px){.gd{padding:0 14px 16px}.gdDetalje{grid-template-columns:72px 1fr;gap:12px;padding:12px}.gdBig{width:72px;height:72px}.gdBig svg{width:58px;height:58px}.gdGrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#ur{min-width:50px;padding:2px 7px}#urKl{font-size:15px}.gdTabs{top:62px}.gdTabs button{padding:9px 9px}}
 </style>
 </head>
@@ -5669,12 +5687,13 @@ const GAADE = (() => {
   const kl = n => String(Math.floor(n / 60)).padStart(2, '0') + '.' + String(n % 60).padStart(2, '0');
   // Night times sort after the evening before: 21.30 < 23.50 < 00.15 < 05.50. "02-03" means some time between 2 and 3.
   const natSort = s => { const h = parseInt(s, 10), m = String(s).includes('-') ? 59 : parseInt(String(s).split('.')[1], 10) || 0; return (h < 12 ? h + 24 : h) * 60 + m; };
-  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], hint: 0, forkert: 0, lag1942: !!M.lag1942.aktiv, pos: null, face: 0 });
+  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], spurgt: [], hint: 0, forkert: 0, lag1942: !!M.lag1942.aktiv, pos: null, face: 0 });
   function hent() {
     try { const g = JSON.parse(localStorage.getItem(GKEY) || 'null'); if (g && g.v === 1 && Array.isArray(g.spor) && Array.isArray(g.ting)) return Object.assign(ny(), g); } catch (e) {}
     return null;
   }
   let G = ny(), gemt = hent(), valg = gemt ? 'fortsaet' : 'nyt';
+  let stedFn = null;   // (placeId) => is Ida at that place now? Set by the PERSONER block.
   function gem() { if (!started) return; try { localStorage.setItem(GKEY, JSON.stringify(G)); gemt = G; } catch (e) {} }
   addEventListener('pagehide', gem);
   document.addEventListener('visibilitychange', () => { if (document.hidden) gem(); });
@@ -5686,7 +5705,7 @@ const GAADE = (() => {
     if (t === 'lag1942') v = G.lag1942;
     else if ((m = t.match(/^akt(>=|<=|==)(\d)$/))) v = m[1] === '>=' ? G.akt >= +m[2] : m[1] === '<=' ? G.akt <= +m[2] : G.akt === +m[2];
     else if ((m = t.match(/^(spor|ting|flag):(\w+)$/))) v = m[1] === 'spor' ? G.spor.includes(+m[2]) : G[m[1]].includes(m[2]);
-    // "sted:x" is answered by the parts of the game that know where Ida stands; here it is false.
+    else if ((m = t.match(/^sted:(\w+)$/))) v = !!stedFn && stedFn(m[1]);   // where Ida stands: told by the PERSONER block
     return neg ? !v : v;
   }
   const ok = list => (list || []).every(item => String(item).split('|').some(term));
@@ -5742,11 +5761,11 @@ const GAADE = (() => {
     $('sceneText').replaceChildren(...o.lines.map(line => {
       const p = document.createElement('p'); p.className = 'lead';
       const [who, text] = Array.isArray(line) ? line : ['fortaeller', line], name = hvem(who);
-      if (name) { const b = document.createElement('b'); b.textContent = name + ': '; p.append(b, text); p.classList.add('replik'); } else p.textContent = text;
+      if (name) { const b = document.createElement('b'); b.textContent = name + ': '; p.append(b, text); p.classList.add('replik'); if (who === 'ida') p.classList.add('ida'); } else p.textContent = text;
       return p;
     }));
     $('sceneBtn').textContent = o.btn || 'Videre'; sceneEfter = o.efter || null;
-    const aaben = [notes, pack].find(d => d.open);
+    const aaben = dialoger().find(d => d.open);
     if ($('scene').hidden) sceneWas = aaben ? dWas : paused;
     if (aaben) lukStille(aaben);
     paused = true; keys.clear(); resetTouch(); P.vel.set(0, 0, 0);
@@ -5793,18 +5812,20 @@ const GAADE = (() => {
   // Only one of the notebook and the backpack is open at a time. Swapping between them keeps the pause from before.
   // The pause is given back at once when a dialog closes; the browser's own close event can come a frame later.
   let dWas = false;
+  const dialoger = () => [notes, pack, samt];
+  const knapTil = (d, v) => { const b = d === notes ? $('bNotes') : d === pack ? $('bPack') : null; if (b) b.setAttribute('aria-expanded', v); };
   function aabn(d) {
     if (!started || !$('scene').hidden || d.open) return;
-    const anden = [notes, pack].find(o => o.open);
+    const anden = dialoger().find(o => o.open);
     if (anden) lukStille(anden); else dWas = paused;
     paused = true; keys.clear(); resetTouch(); P.vel.set(0, 0, 0); jumpReq = false;
     d.lukket = false; d.showModal(); d.querySelector('.gdClose').focus();
-    $(d === notes ? 'bNotes' : 'bPack').setAttribute('aria-expanded', 'true');
+    knapTil(d, 'true');
   }
-  function lukStille(d) { d.lukket = true; d.close(); $(d === notes ? 'bNotes' : 'bPack').setAttribute('aria-expanded', 'false'); }
+  function lukStille(d) { d.lukket = true; d.close(); knapTil(d, 'false'); }
   function efterLuk(d) {
     if (d.lukket) return;
-    d.lukket = true; $(d === notes ? 'bNotes' : 'bPack').setAttribute('aria-expanded', 'false');
+    d.lukket = true; knapTil(d, 'false');
     paused = dWas; keys.clear(); resetTouch(); if (!intro.hidden) goBtn.focus(); else canvas.focus();
   }
   function lukD(d) { if (d.open) d.close(); efterLuk(d); }
@@ -5855,8 +5876,7 @@ const GAADE = (() => {
       if (!ps.length) body.appendChild(el('p', 'gdTom', 'Ida har ikke talt med nogen endnu. Hver person, hun møder, får en side her.'));
       for (const id of ps) {
         const p = M.personer[id], row = el('article', 'gdRow'), txt = el('div');
-        const init = p.navn.split(' ').filter(w => /^[A-ZÆØÅ]/.test(w)).map(w => w[0]).slice(0, 2).join('');
-        row.append(el('div', 'gdNum gdAv', init), txt);
+        row.append(el('div', 'gdNum gdAv', initialer(p.navn)), txt);
         txt.append(el('h3', '', p.alder ? `${p.navn}, ${p.alder}` : p.navn), el('p', 'gdSted', p.rolle));
         const ul = el('ul'); for (const n of p.noter || []) if (ok(n.kraever)) ul.appendChild(el('li', '', n.tekst));
         if (ul.children.length) txt.appendChild(ul);
@@ -5940,6 +5960,70 @@ const GAADE = (() => {
     if (e.code === 'KeyN' && !e.repeat) aabnNoter();
     if (e.code === 'KeyR' && !e.repeat) aabnRygsaek();
   });
+  // ---- conversations: the person's topics from the manuscript. A topic is shown while its conditions are met.
+  // Topics that give or show a thing ("Giv ...", "Vis ...") carry the thing's picture. A new topic takes 5 minutes.
+  const initialer = navn => navn.split(' ').filter(w => /^[A-ZÆØÅ]/.test(w)).map(w => w[0]).slice(0, 2).join('');
+  const samt = dialog('samtaleDialog', 'Samtale');
+  samt.querySelector('.gdBody').innerHTML = '<div class="sHoved"><div class="gdNum gdAv" id="sAv"></div><div><p class="gdSted" id="sRolle"></p><p class="sUdse" id="sUdse"></p></div></div><div class="sLog" id="sLog" aria-live="polite"></div><div class="sEmner" id="sEmner" role="group" aria-label="Spørg, giv eller vis"></div>';
+  luk(samt);
+  let samtP = null;
+  function replik(who, text) {
+    const p = el('p', 'replik'), n = hvem(who);
+    if (n) { p.append(el('b', '', n + ': '), text); if (who === 'ida') p.classList.add('ida'); } else { p.classList.add('fort'); p.textContent = text; }
+    return p;
+  }
+  const tingI = e => (e.kraever || []).map(k => (k.match(/^ting:(\w+)$/) || [])[1]).find(Boolean);
+  const handling = e => /^(Giv|Vis)\b/.test(e.spoerg);
+  function visEmner() {
+    const p = M.personer[samtP], box = $('sEmner'); box.replaceChildren();
+    for (const e of p.emner) {
+      if (!ok(e.kraever)) continue;
+      const b = el('button', 'sEmne'); b.type = 'button';
+      const t = tingI(e); if (t && handling(e)) { b.innerHTML = ikon(t); b.classList.add('sTing'); }
+      if (e.hjaelp) b.classList.add('sHjaelp');
+      b.appendChild(el('span', '', e.spoerg));
+      if (!e.hjaelp && G.spurgt.includes(samtP + '.' + e.id)) b.classList.add('spurgt');
+      b.addEventListener('click', () => spoerg(e));
+      box.appendChild(b);
+    }
+  }
+  function spoerg(e) {
+    const key = samtP + '.' + e.id, log = $('sLog');
+    log.replaceChildren();
+    if (!handling(e)) log.appendChild(replik('ida', e.spoerg));
+    let lines = e.replikker;
+    if (e.hjaelp) { const h = M.hint.find(h => ok(h.naar)); G.hint++; if (h) lines = [[samtP, h.tekst]]; }
+    for (const [w, t] of lines) log.appendChild(replik(w, t));
+    if (!G.spurgt.includes(key)) { G.spurgt.push(key); if (!e.hjaelp) tid(M.ur.minutterPrSamtale); }
+    samt.scrollTop = 0;
+    giv(e.giver);   // may open an act card, which closes the conversation
+    if (samt.open) visEmner();
+  }
+  function samtale(id) {
+    const p = M.personer[id]; if (!p) return;
+    samtP = id; if (!G.moedt.includes(id)) { G.moedt.push(id); gem(); }
+    samt.querySelector('h2').textContent = p.alder ? `${p.navn}, ${p.alder}` : p.navn;
+    $('sAv').textContent = initialer(p.navn); $('sRolle').textContent = p.rolle; $('sUdse').textContent = p.udseende;
+    $('sLog').replaceChildren(el('p', 'gdIntro', 'Vælg, hvad Ida skal spørge om, eller hvad hun skal give eller vise.'));
+    visEmner(); aabn(samt);
+  }
+
+  // ---- events: they happen once when their conditions are met (flag beg_<id>). An event with a time moves the clock on.
+  let begT = 0;
+  HOOKS.frame.push(dt => {
+    if (!started || paused || !$('scene').hidden) { begT = Math.max(begT, 1.2); return; }   // a short breath between two cards
+    begT -= dt; if (begT > 0) return; begT = 0.5;
+    for (const b of M.begivenheder) {
+      if (G.flag.includes('beg_' + b.id) || !ok(b.naar)) continue;
+      G.flag.push('beg_' + b.id);
+      if (b.kl) G.min = Math.max(G.min, toMin(b.kl));
+      for (const [w] of b.replikker) if (M.personer[w] && !G.moedt.includes(w)) G.moedt.push(w);
+      visUr(); gem();
+      scene({ eyebrow: `Akt ${G.akt} · kl. ${kl(G.min)}`, title: b.titel || 'Imens', lines: b.replikker, efter: () => giv(b.giver) });
+      return;
+    }
+  });
+
   visUr(); startKnapper();
 
   // Test shortcuts the player does not see: __cb.gaade.giv(['spor:3']), .akt(3), .saetKl('08.15'), .alt(), .nulstil()
@@ -5956,7 +6040,7 @@ const GAADE = (() => {
   let brugFn = null;
   // A door that has been unlocked stays open for the rest of the game.
   function aabnet(id) { if (!G.laast.includes(id)) { G.laast.push(id); gem(); } }
-  return { begynd, efterStart, startKnapper, giv, ok, tid, scene, hvem, aabnet, M, test, get G() { return G; }, set brug(fn) { brugFn = fn; } };
+  return { begynd, efterStart, startKnapper, giv, ok, tid, scene, hvem, aabnet, samtale, M, test, get G() { return G; }, set brug(fn) { brugFn = fn; }, set sted(fn) { stedFn = fn; } };
 })();
 
 // ======================================================================== MURDER MYSTERY: locks and things to find
@@ -5966,7 +6050,8 @@ const GAADE = (() => {
 // Story conditions ("aaben", e.g. "Snapstinget opens at 7") are switched on when the people are in the game.
 const LAAS = (() => {
   const M = GAADE.M, I = INTERIOR;
-  const HISTORIE_LAASE = false;   // trin 4: true when Bente, the commissioner and the acts can be reached
+  // The story's own opening hours that are switched on. The rest follow when act 1 can be played to the end (trin 5).
+  const HISTORIE_LAASE = new Set(['folketinget']);
   // Places with a lock or a story condition, and where their doors are (interior coordinates, x without I.x).
   const RUM = {
     samtalevaerelset:  { place: 'folketing', rooms: ['samtale'], doors: [[3, -4.4], [-3, -4.4]] },
@@ -5983,7 +6068,7 @@ const LAAS = (() => {
   function status(id) {
     const s = M.steder[id], G = GAADE.G;
     if (!s || alleAabne) return { aaben: true };
-    if (HISTORIE_LAASE && s.aaben && !GAADE.ok(s.aaben)) return { aaben: false, tekst: s.lukketTekst || 'Her er lukket.' };
+    if (HISTORIE_LAASE.has(id) && s.aaben && !GAADE.ok(s.aaben)) return { aaben: false, tekst: s.lukketTekst || 'Her er lukket.' };
     if (s.inde_i) { const st = status(s.inde_i); if (!st.aaben) return st; }
     if (!s.laas || G.laast.includes(id)) return { aaben: true };
     const ting = (s.laas.kraever || []).map(k => (k.match(/^ting:(\w+)$/) || [])[1]).find(Boolean);
@@ -6054,6 +6139,7 @@ const LAAS = (() => {
   // ---- things to examine: where each one is in the game (from the manuscript's UNDERSOEG by id)
   const PASSAGE = (s, d) => [-23.4 + 0.840 * s + 0.543 * d, 86.5 - 0.543 * s + 0.840 * d];   // Proviantpassagen's frame (see passageHouse)
   const FUND = {
+    liget:      { place: 'folketing', at: [8, -2.1], r: 2.4 },
     baenken:    { ude: GARDEN.at(-23, 12.5), r: 3 },
     vandpytten: { ude: PASSAGE(94.2, 47.5), r: 2.2 },
     rapporten:  { place: 'folketing', at: [28.1, 11.2], r: 2.1 },
@@ -6143,6 +6229,146 @@ const LAAS = (() => {
   return { status, RUM, FUND, get alleAabne() { return alleAabne; }, set alleAabne(v) { alleAabne = v; } };
 })();
 
+// ======================================================================== MURDER MYSTERY: people
+// The people of the story as figures in the world. Where a person stands follows the manuscript (steder per act);
+// SPOT says where that place is in the game. Near a person the action button says "Tal med ...", which opens
+// the conversation (GAADE.samtale). This block also tells GAADE where Ida stands, for conditions like "sted:x".
+const PERSONER = (() => {
+  const M = GAADE.M, I = INTERIOR;
+  // ---- where Ida stands, as a place of the manuscript
+  const INDE = { 'folketing/hall': 'vandrehallen', 'folketing/betjent': 'betjentstuen', 'folketing/samtale': 'samtalevaerelset', 'folketing/kompas': 'kompas_gang', 'folketing/office1': 'kompas_kontor', 'folketing/office2': 'kompas_gang', 'folketing/secretariat': 'sekretariatet', 'folketing/meeting': 'kompas_moedelokale', 'folketing/snap': 'snapstinget', 'folketing/snapgang': 'snapstinget', 'folketing/landsting': 'landstingssalen', 'finance/fm-wardrobe': 'fm_garderoben', 'finance/fm-meeting': 'fm_forhandlingsrummet', 'reform/rm-office': 'valdorfs_kontor', 'reform/rm-print': 'rm_printeren', 'reform/rm-side': 'rm_sidedoeren' };
+  const BYG = { folketing: 'folketinget', finance: 'finansministeriet', reform: 'reformministeriet', towerLobby: 'taarnet', towerRestaurant: 'restauranten', stables: 'stalden' };
+  const qR = QUAYS.find(q => q.id === 'reform'), qS = QUAYS.find(q => q.id === 'slots');
+  const UDE = [   // smallest first: [place, x, z, radius]
+    ['proviantpassagen', 82, 74, 8], ['rigsdagsgaarden', ...FT.at(0, 8), 10], ['kajen_reform', qR.x, qR.z, 9], ['kajen_slots', qS.x, qS.z, 9],
+    ['hoejbro', -5, -167, 14], ['marmorbroen', -206, 140, 15], ['prins_joergens_gaard', -36, -62, 16], ['slotspladsen', ...PRESS.at(0, 0), 22],
+    ['bibliotekshaven', GARDEN.cx, GARDEN.cz, 40], ['ridebanen', -140, 85, 42],
+  ];
+  function stedNu() {
+    if (I.on) return INDE[I.place + '/' + I.roomAt(P.pos.x - I.x, P.pos.z)] || BYG[I.place] || null;
+    if (FX.tower?.on) return 'udsigten';
+    if (MYBOAT.on) return null;
+    const hit = UDE.find(([, x, z, r]) => Math.hypot(P.pos.x - x, P.pos.z - z) < r);
+    return hit ? hit[0] : null;
+  }
+  GAADE.sted = id => { for (let s = stedNu(), n = 0; s && n < 6; s = M.steder[s]?.inde_i, n++) if (s === id) return true; return false; };
+
+  // ---- figures: grown-ups in the same cartoon style as Ida
+  const outline = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide }), eye = new THREE.MeshBasicMaterial({ color: '#231a22' });
+  function figur(o) {
+    const g = new THREE.Group(), m = c => toon(c);
+    const coat = m(o.coat), trousers = m(o.trousers || '#2d3340'), skin = m(o.skin || '#efc7a6'), hair = m(o.hair || '#4a3a30'), shoes = m(o.shoes || '#231f20');
+    const part = (geo, mat, parent, x, y, z, ol = 1.05) => { const p = new THREE.Mesh(geo, mat); p.position.set(x, y, z); p.castShadow = true; parent.add(p); if (ol) { const q = new THREE.Mesh(geo, outline); q.scale.setScalar(ol); p.add(q); } return p; };
+    part(new THREE.CapsuleGeometry(0.21, 0.38, 6, 16), coat, g, 0, 1.31, 0);
+    if (o.long) part(new THREE.CylinderGeometry(0.22, 0.27, 0.42, 16), coat, g, 0, 0.88, 0, 1.04);
+    part(new THREE.CylinderGeometry(0.06, 0.065, 0.12, 10), skin, g, 0, 1.64, 0, 0);
+    const head = new THREE.Group(); head.position.set(0, 1.79, 0); g.add(head);
+    part(new THREE.SphereGeometry(0.14, 24, 18), skin, head, 0, 0, 0, 1.05);
+    for (const s of [-1, 1]) part(new THREE.SphereGeometry(0.017, 8, 6), eye, head, s * 0.047, 0.015, 0.13, 0);
+    part(new THREE.SphereGeometry(0.018, 8, 6), skin, head, 0, -0.012, 0.142, 0);
+    const style = o.hairStyle || 'kort';
+    if (style === 'skaldet') part(new THREE.SphereGeometry(0.148, 24, 12, Math.PI * 0.85, Math.PI * 1.3, 1.0, 0.85), hair, head, 0, 0.01, -0.005, 0);   // a fringe of hair round the back, none over the face
+    else { const cap = part(new THREE.SphereGeometry(0.15, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), hair, head, 0, 0.015, -0.012, 1.04); cap.rotation.x = -0.4; }
+    if (style === 'knold') part(new THREE.SphereGeometry(0.07, 14, 10), hair, head, 0, 0.1, -0.13, 1.06);
+    if (style === 'hestehale') { const t = part(new THREE.CapsuleGeometry(0.045, 0.16, 4, 10), hair, head, 0, -0.07, -0.155, 1.08); t.rotation.x = 0.35; }
+    if (style === 'bob') { const b = part(new THREE.SphereGeometry(0.155, 20, 12, 0, Math.PI * 2, 0.9, 1.1), hair, head, 0, -0.01, -0.02, 0); b.scale.set(1, 1.15, 1); }
+    const legs = [];
+    for (const s of [-1, 1]) {
+      const hip = new THREE.Group(); hip.position.set(s * 0.1, 0.86, 0); g.add(hip);
+      part(new THREE.CapsuleGeometry(0.08, 0.28, 4, 14), trousers, hip, 0, -0.2, 0);
+      const knee = new THREE.Group(); knee.position.set(0, -0.42, 0); hip.add(knee);
+      part(new THREE.CapsuleGeometry(0.066, 0.28, 4, 14), trousers, knee, 0, -0.2, 0);
+      part(new THREE.BoxGeometry(0.12, 0.08, 0.26), shoes, knee, 0, -0.42, 0.04, 1.04);
+      legs.push({ hip, knee });
+      const sh = new THREE.Group(); sh.position.set(s * 0.27, 1.54, 0); g.add(sh);
+      part(new THREE.CapsuleGeometry(0.065, 0.46, 4, 10), coat, sh, 0, -0.3, 0);
+      part(new THREE.SphereGeometry(0.058, 10, 8), skin, sh, 0, -0.6, 0);
+      sh.rotation.z = s * 0.08;
+      if (o.arm && o.arm[s > 0 ? 1 : 0]) o.arm[s > 0 ? 1 : 0](sh, part, m);
+    }
+    if (o.extra) o.extra(g, head, part, m);
+    if (o.sidder) for (const l of legs) { l.hip.rotation.x = -Math.PI / 2; l.knee.rotation.x = Math.PI / 2; }
+    g.scale.setScalar(o.scale || 1);
+    const root = new THREE.Group(); root.add(g);
+    return { root, g, head };
+  }
+  const kop = (sh, part, m) => { sh.rotation.x = -0.9; part(new THREE.CylinderGeometry(0.04, 0.032, 0.11, 10), m('#f3efe6'), sh, 0, -0.66, 0.02, 1.08); };
+  const LOOK = {
+    bente: { coat: '#24324a', trousers: '#24324a', hair: '#9b9b9b', hairStyle: 'knold', long: true, scale: 0.95, skin: '#efc6a8',
+      extra: (g, head, part, m) => { const c = part(new THREE.TorusGeometry(0.1, 0.006, 6, 20, Math.PI), m('#7a5a3a'), g, 0, 1.52, 0.1, 0); c.rotation.set(-1.1, 0, Math.PI); } },   // the empty glasses cord
+    kommissaer: { coat: '#b59a6a', trousers: '#3b3a36', hair: '#8e8e8e', hairStyle: 'skaldet', long: true, scale: 1.02, skin: '#e8b996', arm: [null, kop],
+      extra: (g, head, part, m) => { part(new THREE.BoxGeometry(0.11, 0.025, 0.03), m('#7e7e7e'), head, 0, -0.045, 0.135, 0); } },   // grey moustache
+    statsminister: { coat: '#1f2a44', trousers: '#1f2a44', hair: '#5a4334', hairStyle: 'bob', long: true, scale: 0.97, skin: '#f0caa9',
+      extra: (g, head, part, m) => { const t = part(new THREE.TorusGeometry(0.115, 0.04, 8, 18), m('#c0392b'), g, 0, 1.57, 0, 0); t.rotation.x = Math.PI / 2; } },
+    vagt: { coat: '#1e2023', trousers: '#1e2023', hair: '#2b2420', hairStyle: 'kort', scale: 1.04, skin: '#d9a984' },
+    gry: { coat: '#3f6b4f', trousers: '#d9caa5', shoes: '#3a2a20', hair: '#3b2a20', hairStyle: 'hestehale', scale: 0.96,
+      arm: [(sh, part, m) => { sh.rotation.x = -0.25; part(new THREE.SphereGeometry(0.13, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), m('#1c1c1c'), sh, 0.05, -0.55, 0.12, 1.06); }, null] },   // helmet under the arm
+    moerkeberg: { coat: '#4f5459', trousers: '#4f5459', hair: '#bdbdbd', hairStyle: 'skaldet', skin: '#e6cdb8', sidder: true },
+  };
+  // ---- where each person stands at a place of the manuscript: outdoors {ude:[x,z]} or indoors {place, at:[x,z]}
+  const se = STABLE_ENTRY || { x: -165, z: 86, nx: 1, nz: 0 };
+  const SPOT = {
+    bente: {
+      doer: { ude: FT.at(0, 1.7), face: Math.atan2(FT.n[0], FT.n[1]), r: 0 },   // in the door until Ida has met her
+      betjentstuen: { place: 'folketing', at: [10.5, 24.5], face: Math.PI, r: 3.9 },
+    },
+    kommissaer: { vandrehallen: { place: 'folketing', at: [10.6, -1.2], face: -Math.PI / 2, r: 3 } },
+    statsminister: { restauranten: { place: 'towerRestaurant', at: [446.6, -4.6], face: -Math.PI / 2, r: 3, foelge: [[-0.9, -1.3], [0.9, -1.3]] } },
+    gry: {
+      ridebanen: { ude: [se.x + se.nx * 5, se.z + se.nz * 5], face: Math.atan2(se.nx, se.nz), r: 3.2 },
+      stalden: { place: 'stables', at: [301.4, 6], face: -Math.PI / 2, r: 3 },
+    },
+  };
+  const inde = new THREE.Group(); inde.userData.keep = true; I.group.add(inde);
+  const ude = new THREE.Group(); dyn.add(ude);
+  const FIG = {};
+  for (const id of Object.keys(SPOT)) {
+    const f = figur(LOOK[id]); f.spot = null; f.yaw = 0; FIG[id] = f; f.root.visible = false;
+    const sp = Object.values(SPOT[id]).find(s => s.foelge);
+    if (sp) for (const [dx, dz] of sp.foelge) { const v = figur(LOOK.vagt); v.root.position.set(dx, 0, dz); f.root.add(v.root); }
+  }
+  // Aksel Mørkeberg in one of the green sofas at Rigets midte, until the commissioner has him taken away (act 3)
+  const lig = figur(LOOK.moerkeberg); lig.root.position.set(8, I.floor + 0.62 - 0.86, -3.12); inde.add(lig.root);
+  lig.head.rotation.set(0.35, 0, 0.32); lig.g.rotation.x = -0.12;
+
+  function spotFor(id) {
+    const p = M.personer[id], S = SPOT[id];
+    if (id === 'bente' && !GAADE.ok(['flag:moedt_bente'])) return S.doer;
+    if ((p.lag1942 && !GAADE.G.lag1942) || !GAADE.ok(p.kraever)) return null;
+    const sted = p.steder && p.steder[GAADE.G.akt];
+    return (sted && S[sted]) || null;
+  }
+  function placer(id, sp) {
+    const f = FIG[id]; f.spot = sp; f.root.visible = !!sp;
+    if (!sp) return;
+    if (sp.ude) { ude.add(f.root); f.root.position.set(sp.ude[0], groundAt(sp.ude[0], sp.ude[1], 2), sp.ude[1]); }
+    else { inde.add(f.root); f.root.position.set(sp.at[0], I.height(sp.at[0], sp.at[1]), sp.at[1]); }
+    f.yaw = sp.face; f.root.rotation.y = sp.face;
+  }
+  // World position of a spot, and is Ida in the same space as it?
+  const samme = sp => sp.ude ? !I.on && !FX.tower?.on : I.on && I.place === sp.place;
+  const afstand = sp => sp.ude ? Math.hypot(P.pos.x - sp.ude[0], P.pos.z - sp.ude[1]) : Math.hypot(P.pos.x - I.x - sp.at[0], P.pos.z - sp.at[1]);
+  let tjekT = 0;
+  HOOKS.frame.push(dt => {
+    if (!started) return;
+    tjekT -= dt;
+    if (tjekT < 0) { tjekT = 0.4; for (const id of Object.keys(FIG)) { const sp = spotFor(id); if (sp !== FIG[id].spot) placer(id, sp); } lig.root.visible = GAADE.G.akt <= 2; }
+    for (const [id, f] of Object.entries(FIG)) {
+      const sp = f.spot; if (!sp || !samme(sp)) continue;
+      const d = afstand(sp);
+      // turn towards Ida when she is close, otherwise back to the usual direction
+      const wx = sp.ude ? sp.ude[0] : I.x + sp.at[0], wz = sp.ude ? sp.ude[1] : sp.at[1];
+      const want = d < 6 ? Math.atan2(P.pos.x - wx, P.pos.z - wz) : sp.face;
+      f.yaw += angDiff(want, f.yaw) * Math.min(1, dt * 4); f.root.rotation.y = f.yaw;
+      if (!paused && sp.r && d < sp.r) {
+        const p = M.personer[id];
+        offerAction({ id: 'tal-' + id, label: 'Tal med ' + (p.kort || p.navn.split(' ')[0]), prio: 9, run: () => GAADE.samtale(id) });
+      }
+    }
+  });
+  return { stedNu, SPOT, FIG, spotFor };
+})();
+
 // ======================================================================== BOOT
 function boot(data) {
   data = data || {};
@@ -6162,7 +6388,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
