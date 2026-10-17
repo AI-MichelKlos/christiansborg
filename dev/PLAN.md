@@ -206,4 +206,10 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Stedteksterne (`POIS`) er skrevet om til voksne. Beskeder i en voksen tone. Gemmes under en ny nøgle (`mordIRigetsMidte`) med kun dag/aften, lyd og minikort.
   - `setPoiH` er bevaret fra opgavekoden, så handlingsknappen stadig står over stedkortet. `#guide` er bevaret skjult til et senere "Næste spor".
   - Kontrolleret i Chromium på computer og telefonstørrelse: ingen JavaScript-fejl, ingen børneknapper ved Ridebanen, Tøjhusmuseet, Højbro, Gammel Strand og svanerne, gang ude og inde (`__cb.step`), båden, ministerbilerne, hjælpekortet og kortet. Bemærk: testbrowseren kører kun 1-2 billeder i sekundet, så gang skal testes med `__cb.step`, ikke med tastetryk i realtid.
-- [ ] Resten af trin 2 og trin 1 (manuskriptet) følger efter planen.
+- [x] Trin 1, manuskriptet (17. okt. 2026)
+  - Hele gåden står som data i `mordgaade.js` ved siden af `index.html`: 15 personer med emner og replikker, 22 spor, 15 ting, 45 ting at undersøge, steder med låse, faste begivenheder, hint, tidslinje, afsløringen og efterskriften. 1942-laget kan slås til og fra (`lag1942`).
+  - `node dev/tjek-mordgaade.js` tjekker logikken: alle betingelser kan nås, ingen fastlåsning i 2000 tilfældige gennemspilninger med og uden 1942, hint dækker alle trin, ingen tankestreg, og alle "bygget"-steder findes i spillet. Den skriver hele manuskriptet ud som `dev/MANUSKRIPT.md`. Kør den efter hver rettelse i `mordgaade.js`.
+  - Planens nye valg er fulgt: pressekort 17, Pernille i radioen kl. 01.45-02.05, bådlauget, regn kl. 22-02.30, termokanden ved fortøjningspælen, notesbogen under sofaen, Jonas' telefon i mødelokalet, fortalelsen om 4.000 og hesten Vega.
+  - Huller, som tjekket fandt, er rettet i både manuskript og plan: mailen sender sig selv kl. 02.05, Kaspers kort går ud kl. 02.22, Valdorf lægger pressekortet tilbage, springvandet er slukket til kl. 9, tårnet åbner kl. 7, kilen i sidedøren og bemærkningen på gangen kl. 21.45. Ny bifigur: hoffourer Viggo Aagaard.
+  - Skal bygges ud over det eksisterende: sadelkammeret, Riddersalen, fortøjningspælen i kanalen og de to 1942-steder.
+- [ ] Resten af trin 2 følger efter planen.

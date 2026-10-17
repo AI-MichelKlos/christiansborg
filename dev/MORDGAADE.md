@@ -1,6 +1,6 @@
 # Mord i Rigets midte
 
-15. oktober 2026, opdateret 16. oktober 2026 · Michel
+15. oktober 2026, opdateret 17. oktober 2026 · Michel
 
 Udarbejdet med AI (Claude) og med begrænset mennesketjek.
 
@@ -38,15 +38,16 @@ Fem personer er mistænkte, og alle har noget at skjule. Fire af dem bliver rens
 | --- | --- | --- | --- | --- |
 | Ditte Rosenvinge (47) | Reformminister. Reformen er hendes livsværk | Mørkeberg truede med at stemme nej | Lovede ham i et hemmeligt sidebrev en post i EU | Holder: i Finansministeriets forhandlingslokale kl. 01.00-03.30 med ni andre |
 | Jonas Fenger (33) | Kompaspartiets næstformand og kronprins | Mørkeberg ville blive en periode til | Har lækket forhandlingerne til pressen | Holder: videomøde med partiets hovedbestyrelse kl. 01.45-02.40 |
-| Pernille Strandvig (52) | Politisk kommentator på Dagbladet Nordlyset | Mørkeberg truede med at afsløre hendes kilde | Kilden er Jonas | Holder: direkte i radioen fra Slotspladsen kl. 01.50 |
+| Pernille Strandvig (52) | Politisk kommentator på Dagbladet Nordlyset | Mørkeberg truede med at afsløre hendes kilde | Kilden er Jonas | Holder: direkte i radioen fra Slotspladsen kl. 01.45-02.05 |
 | Kasper Lindved (44) | PR-rådgiver i Bro & Bølge Kommunikation, tidligere Mørkebergs spindoktor | Blev fyret af Mørkeberg sidste år | Var i Folketinget om natten med et gammelt adgangskort for at kopiere partiets papirer | Holder: kopimaskinen logger ham kl. 01.38-02.12 |
-| Henrik Valdorf (58) | Departementschef i Reformministeriet. Ivrig sejler | Ingen synlig | Har pyntet på regnestykket: reformen giver 4.000 job, ikke 11.000 | Holder ikke: mailen kl. 01.41 var sat til at blive sendt senere |
+| Henrik Valdorf (58) | Departementschef i Reformministeriet. Ivrig sejler og medlem af bådlauget ved Gammel Strand | Ingen synlig | Har pyntet på regnestykket: reformen giver 4.000 job, ikke 11.000 | Holder ikke: mailen kl. 02.05 var sat til at sende sig selv, mens han var væk |
 
 Vidner og hjælpere:
 
 - **Bente Holmsgaard (59)**, folketingsbetjent på nattevagt gennem 31 år og Idas bedste kilde til husets historie. Hun har adgangsloggen og nøgleskabet og ved, at Mørkeberg bad hende låse Samtaleværelset op til et møde kl. 2. Men hun har mistet sine læsebriller.
 - **Torben Hald (60)**, kriminalkommissær. Han er sikker på, at Kasper er morderen, og vil sige det på pressemødet kl. 10.
 - **Mogens Brask (56)**, kontorchef i Reformministeriet og medlem af DJØF i 31 år. Han har drømt om Elefantordenen hele sit arbejdsliv, selv om kun fire borgerlige danskere har fået den siden 1900. Om morgenen sætter han pressemødet op i Landstingssalen. Han ved mere, end han siger.
+- Viggo Aagaard (63), hoffourer. Han passer på Elefantordenen i Riddersalen og låner den kun ud til en, der kan fortælle, hvem der har lavet gobelinerne.
 - **Gry Strigle (34)**, beridder med nattevagt i De Kongelige Stalde ved Ridebanen. Hun talte med Mørkeberg på hans faste runde ved midnat.
 - **Bodil Kryddal (62)**, køkkenchef i Snapstinget, Folketingets restaurant. Hun fylder Mørkebergs termokande hver aften og ved præcis, hvad der kom i den.
 - **Svend Lysholt (67)**, pensioneret fotograf, som tager nattebilleder fra Højbro. Hans billeder viser lyset fra en lille båd over kanalen.
@@ -55,80 +56,82 @@ Vidner og hjælpere:
 
 ## Hvad der virkelig skete
 
-Valdorf planlagde mordet fra kl. 22 og byggede sig et alibi i ministeriet, mens han sejlede over kanalen. Tabellen er den sande historie, som spilleren skal stykke sammen. Numrene i sidste kolonne henviser til sporene i næste afsnit.
+Valdorf planlagde mordet fra kl. 22 og byggede sig et alibi i ministeriet, mens han sejlede over kanalen. Det regner fra kl. 22 til kl. 02.30. Tabellen er den sande historie, som spilleren skal stykke sammen. Numrene i sidste kolonne henviser til sporene i næste afsnit.
 
 | Kl. | Hvad skete | Spor |
 | --- | --- | --- |
 | 21.30 | Mørkeberg får fyldt sin røde termokande i Snapstinget, som han plejer | 18 |
-| 22.10 | Valdorf går en tur til Gammel Strand, låner den lille røde båd og lægger den ved kajen over for Reformministeriet | 12 |
-| 23.05 | Pressebriefing i Finansministeriet. Valdorf tager gæstekort 17 fra Pernilles frakke i garderoben | 7 |
-| 23.12 | Valdorf skriver en mail og sætter den til at blive sendt kl. 01.41 | 15 |
+| 21.45 | Mørkeberg siger til Valdorf på gangen i Finansministeriet, at han har set tallene fra maj. De skal tale sammen i nat, ellers siger han det kl. 10 | Tilståelsen |
+| 22.10 | Valdorf går en tur til Gammel Strand, låner bådlaugets lille røde båd, som han selv er medlem af, og lægger den ved kajen ved Reformministeriet | 12 |
+| 23.05 | Pressebriefing i Finansministeriet. Valdorf tager pressekort 17 fra Pernilles frakke i garderoben | 7 |
+| 23.12 | Valdorf skriver en mail og sætter den til at sende sig selv kl. 02.05 | 15 |
 | 23.30 | Jonas møder Pernille ved springvandet i Bibliotekshaven og giver hende nyt fra forhandlingerne | 8 |
 | 23.50 | Jonas og Mørkeberg skændes højlydt på gangen i Finansministeriet | 8 |
 | 00.15 | Mørkeberg går sin faste runde på Ridebanen og siger til staldvagten, at der falder en bombe kl. 10. Han gemmer en kopi af de rigtige tal i sadelkammeret. Så går han over i Folketinget med termokanden | 1, 17, 21 |
 | 00.30 | Ditte møder Mørkeberg ved Rigets midte og tilbyder ham sidebrevet. Hun går tilbage kl. 00.55 og glemmer sin kop | 2, 9 |
 | 01.30 | Mørkeberg beder Bente låse Samtaleværelset op til et møde kl. 2. Samtidig går Kasper ind ad Proviantpassagen | 3, 4 |
 | 01.30 | Valdorf forlader forhandlingslokalet for at "regne på tallene" i sit eget ministerium. Hans kort åbner døren på Ved Stranden kl. 01.35 | 9 |
-| 01.41 | Den planlagte mail bliver sendt af sig selv | 15 |
-| 01.44 | Valdorf går ud ad sidedøren og sejler over kanalen til kajen ved Slotspladsen | 13 |
-| 01.50 | Pernille er direkte i radioen fra Slotspladsen | 7 |
-| 01.52 | Gæstekort 17 åbner døren i Rigsdagsgården | 3 |
+| 01.44 | Valdorf går ud ad sidedøren, som han har sat en kile i, og sejler over kanalen til kajen ved Slotspladsen | 13 |
+| 01.45 | Pernille er direkte i radioen fra Slotspladsen til kl. 02.05 | 7 |
+| 01.52 | Pressekort 17 åbner døren i Rigsdagsgården | 3 |
 | 02.00 | Mødet i Samtaleværelset. Mens Mørkeberg læser Valdorfs tabeller, kommer der noget i kaffen | 5 |
+| 02.05 | Den planlagte mail bliver sendt af sig selv | 15 |
 | 02.15 | Mørkeberg får det dårligt og sætter sig i sofaen ved Rigets midte. Valdorf tager termokanden, tabellen og siden fra notesbogen | 1, 6 |
 | 02.20 | Kasper ser en mand i våd, mørk sejlerjakke på trappen med noget rødt under armen | 11 |
-| 02.24 | Gæstekort 17 går ud ad døren i Rigsdagsgården | 3 |
+| 02.22 | Kasper går ud ad Proviantpassagen med sine kopier | 3, 10 |
+| 02.24 | Pressekort 17 går ud ad døren i Rigsdagsgården | 3 |
 | 02.25 | Bente går sin runde med lommelygte gennem Rigsdagsgården. Valdorf smutter ind i gangen til Bibliotekshaven og gemmer sig bag statuen af Søren Kierkegaard. Bente følger lyden, sætter sig et øjeblik på bænken ved statuen og glemmer sine læsebriller der. Her taber han tabellen og siden i springvandets bassin | 19, 20 |
-| 02.31 | Valdorf sejler tilbage og smider termokanden i vandet ved kajen | 13, 14 |
-| 02.36 | Valdorf printer et dokument i Reformministeriet og bliver set af en kollega. Bådnøglen glemmer han i lommen på sejlerjakken | 15, 22 |
-| 02.50 | Valdorf er tilbage i Finansministeriet med nye tabeller | 9 |
+| 02.31 | Valdorf sejler tilbage og smider termokanden i vandet ved den gamle fortøjningspæl midt i kanalen | 13, 14 |
+| 02.36 | Valdorf printer et dokument i Reformministeriet og bliver set af Mogens Brask, mens håret stadig er vådt. Bådnøglen glemmer han i lommen på sejlerjakken | 15, 22 |
+| 02.50 | Valdorf er tilbage i Finansministeriet med nye tabeller og lægger pressekort 17 tilbage i Pernilles frakke i garderoben | 9 |
 | 02-03 | Mørkeberg dør i sofaen | Retsmedicineren |
 | 05.50 | Rengøringen finder ham | 1 |
 
 ## Sporene
 
-Gåden har 22 spor. De første spor åbner sagen og peger i mange retninger, de sidste fører frem til Valdorf. Ingen enkelt ting afslører ham, men sammen beviser båden, gæstekortet, mailen, notesbogen og papirerne i springvandet, hvordan han kom ind, ud og hvorfor.
+Gåden har 22 spor. De første spor åbner sagen og peger i mange retninger, de sidste fører frem til Valdorf. Ingen enkelt ting afslører ham, men sammen beviser båden, pressekortet, mailen, notesbogen og papirerne i springvandet, hvordan han kom ind, ud og hvorfor.
 
 | Nr. | Spor | Hvor det findes | Hvad det viser |
 | --- | --- | --- | --- |
 | 1 | Liget og den forsvundne termokande | Sofaen ved Rigets midte | Mørkeberg døde siddende uden tegn på kamp. Alle ved, at han altid har sin røde termokande med |
 | 2 | Kop med læbestift | Bordet ved sofaen | Nogen har siddet hos ham. Fører til Ditte og sidebrevet |
-| 3 | Adgangsloggen | Betjentstuen ved indgangen. Bente kan først læse den, når hun har fået sine briller | Gæstekort 17 ind kl. 01.52 og ud kl. 02.24 ad døren i Rigsdagsgården. Kaspers gamle kort ind ad Proviantpassagen kl. 01.30 |
+| 3 | Adgangsloggen | Betjentstuen ved indgangen. Bente kan først læse den, når hun har fået sine briller | Pressekort 17 ind kl. 01.52 og ud kl. 02.24 ad døren i Rigsdagsgården. Kaspers gamle kort ind ad Proviantpassagen kl. 01.30 og ud kl. 02.22 |
 | 4 | Bentes forklaring | Betjentstuen | Mødet kl. 2 i Samtaleværelset var "med en fra den anden side af kanalen" |
 | 5 | Samtaleværelset | Døren fra Vandrehallen, med nøglen fra Bentes nøgleskab | To stole trukket ud, en kafferand på bordet og våde fodspor under bordet med mønster fra sejlersko |
-| 6 | Notesbogen | Mørkebergs inderlomme | En side er revet ud. Med blyanten fra Idas rygsæk kommer aftrykket frem: "11.000? Kun 4.000. Departementet har vidst det siden maj. Kl. 10 siger jeg det." |
-| 7 | Pernilles radioindslag | Pernille blandt journalisterne på Slotspladsen | Hun var direkte i radioen fra Slotspladsen kl. 01.50. Gæstekort 17 er hendes, men forsvandt fra frakken i Finansministeriets garderobe under briefingen kl. 23 |
-| 8 | Jonas' telefon | Jonas i Kompaspartiets kontor | SMS'er til Pernille om et møde ved springvandet kl. 23.30 afslører lækket. Videomødet kl. 01.45-02.40 rydder ham. Skænderiet kl. 23.50 blev hørt af flere |
+| 6 | Notesbogen | Under sofaen ved Rigets midte. Ida finder den med lygten på sin mobil | En side er revet ud. Med blyanten fra Idas rygsæk kommer aftrykket frem: "11.000? Kun 4.000. Departementet har vidst det siden maj. Kl. 10 siger jeg det." |
+| 7 | Pernilles radioindslag | Pernille blandt journalisterne på Slotspladsen | Hun var direkte i radioen fra Slotspladsen kl. 01.45-02.05. Pressekort 17 er hendes, men forsvandt fra frakken i Finansministeriets garderobe under briefingen kl. 23 |
+| 8 | Jonas' telefon | Jonas' telefon, glemt i Kompaspartiets mødelokale | SMS'er til Pernille om et møde ved springvandet kl. 23.30 afslører lækket. Videomødet kl. 01.45-02.40 rydder ham. Skænderiet kl. 23.50 blev hørt af flere |
 | 9 | Referatet og adgangsloggen | Finansministeriet, med det gæstekort Ida får af Ditte | Ditte var i forhandlingslokalet kl. 01.00-03.30. Valdorf gik kl. 01.30 og kom tilbage kl. 02.50 |
 | 10 | Kopimaskinens log | Kompaspartiets sekretariat, med Kaspers gamle kort | Kasper kopierede papirer kl. 01.38-02.12. Han er tyv, ikke morder |
 | 11 | Kaspers vidneudsagn | Kasper i Snapstinget, når han bliver vist spor 10 | En mand i våd, mørk sejlerjakke på trappen kl. 02.20 med noget rødt under armen |
-| 12 | Den røde båd | Kajen over for Reformministeriet. Kan også ses med kikkerten fra Udsigten i tårnet | Båden hører til ved Gammel Strand. Den er fortøjet med et rigtigt sømandsknob, mens bådudlejerens egne knob er sjuskede |
+| 12 | Den røde båd | Kajen ved Reformministeriet. Kan også ses med kikkerten fra Udsigten i tårnet | Båden hører til ved Gammel Strand. Den er fortøjet med et rigtigt sømandsknob, mens de andre både i bådlauget er bundet med sjuskede knob |
 | 13 | Svends fotos | Svend på Højbro | Lange eksponeringer viser lys fra en lille båd over kanalen kl. 01.44 og kl. 02.31 |
-| 14 | Termokanden | På bunden ved kajen, synlig fra båden | Den røde termokande med Kompaspartiets logo. Morderen smed den |
-| 15 | Valdorfs kontor | Reformministeriet på Ved Stranden, bag en kodelås | Knobtavle på væggen, fugtig sejlerjakke, sejlersko. Mailen fra kl. 01.41 er "oprettet 23.12" |
-| 16 | Valdorfs fortalelse | Samtalen med Valdorf på Udsigten i tårnet | Han nævner "den røde termokande", før nogen har fortalt ham, at den er væk |
+| 14 | Termokanden | På bunden ved den gamle fortøjningspæl midt i kanalen. Kan kun ses fra båden | Den røde termokande med Kompaspartiets logo. Morderen smed den |
+| 15 | Valdorfs kontor | Reformministeriet på Ved Stranden, bag en kodelås | Knobtavle på væggen, fugtig sejlerjakke, sejlersko. Mailen fra kl. 02.05 er "oprettet 23.12" |
+| 16 | Valdorfs fortalelse | Samtalen med Valdorf på Udsigten i tårnet | Han nævner tallet 4.000, før nogen har sagt det til ham. At termokanden er væk, ved alle |
 | 17 | Staldvagtens forklaring | Gry i De Kongelige Stalde ved Ridebanen | Mørkeberg gik sin faste runde ved midnat og sagde, at der falder en bombe kl. 10. Han havde noget, han ville afsløre |
 | 18 | Køkkenchefens forklaring | Bodil i Snapstinget | Termokanden blev fyldt kl. 21.30 med sort kaffe og to sukker, og kun Mørkeberg drak af den. Det, der kom i kaffen, kom senere |
 | 19 | Bentes runde | Bente, når hun får sine briller tilbage | Kl. 02.25 hørte hun gruset knase i gangen mod Bibliotekshaven og gik derind. Hun troede, det var en ræv |
-| 20 | Papirerne i springvandet | Bibliotekshaven: sejlersko-spor i det våde grus fra gangen hen bag Kierkegaard-statuen, og papirer på bunden af bassinet | Når springvandet springer, skylles den udrevne side og en våd tabel ud til kanten. Tabellen viser 4.000 job og er printet kl. 18.05 på printeren ved departementschefens kontor |
+| 20 | Papirerne i springvandet | Bibliotekshaven: sejlersko-spor i det våde grus fra gangen hen bag Kierkegaard-statuen, og papirer på bunden af bassinet | Springvandet er slukket om natten. Når det springer kl. 9, skylles den udrevne side og en våd tabel ud til kanten. Tabellen viser 4.000 job og er printet kl. 18.05 på printeren ved departementschefens kontor |
 | 21 | Mørkebergs gemte tabel | Sadelkammeret i De Kongelige Stalde, bag en hest, der først flytter sig for en gulerod | En kopi af tabellen med 4.000 job, printet i Reformministeriet i maj, med Mørkebergs håndskrift: "Kl. 10" |
-| 22 | Bådnøglen | Lommen i Valdorfs sejlerjakke | Nøglen til den røde båd med bådudlejningens flyder. Den passer i båden ved kajen |
+| 22 | Bådnøglen | Lommen i Valdorfs sejlerjakke | Nøglen til den røde båd med bådlaugets røde flyder. Den passer i båden ved kajen |
 
 Valdorfs rute natten til torsdag. Ingen så ham fra kl. 01.35 til 02.36:
 
-1. 01.35 Reformministeriet: kommer ind, og mailen er sat til kl. 01.41 (spor 9 og 15)
+1. 01.35 Reformministeriet: kommer ind, og mailen er sat til at sende sig selv kl. 02.05 (spor 9 og 15)
 2. 01.44 Den røde båd over kanalen til Slotspladsen (spor 12 og 13)
-3. 01.52 Folketingets dør: ind med gæstekort 17 (spor 3 og 7)
+3. 01.52 Folketingets dør: ind med pressekort 17 (spor 3 og 7)
 4. 02.00 Samtaleværelset: mødet, og noget kommer i kaffen (spor 5 og 6)
 5. 02.20 og 02.24 Trappen og døren: set af Kasper, ud med kort 17 (spor 3 og 11)
 6. 02.25 Bibliotekshaven: gemmer sig og taber papirerne (spor 19 og 20)
 7. 02.31 Båden tilbage: termokanden smides i vandet (spor 13 og 14)
-8. 02.36 Reformministeriet igen: printer og bliver set (spor 15)
+8. 02.36 Reformministeriet igen: printer og bliver set af Mogens (spor 15)
 
-Båden og gæstekortet lader Valdorf være væk fra ministeriet uden at blive logget. Spilleren kan selv sejle turen og tage tid.
+Båden og pressekortet lader Valdorf være væk fra ministeriet uden at blive logget. Spilleren kan selv sejle turen og tage tid.
 
 ## Rygsækken: ting at finde og bruge
 
-Ida samler ni ting i sin rygsæk, og hver af dem åbner en dør eller får en person til at tale. Mange af sporene kan hun kun nå, når hun har den rigtige ting. Fra start har hun en blyant, en notesbog, sin mobil med lommelygte og sit studiekort i rygsækken.
+Ida samler ti ting i sin rygsæk, og hver af dem åbner en dør eller får en person til at tale. Mange af sporene kan hun kun nå, når hun har den rigtige ting. Fra start har hun en blyant, en notesbog, sin mobil med lommelygte og sit studiekort i rygsækken.
 
 | Ting | Hvor den findes | Bruges på | Det giver |
 | --- | --- | --- | --- |
@@ -137,7 +140,8 @@ Ida samler ni ting i sin rygsæk, og hver af dem åbner en dør eller får en pe
 | Blyanten | I rygsækken fra start | Mørkebergs notesbog | Aftrykket af den udrevne side (spor 6) |
 | Kaspers gamle adgangskort | En vandpyt i Proviantpassagen | Døren til Kompaspartiets sekretariat. Kortet virker stadig, selv om han blev fyret for et år siden | Kopimaskinens log (spor 10) og 50.000-rapporten |
 | 50.000-rapporten | Glemt på kopimaskinen i sekretariatet | Ditte | Hun indrømmer sidebrevet og giver Ida et gæstekort til Finansministeriet (spor 9) |
-| Gulerødder | Bodil i Snapstinget | Hesten foran sadelkammeret | Mørkebergs gemte tabel (spor 21) |
+| Jonas' telefon | Glemt på bordet i Kompaspartiets mødelokale | Jonas | Beskeden fra Pernille (spor 8). Når Ida giver ham telefonen, indrømmer han lækket og bliver renset |
+| Gulerødder | Bodil i Snapstinget | Vega, hesten foran sadelkammeret | Mørkebergs gemte tabel (spor 21) |
 | Elefantordenen | Et etui i Riddersalen, lagt frem til en gallamiddag | Mogens Brask i Landstingssalen | Han får lov at holde den og bliver snakkesalig. Det var ham, der sendte Mørkeberg de rigtige tal, og koden til Valdorfs kontor er "året, hvor Danmark fik sin første grundlov" |
 | Koden 1849 | Grundlovsmontrerne i Vandrehallen, eller Ida ved det | Kodelåsen på Valdorfs kontor | Spor 15 og sejlerjakken |
 | Bådnøglen | Lommen i Valdorfs sejlerjakke | Den røde båd | Spor 22, termokanden på bunden (spor 14) og tidsprøven over kanalen |
@@ -153,8 +157,8 @@ Ida samler ni ting i sin rygsæk, og hver af dem åbner en dør eller får en pe
 Gåden spilles i fire akter fra kl. 06 til kl. 10. Uret går, når spilleren gør noget, og en ny akt åbner, når de vigtigste spor i den forrige er fundet. Man kan altså ikke gå glip af noget ved at gå rundt og kigge.
 
 1. **Fundet (kl. 06.00-07.00).** Ida kommer over Marmorbroen og ind over Ridebanen, hvor hestene bliver trukket ud i det blå morgenlys lige efter regnen. Gry fra staldene hilser og fortæller om Mørkebergs runde (spor 17). I Rigsdagsgården venter Bente: Mørkeberg er lige fundet. Kl. 06.20 kommer kommissær Hald, og kl. 06.30 kommer de sorte biler med statsministeren. Kommissæren vil anholde Kasper, og Bente beder Ida om hjælp. I Vandrehallen ligger Mørkeberg i sofaen ved Rigets midte (spor 1 og 2). Bente kan ikke læse adgangsloggen uden sine briller, og dem finder Ida på bænken i Bibliotekshaven. Så får hun loggen, Bentes forklaring og nøglen til Samtaleværelset (spor 3, 4, 5 og 19). Blyanten i rygsækken får aftrykket frem i Mørkebergs notesbog (spor 6).
-2. **De mistænkte (kl. 07.00-08.30).** I Proviantpassagen ligger Kaspers gamle kort i en vandpyt. Det åbner Kompaspartiets sekretariat, hvor kopimaskinens log og 50.000-rapporten ligger (spor 10). Snapstinget åbner til morgenmad: Her sidder Kasper, og Bodil fortæller om termokanden og giver Ida gulerødder (spor 18). Ditte holder morgenmøde med statsministeren i restauranten i tårnet og bytter sidebrevet og et gæstekort for rapporten. Jonas er i Kompaspartiets kontor, og Pernille står blandt journalisterne på Slotspladsen (spor 7 og 8). Valdorf kommer kl. 07.30 med ministerens papirer og er meget hjælpsom. Ditte og Jonas bliver renset, når deres hemmeligheder kommer frem.
-3. **Ud på Slotsholmen (kl. 08.30-09.30).** Kommissæren råber retsmedicinerens besked ud i Vandrehallen: Der var noget i kaffen. Gulerødderne får hesten til at flytte sig fra sadelkammeret (spor 21). Med gæstekortet kommer Ida ind i Finansministeriet (spor 9). I Riddersalen ligger Elefantordenen, og med den får hun Mogens til at tale og koden til Valdorfs kontor (spor 15). I sejlerjakken ligger bådnøglen (spor 22), og med båden finder hun termokanden og tager tid på turen (spor 12 og 14). På Højbro står Svend med sine billeder (spor 13). Kl. 09.00 springer springvandet i Bibliotekshaven, og papirerne skylles frem (spor 20). Kasper får kopimaskinens log at se og fortæller om manden på trappen (spor 11).
+2. **De mistænkte (kl. 07.00-08.30).** I Proviantpassagen ligger Kaspers gamle kort i en vandpyt. Det åbner Kompaspartiets sekretariat, hvor kopimaskinens log og 50.000-rapporten ligger (spor 10). Snapstinget åbner til morgenmad: Her sidder Kasper, og Bodil fortæller om termokanden og giver Ida gulerødder (spor 18). Ditte holder morgenmøde med statsministeren i restauranten i tårnet og bytter sidebrevet og et gæstekort for rapporten. Jonas har glemt sin telefon i Kompaspartiets mødelokale, og Pernille står blandt journalisterne på Slotspladsen (spor 7 og 8). Valdorf kommer kl. 07.30 med ministerens papirer og er meget hjælpsom. Ditte og Jonas bliver renset, når deres hemmeligheder kommer frem.
+3. **Ud på Slotsholmen (kl. 08.30-09.30).** Kommissæren råber retsmedicinerens besked ud i Vandrehallen: Der var noget i kaffen. Gulerødderne får hesten Vega til at flytte sig fra sadelkammeret (spor 21). Med gæstekortet kommer Ida ind i Finansministeriet (spor 9). I Riddersalen ligger Elefantordenen, og med den får hun Mogens til at tale og koden til Valdorfs kontor (spor 15). I sejlerjakken ligger bådnøglen (spor 22), og med båden finder hun termokanden og tager tid på turen (spor 12 og 14). På Højbro står Svend med sine billeder (spor 13). Kl. 09.00 springer springvandet i Bibliotekshaven, og papirerne skylles frem (spor 20). Kasper får kopimaskinens log at se og fortæller om manden på trappen (spor 11).
 4. **Afsløringen (kl. 09.30-10.00).** Valdorf foreslår en snak på Udsigten i tårnet. Deroppe, med hele Slotsholmen under sig, siger han noget, han ikke burde vide (spor 16). Kl. 10 i Landstingssalen rejser kommissæren sig for at sige, at Kasper er anholdt. Ida rækker hånden op.
 
 ## Slotsholmen i gåden
@@ -170,7 +174,7 @@ Gåden bruger 15 steder ude og inde, så spilleren krydser Slotsholmen flere gan
 | Samtaleværelset | Mødet kl. 2 | 1 |
 | Proviantpassagen | Kaspers vej ind om natten og hans tabte kort | 2 |
 | Snapstinget | Morgenmad, Kasper, køkkenchefen Bodil og gulerødderne (spor 18) | 2 |
-| Restauranten i tårnet | Dittes morgenmøde med statsministeren og byttet med 50.000-rapporten | 2 |
+| Restauranten i tårnet | Dittes morgenmøde med statsministeren og byttet med 50.000-rapporten. Tårnet åbner kl. 7 | 2 |
 | Christiansborg Slotsplads | Journalister og tv-vogne om natten, Pernilles radioindslag | 2, 3 |
 | Prins Jørgens Gård og Riddersalen | Indgangen til De Kongelige Repræsentationslokaler og Elefantordenen i sit etui | 3 |
 | Finansministeriet | Forhandlingslokalet, garderoben og referatet (spor 7 og 9) | 3 |
@@ -187,12 +191,12 @@ Kl. 10 i Landstingssalen sidder pressen, de fem mistænkte, Bente, Mogens og sta
 
 | Spørgsmål | Rigtigt svar | Spor der beviser det |
 | --- | --- | --- |
-| Hvem? | Henrik Valdorf | 11, 15, 16, 20 |
+| Hvem? | Henrik Valdorf | 11, 15, 16, 20, 22 |
 | Hvordan? | Noget i kaffen fra termokanden under mødet i Samtaleværelset | 1, 5, 14, 18 og retsmedicineren |
-| Hvordan kom han ind og ud? | Med båden over kanalen og Pernilles gæstekort | 3, 7, 12, 13, 19, 22 |
-| Hvorfor? | Mørkeberg ville sige kl. 10, at reformen giver 4.000 job og ikke 11.000 | 6, 9, 17, 21 |
+| Hvordan kom han ind og ud? | Med båden over kanalen og Pernilles pressekort | 3, 7, 12, 13, 19, 22 |
+| Hvorfor? | Mørkeberg ville sige kl. 10, at reformen giver 4.000 job og ikke 11.000 | 6, 9, 17, 20, 21 |
 
-Vælger spilleren forkert, protesterer den, det går ud over, med sit alibi ("Jeg var jo i radioen kl. 01.50!"). Efter tre forkerte svar fører kommissæren Kasper ud, Valdorf smiler høfligt, og spilleren kan prøve igen. Til sidst får man 1-3 stjerner efter, hvor få hjælp og forkerte svar man har brugt.
+Vælger spilleren forkert, protesterer den, det går ud over, med sit alibi ("Jeg var jo i radioen kl. 01.52!"). Efter tre forkerte svar fører kommissæren Kasper ud, Valdorf smiler høfligt, og spilleren kan prøve igen. Til sidst får man 1-3 stjerner efter, hvor få hjælp og forkerte svar man har brugt.
 
 Når beviserne er lagt frem, tilstår Valdorf roligt. Han har brugt hele sit arbejdsliv på regnestykker, der holder, og Mørkeberg ville ødelægge det hele med én sætning på et pressemøde.
 
@@ -208,7 +212,7 @@ Som et ekstra lag kan Ida rejse tilbage til besættelsen og få en oplysning af 
 
 **Hvad sker der i 1942.** Slotsholmen er stille, og tyske soldater går patrulje. Ida har ingen papirer, så hun må gå uden om dem. Ser de hende, bliver hun sendt tilbage til betjentstuen. Kongen kommer ridende forbi Ridebanen. Han taber en handske, Ida samler den op, og som tak fortæller han, at reservenøglen til hans gamle sadelskab hænger bag den tredje hestesko over staldporten.
 
-**Tilbage i 2026.** Nøglen hænger der stadig. Inde i sadelkammeret står kongens gamle sadelskab, og her har Mørkeberg gemt sin tabel (spor 21). Han kendte historien fra en bog om besættelsen. Med laget får rygsækken en tiende ting: kongens nøgle.
+**Tilbage i 2026.** Nøglen hænger der stadig. Inde i sadelkammeret står kongens gamle sadelskab, og her har Mørkeberg gemt sin tabel (spor 21). Han kendte historien fra en bog om besættelsen. Med laget får rygsækken en ellevte ting: kongens nøgle.
 
 **Nødplanen.** Laget er en brik, der kan sættes i eller tages ud. Uden 1942 er sadelskabet ikke låst, og Ida når tabellen med guleroden som beskrevet ovenfor. Med 1942 er skabet låst, og nøglen kommer fra kongen. Resten af gåden er den samme. Radioen kan stå i betjentstuen fra start som pynt, så den er klar, hvis laget bliver bygget.
 
@@ -260,13 +264,13 @@ De fleste rum blev bygget 15.-16. oktober 2026, og ved en gennemgang i spillet 1
 | Vandrehallen og trappen | To trappeløb med repos, gallerier, kamin og siddegrupper | Liget i sofaen, koppen og kommissæren |
 | Samtaleværelset | Grønne vægge, blå stole, runde borde, lysekrone og to døre fra Vandrehallen | Lås på døren, fodspor, kafferand og to stole trukket ud |
 | Landstingssalen | Stolerækker, talerstol og syv frontpladser | Skærm til pressemødet, pressefolk, Mogens og alle personerne til afsløringen |
-| Kompaspartiets gang | To kontorer, sekretariat med kopimaskine og mødelokale | Kortlæser på sekretariatets dør, 50.000-rapporten og Jonas |
+| Kompaspartiets gang | To kontorer, sekretariat med kopimaskine og mødelokale | Kortlæser på sekretariatets dør, 50.000-rapporten, Jonas og hans telefon i mødelokalet |
 | Snapstinget | Spiseborde, buffet og kaffeområde | Bodil, Kasper, morgenmad og gulerødderne |
 | Tårnet | Elevatorhal, restaurant ved 34 m og Udsigten ved 44 m | Ditte og statsministeren ved et bord. Valdorf på Udsigten |
 | Finansministeriet | Facade, foyer, garderobe, midtergang og forhandlingsrum | Kortlæser, referatet og adgangsloggen |
-| Slotspladsen | Presseområde med to tv-vogne, tre kameraer og arbejdslys | Pernille og journalister. Lys til natten |
+| Slotspladsen | Presseområde med to tv-vogne, tre kameraer og arbejdslys | Pernille, journalister og en radiovogn. Lys til natten |
 | Reformministeriet | Foyer, gang, departementschefens kontor, printerområde og åben sidedør | Kodelås på kontoret, knobtavle og sejlerjakke med bådnøgle |
-| De to kajer | Trapper, håndlister, afsatser og fortøjningsringe | Den røde båd ved den forkerte kaj og termokanden på bunden |
+| De to kajer | Trapper, håndlister, afsatser og fortøjningsringe | Den røde båd ved den forkerte kaj og termokanden på bunden ved en gammel fortøjningspæl midt i kanalen |
 | Bibliotekshaven | Grusstier, bede, bænke, Kierkegaard-statuen og springvandet | Brillerne på bænken, fodspor i gruset og papirerne i bassinet |
 | Staldene | Marmorstald med fire hvide heste og indgang fra Ridebanen | Sadelkammer med en hest foran, staldvagtens kontor og Gry. Kongens sadelskab, hvis 1942 bygges |
 | Proviantpassagen | Porten med brosten | Vandpytten med Kaspers kort |
@@ -331,7 +335,7 @@ Mordgåden bygges i det samme spil og erstatter børneudgaven. Den, der bygger, 
 
 **Historien som data**
 
-- Personer, steder, ting, spor, samtaler og faste begivenheder ligger i én samlet blok i filen, så teksterne kan rettes uden at røre resten af koden.
+- Personer, steder, ting, spor, samtaler og faste begivenheder ligger i filen mordgaade.js ved siden af spillet, så teksterne kan rettes uden at røre resten af koden. Programmet dev/tjek-mordgaade.js spiller gåden igennem på papiret med og uden 1942-laget og skriver hele manuskriptet ud som dev/MANUSKRIPT.md.
 - Alt, der ændrer sig under spillet, samles ét sted: akt, klokkeslæt, fundne spor, ting i rygsækken, ting givet væk, døre låst op og personer, der er renset. Det gemmes samlet i browseren under en ny nøgle, så gamle gemte data fra børneudgaven ikke blander sig.
 - Testgenveje, som spilleren ikke ser: spring til en akt, få alle spor og ting, og sæt uret.
 
@@ -360,7 +364,7 @@ Den sidste børneudgave er gemt i grenen boerneudgave i GitHub, så den altid ka
 
 Gåden kan bygges i ti trin, ét trin ad gangen som resten af spillet. Manuskriptet kommer først, så historien hænger sammen, før der bygges. Efter trin 5 kan første akt spilles.
 
-1. **Manuskript.** Alle replikker, sportekster, ting og afsløringen skrives færdige og tjekkes for huller i logikken, så hver ting kan findes, før den skal bruges.
+1. **Manuskript.** Alle replikker, sportekster, ting og afsløringen skrives færdige og tjekkes for huller i logikken, så hver ting kan findes, før den skal bruges (gjort 17. oktober 2026).
 2. **Oprydning og ramme.** Børnetingene fjernes, Ida med rygsæk og ny startskærm (gjort 16. oktober 2026). Derefter uret, en tom notesbog, rygsækken, den samlede tekstblok og gemning.
 3. **Låse og ting.** Låste døre med nøgle, kort og kode i de rum, der allerede er bygget. Ting, der kan samles op, ses på, gives væk og bruges.
 4. **Personer og samtaler.** Bente, kommissæren, statsministeren og Gry, "Giv" og "Vis" i samtalerne og åbningsscenen kl. 06.20-06.30.
@@ -384,7 +388,7 @@ Ni ting skal afklares. Forslaget står først i hvert punkt, og indtil Michel v�
 - **Hvor konkret er reformen?** Fremtidsreformen er bevidst uden emne. Jo mere den ligner en rigtig reform, jo tættere kommer gåden på rigtig politik.
 - **Hvad hedder ministeriet?** Reformministeriet, så ingen rigtig person kan forveksles med morderen. Finansministeriet optræder kun som bygning og mødested, og ingen af dets folk er med i historien.
 - **Hvor tæt på virkeligheden er rummene?** Rummene er bygget efter billeder, men planerne er anslag. Restauranten i tårnet holder normalt ikke åbent om morgenen, så Dittes morgenmøde er digtet. Det er ikke tjekket, om Bibliotekshaven er lukket om natten. I gåden står lågen fra gangen åben. Elefantordenen i etuiet og hoffourerens bog er også digtet.
-- **Én fil eller to?** Spillet er på 452 KB i én fil, efter at børnetingene er fjernet. Historien og 1942-laget kan også ligge i en fil ved siden af, som hentes, når spillet starter.
+- **Én fil eller to?** Besluttet: to. Spillet er på 452 KB. Historien og 1942-laget ligger i mordgaade.js ved siden af index.html, så de kan tjekkes for sig med dev/tjek-mordgaade.js.
 - **Hvad hedder spillet?** *Mord i Rigets midte* er et arbejdsnavn.
 
 ## Kilder
