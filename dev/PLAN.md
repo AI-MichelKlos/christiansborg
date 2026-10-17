@@ -250,4 +250,12 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
 - [x] Pænere heste (17. okt. 2026, efter ønske fra Michel)
   - Én fælles hestemodel (`buildHorse`) bruges på Ridebanen, i staldene og over staldenes døre: rundere krop med bryst og højere kryds, en nakke, der bliver smallere opad, med manke, et hoved med mule, næsebor, øjne, ører og pandelok, ben med knæ og hove og en fyldigere hale. De brune heste har en hvid blis.
   - Over staldenes døre er den øverste halvdel nu åben og mørk, og hesten læner hoved og hals ud over den nederste halvdør i stedet for at stikke hovedet gennem glasset. Hovederne drejer og nikker lidt.
-- [ ] Trin 6: akt 2.
+- [x] Trin 6: akt 2 (17. okt. 2026). Akt 2 kan nu spilles fra kortet "Akt 2 · De mistænkte" til kortet "Akt 3 · Ud på Slotsholmen".
+  - Nye personer med eget udseende: Bodil (kokkejakke, briller i panden, en kaffekande i hver hånd) ved kaffen i Snapstinget, Kasper (lyseblå skjorte, mørke rande under øjnene, et rundstykke i hånden) på en stol ved bordet nærmest døren i Snapstinget, Ditte (mørkegrå dragt, rød læbestift, en telefon i hver hånd) ved sit bord i restauranten i tårnet, Jonas (smal jakke, hvide sneakers, to telefoner) på Kompaspartiets kontor 1, Pernille (lang regnfrakke, presseskilt, termokop) ved radiovognen på Slotspladsen og Valdorf (gråt jakkesæt, gult slips, mappe, solbrun) i Vandrehallen fra kl. 07.30. Valdorf står i restauranten i akt 3.
+  - En person kan sidde (`dy` i `SPOT` og `sidder` i udseendet). Den, der sidder, drejer kun hovedet mod Ida. Står to personer tæt, svarer den nærmeste.
+  - Nye ting at undersøge: kopimaskinens skærm i sekretariatet (spor 10), whiteboardet på Kompaspartiets kontor, buffeten i Snapstinget og radiovognen på Slotspladsen. Rapporten, telefonen og Kaspers kort fra trin 3 og 5 bruges nu i samtalerne.
+  - Nye modeller: whiteboard med »4 mandater = 100 % af magten« og et hjerte, Kaspers tallerken med rundstykker og krummer, Dittes bord med bærbar, papirer og en kop med læbestift. Den ene tv-vogn på Slotspladsen er nu en radiovogn med åbne bagdøre og et oplyst bord.
+  - Rettet: stolene i restauranten vendte ryggen mod bordet, frisuren "bob" dækkede ansigtet fra siden, og statsministerens røde tørklæde var skjult inde i frakken.
+  - Når en akt skifter midt i en samtale, venter kortet med den nye akt, til samtalen er lukket, så man kan nå at læse svaret.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele akt 2 med alle fire mistænkte, Bodil, Valdorfs ankomst, rapporten til Ditte og telefonen til Jonas, til kortet for akt 3.
+- [ ] Trin 7: Riddersalen.
