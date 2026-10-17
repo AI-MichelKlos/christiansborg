@@ -124,6 +124,58 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 .inTowerView #towerFloors{top:78px}
 .inTowerView #guide,.inTowerView #poi,.inTowerView #map,.inTowerView #bMap,.inTowerView #bNight{display:none!important}
 @media(max-height:500px){.inTowerRooms #towerFloors{top:112px}}
+/* Murder mystery: clock, notebook, backpack, settings and the scene card */
+:root{--ts:1}
+body.storTekst{--ts:1.2}
+body.storTekst #poi p,body.storTekst .lead{font-size:18px}
+body.storTekst #poi b{font-size:23px}
+body.storTekst #toast{font-size:18px}
+body.storTekst .keys{font-size:16px}
+#ur{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 10px;min-width:56px;box-sizing:border-box;line-height:1.05;background:#fffdf6}
+#urKl{font:800 17px var(--display);letter-spacing:.02em}
+#urAkt{font:600 10px var(--body);letter-spacing:.06em;text-transform:uppercase;opacity:.72}
+.gd{position:fixed;inset:12px;margin:auto;box-sizing:border-box;width:min(720px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;border:2.5px solid var(--ink);border-radius:18px;padding:0 20px 20px;background:var(--paper);color:var(--ink);font:calc(15px * var(--ts))/1.5 var(--body);box-shadow:4px 5px 0 var(--ink)}
+.gd.gdSmall{width:min(420px,calc(100vw - 24px))}
+.gd::backdrop{background:rgba(20,24,23,.62)}
+.gdHead{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:2;background:var(--paper);padding:16px 0 10px}
+.gdHead h2{font:800 calc(26px * var(--ts))/1.1 var(--display);margin:0}
+.gdHead .btn{min-height:40px}
+.gdTabs{display:flex;gap:4px;margin:0 0 14px;border-bottom:2px solid var(--paper-2);position:sticky;top:66px;z-index:2;background:var(--paper)}
+.gdTabs button{font:700 calc(14.5px * var(--ts)) var(--body);padding:9px 12px;min-height:44px;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;background:none;color:var(--ink);cursor:pointer}
+.gdTabs button[aria-selected=true]{border-bottom-color:var(--leaf-deep)}
+.gdTabs button:focus-visible,.gdTing:focus-visible,.gdCheck input:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+.gdTom{margin:6px 0;padding:22px 18px;border:2px dashed #cbbd9c;border-radius:12px;color:#5d5368;text-align:center}
+.gdIntro{margin:12px 0 0;color:#5d5368;font-size:calc(13.5px * var(--ts))}
+.gdRow{display:grid;grid-template-columns:38px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--paper-2)}
+.gdRow h3{font:700 calc(16px * var(--ts))/1.3 var(--body);margin:2px 0 3px}
+.gdRow p{margin:0 0 4px}
+.gdRow ul{margin:6px 0 0;padding-left:18px}
+.gdNum{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--paper);font:800 15px var(--display)}
+.gdAv{background:var(--leaf);color:var(--ink);font-size:13px}
+.gdNy{background:#fff1b8;border-radius:8px;padding:6px 9px}
+.gdSted{color:#5d5368;font-size:calc(13px * var(--ts))}
+.gdTid{list-style:none;margin:10px 0 0;padding:0;border-left:3px solid var(--paper-2)}
+.gdTid li{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:7px 0 7px 12px;position:relative}
+.gdTid li::before{content:"";position:absolute;left:-7.5px;top:14px;width:9px;height:9px;border-radius:50%;background:var(--leaf);border:1.5px solid var(--ink)}
+.gdTid b{font:800 calc(15px * var(--ts))/1.5 var(--display)}
+.gdDetalje{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:start;padding:14px;margin:0 0 14px;background:var(--paper-2);border-radius:14px}
+.gdDetalje h3{font:800 calc(20px * var(--ts))/1.2 var(--display);margin:4px 0 6px}
+.gdDetalje p{margin:0 0 6px}
+.gdBig{width:96px;height:96px;border-radius:14px;background:#fff;border:2px solid var(--ink);display:grid;place-items:center}
+.gdBig svg{width:76px;height:76px}
+.gdMærke{display:inline-block;background:#ffd9b0;border:1.5px solid var(--ink);border-radius:999px;padding:2px 10px;font-weight:700;font-size:calc(13px * var(--ts))}
+.gdGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px}
+.gdTing{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px 9px;min-height:44px;border:2px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);font:600 calc(12.5px * var(--ts))/1.25 var(--body);text-align:center;cursor:pointer;position:relative;overflow-wrap:break-word;hyphens:manual}
+.gdTing svg{width:48px;height:48px}
+.gdTing[aria-pressed=true]{background:#ffe4bd;box-shadow:2px 3px 0 var(--ink)}
+.gdTing.tilbage::after{content:"Skal tilbage";position:absolute;top:-8px;right:-6px;background:#ffd9b0;border:1.5px solid var(--ink);border-radius:999px;padding:0 6px;font-size:10px;font-weight:700}
+.gdCheck{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:600}
+.gdCheck input{width:20px;height:20px;accent-color:var(--leaf-deep)}
+.gdFs{border:2px solid var(--paper-2);border-radius:12px;margin:8px 0 10px;padding:4px 14px 6px}
+.gdFs legend{font-weight:700;padding:0 6px}
+#setDone{margin-top:12px}
+#scene .card{max-width:560px}
+@media(max-width:600px){.gd{padding:0 14px 16px}.gdDetalje{grid-template-columns:72px 1fr;gap:12px;padding:12px}.gdBig{width:72px;height:72px}.gdBig svg{width:58px;height:58px}.gdGrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#ur{min-width:50px;padding:2px 7px}#urKl{font-size:15px}.gdTabs{top:62px}.gdTabs button{padding:9px 9px}}
 </style>
 </head>
 <body>
@@ -131,8 +183,11 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 
 <div id="hud" hidden>
   <div id="tools">
+    <div id="ur" class="sticker" role="status"><b id="urKl">06.00</b><span id="urAkt">Akt 1</span></div>
+    <button id="bNotes" class="sticker btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-keyshortcuts="N"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6z"/><path d="M6 3v18M9.5 8h5M9.5 12h5"/></svg><span>Notesbog</span></button>
+    <button id="bPack" class="sticker btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-keyshortcuts="R"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 10a6 6 0 0112 0v9a2 2 0 01-2 2H8a2 2 0 01-2-2z"/><path d="M9 6V4.5A1.5 1.5 0 0110.5 3h3A1.5 1.5 0 0115 4.5V6M9 21v-5h6v5"/></svg><span>Rygsæk</span></button>
     <button id="bMap" class="sticker btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
-    <button id="bNight" class="sticker btn" type="button" aria-pressed="false"><svg id="iNight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span id="tNight">Aften</span></button>
+    <button id="bNight" class="sticker btn" type="button" aria-pressed="false" hidden><svg id="iNight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span id="tNight">Aften</span></button>
     <button id="bSound" class="sticker btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="iWave" d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg><span>Lyd</span></button>
     <button id="bHelp" class="sticker btn" type="button" aria-label="Hjælp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-1 .7-1.6 1.2-1.6 2.4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg><span>Hjælp</span></button>
   </div>
@@ -150,7 +205,7 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
   <div class="card sticker">
     <div class="eyebrow">Christiansborg · en mordgåde i 3D</div>
     <h1 id="introTitle">Mord i Rigets midte</h1>
-    <p class="lead" id="introLead">En politiker er fundet død i Vandrehallen natten før et stort pressemøde. Gåden er under opbygning. Indtil videre kan du gå rundt på Slotsholmen og i de rum, hvor historien skal foregå.</p>
+    <p class="lead" id="introLead">Ida er 24 år og skriver speciale om Christiansborg. Torsdag kl. 6 skal hun møde nattevagten Bente. Samme nat er en politiker fundet død i Vandrehallen. Gåden er under opbygning: Uret, notesbogen og rygsækken virker, og personer og spor kommer i de næste trin.</p>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -159,19 +214,32 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
       <span><kbd>Mellemrum</kbd></span><span>Hop</span>
       <span><kbd>E</kbd></span><span>Gå ind, undersøg eller brug det, knappen viser</span>
       <span>Træk med musen</span><span>Kig dig omkring</span>
-      <span><kbd>N</kbd> <kbd>M</kbd></span><span>Dag eller aften · åbn oversigtskortet</span>
+      <span><kbd>N</kbd> <kbd>R</kbd></span><span>Notesbog · rygsæk</span>
+      <span><kbd>M</kbd></span><span>Oversigtskort</span>
     </div>
     <div class="keys" id="keysTouch" hidden>
       <span>Venstre tommel</span><span>Træk i den retning, du vil gå. Træk lidt for at gå langsomt. Slip for at stoppe</span>
       <span>Kamera</span><span>Følger roligt med. Træk på højre side for selv at kigge</span>
       <span>Hop-knappen</span><span>Hop</span>
       <span>Handlingsknappen</span><span>Tryk for at undersøge, tale eller bruge ting</span>
+      <span>Knapperne øverst</span><span>Uret, notesbogen, rygsækken og kortet</span>
     </div>
     <button class="go" id="goBtn" type="button" disabled>Henter Slotsholmen …</button>
+    <button class="go alt" id="newBtn" type="button" hidden>Nyt spil</button>
+    <button class="go alt" id="setBtn" type="button">Indstillinger</button>
     <p class="foot">Kortdata: © OpenStreetMap-bidragydere (ODbL). Mange huse er stadig enkle klodser. Placeringer og detaljer er forenklede.</p>
   </div>
 </div>
 
+
+<div id="scene" class="overlay" hidden>
+  <div class="card sticker" role="dialog" aria-modal="true" aria-labelledby="sceneTitle">
+    <div class="eyebrow" id="sceneEyebrow"></div>
+    <h2 id="sceneTitle"></h2>
+    <div id="sceneText"></div>
+    <button class="go" id="sceneBtn" type="button">Videre</button>
+  </div>
+</div>
 
 <script>
 setTimeout(function(){ if(!window.__gameReady){ var e=document.getElementById('loadErr'); if(e) e.hidden=false; var b=document.getElementById('goBtn'); if(b) b.textContent='Kunne ikke hente 3D-motoren'; } }, 12000);
@@ -179,6 +247,7 @@ setTimeout(function(){ if(!window.__gameReady){ var e=document.getElementById('l
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'three';
+import { MANUS } from './mordgaade.js';   // the whole story: people, places, things, clues and the reveal
 
 const $ = id => document.getElementById(id);
 const TESTMODE = /(^|[?&#])test\b/.test(location.search + location.hash);   // ?test shows the start-place shortcuts
@@ -3458,6 +3527,7 @@ function setEvening(v) {
   save();
 }
 function setSound(v) { soundOn = v; $('bSound').setAttribute('aria-pressed', String(v)); $('iWave').style.display = v ? '' : 'none'; save(); }
+function setTekst(v) { tekstStor = v; document.body.classList.toggle('storTekst', v); save(); }
 let toastTimer = 0;
 function toast(msg) { const t = $('toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; toastTimer = 3.4; }
 let curPoi = null, poiExpanded = false;
@@ -3485,17 +3555,19 @@ $('bSound').addEventListener('click', () => { setSound(!soundOn); if (soundOn) s
 $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
-  paused = true; keys.clear(); resetTouch();
+  paused = true; keys.clear(); resetTouch(); GAADE.startKnapper();
   if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
   else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';}
-  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk M for oversigtskortet. Personer, spor og ting kommer i de næste trin af gåden.'; }
+  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk N for notesbogen, R for rygsækken og M for oversigtskortet. Uret går, når Ida går og taler. Personer og spor kommer i de næste trin af gåden.'; }
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
   audio();
+  const first = !started, nyt = first && GAADE.begynd();   // Nyt spil or Fortsæt
   intro.hidden = true; hud.hidden = false; paused = false;
   if (!started) { started = true; startBlend = 0; shadowExtent(60); for (const h of HOOKS.start) h(); }
   canvas.focus();
+  if (first) GAADE.efterStart(nyt);
 });
 
 if (isTouch) { $('keysDesk').hidden = true; $('keysTouch').hidden = false; $('jump').hidden = false; $('touchHint').hidden = false; $('lookHint').hidden = false; }
@@ -3507,7 +3579,6 @@ window.addEventListener('keydown', e => {
   if (!started || paused) return;
   if (MOVE_KEYS.includes(e.code)) { keys.add(e.code); e.preventDefault(); }
   if (e.code === 'Space' && !e.repeat) jumpReq = true;
-  if (e.code === 'KeyN' && !e.repeat) setEvening(!evening);
   if (e.code === 'KeyM' && !e.repeat) FX.mapView?.open();
   if (e.code === 'KeyE' && !e.repeat) runAction();
   for (const h of HOOKS.key) h(e);
@@ -3640,11 +3711,10 @@ function updActions() {
 }
 
 // ======================================================================== STATE / STORAGE
-let soundOn = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
+let soundOn = true, tekstStor = false, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'mordIRigetsMidte';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ ev: evening, sound: soundOn, map: showMap })); } catch (e) {} }
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor })); } catch (e) {} }   // settings; the game itself is saved by GAADE
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
-HOOKS.start.push(() => setTimeout(() => !FX.interior?.on && toast('Velkommen til Slotsholmen. Kortet viser stederne i spillet.'), 1200));
 
 // ======================================================================== MAIN LOOP
 let last = performance.now(), clockT = 0, poiT = 0, mapT = 0;
@@ -5577,25 +5647,313 @@ const MAPVIEW=(()=>{
 })();
 FX.mapView=MAPVIEW;
 
+// ======================================================================== MURDER MYSTERY: state, clock, notebook, backpack and saving
+// The story lives in mordgaade.js (MANUS). This block keeps the player's progress in one object G, runs the clock,
+// shows the notebook (N) and the backpack (R), and saves G in the browser under its own key (GKEY).
+// Conditions and effects use the same small language as mordgaade.js (see the top of that file).
+const GAADE = (() => {
+  const M = MANUS, GKEY = 'mordIRigetsMidte.spil';
+  const START_POS = [-212, 0, 139], START_FACE = Math.atan2(24, -15);   // west end of Marmorbroen, facing Ridebanen
+  const toMin = s => { const [h, m] = String(s).split(/[.:]/).map(Number); return h * 60 + (m || 0); };
+  const kl = n => String(Math.floor(n / 60)).padStart(2, '0') + '.' + String(n % 60).padStart(2, '0');
+  // Night times sort after the evening before: 21.30 < 23.50 < 00.15 < 05.50. "02-03" means some time between 2 and 3.
+  const natSort = s => { const h = parseInt(s, 10), m = String(s).includes('-') ? 59 : parseInt(String(s).split('.')[1], 10) || 0; return (h < 12 ? h + 24 : h) * 60 + m; };
+  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], hint: 0, forkert: 0, lag1942: !!M.lag1942.aktiv, pos: null, face: 0 });
+  function hent() {
+    try { const g = JSON.parse(localStorage.getItem(GKEY) || 'null'); if (g && g.v === 1 && Array.isArray(g.spor) && Array.isArray(g.ting)) return Object.assign(ny(), g); } catch (e) {}
+    return null;
+  }
+  let G = ny(), gemt = hent(), valg = gemt ? 'fortsaet' : 'nyt';
+  function gem() { if (!started) return; try { localStorage.setItem(GKEY, JSON.stringify(G)); gemt = G; } catch (e) {} }
+  addEventListener('pagehide', gem);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) gem(); });
+
+  // ---- conditions and effects
+  function term(t) {
+    const neg = t[0] === '!'; if (neg) t = t.slice(1);
+    let v = false, m;
+    if (t === 'lag1942') v = G.lag1942;
+    else if ((m = t.match(/^akt(>=|<=|==)(\d)$/))) v = m[1] === '>=' ? G.akt >= +m[2] : m[1] === '<=' ? G.akt <= +m[2] : G.akt === +m[2];
+    else if ((m = t.match(/^(spor|ting|flag):(\w+)$/))) v = m[1] === 'spor' ? G.spor.includes(+m[2]) : G[m[1]].includes(m[2]);
+    // "sted:x" is answered by the parts of the game that know where Ida stands; here it is false.
+    return neg ? !v : v;
+  }
+  const ok = list => (list || []).every(item => String(item).split('|').some(term));
+  function giv(list) {
+    for (const raw of list || []) {
+      const m = String(raw).match(/^([+-]?)(spor|ting|flag|akt):(\w+)$/); if (!m) continue;
+      const [, sign, kind, val] = m;
+      if (kind === 'spor') { const n = +val; if (M.spor[n] && !G.spor.includes(n)) { G.spor.push(n); toast('Nyt spor i notesbogen: ' + M.spor[n].titel); } }
+      else if (kind === 'akt') G.akt = Math.max(G.akt, +val);
+      else if (kind === 'ting') {
+        if (sign === '-') { const i = G.ting.indexOf(val); if (i >= 0) { G.ting.splice(i, 1); if (!G.givet.includes(val)) G.givet.push(val); } }
+        else if (M.ting[val] && !G.ting.includes(val)) { G.ting.push(val); toast('I rygsækken: ' + M.ting[val].navn); }
+      } else if (sign === '-') G.flag = G.flag.filter(f => f !== val);
+      else if (!G.flag.includes(val)) G.flag.push(val);
+    }
+    tjekAkt(); visUr(); gem();
+  }
+
+  // ---- acts and the clock. The clock waits 5 minutes before the end of an act until the next act opens.
+  const akt = () => M.akter[G.akt - 1];
+  const loft = () => toMin(akt().til) - 5;
+  function tjekAkt() {
+    let skift = false;
+    while (G.akt < M.akter.length && ok(M.akter[G.akt].kraever)) { G.akt++; skift = true; }
+    G.min = Math.max(G.min, toMin(akt().fra));
+    if (skift && started) { gem(); scene({ eyebrow: `Akt ${akt().nr} · kl. ${akt().fra}`, title: akt().navn, lines: [akt().intro] }); }
+  }
+  function tid(minutter) { const f = G.min; G.min = Math.max(G.min, Math.min(G.min + minutter, loft())); if (G.min !== f) visUr(); }
+  function visUr() {
+    $('urKl').textContent = kl(G.min); $('urAkt').textContent = 'Akt ' + G.akt;
+    $('ur').title = `Akt ${G.akt}: ${akt().navn}`; $('ur').setAttribute('aria-label', `Klokken er ${kl(G.min)}. Akt ${G.akt}: ${akt().navn}`);
+  }
+  const ude = () => !FX.interior?.on && !FX.tower?.on && !TOWER.busy && !MYBOAT.on;
+  const sidst = new THREE.Vector3(); let harSidst = false, udeT = 0, gemT = 20;
+  HOOKS.frame.push(dt => {
+    if (!started || paused) { harSidst = false; return; }
+    if (harSidst) {
+      const d = Math.hypot(P.pos.x - sidst.x, P.pos.z - sidst.z);
+      if (d < 5) { G.meter += d; const n = Math.floor(G.meter / M.ur.meterPrMinut); if (n) { G.meter -= n * M.ur.meterPrMinut; tid(n); } }   // larger jumps are doors and lifts
+    }
+    sidst.copy(P.pos); harSidst = true;
+    // Fortsæt puts her back where she last walked outdoors (outside the door, if she was inside).
+    udeT -= dt; if (udeT < 0) { udeT = 1; if (ude()) { G.pos = [P.pos.x, P.pos.y, P.pos.z].map(v => +v.toFixed(2)); G.face = +P.face.toFixed(3); } }
+    gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
+  });
+
+  // ---- a card in the middle of the screen: the opening and each new act
+  let sceneWas = false;
+  function scene(o) {
+    $('sceneEyebrow').textContent = o.eyebrow; $('sceneTitle').textContent = o.title;
+    $('sceneText').replaceChildren(...o.lines.map(t => { const p = document.createElement('p'); p.className = 'lead'; p.textContent = t; return p; }));
+    $('sceneBtn').textContent = o.btn || 'Videre';
+    const aaben = [notes, pack].find(d => d.open);
+    if ($('scene').hidden) sceneWas = aaben ? dWas : paused;
+    if (aaben) lukStille(aaben);
+    paused = true; keys.clear(); resetTouch(); P.vel.set(0, 0, 0);
+    $('scene').hidden = false; $('sceneBtn').focus();
+  }
+  $('sceneBtn').addEventListener('click', () => { $('scene').hidden = true; paused = sceneWas; canvas.focus(); });
+
+  // ---- start: Nyt spil or Fortsæt
+  function begynd() {
+    const nyt = valg === 'nyt' || !gemt;
+    G = nyt ? ny() : Object.assign(ny(), gemt);
+    const p = (!nyt && G.pos) || START_POS;
+    P.pos.set(p[0], p[1] || 0, p[2]); P.vel.set(0, 0, 0); P.face = nyt || !G.pos ? START_FACE : G.face || 0;
+    cam.yaw = P.face + Math.PI; camInit = false; kid.root.position.copy(P.pos); kid.root.rotation.y = P.face;
+    tjekAkt(); visUr();
+    return nyt;
+  }
+  function efterStart(nyt) {
+    gem();
+    if (nyt && !TESTMODE) scene({ eyebrow: `Akt 1 · ${akt().navn} · kl. ${kl(G.min)}`, title: 'Torsdag morgen', lines: M.start.replikker.map(r => r[1]), btn: 'Gå over broen' });
+    else if (!nyt) setTimeout(() => toast(`Velkommen tilbage. Klokken er ${kl(G.min)}.`), 900);
+  }
+  function startKnapper() {
+    const n = $('newBtn');
+    n.hidden = !gemt || started; n.dataset.sikker = ''; n.textContent = 'Nyt spil';
+    if (!started) goBtn.textContent = gemt ? `Fortsæt · kl. ${kl(gemt.min)}, akt ${gemt.akt}` : 'Nyt spil';
+  }
+  $('newBtn').addEventListener('click', () => {
+    const n = $('newBtn');
+    if (n.dataset.sikker !== '1') { n.dataset.sikker = '1'; n.textContent = 'Start forfra? Tryk igen'; return; }
+    valg = 'nyt'; goBtn.click();
+  });
+
+  // ---- dialogs: notebook, backpack and settings
+  function dialog(id, title, small) {
+    const d = document.createElement('dialog'); d.id = id; d.className = 'gd' + (small ? ' gdSmall' : ''); d.setAttribute('aria-labelledby', id + 'Title');
+    d.innerHTML = `<header class="gdHead"><h2 id="${id}Title">${title}</h2><button class="sticker btn gdClose" type="button">Luk</button></header><div class="gdBody"></div>`;
+    document.body.appendChild(d);
+    if (small) d.querySelector('.gdClose').addEventListener('click', () => d.close());
+    d.addEventListener('pointerdown', e => e.stopPropagation()); d.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+    return d;
+  }
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  // Only one of the notebook and the backpack is open at a time. Swapping between them keeps the pause from before.
+  // The pause is given back at once when a dialog closes; the browser's own close event can come a frame later.
+  let dWas = false;
+  function aabn(d) {
+    if (!started || !$('scene').hidden || d.open) return;
+    const anden = [notes, pack].find(o => o.open);
+    if (anden) lukStille(anden); else dWas = paused;
+    paused = true; keys.clear(); resetTouch(); P.vel.set(0, 0, 0); jumpReq = false;
+    d.lukket = false; d.showModal(); d.querySelector('.gdClose').focus();
+    $(d === notes ? 'bNotes' : 'bPack').setAttribute('aria-expanded', 'true');
+  }
+  function lukStille(d) { d.lukket = true; d.close(); $(d === notes ? 'bNotes' : 'bPack').setAttribute('aria-expanded', 'false'); }
+  function efterLuk(d) {
+    if (d.lukket) return;
+    d.lukket = true; $(d === notes ? 'bNotes' : 'bPack').setAttribute('aria-expanded', 'false');
+    paused = dWas; keys.clear(); resetTouch(); if (!intro.hidden) goBtn.focus(); else canvas.focus();
+  }
+  function lukD(d) { if (d.open) d.close(); efterLuk(d); }
+  function luk(d) {
+    d.addEventListener('keydown', e => {
+      e.stopPropagation(); if (e.repeat) return;
+      if (e.code === 'KeyN') { e.preventDefault(); if (d === notes) lukD(d); else aabnNoter(); }
+      if (e.code === 'KeyR') { e.preventDefault(); if (d === pack) lukD(d); else aabnRygsaek(); }
+    });
+    d.addEventListener('cancel', () => efterLuk(d));
+    d.addEventListener('close', () => efterLuk(d));
+    d.querySelector('.gdClose').addEventListener('click', () => lukD(d));
+  }
+
+  // Notebook: Spor, Personer and Tidslinje. It fills itself from G.
+  const notes = dialog('notesDialog', 'Notesbog');
+  const tabs = el('div', 'gdTabs'); tabs.setAttribute('role', 'tablist'); notes.querySelector('.gdHead').after(tabs);
+  const FANER = [['spor', 'Spor'], ['personer', 'Personer'], ['tid', 'Tidslinje']];
+  let fane = 'spor';
+  for (const [id, navn] of FANER) {
+    const b = el('button', '', navn); b.type = 'button'; b.dataset.fane = id; b.setAttribute('role', 'tab');
+    b.addEventListener('click', () => { fane = id; visNoter(); });
+    tabs.appendChild(b);
+  }
+  tabs.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const i = FANER.findIndex(f => f[0] === fane), j = (i + (e.key === 'ArrowRight' ? 1 : FANER.length - 1)) % FANER.length;
+    fane = FANER[j][0]; visNoter(); tabs.querySelector(`[data-fane="${fane}"]`).focus();
+  });
+  const personer = () => G.moedt.filter(id => M.personer[id] && (!M.personer[id].lag1942 || G.lag1942));
+  const tidslinje = () => M.tidslinje.filter(e => ok(e.kraever)).sort((a, b) => natSort(a.kl) - natSort(b.kl));
+  function visNoter() {
+    const tal = { spor: G.spor.length, personer: personer().length, tid: tidslinje().length };
+    for (const b of tabs.children) { const on = b.dataset.fane === fane; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; b.textContent = FANER.find(f => f[0] === b.dataset.fane)[1] + ` (${tal[b.dataset.fane]})`; }
+    const body = notes.querySelector('.gdBody'); body.replaceChildren(); body.setAttribute('role', 'tabpanel');
+    if (fane === 'spor') {
+      if (!G.spor.length) body.appendChild(el('p', 'gdTom', 'Ingen spor endnu. Undersøg ting, og tal med folk. Det, du finder, skriver Ida her.'));
+      for (const n of [...G.spor].sort((a, b) => a - b)) {
+        const s = M.spor[n], row = el('article', 'gdRow'), txt = el('div');
+        row.append(el('div', 'gdNum', String(n)), txt);
+        txt.append(el('h3', '', s.titel), el('p', '', s.tekst));
+        if (s.opdatering && ok(s.opdatering.kraever)) txt.appendChild(el('p', 'gdNy', s.opdatering.tekst));
+        if (M.steder[s.sted]) txt.appendChild(el('p', 'gdSted', M.steder[s.sted].navn));
+        body.appendChild(row);
+      }
+    } else if (fane === 'personer') {
+      const ps = personer();
+      if (!ps.length) body.appendChild(el('p', 'gdTom', 'Ida har ikke talt med nogen endnu. Hver person, hun møder, får en side her.'));
+      for (const id of ps) {
+        const p = M.personer[id], row = el('article', 'gdRow'), txt = el('div');
+        const init = p.navn.split(' ').filter(w => /^[A-ZÆØÅ]/.test(w)).map(w => w[0]).slice(0, 2).join('');
+        row.append(el('div', 'gdNum gdAv', init), txt);
+        txt.append(el('h3', '', p.alder ? `${p.navn}, ${p.alder}` : p.navn), el('p', 'gdSted', p.rolle));
+        const ul = el('ul'); for (const n of p.noter || []) if (ok(n.kraever)) ul.appendChild(el('li', '', n.tekst));
+        if (ul.children.length) txt.appendChild(ul);
+        body.appendChild(row);
+      }
+    } else {
+      body.appendChild(el('p', 'gdIntro', 'Natten til torsdag. Ida skriver det ind, efterhånden som hun får det at vide.'));
+      const ol = el('ol', 'gdTid');
+      for (const e of tidslinje()) { const li = el('li'); li.append(el('b', '', e.kl), el('span', '', e.tekst)); ol.appendChild(li); }
+      body.appendChild(ol);
+    }
+  }
+  luk(notes);
+  function aabnNoter() { visNoter(); aabn(notes); }
+
+  // Backpack: the things Ida carries, as small pictures. A thing can be looked at here; giving and using come later.
+  const IKON = {
+    blyant: '<path d="M12 31L32 11l6 6-20 20z" fill="#f2c94c"/><path d="M12 31l6 6-9 3z" fill="#f6e3c3"/><path d="M32 11l3-3 6 6-3 3z" fill="#e8a0a8"/><path d="M9 40l1.5-4.5 3 3z" fill="#2a2238"/>',
+    notesbog: '<rect x="11" y="7" width="27" height="34" rx="3" fill="#3d6b56"/><path d="M15 7v34"/><path d="M33 7v34" stroke="#d9c58a" stroke-width="2.6"/>',
+    mobil: '<rect x="15" y="5" width="18" height="38" rx="4" fill="#2f3542"/><rect x="18" y="10" width="12" height="24" rx="1" fill="#cfe3f3" stroke="none"/><circle cx="24" cy="38.5" r="1.6" fill="#cfe3f3" stroke="none"/>',
+    studiekort: '<rect x="6" y="12" width="36" height="24" rx="3" fill="#fff"/><path d="M6 17h36" stroke="#b5372f" stroke-width="4"/><rect x="10" y="21" width="9" height="11" rx="1" fill="#cfd8e3"/><path d="M23 24h14M23 29h10"/>',
+    briller: '<circle cx="15" cy="25" r="8" fill="#eaf4fb" stroke="#c0392b" stroke-width="3"/><circle cx="33" cy="25" r="8" fill="#eaf4fb" stroke="#c0392b" stroke-width="3"/><path d="M23 24q1-3 2 0" stroke="#c0392b" stroke-width="2.6"/><path d="M7 24l-3-4M41 24l3-4" stroke="#c0392b" stroke-width="2.6"/><path d="M4 20q20 26 40 0" stroke="#8e9bb3" stroke-dasharray="2 3"/>',
+    noegle_samtale: '<circle cx="14" cy="24" r="8" fill="#d4a64a"/><circle cx="14" cy="24" r="3" fill="#fffaf0"/><path d="M22 22h20v4H22z" fill="#d4a64a"/><path d="M33 26v6h3v-6M38 26v4h3v-4" fill="#d4a64a"/>',
+    kaspers_kort: '<rect x="6" y="12" width="36" height="24" rx="3" fill="#8fb3d9"/><rect x="11" y="20" width="8" height="7" rx="1" fill="#e5c07b"/><path d="M23 24h14M23 29h9"/><path d="M38 5q3 4 0 6-3-2 0-6zM31 3q2 3 0 4-2-1 0-4z" fill="#5aa0d8" stroke-width="1.6"/>',
+    rapport_50000: '<path d="M12 6h18l8 8v28H12z" fill="#fff"/><path d="M30 6v8h8"/><rect x="16" y="18" width="18" height="5" fill="#ec8f33"/><path d="M16 29h18M16 34h13"/>',
+    gaestekort_fm: '<rect x="8" y="10" width="32" height="30" rx="3" fill="#fff"/><path d="M20 10v-4h8v4"/><path d="M8 16h32" stroke="#b5372f" stroke-width="4"/><text x="24" y="34" text-anchor="middle" font-size="13" font-weight="700" font-family="system-ui,sans-serif" fill="#2a2238" stroke="none">31</text>',
+    jonas_telefon: '<rect x="15" y="5" width="18" height="38" rx="4" fill="#b5372f"/><rect x="18" y="10" width="12" height="24" rx="1" fill="#2f3542" stroke="none"/><path d="M24 15l1.6 5.4L31 22l-5.4 1.6L24 29l-1.6-5.4L17 22l5.4-1.6z" fill="#f2c94c" stroke="none"/>',
+    guleroedder: '<path d="M10 40l9-20 5 4z" fill="#ec8f33"/><path d="M20 42l6-22 5 3z" fill="#f09a44"/><path d="M30 40l4-21 5 3z" fill="#ec8f33"/><path d="M21 21l-2-7M23 22l3-7M28 21l-1-7M31 22l4-6M36 20l1-7M38 21l5-5" stroke="#5a8f3a" stroke-width="2.6"/>',
+    elefantorden: '<path d="M16 4l8 8 8-8" stroke="#5b8fc7" stroke-width="4"/><ellipse cx="21" cy="29" rx="11" ry="8" fill="#e2b84b"/><circle cx="32" cy="25" r="6" fill="#e2b84b"/><path d="M37 27q5 4 1 10" fill="none" stroke-width="3"/><path d="M14 35v6M19 36v6M25 36v6M29 35v6" stroke-width="3"/><path d="M15 21v-6h3v2h2v-2h3v2h2v-2h3v6z" fill="#fffaf0"/><circle cx="33" cy="23" r="1" fill="#2a2238"/>',
+    baadnoegle: '<rect x="5" y="9" width="13" height="22" rx="6" fill="#d9534f"/><path d="M11 31v4h8"/><circle cx="23" cy="35" r="4.5" fill="#c7ced6"/><path d="M27 35h15v3M37 35v5" fill="none"/>',
+    handske: '<path d="M14 42V24l-4-7 3-2 5 6V9a2 2 0 014 0v10V7a2 2 0 014 0v12V9a2 2 0 014 0v12-8a2 2 0 014 0v18q0 7-4 11z" fill="#8a5a3b"/>',
+    kongens_noegle: '<path d="M8 14l3 6h10l3-6-5 3-3-5-3 5z" fill="#e2b84b"/><circle cx="16" cy="26" r="6" fill="#e2b84b"/><circle cx="16" cy="26" r="2.2" fill="#fffaf0"/><path d="M22 25h18v3H22zM34 28v5h3v-5" fill="#e2b84b"/>',
+  };
+  const ikon = id => `<svg viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="#2a2238" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">${IKON[id] || '<rect x="10" y="10" width="28" height="28" rx="4" fill="#f1e7d2"/>'}</svg>`;
+  const pack = dialog('packDialog', 'Rygsæk');
+  let valgt = null;
+  function visRygsaek() {
+    const body = pack.querySelector('.gdBody'); body.replaceChildren();
+    if (!G.ting.includes(valgt)) valgt = G.ting[0] || null;
+    if (valgt) {
+      const t = M.ting[valgt], d = el('div', 'gdDetalje'), txt = el('div');
+      const pic = el('div', 'gdBig'); pic.innerHTML = ikon(valgt);
+      txt.append(el('h3', '', t.navn), el('p', '', t.tekst));
+      if (t.tilbage) txt.appendChild(el('p', 'gdMærke', 'Skal tilbage før kl. 10'));
+      d.append(pic, txt); body.appendChild(d);
+    }
+    const grid = el('div', 'gdGrid'); grid.setAttribute('role', 'group'); grid.setAttribute('aria-label', 'Ting i rygsækken');
+    for (const id of G.ting) {
+      const t = M.ting[id]; if (!t) continue;
+      const b = el('button', 'gdTing'); b.type = 'button'; b.setAttribute('aria-pressed', String(id === valgt)); b.dataset.ting = id;
+      b.innerHTML = ikon(id); b.appendChild(el('span', '', t.navn)); if (t.tilbage) b.classList.add('tilbage');
+      b.addEventListener('click', () => { valgt = id; visRygsaek(); pack.querySelector(`[data-ting="${id}"]`)?.focus(); });
+      grid.appendChild(b);
+    }
+    body.appendChild(grid);
+    body.appendChild(el('p', 'gdIntro', G.givet.length ? 'Givet væk: ' + G.givet.map(id => M.ting[id]?.navn || id).join(', ') + '.' : 'Ting, Ida finder, lægger hun her. Senere kan hun vise dem frem, give dem væk og bruge dem på døre.'));
+  }
+  luk(pack);
+  function aabnRygsaek() { visRygsaek(); aabn(pack); }
+
+  // Settings: sound, text size and the small map. Also reachable from the start card and the help card.
+  const sets = dialog('setDialog', 'Indstillinger', true);
+  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><button class="go" id="setDone" type="button">Færdig</button>';
+  sets.addEventListener('keydown', e => e.stopPropagation());
+  sets.addEventListener('close', () => { if (!intro.hidden) $('setBtn').focus(); else canvas.focus(); });
+  $('setDone').addEventListener('click', () => sets.close());
+  $('setSound').addEventListener('change', e => setSound(e.target.checked));
+  $('setMini').addEventListener('change', e => setMapVisible(e.target.checked));
+  for (const r of sets.querySelectorAll('[name=setTs]')) r.addEventListener('change', e => setTekst(e.target.value === 'stor'));
+  $('setBtn').addEventListener('click', () => {
+    $('setSound').checked = soundOn; $('setMini').checked = showMap;
+    for (const r of sets.querySelectorAll('[name=setTs]')) r.checked = (r.value === 'stor') === tekstStor;
+    sets.showModal(); $('setSound').focus();
+  });
+
+  $('bNotes').addEventListener('click', aabnNoter);
+  $('bPack').addEventListener('click', aabnRygsaek);
+  HOOKS.key.push(e => {
+    if (e.code === 'KeyN' && !e.repeat) aabnNoter();
+    if (e.code === 'KeyR' && !e.repeat) aabnRygsaek();
+  });
+  visUr(); startKnapper();
+
+  // Test shortcuts the player does not see: __cb.gaade.giv(['spor:3']), .akt(3), .saetKl('08.15'), .alt(), .nulstil()
+  const test = {
+    get G() { return G; }, get paused() { return paused; }, M, ok, giv, tid, kl, gem, scene,
+    akt: n => { G.akt = Math.max(1, Math.min(M.akter.length, n)); G.min = toMin(akt().fra); visUr(); gem(); },
+    saetKl: s => { G.min = toMin(s); visUr(); },
+    moed: (...ids) => { for (const id of ids) if (!G.moedt.includes(id)) G.moedt.push(id); gem(); },
+    alt: () => { giv([...Object.keys(M.spor).map(n => 'spor:' + n), ...Object.keys(M.ting).filter(id => !M.ting[id].lag1942).map(id => '+ting:' + id)]); test.moed(...Object.keys(M.personer).filter(id => !M.personer[id].lag1942)); },
+    nulstil: () => { try { localStorage.removeItem(GKEY); } catch (e) {} gemt = null; valg = 'nyt'; G = ny(); visUr(); startKnapper(); },
+  };
+  return { begynd, efterStart, startKnapper, giv, ok, tid, scene, test, get G() { return G; } };
+})();
+
 // ======================================================================== BOOT
 function boot(data) {
   data = data || {};
   const st = load();
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
-  setEvening(typeof data.evening === 'boolean' ? data.evening : !!st.ev); ev = evening ? 1 : 0;
+  setTekst(!!st.tekst);
+  setEvening(typeof data.evening === 'boolean' ? data.evening : false); ev = evening ? 1 : 0;   // the clock will set the light later
   setMapVisible(showMap); sizeMap();
   if (data.pos) { P.pos.fromArray(data.pos); if (typeof data.face === 'number') P.face = data.face; }
   cam.yaw = P.face + Math.PI;
   kid.root.position.copy(P.pos); kid.root.rotation.y = P.face;
   window.__gameReady = true;
-  goBtn.disabled = false; goBtn.textContent = 'Gå ud på Slotsholmen';
+  goBtn.disabled = false; GAADE.startKnapper();
   if (data.started) { intro.hidden = true; hud.hidden = false; started = true; paused = false; shadowExtent(60); startBlend = 1; }
   requestAnimationFrame(t => { last = t; frame(t); });
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

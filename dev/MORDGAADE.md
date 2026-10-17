@@ -365,7 +365,7 @@ Den sidste børneudgave er gemt i grenen boerneudgave i GitHub, så den altid ka
 Gåden kan bygges i ti trin, ét trin ad gangen som resten af spillet. Manuskriptet kommer først, så historien hænger sammen, før der bygges. Efter trin 5 kan første akt spilles.
 
 1. **Manuskript.** Alle replikker, sportekster, ting og afsløringen skrives færdige og tjekkes for huller i logikken, så hver ting kan findes, før den skal bruges (gjort 17. oktober 2026).
-2. **Oprydning og ramme.** Børnetingene fjernes, Ida med rygsæk og ny startskærm (gjort 16. oktober 2026). Derefter uret, en tom notesbog, rygsækken, den samlede tekstblok og gemning.
+2. **Oprydning og ramme.** Børnetingene fjernes, Ida med rygsæk og ny startskærm (gjort 16. oktober 2026). Derefter uret, en tom notesbog, rygsækken, den samlede tekstblok og gemning (gjort 17. oktober 2026).
 3. **Låse og ting.** Låste døre med nøgle, kort og kode i de rum, der allerede er bygget. Ting, der kan samles op, ses på, gives væk og bruges.
 4. **Personer og samtaler.** Bente, kommissæren, statsministeren og Gry, "Giv" og "Vis" i samtalerne og åbningsscenen kl. 06.20-06.30.
 5. **Akt 1.** Liget, koppen, brillerne i Bibliotekshaven, nøglen, sporene i Samtaleværelset, blyanten på notesbogen og undersøg-visningen. Nu kan akt 1 spilles.

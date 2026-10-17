@@ -212,4 +212,13 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Planens nye valg er fulgt: pressekort 17, Pernille i radioen kl. 01.45-02.05, bådlauget, regn kl. 22-02.30, termokanden ved fortøjningspælen, notesbogen under sofaen, Jonas' telefon i mødelokalet, fortalelsen om 4.000 og hesten Vega.
   - Huller, som tjekket fandt, er rettet i både manuskript og plan: mailen sender sig selv kl. 02.05, Kaspers kort går ud kl. 02.22, Valdorf lægger pressekortet tilbage, springvandet er slukket til kl. 9, tårnet åbner kl. 7, kilen i sidedøren og bemærkningen på gangen kl. 21.45. Ny bifigur: hoffourer Viggo Aagaard.
   - Skal bygges ud over det eksisterende: sadelkammeret, Riddersalen, fortøjningspælen i kanalen og de to 1942-steder.
-- [ ] Resten af trin 2 følger efter planen.
+- [x] Resten af trin 2: ramme (17. okt. 2026)
+  - Spillet henter historien fra `mordgaade.js` (`import { MANUS }`). Blokken `GAADE` i `index.html` holder hele spillerens tilstand i ét objekt: akt, klokkeslæt, spor, ting, ting givet væk, døre låst op, personer mødt og renset, flag, hint, forkerte svar og position. Betingelser og virkninger bruger samme lille sprog som manuskriptet (`GAADE.ok`, `GAADE.giv`).
+  - Uret øverst starter kl. 06.00 og går 1 minut for hver 80 m, Ida går (`GAADE.tid` bruges senere til samtaler). Det står stille 5 minutter før aktens slut, til den næste akt åbner. En ny akt åbner af sig selv, når dens krav er opfyldt, og viser et kort med navn og klokkeslæt.
+  - Notesbogen (N eller knappen) har fanerne Spor, Personer og Tidslinje og fylder sig selv ud fra tilstanden. Rygsækken (R eller knappen) viser tingene som små tegninger med navn og tekst. Elefantordenen er mærket "Skal tilbage". At give og bruge ting kommer med samtalerne.
+  - Gemning under nøglen `mordIRigetsMidte.spil`: ved hvert nyt spor, hver ny ting og hvert aktskift, hvert 20. sekund og når siden lukkes. Fortsæt sætter Ida, hvor hun sidst gik udenfor (uden for døren, hvis hun var inde). Indstillinger (lyd, tekststørrelse, minikort) gemmes for sig under `mordIRigetsMidte`.
+  - Startskærm: Nyt spil eller Fortsæt med klokkeslæt og akt, Nyt spil (spørger én gang til) og Indstillinger. Nyt spil starter på Marmorbroen kl. 06.00 med en kort tekst fra manuskriptets start. Med `?test` springes teksten over.
+  - Dag/aften-knappen og N for aften er fjernet. Lyset er dag, indtil uret styrer lyset i det sidste trin.
+  - Testgenveje i konsollen: `__cb.gaade.giv(['spor:3','+ting:briller'])`, `.akt(3)`, `.saetKl('08.15')`, `.moed('bente')`, `.alt()`, `.nulstil()`, `.paused`.
+  - Kontrolleret i Chromium på computer (1280 x 800) og telefon (390 x 844 med touch) uden JavaScript-fejl: start, indstillinger, Nyt spil, uret under gang, notesbog og rygsæk tomme og fyldte, skift mellem dem med N og R, aktkort, gang efter lukning, Fortsæt efter genindlæsning og knapperne inde i Folketinget.
+- [ ] Trin 3: låse og ting.

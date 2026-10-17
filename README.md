@@ -1,6 +1,6 @@
 # Christiansborg: Mord i Rigets midte
 
-En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Gåden er under opbygning. Slotsholmen og de rum, hvor historien skal foregå, kan allerede udforskes. Personer, spor, ting og selve gåden kommer trin for trin.
+En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Gåden er under opbygning. Slotsholmen og de rum, hvor historien skal foregå, kan allerede udforskes, og uret, notesbogen og rygsækken virker. Personerne og sporene kommer trin for trin.
 
 Spil det her: https://ai-michelklos.github.io/christiansborg/
 
@@ -19,12 +19,14 @@ Skriv `?test` efter adressen, altså https://ai-michelklos.github.io/christiansb
 Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsning og løbehjul. Det blev fjernet 16. oktober 2026, da spillet blev til en mordgåde. Den sidste børneudgave ligger i grenen [boerneudgave](https://github.com/AI-MichelKlos/christiansborg/tree/boerneudgave).
 
 ## Styring
-- Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe og E for at gå ind, undersøge eller bruge det, knappen viser. Træk med musen for at kigge. N skifter mellem dag og aften, M åbner oversigtskortet.
-- Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap og en handlingsknap.
+- Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe og E for at gå ind, undersøge eller bruge det, knappen viser. Træk med musen for at kigge. N åbner notesbogen, R rygsækken og M oversigtskortet.
+- Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap og en handlingsknap. Uret, notesbogen, rygsækken og kortet ligger som knapper øverst.
 - Tårnet: gå hen til Kongeporten, og vælg Gå ind i tårnet. Vælg derefter etage til restauranten eller Udsigten. Deroppe drejer pilene eller tommelen dig rundt, og mellemrum eller knappen Kikkert zoomer ind.
 
 ## Om spillet
-- Én fil (`index.html`) med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
+- Spillet er `index.html` med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
+- Hele historien står i `mordgaade.js` ved siden af spillet. Ret teksterne der, og kør `node dev/tjek-mordgaade.js` bagefter. Spillet skal hentes fra en webserver (fx GitHub Pages), ikke åbnes direkte som fil, fordi det henter `mordgaade.js`.
+- Spillet gemmer selv i browseren, og startskærmen tilbyder Fortsæt og Nyt spil.
 - Husene er enkle klodser med den rigtige grundplan. Spillet bygges op lidt efter lidt. Tjeklisten står i `dev/PLAN.md`, og planen for gåden i `dev/MORDGAADE.md`.
 - Kortdata: © OpenStreetMap-bidragydere, ODbL (https://www.openstreetmap.org/copyright).
 
