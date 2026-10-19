@@ -319,3 +319,15 @@ Kortvinduet holder spilleren stille og nulstiller tast- og touchinput ved åbnin
 Kontrol: alle 16 markører og stednavne er til stede og vælger korrekt indhold. Markørernes afstand og tekstens bredde er kontrolleret i telefonformat. Udendørs position, indendørs indgangsmarkering, Udsigten, minikort til/fra, M, tryk på minikort, pause, Escape, synlig luk-knap efter listevalg og genoptaget touchgang med straks-stop er kontrolleret. Skærmbilleder i stort format, stående telefonformat og liggende telefonformat er gennemset. Modulets syntaks og git diff --check er kontrolleret. Ingen JavaScript-fejl under kontrollerne.
 
 Ingen nye rum, personer, spor, samtaler eller historiehændelser er tilføjet. Der er ikke foretaget nye fotobaserede rekonstruktioner; kortet bygger på de eksisterende geometrier og indgange.
+
+## Runde 12: Riddersalen og navneskiltene i Landstingssalen (19. oktober 2026)
+
+Riddersalen er bygget fra bunden som et eget rum. Man kommer ind gennem en åben dør med skiltet "De Kongelige Repræsentationslokaler" på slottets facade i Prins Jørgens Gård. Døren står mellem to af de fire statuer. Det er anslået, hvor på facaden den rigtige indgang ligger. Inde står man straks i salen. Trappen op til første sal er sprunget over.
+
+Salen er 40 m lang, 17 m bred og 10 m høj. Målene er anslag efter billeder. Der er syv høje vinduer på den ene langside, et malet loft med lys himmel i forgyldte rammer, en panelbeklædt sokkel, en forgyldt gesims og tre store lysekroner. Langbordet midt i salen er dækket til aftenens gallamiddag med hvid dug, forgyldte stole med røde hynder, tallerkener med guldkant, glas, kandelabre og blomster. I bordets ende står det åbne etui med Elefantordenen.
+
+Salen har 17 vævede billeder som de rigtige gobeliner: syv på den lange væg, seks mellem vinduerne og to på hver endevæg. Mønstrene er nye og abstrakte. De viser omtrent gobelinernes størrelse og stærke farver, men de er ikke kopier af Bjørn Nørgaards gobeliner. Etuiet, elefanten og hoffourerens bog er digtet.
+
+I Landstingssalen står der nu navneskilte til pressemødet på de syv borde på podiet.
+
+Kontrol: indgangen er lukket i akt 1-2 og åben fra akt 3. Ind og ud, hoffoureren, gobelinerne, lån og aflevering af ordenen og Mogens er gennemprøvet i Chromium på computer og telefon uden JavaScript-fejl.

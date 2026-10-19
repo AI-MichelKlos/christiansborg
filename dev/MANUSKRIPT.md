@@ -11,8 +11,8 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 - Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 63 skridt.
 - Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 75 skridt.
 - Fejl: ingen. Advarsler: ingen.
-- Steder, der skal bygges: Sadelkammeret (sadelkammeret), Riddersalen (riddersalen), Kanalen ved den gamle fortøjningspæl (kanalen), Betjentstuen, juni 1942 (betjentstuen_1942), Ridebanen, juni 1942 (ridebanen_1942).
-- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 45. Replikker: 294.
+- Steder, der skal bygges: Sadelkammeret (sadelkammeret), Kanalen ved den gamle fortøjningspæl (kanalen), Betjentstuen, juni 1942 (betjentstuen_1942), Ridebanen, juni 1942 (ridebanen_1942).
+- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 295.
 
 ## Start
 
@@ -888,7 +888,7 @@ I spillet: ude: Slotspladsens presseområde (bygget).
 
 ### Riddersalen
 
-I spillet: inde: riddersalen (skal bygges).
+I spillet: inde: riddersal (bygget).
 
 Åben, når: akt 3 eller senere. Ellers: »Riddersalen åbner kl. 8.30, når hoffet begynder at dække op til aftenens gallamiddag.«
 
@@ -900,7 +900,15 @@ I spillet: inde: riddersalen (skal bygges).
 
 **Se på etuiet**
 
+<small>Kræver: har ikke Elefantordenen.</small>
+
 *I et åbent etui på det dækkede langbord ligger Elefantordenen: en lille elefant af guld, emalje og diamanter med et tårn på ryggen.*
+
+**Se på etuiet**
+
+<small>Kræver: har Elefantordenen.</small>
+
+*Etuiet er tomt. Kun det lyseblå bånd ligger tilbage, og hoffoureren holder øje med det.*
 
 ### Finansministeriet
 

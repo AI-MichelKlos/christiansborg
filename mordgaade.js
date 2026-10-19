@@ -93,7 +93,7 @@ const STEDER = {
   proviantpassagen: { navn: "Proviantpassagen", spil: "ude: Proviantpassagen", status: "bygget" },
   slotspladsen:     { navn: "Slotspladsens presseområde", spil: "ude: Slotspladsens presseområde", status: "bygget" },
   prins_joergens_gaard: { navn: "Prins Jørgens Gård", spil: "ude: Prins Jørgens Gård", status: "bygget" },
-  riddersalen:      { navn: "Riddersalen", spil: "inde: riddersalen", status: "skal bygges",
+  riddersalen:      { navn: "Riddersalen", spil: "inde: riddersal", status: "bygget",
                       aaben: ["akt>=3"], lukketTekst: "Riddersalen åbner kl. 8.30, når hoffet begynder at dække op til aftenens gallamiddag." },
   finansministeriet: { navn: "Finansministeriet", spil: "inde: finance", status: "bygget",
                       laas: { kraever: ["ting:gaestekort_fm"], tekst: "En vagt i foyeren: »Kun med adgangskort i dag. Forhandlingerne er ikke slut.«",
@@ -786,8 +786,11 @@ const UNDERSOEG = [
   { id: "gobelinerne", sted: "riddersalen", navn: "Se på gobelinerne", viden: true, kraever: [], giver: ["flag:gobelin_kendt"], replikker: [
     ["ida", "Bjørn Nørgaards gobeliner. 17 vævede billeder af Danmarks og verdens historie. De blev hængt op i 2000."],
   ] },
-  { id: "etuiet", sted: "riddersalen", navn: "Se på etuiet", kraever: [], giver: [], replikker: [
+  { id: "etuiet", sted: "riddersalen", navn: "Se på etuiet", kraever: ["!ting:elefantorden"], giver: [], replikker: [
     ["fortaeller", "I et åbent etui på det dækkede langbord ligger Elefantordenen: en lille elefant af guld, emalje og diamanter med et tårn på ryggen."],
+  ] },
+  { id: "etuiet_tomt", sted: "riddersalen", navn: "Se på etuiet", kraever: ["ting:elefantorden"], giver: [], replikker: [
+    ["fortaeller", "Etuiet er tomt. Kun det lyseblå bånd ligger tilbage, og hoffoureren holder øje med det."],
   ] },
 
   // Finansministeriet

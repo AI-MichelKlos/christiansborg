@@ -2566,6 +2566,15 @@ const PM_ENTRY=(()=>{
   bakeGroup(r);return {...d,at};
 })();
 
+// De Kongelige Repræsentationslokaler: the way in to Riddersalen from Prins Jørgens Gård. The door is placed
+// on the palace facade between two of the statues; its exact place is an estimate.
+const RIDDER_ENTRY=(()=>{
+  const main=PARTS.find(p=>p.h===38.6&&p.ring),target=[-32,-45.5];
+  const e=edgesOf(main.ring).sort((a,b)=>segDist(...target,...a.a,...a.b)-segDist(...target,...b.a,...b.b))[0];
+  const dx=e.b[0]-e.a[0],dz=e.b[1]-e.a[1],t=Math.max(.1,Math.min(.9,((target[0]-e.a[0])*dx+(target[1]-e.a[1])*dz)/(e.len*e.len)));
+  ministryPortal('riddersal',e,'De Kongelige Repræsentationslokaler',t);
+  return MINISTRY_DOORS.riddersal;
+})();
 
 // Højesteret's four-column entrance replaces the simplified portico block.
 const COURT_ENTRY=(()=>{
@@ -3624,7 +3633,7 @@ $('bHelp').addEventListener('click', () => openIntro(true));
 
 function openIntro(help) {
   paused = true; keys.clear(); resetTouch(); GAADE.startKnapper();
-  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
+  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='riddersal'?'I Riddersalen':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='riddersal'?'Gå langs gobelinerne og det dækkede langbord. Hoffoureren står ved bordets ende. Gå tilbage til døren og vælg Gå udenfor for at komme ud i Prins Jørgens Gård. Salens mål er anslået, og gobelinerne er ikke kopier af de rigtige.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
   else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';}
   else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk N for notesbogen, R for rygsækken og M for oversigtskortet. Uret går, når Ida går og taler. Personer og spor kommer i de næste trin af gåden.'; }
   intro.hidden = false; goBtn.focus();
@@ -5059,6 +5068,90 @@ const INTERIOR = (() => {
     b(2,.05,.6,new THREE.MeshBasicMaterial({color:'#fff1cb'}),500,4.1,0);
   }
 
+  // Riddersalen, built from photographs of the great hall: tall windows on one side, woven pictures all round,
+  // a painted ceiling, three chandeliers and a long table laid for a gala dinner. The size is an estimate, and the
+  // 17 woven pictures are original patterns that suggest their size and colours without copying the real ones.
+  function riddersalFits(x,z){return x>605.35&&x<644.65&&Math.abs(z)<8.1;}
+  function buildRiddersal(woodFloor){
+    const X0=605,X1=645,Z=8.5,H=10,cx=(X0+X1)/2,L=X1-X0;
+    const wall=material('#ece2cc'),cream=material('#f5eedd'),dado=material('#d8c9a8'),gold=material('#c9a24b',{metalness:.55,roughness:.35});
+    const glass=material('#d6e4e0',{emissive:'#d6e4e0',emissiveIntensity:.6}),glow=new THREE.MeshBasicMaterial({color:'#fff3cc'}),silver=material('#dcdcd6',{metalness:.75,roughness:.28});
+    const cloth=material('#f8f5ee'),red=material('#8a2531'),chairGold=material('#b8924a',{metalness:.35,roughness:.5});
+    b(L,.2,2*Z,woodFloor,cx,-.2,0);b(L,.2,2*Z,cream,cx,H,0);
+    // the painted ceiling: soft sky in gilded frames
+    const ceilTex=ctex(1024,512,(c,W,Hh)=>{
+      c.fillStyle='#e9dfc6';c.fillRect(0,0,W,Hh);
+      for(let i=0;i<5;i++){const x0=24+i*197,y0=40,w=178,h=Hh-80;
+        const gr=c.createRadialGradient(x0+w/2,y0+h/2,10,x0+w/2,y0+h/2,h*.7);gr.addColorStop(0,'#cfdde0');gr.addColorStop(1,'#9fb4bb');c.fillStyle=gr;c.fillRect(x0,y0,w,h);
+        c.fillStyle='rgba(255,255,255,.55)';for(let k=0;k<7;k++){c.beginPath();c.ellipse(x0+20+((k*53+i*31)%140),y0+60+((k*97+i*17)%(h-120)),34,14,0,0,Math.PI*2);c.fill();}
+        c.strokeStyle='#b8933f';c.lineWidth=10;c.strokeRect(x0,y0,w,h);c.strokeStyle='#e8d29a';c.lineWidth=3;c.strokeRect(x0+9,y0+9,w-18,h-18);}
+    },{wrap:false});
+    const ceil=new THREE.Mesh(new THREE.PlaneGeometry(L-.6,2*Z-.6),new THREE.MeshBasicMaterial({map:ceilTex}));ceil.rotation.x=Math.PI/2;ceil.position.set(cx,H-.03,0);g.add(ceil);
+    // walls with a panelled dado and a gilded cornice
+    b(L,H,.3,wall,cx,0,Z);b(L,H,.3,wall,cx,0,-Z);b(.3,H,2*Z,wall,X1,0,0);
+    for(const [a,c2] of [[-Z,-1.5],[1.5,Z]])b(.3,H,c2-a,wall,X0,0,(a+c2)/2);
+    b(.3,H-3.4,3,wall,X0,3.4,0);
+    for(const z of [-1,1]){b(L,1.05,.08,dado,cx,0,z*(Z-.19));b(L,.06,.12,gold,cx,1.05,z*(Z-.2));b(L,.4,.5,cream,cx,H-.7,z*(Z-.3));b(L,.07,.52,gold,cx,H-.78,z*(Z-.3));}
+    for(const x of [X0,X1]){b(.08,1.05,2*Z,dado,x+(x<cx?.19:-.19),0,0);b(.12,.06,2*Z,gold,x+(x<cx?.2:-.2),1.05,0);b(.5,.4,2*Z,cream,x+(x<cx?.3:-.3),H-.7,0);}
+    // the woven pictures: original patterns in strong colours, each one different
+    function gobelin(x,z,ry,w,h,y0,seed){
+      let s=seed*7919+13;const rnd=()=>((s=(s*9301+49297)%233280)/233280);
+      const pals=[['#b8432f','#e2b23c','#2e5d7a','#efe2c4','#3d6b47','#6b3a5a'],['#2b4f73','#d9a43a','#9c2f3a','#e9ddc2','#5d7f5a','#1f2a33'],['#7d3a6b','#e0c060','#2f6f6a','#f0e4c8','#c4562f','#28324a']];
+      const pal=pals[seed%3],pick=()=>pal[Math.floor(rnd()*pal.length)];
+      const tex=ctex(384,480,(c,W,Hh)=>{
+        c.fillStyle=pal[3];c.fillRect(0,0,W,Hh);
+        for(let k=0;k<9;k++){c.fillStyle=pick();c.beginPath();const px=rnd()*W,py=rnd()*Hh,r=20+rnd()*70;if(k%3===0)c.fillRect(px-r,py-r*.6,r*1.6,r*1.2);else{c.ellipse(px,py,r,r*(.5+rnd()*.6),rnd()*3,0,Math.PI*2);c.fill();}}
+        for(let row=0;row<3;row++){const y=40+rnd()*(Hh-80);c.fillStyle=pick();for(let x=12;x<W;x+=22)c.fillRect(x,y,12,12);}
+        c.strokeStyle=pick();c.lineWidth=6;c.beginPath();c.moveTo(0,Hh*rnd());for(let x=0;x<=W;x+=32)c.lineTo(x,Hh*(.3+rnd()*.4));c.stroke();
+        c.fillStyle='rgba(40,30,20,.08)';for(let y=0;y<Hh;y+=3)c.fillRect(0,y,W,1);
+        c.strokeStyle='#3a2a22';c.lineWidth=14;c.strokeRect(0,0,W,Hh);c.strokeStyle='#c9a24b';c.lineWidth=3;c.strokeRect(10,10,W-20,Hh-20);
+      },{wrap:false});
+      const r=new THREE.Group();r.position.set(x,y0,z);r.rotation.y=ry;g.add(r);
+      const q=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex}));q.position.set(0,h/2,.03);r.add(q);
+      box(w+.16,.07,.08,gold,0,h,.03,{parent:r,cast:false});
+    }
+    let n=0;
+    for(let i=0;i<7;i++){const x=X0+3.3+i*5.57;gobelin(x,Z-.17,Math.PI,4,5.4,1.3,n++);   // seven on the inner wall
+      if(i<6){b(.5,H-1.9,.24,cream,x+2.785,1.1,Z-.2);b(.66,.2,.34,gold,x+2.785,H-.98,Z-.24);}}
+    for(let i=0;i<7;i++){const x=X0+3.3+i*5.57;   // seven tall windows, six woven pictures between them
+      const sh=new THREE.Shape();sh.moveTo(-1.3,0);sh.lineTo(1.3,0);sh.lineTo(1.3,4.6);sh.absarc(0,4.6,1.3,0,Math.PI,false);sh.lineTo(-1.3,0);
+      const win=new THREE.Mesh(new THREE.ShapeGeometry(sh),glass);win.position.set(x,1.4,-Z+.16);g.add(win);
+      for(const dx of [-1.3,0,1.3])b(.07,4.6,.1,cream,x+dx,1.4,-Z+.2);for(let j=1;j<6;j++)b(2.6,.05,.1,cream,x,1.4+j*.8,-Z+.2);
+      b(2.9,.12,.4,cream,x,1.28,-Z+.3);
+      if(i<6)gobelin(x+2.785,-Z+.17,0,2.3,4.2,1.8,n++);}
+    for(const z of [-4.2,4.2])gobelin(X1-.17,z,-Math.PI/2,3.6,5.4,1.3,n++);
+    for(const z of [-4.6,4.6])gobelin(X0+.17,z,Math.PI/2,3,4.6,1.5,n++);
+    // a pair of closed doors at the far end, and the open door from the stairs
+    b(.12,4,2.6,material('#e9dcc0'),X1-.2,0,0);for(const dz of [-.65,.65])b(.06,3.4,1,gold,X1-.27,.3,dz);
+    openDoor(X0,0,-Math.PI/2,0,'Ud til Prins Jørgens Gård','Riddersalen');b(.05,3.3,2.8,material('#3b342a'),X0-.4,0,0);
+    b(4.5,.012,1.7,red,X0+2.4,.001,0);
+    // three chandeliers
+    for(const x of [cx-10,cx,cx+10]){
+      b(.05,2.2,.05,gold,x,H-2.2,0);
+      for(const [rad,y] of [[1.1,6.5],[1.6,6.9],[2,7.3]]){mesh(new THREE.TorusGeometry(rad,.03,6,40),gold,x,y,0,{parent:g,rx:Math.PI/2});
+        for(let k=0;k<14;k++){const a=k*Math.PI/7;mesh(new THREE.SphereGeometry(.06,6,6),glow,x+Math.cos(a)*rad,y+.08,Math.sin(a)*rad,{parent:g});}}
+    }
+    // the long table laid for the gala dinner, with gilded chairs, plates, glasses, candelabra and flowers
+    const T0=611,T1=640.4,tx=(T0+T1)/2;
+    b(T1-T0,.78,1.5,cloth,tx,0,0);b(T1-T0+.04,.02,1.54,cloth,tx,.78,0);obstacle(tx,0,T1-T0,1.5);
+    const plate=new THREE.CylinderGeometry(.14,.12,.015,18),rim=new THREE.TorusGeometry(.13,.008,4,18),gl=new THREE.CylinderGeometry(.03,.022,.14,8);
+    for(let x=T0+1.1;x<=T0+24.6;x+=1.07)for(const side of [-1,1]){
+      const r=new THREE.Group();r.position.set(x,0,side*1.12);r.rotation.y=side>0?0:Math.PI;g.add(r);
+      const add=(w,h,d,m,a,y,c2)=>box(w,h,d,m,a,y,c2,{parent:r,cast:false});
+      for(const a of [-.2,.2])for(const c2 of [-.18,.18])add(.04,.46,.04,chairGold,a,0,c2);
+      add(.48,.08,.46,red,0,.46,0);add(.46,.62,.06,chairGold,0,.5,.22);add(.34,.44,.07,red,0,.58,.22);
+      obstacle(x,side*1.12,.55,.55);
+      mesh(plate,cloth,x,.805,side*.48,{parent:g});mesh(rim,gold,x,.815,side*.48,{parent:g,rx:Math.PI/2});
+      for(const dx of [-.16,.16])mesh(gl,glass,x+dx,.86,side*.22,{parent:g});
+    }
+    for(let x=T0+2;x<T0+24;x+=4.2){
+      mesh(new THREE.CylinderGeometry(.09,.13,.06,12),silver,x,.82,0,{parent:g});mesh(new THREE.CylinderGeometry(.025,.03,.5,8),silver,x,1.07,0,{parent:g});
+      for(const dz of [-.22,0,.22]){mesh(new THREE.CylinderGeometry(.02,.02,.2,8),cloth,x,1.42,dz,{parent:g});mesh(new THREE.SphereGeometry(.03,6,6),glow,x,1.55,dz,{parent:g});}
+      b(.5,.04,.05,silver,x,1.3,0);
+      for(const [dx,col] of [[2.1,'#c23b4a'],[2.25,'#f4efe4'],[1.95,'#e7a9b4']])mesh(new THREE.SphereGeometry(.09,8,6),material(col),x+dx,.88,(dx-2.1)*1.4,{parent:g});
+    }
+  }
+
   function landstingFits(x,z){
     return (x> -65.6&&x< -40.4&&Math.abs(z)<11.6)||(x> -40.8&&x< -38.6&&Math.abs(z)<1.12);
   }
@@ -5439,6 +5532,7 @@ const INTERIOR = (() => {
     buildFolkSal(woodFloor);
     buildPMEntry();
     buildCourtEntry();
+    buildRiddersal(woodFloor);
     FX.wayfinding?.indoor(g,I);
     b(3,3.25,.35,plaster,24,I.floor+3.25,4.8);openDoor(24,4.8,0,I.floor,'Kompaspartiet');
     buildHallVaults();
@@ -5477,6 +5571,7 @@ const INTERIOR = (() => {
     if(x>40.4&&x<78&&Math.abs(z)<18)return 'folkesal';
     if(x>534&&x<546)return 'courtEntry';
     if(x>495&&x<505)return 'pmEntry';
+    if(x>600&&x<650)return 'riddersal';
     if(x< -40.4&&Math.abs(z)<12)return 'landsting';
     if(x>390&&x<410)return 'towerLobby';if(x>429&&x<451)return 'towerRestaurant';
     if(x>290&&x<310)return 'stables';
@@ -5509,15 +5604,15 @@ const INTERIOR = (() => {
     const samtaleDoor=(Math.abs(x-3)<1.15||Math.abs(x+3)<1.15)&&z< -3.8&&z> -5.5;
     const betjent=x>4.75&&x<12.05&&z>19.05&&z<25.15;
     const betjentDoor=x>3.5&&x<5.1&&Math.abs(z-20.4)<1.15;
-    return ((x>535.35&&x<544.65&&z> -4.65&&z<4.65)||folkSalFits(x,z)||(x>496.35&&x<503.65&&z> -3.65&&z<3.65)||landstingFits(x,z)||towerFits(x,z)||stableFits(x,z)||ministryFits(x,z)||hall||entry||lower||stairs||gallery||samtale||samtaleDoor||betjent||betjentDoor||roundThreeFits(x,z))&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
+    return ((x>535.35&&x<544.65&&z> -4.65&&z<4.65)||folkSalFits(x,z)||(x>496.35&&x<503.65&&z> -3.65&&z<3.65)||landstingFits(x,z)||riddersalFits(x,z)||towerFits(x,z)||stableFits(x,z)||ministryFits(x,z)||hall||entry||lower||stairs||gallery||samtale||samtaleDoor||betjent||betjentDoor||roundThreeFits(x,z))&&!I.obstacles.some(o=>x>o[0]-.28&&x<o[1]+.28&&z>o[2]-.28&&z<o[3]+.28);
   }
   function enter(place='folketing',side=false) {
     if(I.on||MYBOAT.on||TOWER.on||TOWER.busy)return;
     if(I.mayEnter&&!I.mayEnter(place))return;   // a building that is closed in the story
     build(); I.place=place; I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
     I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
-    P.pos.set(I.x+(place==='towerLobby'?400:place==='towerRestaurant'?440:place==='courtEntry'?540:place==='pmEntry'?500:place==='finance'?100:place==='stables'?300:place==='reform'?(side?212:200):0),0,place==='towerLobby'?7:place==='towerRestaurant'?11:place==='folketing'?21:place==='courtEntry'?3:place==='pmEntry'?2:place==='stables'?18:side?-16:8);P.face=side?-Math.PI/2:Math.PI;cam.yaw=P.face+Math.PI;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
-    document.body.classList.add('inFolketing');document.body.classList.toggle('inTowerRooms',place.startsWith('tower'));$('indoorExit').textContent=place==='towerRestaurant'?'Til elevatorhallen':place==='folketing'?'Ud i gården':'Gå udenfor';showPoi(null);toast(place==='towerLobby'?'Gå hen til elevatoren eller vælg en etage.':place==='towerRestaurant'?'Udforsk restauranten. Trappen og etagevalget fører til Udsigten.':place==='stables'?'Følg den brede staldgang mellem marmorsøjlerne.':place==='courtEntry'?'Du er i spillets forenklede vindfang. Udgangen fører tilbage gennem søjleportalen.':place==='pmEntry'?'Du er i spillets forenklede forhal. Udgangen fører til Prins Jørgens Gård.':place==='finance'?'Garderoben er til venstre. Forhandlingsrummet ligger lige fremme.':place==='reform'?'Udforsk kontoret, printerområdet og gangen til sidedøren.':'Snapstinget er til venstre og betjentstuen til højre. Kompaspartiet ligger ved Vandrehallen.');
+    P.pos.set(I.x+(place==='towerLobby'?400:place==='towerRestaurant'?440:place==='courtEntry'?540:place==='pmEntry'?500:place==='riddersal'?607:place==='finance'?100:place==='stables'?300:place==='reform'?(side?212:200):0),0,place==='towerLobby'?7:place==='towerRestaurant'?11:place==='folketing'?21:place==='courtEntry'?3:place==='pmEntry'?2:place==='riddersal'?0:place==='stables'?18:side?-16:8);P.face=side?-Math.PI/2:place==='riddersal'?Math.PI/2:Math.PI;cam.yaw=P.face+Math.PI;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
+    document.body.classList.add('inFolketing');document.body.classList.toggle('inTowerRooms',place.startsWith('tower'));$('indoorExit').textContent=place==='towerRestaurant'?'Til elevatorhallen':place==='folketing'?'Ud i gården':'Gå udenfor';showPoi(null);toast(place==='towerLobby'?'Gå hen til elevatoren eller vælg en etage.':place==='towerRestaurant'?'Udforsk restauranten. Trappen og etagevalget fører til Udsigten.':place==='stables'?'Følg den brede staldgang mellem marmorsøjlerne.':place==='courtEntry'?'Du er i spillets forenklede vindfang. Udgangen fører tilbage gennem søjleportalen.':place==='pmEntry'?'Du er i spillets forenklede forhal. Udgangen fører til Prins Jørgens Gård.':place==='riddersal'?'Riddersalen er ved at blive dækket op til aftenens gallamiddag.':place==='finance'?'Garderoben er til venstre. Forhandlingsrummet ligger lige fremme.':place==='reform'?'Udforsk kontoret, printerområdet og gangen til sidedøren.':'Snapstinget er til venstre og betjentstuen til højre. Kompaspartiet ligger ved Vandrehallen.');
   }
   function leave(side=false,transfer=false) {
     if(!I.on)return;
@@ -5525,7 +5620,7 @@ const INTERIOR = (() => {
     I.on=false;g.visible=false;world.visible=true;dyn.visible=true;scene.fog=I.fog;scene.background=I.bg;evApplied=-1;applyEvening();
     const d=I.place.startsWith('tower')?{x:TOWER.door[0],z:TOWER.door[1],nx:TOWER.OUT[0],nz:TOWER.OUT[1],ry:Math.atan2(...TOWER.OUT)}:I.place==='folketing'?null:MINISTRY_DOORS[I.place==='reform'&&side?'reformSide':I.place];
     const distance=I.place==='courtEntry'?8:3;const p=d?[d.x+d.nx*distance,d.z+d.nz*distance]:FT.at(0,2.5);P.pos.set(p[0],d?0:1.2,p[1]);P.face=d?d.ry:Math.atan2(FT.n[0],FT.n[1]);P.vel.set(0,0,0);cam.yaw=P.face+Math.PI;camInit=false;kid.root.position.copy(P.pos);
-    document.body.classList.remove('inFolketing','inTowerRooms');keys.clear();if(!transfer)toast(I.place.startsWith('tower')?'Du er tilbage ved Kongeporten.':I.place==='folketing'?'Du er tilbage i Rigsdagsgården.':(I.place==='pmEntry'||I.place==='courtEntry')?'Du er tilbage i Prins Jørgens Gård.':I.place==='finance'?'Du er tilbage på Slotspladsen.':I.place==='stables'?'Du er tilbage ved Ridebanen.':'Du er tilbage ved Reformministeriet.');
+    document.body.classList.remove('inFolketing','inTowerRooms');keys.clear();if(!transfer)toast(I.place.startsWith('tower')?'Du er tilbage ved Kongeporten.':I.place==='folketing'?'Du er tilbage i Rigsdagsgården.':(I.place==='pmEntry'||I.place==='courtEntry'||I.place==='riddersal')?'Du er tilbage i Prins Jørgens Gård.':I.place==='finance'?'Du er tilbage på Slotspladsen.':I.place==='stables'?'Du er tilbage ved Ridebanen.':'Du er tilbage ved Reformministeriet.');
   }
   // Separate indoor navigation avoids outdoor building, water and bounds collisions.
   HOOKS.ride.unshift(dt=>{
@@ -5550,9 +5645,9 @@ const INTERIOR = (() => {
       const canEnter=!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy;
       if(canEnter&&P.onGround&&P.pos.y<.8)for(const [key,d] of Object.entries(MINISTRY_DOORS)){
         const dx=P.pos.x-d.x,dz=P.pos.z-d.z,depth=dx*d.nx+dz*d.nz,across=dx*d.nz-dz*d.nx;
-        const go=()=>enter(key==='courtEntry'?'courtEntry':key==='pmEntry'?'pmEntry':key==='finance'?'finance':key==='stables'?'stables':'reform',key==='reformSide');
+        const go=()=>enter(key==='courtEntry'?'courtEntry':key==='pmEntry'?'pmEntry':key==='finance'?'finance':key==='stables'?'stables':key==='riddersal'?'riddersal':'reform',key==='reformSide');
         if(Math.abs(across)<1.05&&depth>.65&&depth<1.65){go();return;}
-        if(Math.abs(across)<4&&depth>.5&&depth<7&&Math.cos(P.face-d.ry)<-.25)offerAction({id:'ministry-'+key,label:'Gå ind i '+(key==='courtEntry'?'Højesteret':key==='pmEntry'?'Statsministeriet':key==='finance'?'Finansministeriet':key==='stables'?'De Kongelige Stalde':'Reformministeriet'),prio:9,run:go});
+        if(Math.abs(across)<4&&depth>.5&&depth<7&&Math.cos(P.face-d.ry)<-.25)offerAction({id:'ministry-'+key,label:'Gå ind i '+(key==='courtEntry'?'Højesteret':key==='pmEntry'?'Statsministeriet':key==='finance'?'Finansministeriet':key==='stables'?'De Kongelige Stalde':key==='riddersal'?'Riddersalen':'Reformministeriet'),prio:9,run:go});
       }
       if(canEnter && Math.abs(p[0])<1 && p[1]>.15 && p[1]<1.4 && P.onGround && P.pos.y>.8) { enter(); return; }
       if(canEnter&&Math.abs(p[0])<4&&p[1]>.3&&p[1]<7)offerAction({id:'folketing-enter',label:'Gå ind i Folketinget',prio:8,run:()=>enter()});
@@ -5564,13 +5659,13 @@ const INTERIOR = (() => {
     kid.root.visible=false;
     const room=roomAt(x,z);
     const annexNames={kompas:'Kompaspartiet · gangen',office1:'Kompaspartiet · kontor 1',office2:'Kompaspartiet · kontor 2',secretariat:'Kompaspartiet · sekretariatet',meeting:'Kompaspartiet · mødelokalet',snap:'Snapstinget',snapgang:'Gangen til Snapstinget'};
-    const name=room==='courtEntry'?'Højesteret · vindfang':room==='folkesal'?'Folketingssalen':room==='pmEntry'?'Statsministeriet · forhal':room==='landsting'?'Landstingssalen':room==='towerLobby'?'Tårnet · elevatorhallen':room==='towerRestaurant'?'Restauranten i Tårnet · 34 m':room==='stables'?'De Kongelige Stalde':ministryRooms.find(r=>r.id===room)?.name||annexNames[room]|| (room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>7.5?(Math.abs(x)>3.2?'Vandrehallen · trappegalleriet':'Trappen til Vandrehallen'):Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen');
+    const name=room==='courtEntry'?'Højesteret · vindfang':room==='folkesal'?'Folketingssalen':room==='pmEntry'?'Statsministeriet · forhal':room==='riddersal'?'Riddersalen':room==='landsting'?'Landstingssalen':room==='towerLobby'?'Tårnet · elevatorhallen':room==='towerRestaurant'?'Restauranten i Tårnet · 34 m':room==='stables'?'De Kongelige Stalde':ministryRooms.find(r=>r.id===room)?.name||annexNames[room]|| (room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>7.5?(Math.abs(x)>3.2?'Vandrehallen · trappegalleriet':'Trappen til Vandrehallen'):Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen');
     $('indoorName').textContent=name;
     if(I.place==='towerLobby'&&z< -4)offerAction({id:'tower-restaurant',label:'Kør til restauranten',prio:12,run:()=>liftTo('towerRestaurant')});
     if(I.place==='towerRestaurant'&&x>447.3&&z< -6.4&&P.pos.y>4.9)offerAction({id:'tower-view',label:'Fortsæt til Udsigten',prio:12,run:()=>liftTo('view')});
     if(I.place!=='folketing'&&!I.place.startsWith('tower')){
       const side=I.place==='reform'&&x>211&&z< -14;
-      if((I.place==='courtEntry'?z>3.5:I.place==='pmEntry'?z>2.5:I.place==='stables'?z>17:(z>7&&x<(I.place==='finance'?102:202)))||side)offerAction({id:'ministry-exit',label:side?'Gå ud gennem sidedøren':'Gå udenfor',prio:10,run:()=>leave(side)});
+      if((I.place==='courtEntry'?z>3.5:I.place==='pmEntry'?z>2.5:I.place==='riddersal'?x<608.5:I.place==='stables'?z>17:(z>7&&x<(I.place==='finance'?102:202)))||side)offerAction({id:'ministry-exit',label:side?'Gå ud gennem sidedøren':'Gå udenfor',prio:10,run:()=>leave(side)});
     }
     if(room==='hall'&&z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
         if(room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
@@ -5580,7 +5675,7 @@ const INTERIOR = (() => {
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',()=>I.place==='towerRestaurant'?liftTo('towerLobby'):leave());hud.appendChild(exit);
   const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);if(!TESTMODE)shortcut.style.display='none';
   shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
-  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Vælg et startsted');destinations.innerHTML='<option value="">Vælg et startsted…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option><option value="quay-reform">Kajen ved Reformministeriet</option><option value="quay-slots">Kajen ved Slotspladsen</option><option value="garden">Bibliotekshaven</option><option value="stables">De Kongelige Stalde</option><option value="tower">Tårnet ved Kongeporten</option><option value="courtEntry">Højesterets indgang</option><option value="pmEntry">Statsministeriets indgang</option><option value="folkesal">Folketingssalen via Vandrehallen</option><option value="landsting">Landstingssalen via Vandrehallen</option><option value="press">Slotspladsens presseområde</option>';shortcut.after(destinations);if(!TESTMODE)destinations.style.display='none';
+  const destinations=document.createElement('select');destinations.id='startMinistry';destinations.className='go alt';destinations.setAttribute('aria-label','Vælg et startsted');destinations.innerHTML='<option value="">Vælg et startsted…</option><option value="finance">Finansministeriet</option><option value="reform">Reformministeriet</option><option value="quay-reform">Kajen ved Reformministeriet</option><option value="quay-slots">Kajen ved Slotspladsen</option><option value="garden">Bibliotekshaven</option><option value="stables">De Kongelige Stalde</option><option value="tower">Tårnet ved Kongeporten</option><option value="courtEntry">Højesterets indgang</option><option value="pmEntry">Statsministeriets indgang</option><option value="riddersal">Riddersalen</option><option value="folkesal">Folketingssalen via Vandrehallen</option><option value="landsting">Landstingssalen via Vandrehallen</option><option value="press">Slotspladsens presseområde</option>';shortcut.after(destinations);if(!TESTMODE)destinations.style.display='none';
   destinations.addEventListener('change',()=>{const key=destinations.value;destinations.value='';if(!key||!window.__gameReady||MYBOAT.on||TOWER.on||TOWER.busy)return;goBtn.click();if(I.on)leave();if(key==='courtEntry'){const d=COURT_ENTRY,p=d.at(0,8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=d.ry+Math.PI;cam.yaw=d.ry;cam.pitch=.2;camInit=false;startBlend=1;toast('Gå op ad trappen mellem de fire søjler.');return;}if(key==='folkesal'){enter();P.pos.set(I.x+36,I.floor,0);P.face=Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Folketingssalen.');return;}if(key==='landsting'){enter();P.pos.set(I.x-36,I.floor,0);P.face=-Math.PI/2;cam.yaw=P.face+Math.PI;cam.pitch=.08;toast('Gå gennem den åbne dør til Landstingssalen.');return;}if(key==='press'){const p=PRESS.at(0,-8);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=PRESS.ry;cam.yaw=P.face+Math.PI;cam.pitch=.3;camInit=false;startBlend=1;toast('Gå rundt mellem kameraerne, tv-vognen og radiovognen på Slotspladsen.');return;}if(key==='tower'){P.pos.set(TOWER.door[0]+TOWER.OUT[0]*3,0,TOWER.door[1]+TOWER.OUT[1]*3);P.vel.set(0,0,0);P.face=Math.atan2(-TOWER.OUT[0],-TOWER.OUT[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Vælg Gå ind i tårnet ved Kongeporten.');return;}if(key==='garden'){const p=GARDEN.at(0,-35);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.face=.582;cam.yaw=P.face+Math.PI;cam.pitch=.35;camInit=false;startBlend=1;toast('Følg grusstierne til bassinet og Kierkegaard-statuen.');return;}if(key.startsWith('quay-')){const q=QUAYS.find(q=>q.id===key.slice(5)),p=q.at(0,6.3);P.pos.set(p[0],0,p[1]);P.vel.set(0,0,0);P.onGround=true;P.face=Math.atan2(-q.nx,-q.nz);cam.yaw=P.face+Math.PI;cam.pitch=.4;camInit=false;startBlend=1;toast('Gå ned ad trappen til kajens afsats.');return;}const d=MINISTRY_DOORS[key];P.pos.set(d.x+d.nx*5,0,d.z+d.nz*5);P.face=d.ry+Math.PI;cam.yaw=d.ry;camInit=false;startBlend=1;toast('Gå hen til den åbne dør i '+d.title+'.');});
   function liftTo(place){
     if(TOWER.busy||!I.on||!I.place.startsWith('tower')||I.place===place)return;
@@ -5672,16 +5767,17 @@ const MAPVIEW=(()=>{
     {id:'tower',name:'Tårnet ved Kongeporten',at:TOWER.door,offset:[0,12],text:'Gå til Kongeporten på Slotspladsen, og vælg Gå ind i tårnet.',rooms:'Elevatorhallen, restauranten og Udsigten forbindes via Vælg etage. Fra restauranten kan man også gå op ad sidetrappen.'},
     {id:'pmEntry',name:'Statsministeriet',at:door('pmEntry'),offset:[-5,0],text:'Indgangen med nummer 11 ligger i Prins Jørgens Gård ved Højesteret.',rooms:'Døren fører til spillets forenklede forhal. Gå udenfor vender tilbage til samme indgang.'},
     {id:'courtEntry',name:'Højesteret',at:COURT_ENTRY.at(0,8),offset:[-25,8],text:'Gå op ad den brede trappe mellem de fire søjler i Prins Jørgens Gård.',rooms:'Døren fører til spillets lille vindfang. Udgangen fører tilbage foran trappen.'},
+    {id:'riddersal',name:'Riddersalen',at:door('riddersal'),offset:[10,-16],text:'Indgangen til De Kongelige Repræsentationslokaler ligger i Prins Jørgens Gård mellem statuerne.',rooms:'Riddersalen med gobelinerne og det dækkede langbord. Gå udenfor fører tilbage til gården.'},
     {id:'finance',name:'Finansministeriet',at:door('finance'),offset:[14,12],text:'Den åbne indgang ligger i den røde bygning ved Slotspladsen og Slotsholmsgade.',rooms:'Foyer, garderobe, midtergang og forhandlingsrum. Gå tilbage gennem foyeren til udgangen.'},
     {id:'reform',name:'Reformministeriet',at:door('reform'),offset:[26,-12],text:'Det fiktive ministerium ligger på Ved Stranden, på den modsatte side af kanalen.',rooms:'Foyer, gang, departementschefens kontor og printerområde. Sidedøren fører ud på bygningens anden side.'},
     {id:'garden',name:'Bibliotekshaven',at:GARDEN.at(0,-35),offset:[10,10],text:'Følg Tøjhusgade og passagen mod Det Kongelige Bibliotek.',rooms:'Grusstierne fører rundt om bassinet, blomsterbedene og Kierkegaard-statuen.'},
     {id:'stables',name:'De Kongelige Stalde',at:door('stables'),offset:[-8,6],text:'Gå til den åbne staldport fra Ridebanen.',rooms:'Følg den brede staldgang. Den samme port eller Gå udenfor fører tilbage til Ridebanen.'},
     {id:'quay-slots',name:'Kajen ved Slotspladsen',at:QUAYS.find(q=>q.id==='slots').at(0,6.3),offset:[22,-18],text:'Stentrappen går fra Slotspladsens side ned til afsatsen over kanalen.',rooms:'Gå ned og op ad trinene. Båden kan lægge til ved afsatsen.'},
     {id:'quay-reform',name:'Kajen ved Reformministeriet',at:QUAYS.find(q=>q.id==='reform').at(0,6.3),offset:[2,-23],text:'Kajtrappen ligger på Ved Stranden foran det fiktive Reformministerium.',rooms:'Trappen forbinder gaden med afsatsen over vandet.'},
-    {id:'press',name:'Slotspladsens presseområde',at:PRESS.at(0,0),offset:[30,12],text:'Tv-vognene, kameraerne og arbejdslysene står på Slotspladsen foran Finansministeriet.',rooms:'Der er passage mellem udstyret og rundt om vognene.'},
+    {id:'press',name:'Slotspladsens presseområde',at:PRESS.at(0,0),offset:[30,12],text:'Tv-vognen, radiovognen, kameraerne og arbejdslysene står på Slotspladsen foran Finansministeriet.',rooms:'Der er passage mellem udstyret og rundt om vognene.'},
     {id:'ride',name:'Ridebanen',at:[-140,85],offset:[0,-3],text:'Den store ridebane ligger mellem Marmorbroen og slottet.',rooms:'Staldindgangen ligger på Ridebanens vestside. Vejviseren forklarer vejen videre mod Tøjhusgade.'},
     {id:'marmor',name:'Marmorbroen',at:[-206,140],offset:[-7,0],text:'Den brede stenbro fører over kanalen til Ridebanen.',rooms:'Bliv på slotsiden af kanalen, hvis du følger vejen rundt om staldenes sydside mod Tøjhusgade.'},
-    {id:'prins',name:'Prins Jørgens Gård',at:[-39,-76],offset:[-12,-22],text:'Fra Slotspladsen går man gennem porten i Kirkeløngangsbygningen.',rooms:'I gården ligger indgangene til Statsministeriet og Højesteret. Begge er markeret særskilt på kortet.'},
+    {id:'prins',name:'Prins Jørgens Gård',at:[-39,-76],offset:[-12,-22],text:'Fra Slotspladsen går man gennem porten i Kirkeløngangsbygningen.',rooms:'I gården ligger indgangene til Statsministeriet, Højesteret og Riddersalen. De er markeret særskilt på kortet.'},
     {id:'hoejbro',name:'Højbro',at:[-5,-167],offset:[-3,-8],text:'Broen forbinder Slotsholmen med Højbro Plads og Gammel Strand.',rooms:'Herfra kan man fortsætte mod Ved Stranden eller tilbage langs kanalen til Slotspladsen.'},
     {id:'slots',name:'Slotspladsen',at:[85,-51],offset:[10,-12],text:'Pladsen foran slottet med rytterstatuen af Frederik 7.',rooms:'Her ligger Tårnets indgang, presseområdet og vejene til ministerierne. Vejviseren viser næste passage mod Rigsdagsgården og Prins Jørgens Gård.'}
   ];
@@ -6098,7 +6194,7 @@ const LAAS = (() => {
     finansministeriet: { place: 'finance', rooms: ['fm-wardrobe', 'fm-corridor', 'fm-meeting'], doors: [[98.6, 6], [100, 2.6]] },
     valdorfs_kontor:   { place: 'reform', rooms: ['rm-office'], doors: [[198.6, -11]] },
   };
-  const BYGNING = { folketing: 'folketinget', reform: 'reformministeriet', towerLobby: 'taarnet' };   // whole buildings, checked at the front door
+  const BYGNING = { folketing: 'folketinget', reform: 'reformministeriet', towerLobby: 'taarnet', riddersal: 'riddersalen' };   // whole buildings, checked at the front door
   const rumSted = {}; for (const [id, r] of Object.entries(RUM)) for (const room of r.rooms) rumSted[r.place + '/' + room] = id;
   let alleAabne = false;   // ?test: a checkbox on the start card opens every lock
 
@@ -6204,6 +6300,10 @@ const LAAS = (() => {
     tavlen:     { place: 'folketing', at: [19.9, 6.9], r: 1.5 },
     buffeten:   { place: 'folketing', at: [-16.9, 28.6], r: 1.5 },
     radiovognen: { ude: PRESS.at(4.5, 11.6), r: 2.2 },
+    gobelinerne: { place: 'riddersal', at: [625, 6.6], r: 3.2 },
+    etuiet:     { place: 'riddersal', at: [638.4, -1.35], r: 1.6 },
+    etuiet_tomt: { place: 'riddersal', at: [638.4, -1.35], r: 1.6 },
+    navneskiltene: { place: 'folketing', at: [-61.2, -0.9], r: 2.2 },
     kontoret:   { place: 'reform', at: [194, -11.4], r: 2.6 },
     jakken:     { place: 'reform', at: [196.9, -15.4], r: 1.9, prio: 8 },
   };
@@ -6296,6 +6396,7 @@ const LAAS = (() => {
   const inde = new THREE.Group(); inde.userData.keep = true; I.group.add(inde);   // moves with the interiors and is hidden outside
   const ude = new THREE.Group(); dyn.add(ude);
   const ting = {};
+  let ordenObj = null;   // the Order of the Elephant in its case: gone while Ida has borrowed it
   function glasses(parent, x, y, z, ry, mat) {
     const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g);
     for (const sx of [-1, 1]) { const r = new THREE.Mesh(new THREE.TorusGeometry(.045, .009, 6, 16), mat); r.rotation.x = Math.PI / 2; r.position.x = sx * .055; g.add(r); }
@@ -6388,12 +6489,35 @@ const LAAS = (() => {
     for (const [x, z, ry, n] of [[.5, .45, .2, 6], [-.35, .55, -.3, 3], [-.45, -.5, .1, 4]]) for (let i = 0; i < n; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(.21, .004, .3), std(i % 3 ? '#fbfaf5' : '#eef1f4')); p.position.set(x + i * .004, .003 + i * .004, z); p.rotation.y = ry + i * .05; dt.add(p); }
     const dk = new THREE.Mesh(new THREE.CylinderGeometry(.045, .038, .09, 12), std('#f7f4ec')); dk.position.set(.7, .045, .05); dt.add(dk);
     const dm = new THREE.Mesh(new THREE.BoxGeometry(.022, .012, .006), std('#b8232f')); dm.position.set(.745, .085, .06); dm.rotation.y = 1.4; dt.add(dm);
+    // Riddersalen: the open case with the Order of the Elephant at the end of the long table
+    const etui = new THREE.Group(); etui.position.set(638.4, .8, -.25); etui.rotation.y = -.25; etui.scale.setScalar(1.6); inde.add(etui);
+    box(.34, .05, .24, std('#1d2a52'), 0, 0, 0, { parent: etui, cast: false }); box(.31, .012, .21, std('#f2ead6'), 0, .05, 0, { parent: etui, cast: false });
+    const lid = box(.34, .24, .03, std('#1d2a52'), 0, .05, .125, { parent: etui, cast: false }); lid.rotation.x = -.35;
+    box(.3, .012, .05, std('#7fb3d5'), 0, .062, .07, { parent: etui, cast: false });   // the light blue ribbon
+    const orden = new THREE.Group(); orden.position.set(0, .085, -.03); etui.add(orden);
+    const hvid = std('#f7f6f1'), guld = std('#d4af37', { metalness: .6, roughness: .3 });
+    const krop = new THREE.Mesh(new THREE.SphereGeometry(.045, 14, 10), hvid); krop.scale.set(1.3, .9, .8); orden.add(krop);
+    const hoved = new THREE.Mesh(new THREE.SphereGeometry(.028, 12, 8), hvid); hoved.position.set(.055, .015, 0); orden.add(hoved);
+    const snabel = new THREE.Mesh(new THREE.CylinderGeometry(.007, .011, .06, 8), hvid); snabel.position.set(.08, -.022, 0); snabel.rotation.z = .25; orden.add(snabel);
+    for (const z of [-.026, .026]) { const oere = new THREE.Mesh(new THREE.SphereGeometry(.024, 10, 8), hvid); oere.scale.set(.35, 1, 1); oere.position.set(.045, .018, z); orden.add(oere); }
+    for (const [x, z] of [[-.03, -.02], [-.03, .02], [.03, -.02], [.03, .02]]) { const ben = new THREE.Mesh(new THREE.CylinderGeometry(.01, .01, .035, 6), hvid); ben.position.set(x, -.04, z); orden.add(ben); }
+    const taarn = new THREE.Mesh(new THREE.BoxGeometry(.035, .03, .03), guld); taarn.position.set(-.008, .052, 0); orden.add(taarn);
+    for (const z of [-.018, .018]) { const sten = new THREE.Mesh(new THREE.SphereGeometry(.006, 6, 4), std('#e8f0ff', { metalness: .9, roughness: .1 })); sten.position.set(.045, .03, z); orden.add(sten); }
+    ordenObj = orden;
+    // Landstingssalen: name cards on the desks for the press conference, ordered by rank
+    const navne = ['Rigspolitiet', 'Kommissær Hald', 'Statsministeren', 'Reformministeren', 'A. Mørkeberg', 'Departementschefen', 'Kompaspartiet'];
+    navne.forEach((navn, j) => {
+      const tex = ctex(256, 64, (c, W, H) => { c.fillStyle = '#fbfaf5'; c.fillRect(0, 0, W, H); c.fillStyle = '#1f2a44'; c.font = 'bold 26px Georgia'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(navn, W / 2, H / 2, W - 16); }, { wrap: false });
+      const kort = new THREE.Mesh(new THREE.PlaneGeometry(.4, .1), new THREE.MeshBasicMaterial({ map: tex })); kort.position.set(-62.6, I.floor + .97, -5.4 + j * 1.8); kort.rotation.y = Math.PI / 2; inde.add(kort);
+      box(.03, .1, .4, std('#fbfaf5'), -62.63, I.floor + .91, -5.4 + j * 1.8, { parent: inde, cast: false });
+    });
   }
 
   // ---- every frame: what Ida can do where she stands
   HOOKS.frame.push(() => {
     if (!started) return;
     for (const [id, obj] of Object.entries(ting)) obj.visible = !!U[id] && GAADE.ok(U[id].kraever);
+    if (ordenObj) ordenObj.visible = !GAADE.G.ting.includes('elefantorden');
     if (paused) return;
     const st = vedDoer();
     if (st) {
@@ -6424,7 +6548,7 @@ const PERSONER = (() => {
   const M = GAADE.M, I = INTERIOR;
   // ---- where Ida stands, as a place of the manuscript
   const INDE = { 'folketing/hall': 'vandrehallen', 'folketing/betjent': 'betjentstuen', 'folketing/samtale': 'samtalevaerelset', 'folketing/kompas': 'kompas_gang', 'folketing/office1': 'kompas_kontor', 'folketing/office2': 'kompas_gang', 'folketing/secretariat': 'sekretariatet', 'folketing/meeting': 'kompas_moedelokale', 'folketing/snap': 'snapstinget', 'folketing/snapgang': 'snapstinget', 'folketing/landsting': 'landstingssalen', 'finance/fm-wardrobe': 'fm_garderoben', 'finance/fm-meeting': 'fm_forhandlingsrummet', 'reform/rm-office': 'valdorfs_kontor', 'reform/rm-print': 'rm_printeren', 'reform/rm-side': 'rm_sidedoeren' };
-  const BYG = { folketing: 'folketinget', finance: 'finansministeriet', reform: 'reformministeriet', towerLobby: 'taarnet', towerRestaurant: 'restauranten', stables: 'stalden' };
+  const BYG = { folketing: 'folketinget', finance: 'finansministeriet', reform: 'reformministeriet', towerLobby: 'taarnet', towerRestaurant: 'restauranten', stables: 'stalden', riddersal: 'riddersalen' };
   const qR = QUAYS.find(q => q.id === 'reform'), qS = QUAYS.find(q => q.id === 'slots');
   const UDE = [   // smallest first: [place, x, z, radius]
     ['proviantpassagen', 82, 74, 8], ['rigsdagsgaarden', ...FT.at(0, 8), 10], ['kajen_reform', qR.x, qR.z, 9], ['kajen_slots', qS.x, qS.z, 9],
@@ -6484,6 +6608,9 @@ const PERSONER = (() => {
   const tlf = (sh, part, m) => { sh.rotation.x = -1.05; part(new THREE.BoxGeometry(0.075, 0.012, 0.15), m('#1d2027'), sh, 0, -0.64, 0.05, 1.1); };
   const kande = (sh, part, m) => { sh.rotation.x = -0.35; part(new THREE.CylinderGeometry(0.07, 0.085, 0.24, 12), m('#c9ccd0'), sh, 0, -0.76, 0.03, 1.06); };
   const rundstykke = (sh, part, m) => { sh.rotation.x = -1.25; part(new THREE.SphereGeometry(0.06, 10, 8), m('#c98c4a'), sh, 0, -0.66, 0.05, 1.08); };
+  const handske = (sh, part, m) => { part(new THREE.SphereGeometry(0.064, 10, 8), m('#f6f5f0'), sh, 0, -0.6, 0, 1.05); };
+  const protokol = (sh, part, m) => { sh.rotation.z -= 0.08; handske(sh, part, m); part(new THREE.BoxGeometry(0.07, 0.34, 0.3), m('#6b1f27'), sh, 0.03, -0.3, 0.02, 1.05); };   // a thick red book under the arm
+  const skilt = (sh, part, m) => { sh.rotation.x = -0.8; const k = part(new THREE.BoxGeometry(0.32, 0.1, 0.012), m('#fbfaf5'), sh, 0, -0.66, 0.06, 1.08); k.rotation.x = 0.8; };
   const mappe = (sh, part, m) => { part(new THREE.BoxGeometry(0.09, 0.3, 0.4), m('#4a2e1f'), sh, 0.02, -0.8, 0, 1.04); };   // a briefcase in his hand
   const LOOK = {
     bente: { coat: '#24324a', trousers: '#24324a', hair: '#9b9b9b', hairStyle: 'knold', long: true, scale: 0.95, skin: '#efc6a8',
@@ -6514,6 +6641,18 @@ const PERSONER = (() => {
       extra: (g, head, part, m) => { for (const s of [-1, 1]) part(new THREE.BoxGeometry(0.04, 0.012, 0.01), m('#8d6a6a'), head, s * 0.047, -0.012, 0.132, 0); } },   // dark rings under the eyes
     valdorf: { coat: '#6e7379', trousers: '#5f646a', hair: '#d9d9d6', hairStyle: 'kort', scale: 1.03, skin: '#c98d62', arm: [null, mappe],
       extra: (g, head, part, m) => { part(new THREE.BoxGeometry(0.16, 0.05, 0.02), m('#f4f4f0'), g, 0, 1.52, 0.19, 0); part(new THREE.BoxGeometry(0.06, 0.3, 0.02), m('#e2b33c'), g, 0, 1.33, 0.208, 0); } },   // white collar and yellow tie
+    // Riddersalen and Landstingssalen
+    hoffourer: { coat: '#1c2233', trousers: '#1c2233', hair: '#a9a9a6', hairStyle: 'skaldet', long: true, scale: 1.02, skin: '#ecc8aa', arm: [protokol, handske],
+      extra: (g, head, part, m) => {   // a dark livery with gold buttons and a gold collar
+        for (const y of [1.06, 1.2, 1.34, 1.48]) part(new THREE.SphereGeometry(0.02, 8, 6), m('#d4af37'), g, 0, y, 0.205, 0);
+        const k = part(new THREE.TorusGeometry(0.155, 0.03, 8, 18), m('#c9a24b'), g, 0, 1.6, 0, 0); k.rotation.x = Math.PI / 2;
+      } },
+    mogens: { coat: '#7a5a3c', trousers: '#4a4a46', hair: '#8c7c6c', hairStyle: 'skaldet', scale: 0.98, skin: '#eac3a3', arm: [null, skilt],
+      extra: (g, head, part, m) => {   // glasses with tape on one side, and the DJØF pin on his cardigan
+        for (const s of [-1, 1]) { const r = part(new THREE.TorusGeometry(0.034, 0.007, 6, 14), m('#2b2b2b'), head, s * 0.047, 0.015, 0.138, 0); }
+        part(new THREE.BoxGeometry(0.03, 0.03, 0.02), m('#f4f4ee'), head, 0.08, 0.015, 0.136, 0);
+        part(new THREE.SphereGeometry(0.018, 8, 6), m('#d4af37'), g, -0.1, 1.45, 0.2, 0);
+      } },
   };
   // ---- where each person stands at a place of the manuscript: outdoors {ude:[x,z]} or indoors {place, at:[x,z]}
   const se = STABLE_ENTRY || { x: -165, z: 86, nx: 1, nz: 0 };
@@ -6536,6 +6675,9 @@ const PERSONER = (() => {
     jonas: { kompas_kontor: { place: 'folketing', at: [19.3, 11], face: Math.PI / 2, r: 2.4 } },
     pernille: { slotspladsen: { ude: PRESS.at(7, 5.6), face: Math.atan2(PRESS.at(4, 1)[0] - PRESS.at(7, 5.6)[0], PRESS.at(4, 1)[1] - PRESS.at(7, 5.6)[1]), r: 2.6 } },
     // Valdorf comes up the stairs at 07.30 and stays in the hall near the commissioner; in act 3 he is in the restaurant
+    hoffourer: { riddersalen: { place: 'riddersal', at: [641.6, 1.4], face: -Math.PI / 2, r: 2.6 } },
+    // Mogens sets out the name cards for the press conference in Landstingssalen
+    mogens: { landstingssalen: { place: 'folketing', at: [-60.2, 6.4], face: -Math.PI / 2, r: 2.4 } },
     valdorf: {
       vandrehallen: { place: 'folketing', at: [5.5, 2.4], face: 2.35, r: 2.4 },
       restauranten: { place: 'towerRestaurant', at: [443.1, 5.4], face: Math.PI / 2, r: 2.4 },

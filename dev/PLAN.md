@@ -258,4 +258,10 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Rettet: stolene i restauranten vendte ryggen mod bordet, frisuren "bob" dækkede ansigtet fra siden, og statsministerens røde tørklæde var skjult inde i frakken.
   - Når en akt skifter midt i en samtale, venter kortet med den nye akt, til samtalen er lukket, så man kan nå at læse svaret.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele akt 2 med alle fire mistænkte, Bodil, Valdorfs ankomst, rapporten til Ditte og telefonen til Jonas, til kortet for akt 3.
-- [ ] Trin 7: Riddersalen.
+- [x] Trin 7: Riddersalen (19. okt. 2026). Riddersalen findes nu og åbner i akt 3. Mogens står i Landstingssalen fra akt 2.
+  - Nyt rum: Riddersalen (`buildRiddersal`, sted `riddersal` i interiøret). Indgangen "De Kongelige Repræsentationslokaler" ligger på slottets facade i Prins Jørgens Gård mellem to statuer. Den er med i oversigtskortet, i hjælpen og på listen over startsteder. Se `dev/INTERIOR.md`, runde 12.
+  - I salen: 17 vævede billeder med nye, abstrakte mønstre (ikke kopier af gobelinerne), syv vinduer, malet loft, tre lysekroner og et langbord dækket til gallamiddag med 44 stole. I bordets ende står etuiet med Elefantordenen og et lyseblåt bånd. Elefanten forsvinder fra etuiet, mens Ida har lånt den.
+  - Hoffoureren (mørk livré med guldknapper, hvide handsker og en tyk rød protokol under armen) står ved bordets ende. Mogens (brun cardigan, briller med tape, DJØF-nål og et navneskilt i hånden) står ved podiet i Landstingssalen, hvor der nu står navneskilte på bordene.
+  - Nye ting at undersøge: gobelinerne, etuiet og navneskiltene. Manuskriptet har fået teksten "Etuiet er tomt", når Ida har ordenen.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: lukket i akt 2, åben i akt 3, hoffoureren, gobelinerne, lån ordenen, vis den til Mogens (koden og det våde hår), læg den tilbage og gå ud igen.
+- [ ] Trin 8: akt 3.
