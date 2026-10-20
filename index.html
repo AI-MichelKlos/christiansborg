@@ -134,6 +134,7 @@ body.storTekst .keys{font-size:16px}
 #ur{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 10px;min-width:56px;box-sizing:border-box;line-height:1.05;background:#fffdf6}
 #urKl{font:800 17px var(--display);letter-spacing:.02em}
 #urAkt{font:600 10px var(--body);letter-spacing:.06em;text-transform:uppercase;opacity:.72}
+#urStop{font:700 10px var(--body);color:#b23a2a;white-space:nowrap}
 .gd{position:fixed;inset:12px;margin:auto;box-sizing:border-box;width:min(720px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;border:2.5px solid var(--ink);border-radius:18px;padding:0 20px 20px;background:var(--paper);color:var(--ink);font:calc(15px * var(--ts))/1.5 var(--body);box-shadow:4px 5px 0 var(--ink)}
 .gd.gdSmall{width:min(420px,calc(100vw - 24px))}
 .gd::backdrop{background:rgba(20,24,23,.62)}
@@ -215,7 +216,7 @@ body.storTekst .keys{font-size:16px}
 
 <div id="hud" hidden>
   <div id="tools">
-    <div id="ur" class="sticker" role="status"><b id="urKl">06.00</b><span id="urAkt">Akt 1</span></div>
+    <div id="ur" class="sticker" role="status"><b id="urKl">06.00</b><span id="urAkt">Akt 1</span><span id="urStop" hidden></span></div>
     <button id="bNotes" class="sticker btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-keyshortcuts="N"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6z"/><path d="M6 3v18M9.5 8h5M9.5 12h5"/></svg><span>Notesbog</span></button>
     <button id="bPack" class="sticker btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-keyshortcuts="R"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 10a6 6 0 0112 0v9a2 2 0 01-2 2H8a2 2 0 01-2-2z"/><path d="M9 6V4.5A1.5 1.5 0 0110.5 3h3A1.5 1.5 0 0115 4.5V6M9 21v-5h6v5"/></svg><span>Rygsæk</span></button>
     <button id="bMap" class="sticker btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Kort</span></button>
@@ -4226,7 +4227,7 @@ const FOUNTAIN = (() => {
   const F = { cx, cz, on: 0, next: 25 };
   const start = () => { F.on = 9; pts.visible = true; tone(300, 180, 0, 0.5, 0.03, 'triangle'); };
   HOOKS.frame.push((dt, t) => {
-    F.next -= dt; if (F.next <= 0 && F.on <= 0) { F.next = rr(45, 70); if (started && Math.hypot(P.pos.x - cx, P.pos.z - cz) < 60) start(); }
+    F.next -= dt; if (F.next <= 0 && F.on <= 0) { F.next = rr(45, 70); if (started && (!F.tilladt || F.tilladt()) && Math.hypot(P.pos.x - cx, P.pos.z - cz) < 60) start(); }   // tilladt: the story says when
     if (F.on > 0) F.on -= dt;
     let alive = 0, spawn = F.on > 0 ? Math.ceil(dt * 70) : 0;
     for (let i = 0; i < N; i++) {
@@ -4243,9 +4244,8 @@ const FOUNTAIN = (() => {
     }
     geo.attributes.position.needsUpdate = alive > 0; pts.visible = alive > 0;
     rings.forEach((m, i) => { const ph = (t * 0.5 + i / 3) % 1; m.visible = alive > 0; m.scale.setScalar(1.6 + ph * 2.6); m.material.opacity = 0.55 * (1 - ph); });
-    if (!started || paused || F.on > 0) return;
-    if (Math.hypot(P.pos.x - cx, P.pos.z - cz) < 19) offerAction({ id: 'springvand', label: 'Start springvandet', prio: 1, run: start });
   });
+  F.start = start;
   return F;
 })();
 
@@ -4271,19 +4271,21 @@ const MYBOAT = { x: -37.5, z: -170.6, h: -1.27, v: 0, on: false, duck: 0, putT: 
   // white foam behind the boat when it sails
   MYBOAT.foam = Array.from({ length: 14 }, () => { const m = new THREE.Mesh(new THREE.CircleGeometry(0.25, 12), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.visible = false; dyn.add(m); return { m, t: 9 }; });
 }
-POIS.push({ n: 'Den lille båd', t: 'En lille rød båd ved kajen. Gå hen til den for at sejle i kanalen.', x: MYBOAT.x, z: MYBOAT.z, r: 9 });
+POIS.push({ n: 'Den lille båd', t: 'En lille rød båd ved kajen. Den er låst med en kæde og en hængelås.', x: MYBOAT.x, z: MYBOAT.z, r: 9 });
 const BOAT_POI = POIS[POIS.length - 1];
 function lowAt(x, z) {   // under the low ends of an arched bridge
   for (const F of ARCHES) { const dx = x - F.cx, dz = z - F.cz, s = dx * F.ux + dz * F.uz; if (Math.abs(s) >= F.L / 2) continue; if (Math.abs(dx * F.vx + dz * F.vz) < F.W / 2 + 0.4 && archSoffit(F, s) < WL + 2.0) return true; }
   return false;
 }
 const HULL_PTS = [[0, 2.8], [0, -3.0], [-1.15, 1.4], [1.15, 1.4], [-1.15, -0.6], [1.15, -0.6], [-1.1, -2.6], [1.1, -2.6]];
+const BOAT_POSTS = [];   // posts in the water the boat cannot sail through: [x, z]
 function boatFits(x, z, h, boats = true) {
   if (x < BOUNDS[0] - 40 || x > BOUNDS[1] + 40 || z < BOUNDS[2] - 40 || z > BOUNDS[3] + 40) return false;
   const c = Math.cos(h), s = Math.sin(h);
   for (const [lx, lz] of HULL_PTS) {
     const px = x + lx * c + lz * s, pz = z - lx * s + lz * c;
     if (!rawWater(px, pz) || lowAt(px, pz) || quaySurfaceAt(px,pz)) return false;
+    for (const [qx, qz] of BOAT_POSTS) if (Math.hypot(px - qx, pz - qz) < 0.45) return false;
     if (boats) for (const b of BOATS) {   // the big boats
       const bx = px - b.g.position.x, bz = pz - b.g.position.z, fx = Math.sin(b.head), fz = Math.cos(b.head), L = b.big ? 11.6 : 7.4, W = b.big ? 3.5 : 2.3;
       if (Math.abs(bx * fx + bz * fz) < L && Math.abs(bx * fz - bz * fx) < W) return false;
@@ -4299,6 +4301,11 @@ function landSpot() {   // a free spot on the quay next to the boat
     if (!waterAt(x, z) && !inBuilding(x, z) && groundAt(x, z, 99) - archH(x, z) < 0.3 && x > BOUNDS[0] && x < BOUNDS[1] && z > BOUNDS[2] && z < BOUNDS[3]) return [x, z];
   }
   return null;
+}
+{ // The murder mystery: the rowing club's little red boat lies at the quay by the Reform ministry, not at Gammel Strand
+  const q = QUAYS.find(q => q.id === 'reform'), h = Math.atan2(q.ux, q.uz);
+  for (let d = -3.2; d > -9; d -= 0.2) { const [x, z] = q.at(0, d); if (boatFits(x, z, h, false)) { MYBOAT.x = x; MYBOAT.z = z; MYBOAT.h = h; break; } }
+  BOAT_POI.x = MYBOAT.x; BOAT_POI.z = MYBOAT.z;
 }
 const toot = () => { tone(392, 388, 0, 0.22, 0.08, 'triangle'); tone(523, 518, 0, 0.22, 0.05, 'sine'); tone(392, 388, 0.3, 0.4, 0.08, 'triangle'); tone(523, 518, 0.3, 0.4, 0.05, 'sine'); };
 let sailedOnce = false;
@@ -4366,7 +4373,7 @@ HOOKS.frame.push((dt, t) => {
   for (const f of B.foam) if (f.t <= 1.6) { f.t += dt; f.m.scale.setScalar(0.6 + f.t * 0.9); f.m.material.opacity = Math.max(0, 0.6 * (1 - f.t / 1.6)); if (f.t > 1.6) f.m.visible = false; }
   if (!started || paused) return;
   if (!B.on) {
-    if (Math.hypot(P.pos.x - B.x, P.pos.z - B.z) < 5.5 && !waterAt(P.pos.x, P.pos.z)) offerAction({ id: 'sejl', label: 'Sejl med båden', prio: 3, run: boardBoat });
+    if (Math.hypot(P.pos.x - B.x, P.pos.z - B.z) < 5.5 && !waterAt(P.pos.x, P.pos.z) && !(B.laast && B.laast())) offerAction({ id: 'sejl', label: 'Sejl med båden', prio: 3, run: boardBoat });   // laast: the padlock (murder mystery)
   } else {
     const spot = landSpot(); if (spot) offerAction({ id: 'land', label: 'Gå i land', prio: 2, run: () => leaveBoat(spot) });
     B.stillT = !spot && Math.abs(B.v) < 0.3 ? (B.stillT || 0) + dt : 0;   // she stops out on the water: tell her how to get ashore (once each trip)
@@ -5302,7 +5309,7 @@ const INTERIOR = (() => {
     sign('Restauranten · 34 m',4,.6,440,4,13.32,Math.PI);
   }
 
-  function stableFits(x,z){return x>297.85&&x<302.15&&z> -19.55&&z<19.55||x>296&&x<307.5&&z>17.25&&z<19.55;}
+  function stableFits(x,z){return x>297.85&&x<302.15&&z> -19.55&&z<19.55||x>296&&x<307.5&&z>17.25&&z<19.55||x>296.35&&x<303.65&&z> -26.65&&z< -20.35||Math.abs(x-300)<1.1&&z> -20.7&&z< -19.3;}
   function buildStables(){
     const white=material('#e8e4da'),wood=material('#72482e'),iron=material('#373d38'),glow=new THREE.MeshBasicMaterial({color:'#fff0d1'});
     const marbleTex=ctex(128,256,(c,W,H)=>{c.fillStyle='#a79e86';c.fillRect(0,0,W,H);for(let k=0;k<25;k++){c.strokeStyle=k%2?'#c9c5b4':'#777c6c';c.lineWidth=1.1;c.beginPath();for(let y=0;y<H;y+=7){const x=k*9-45+y*.15+Math.sin(y/31+k)*7;y?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}},{rep:.65});
@@ -5310,8 +5317,26 @@ const INTERIOR = (() => {
     const paving=ctex(128,128,(c,W,H)=>{c.fillStyle='#b0a591';c.fillRect(0,0,W,H);for(let y=0;y<8;y++)for(let x=-1;x<9;x++){c.fillStyle=['#b6ab96','#a39985','#c0b49b'][(x+10+y)%3];c.fillRect(x*16+(y%2)*8+1,y*16+1,14,14);}},{rep:.8});
     b(16,.2,40,material('#fff',{map:paving}),300,-.2,0);
     for(const x of [292,308])b(.3,5.7,40,white,x,0,0);
-    b(16,5.7,.3,white,300,0,-20);
-    for(const [a,c]of[[292,298.5],[301.5,308]])b(c-a,5.7,.3,white,(a+c)/2,0,20);
+    for(const [a,c]of[[292,298.5],[301.5,308]])b(c-a,5.7,.3,white,(a+c)/2,0,-20);b(3,2.45,.3,white,300,3.25,-20);
+    // The saddle room behind the far end wall (Sadelkammeret). Its layout is invented for the story.
+    {
+      const plank=material('#8a6142'),dark=material('#4a3122'),leather=material('#6b3f22'),cloth=material('#2f4a6b'),gold=material('#c9a24b',{metalness:.55,roughness:.35});
+      b(8,.2,7,plank,300,-.2,-23.5);b(8,.2,7,white,300,3.4,-23.5);
+      b(8,3.4,.3,white,300,0,-27);for(const x of [296,304])b(.3,3.4,7,white,x,0,-23.5);
+      b(7.7,1.1,.08,plank,300,0,-26.8);for(const x of [296.19,303.81])b(.08,1.1,6.6,plank,x,0,-23.5);
+      openDoor(300,-20,Math.PI,0,'Sadelkammeret','Til staldgangen');
+      for(const side of [-1,1])for(const z of [-21.6,-23.2,-24.8]){   // saddles on wall racks
+        const x=300+side*3.55;b(.5,.08,.12,dark,x,1.25,z);
+        const sad=new THREE.Mesh(new THREE.SphereGeometry(.3,14,8,0,Math.PI*2,0,Math.PI/2),leather);sad.scale.set(1,.55,1.15);sad.position.set(x-side*.05,1.33,z);g.add(sad);b(.06,.4,.04,dark,x-side*.05,.95,z+.2);
+        b(.04,.5,.66,cloth,x+side*.02,.95,z);obstacle(x,z,.8,.9);
+      }
+      for(const x of [297.4,298.3,301.7,302.6]){b(.06,.1,.12,gold,x,2.1,-26.82);mesh(new THREE.TorusGeometry(.18,.025,6,16),leather,x,1.85,-26.78,{parent:g});b(.03,.5,.02,leather,x,1.3,-26.78);}
+      // the old cabinet with a small crown on its door
+      b(1.7,2.3,.6,dark,300,0,-26.5);b(.04,2.05,.62,material('#2e1f15'),300,.12,-26.5);obstacle(300,-26.5,1.8,.7);
+      b(.34,.12,.04,gold,300,1.75,-26.18);for(const dx of [-.12,0,.12])mesh(new THREE.ConeGeometry(.035,.09,6),gold,300+dx,1.91,-26.17,{parent:g});
+      b(.05,.12,.04,gold,300.12,1.05,-26.18);
+      b(1.2,.05,.45,material('#fff0d1'),300,3.36,-23.5);
+    }
     b(3,2.45,.3,white,300,3.25,20);openDoor(300,20,0,0,'Ud til Ridebanen','De Kongelige Stalde');
     for(const side of [-1,1]){
       b(5.5,.2,40,white,300+side*5.25,4.05,0);b(.2,1.7,40,marble,300+side*7.7,0,0);
@@ -5343,7 +5368,7 @@ const INTERIOR = (() => {
     for(const [x,z,ry]of[[295.1,-9,Math.PI/2],[295.1,9,Math.PI/2],[304.9,-3,-Math.PI/2],[304.9,9,-Math.PI/2]])horse(x,z,ry);
     // Small tack alcove by the entrance with blank hooks and leather loops.
     for(const z of [17.7,18.7]){b(.1,.25,.1,brass,307.65,1.9,z);mesh(new THREE.TorusGeometry(.22,.035,6,16),iron,307.6,1.55,z,{parent:g,ry:Math.PI/2});}
-    sign('De Kongelige Stalde',4,.6,300,3.3,-19.8);
+    sign('De Kongelige Stalde',4,.6,300,4.6,-19.8);
   }
 
   // Round 4. Two compact, connected layouts, not reconstructions of real plans.
@@ -5574,7 +5599,7 @@ const INTERIOR = (() => {
     if(x>600&&x<650)return 'riddersal';
     if(x< -40.4&&Math.abs(z)<12)return 'landsting';
     if(x>390&&x<410)return 'towerLobby';if(x>429&&x<451)return 'towerRestaurant';
-    if(x>290&&x<310)return 'stables';
+    if(x>290&&x<310)return z< -20.1?'sadel':'stables';
     if(x>80)return ministryRooms.find(r=>x>=r.a&&x<=r.c&&z>=r.n&&z<=r.s)?.id||'ministry';
     const annex=roundThreeAt(x,z);if(annex)return annex;
     if(Math.abs(x)<6.1&&z< -4.8&&z> -18)return 'samtale';
@@ -5659,7 +5684,7 @@ const INTERIOR = (() => {
     kid.root.visible=false;
     const room=roomAt(x,z);
     const annexNames={kompas:'Kompaspartiet · gangen',office1:'Kompaspartiet · kontor 1',office2:'Kompaspartiet · kontor 2',secretariat:'Kompaspartiet · sekretariatet',meeting:'Kompaspartiet · mødelokalet',snap:'Snapstinget',snapgang:'Gangen til Snapstinget'};
-    const name=room==='courtEntry'?'Højesteret · vindfang':room==='folkesal'?'Folketingssalen':room==='pmEntry'?'Statsministeriet · forhal':room==='riddersal'?'Riddersalen':room==='landsting'?'Landstingssalen':room==='towerLobby'?'Tårnet · elevatorhallen':room==='towerRestaurant'?'Restauranten i Tårnet · 34 m':room==='stables'?'De Kongelige Stalde':ministryRooms.find(r=>r.id===room)?.name||annexNames[room]|| (room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>7.5?(Math.abs(x)>3.2?'Vandrehallen · trappegalleriet':'Trappen til Vandrehallen'):Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen');
+    const name=room==='courtEntry'?'Højesteret · vindfang':room==='folkesal'?'Folketingssalen':room==='pmEntry'?'Statsministeriet · forhal':room==='riddersal'?'Riddersalen':room==='landsting'?'Landstingssalen':room==='towerLobby'?'Tårnet · elevatorhallen':room==='towerRestaurant'?'Restauranten i Tårnet · 34 m':room==='sadel'?'De Kongelige Stalde · sadelkammeret':room==='stables'?'De Kongelige Stalde':ministryRooms.find(r=>r.id===room)?.name||annexNames[room]|| (room==='samtale'?'Samtaleværelset':room==='betjent'?'Betjentstuen':z>7.5?(Math.abs(x)>3.2?'Vandrehallen · trappegalleriet':'Trappen til Vandrehallen'):Math.abs(x)<10?'Vandrehallen · Rigets midte':'Vandrehallen');
     $('indoorName').textContent=name;
     if(I.place==='towerLobby'&&z< -4)offerAction({id:'tower-restaurant',label:'Kør til restauranten',prio:12,run:()=>liftTo('towerRestaurant')});
     if(I.place==='towerRestaurant'&&x>447.3&&z< -6.4&&P.pos.y>4.9)offerAction({id:'tower-view',label:'Fortsæt til Udsigten',prio:12,run:()=>liftTo('view')});
@@ -6193,6 +6218,7 @@ const LAAS = (() => {
     snapstinget:       { place: 'folketing', rooms: ['snap', 'snapgang'], doors: [[-4, 20.4]] },
     finansministeriet: { place: 'finance', rooms: ['fm-wardrobe', 'fm-corridor', 'fm-meeting'], doors: [[98.6, 6], [100, 2.6]] },
     valdorfs_kontor:   { place: 'reform', rooms: ['rm-office'], doors: [[198.6, -11]] },
+    sadelkammeret:     { place: 'stables', rooms: ['sadel'], doors: [[300, -20]] },   // Vega stands in front of it
   };
   const BYGNING = { folketing: 'folketinget', reform: 'reformministeriet', towerLobby: 'taarnet', riddersal: 'riddersalen' };   // whole buildings, checked at the front door
   const rumSted = {}; for (const [id, r] of Object.entries(RUM)) for (const room of r.rooms) rumSted[r.place + '/' + room] = id;
@@ -6206,6 +6232,7 @@ const LAAS = (() => {
     if (s.inde_i) { const st = status(s.inde_i); if (!st.aaben) return st; }
     if (!s.laas || G.laast.includes(id)) return { aaben: true };
     const ting = (s.laas.kraever || []).map(k => (k.match(/^ting:(\w+)$/) || [])[1]).find(Boolean);
+    if (!s.laas.kode && !ting && GAADE.ok(s.laas.kraever)) return { aaben: true };   // nothing to open with, e.g. the horse has moved
     return { aaben: false, id, laas: s.laas, tekst: s.laas.tekst, kode: s.laas.kode, ting, kan: !s.laas.kode && GAADE.ok(s.laas.kraever) };
   }
   let bumpT = 0;
@@ -6276,6 +6303,10 @@ const LAAS = (() => {
   const pondEdge = (fx, fz, tx, tz) => { const a = GARDEN.at(fx, fz), b = GARDEN.at(tx, tz); let k = 0; while (k < 1 && !waterAt(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k)) k += 0.01; return [a[0] + (b[0] - a[0]) * (k - 0.01), a[1] + (b[1] - a[1]) * (k - 0.01)]; };
   const kant = pondEdge(-23, 8, 0, 0), ringP = pondEdge(0, 30, 0, 0);
   const toward = (p, q, d) => { const l = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; return [p[0] + (q[0] - p[0]) / l * d, p[1] + (q[1] - p[1]) / l * d]; };
+  // The quay by the Reform ministry, and the old mooring post in the middle of the canal between the two quays
+  const KAJ = QUAYS.find(q => q.id === 'reform'), KAJ2 = QUAYS.find(q => q.id === 'slots');
+  const PAEL = (() => { const a = KAJ.at(0, -6), c = KAJ2.at(0, -6); let p = [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2]; for (let k = 0; k < 40 && !rawWater(p[0], p[1]); k++) p = [p[0] + (c[0] - p[0]) * .1, p[1] + (c[1] - p[1]) * .1]; return p; })();
+  BOAT_POSTS.push(PAEL);
   const FUND = {
     liget:      { place: 'folketing', at: [8, -2.6], r: 1.9 },
     bordet:     { place: 'folketing', at: [8, -1.5], r: 2.3 },
@@ -6304,6 +6335,20 @@ const LAAS = (() => {
     etuiet:     { place: 'riddersal', at: [638.4, -1.35], r: 1.6 },
     etuiet_tomt: { place: 'riddersal', at: [638.4, -1.35], r: 1.6 },
     navneskiltene: { place: 'folketing', at: [-61.2, -0.9], r: 2.2 },
+    // Act 3
+    knagerne:   { place: 'finance', at: [94.5, 3.6], r: 2 },
+    referatet:  { place: 'finance', at: [100, -9.2], r: 1.8 },
+    printloggen: { place: 'reform', at: [207.3, -8], r: 1.6 },
+    kilen:      { place: 'reform', at: [210.6, -16.2], r: 1.4 },
+    baaden:     { ude: KAJ.at(0, 6.6), r: 2.8 },   // at the top of the quay steps, away from where she gets into the boat
+    sejl:       { ude: KAJ.at(0, 6.6), r: 2.8 },
+    tidsproeven: { ude: KAJ.at(0, 6.6), r: 2.8 },
+    termokanden: { baad: PAEL, r: 5 },
+    kikkerten:  { udsigt: true, kunNy: true },
+    sadeldoeren: { place: 'stables', at: [300, -16.6], r: 2 },
+    gulerod:    { place: 'stables', at: [300, -16.6], r: 2 },
+    skabet:     { place: 'stables', at: [300, -25.2], r: 1.5 },
+    skabet_laast: { place: 'stables', at: [300, -25.2], r: 1.5 },
     kontoret:   { place: 'reform', at: [194, -11.4], r: 2.6 },
     jakken:     { place: 'reform', at: [196.9, -15.4], r: 1.9, prio: 8 },
   };
@@ -6312,8 +6357,9 @@ const LAAS = (() => {
   function undersoeg(u) {
     GAADE.tid(M.ur.minutterPrUndersoeg);
     if (VIS[u.id]) return VIS[u.id](u);
-    GAADE.scene({ eyebrow: stedNavn(u), title: u.navn, lines: u.replikker, efter: () => GAADE.giv(u.giver) });
+    GAADE.scene({ eyebrow: stedNavn(u), title: u.navn, lines: u.replikker, efter: () => { GAADE.giv(u.giver); EFTER[u.id]?.(); } });
   }
+  const EFTER = { sejl: () => { if (!MYBOAT.on) boardBoat(); } };   // after the padlock is open she gets into the boat
   // Does a thing to examine still have something new to give? New things come before talk and before old things.
   function nyt(giver) {
     const G = GAADE.G;
@@ -6385,8 +6431,33 @@ const LAAS = (() => {
   gnidD.addEventListener('cancel', () => lukGnid(gnidFaerdig)); gnidD.addEventListener('close', () => lukGnid(gnidFaerdig));
   gnidD.addEventListener('keydown', e => e.stopPropagation());
   gnidD.addEventListener('pointerdown', e => e.stopPropagation()); gnidD.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
-  const VIS = { blyanten: gnid };
+  // ---- the time trial: a stopwatch from the quay by the ministry to the door in Rigsdagsgården
+  let stopur = null;
+  function startStopur(u) {
+    stopur = { u, gaa: 0, baad: 0, sidst: [P.pos.x, P.pos.z] };
+    $('urStop').hidden = false; $('urStop').textContent = 'Stopur 0 min';
+    toast('Stopuret kører. Sejl over kanalen, læg til ved kajen ved Slotspladsen, og gå til døren i Rigsdagsgården.');
+  }
+  const stopMin = () => stopur.gaa / M.ur.meterPrMinut + stopur.baad / 120;   // the boat does about 120 m a minute
+  function stopStopur() {
+    const n = Math.max(1, Math.round(stopMin())), u = stopur.u; stopur = null; $('urStop').hidden = true;
+    const tid = n === 1 ? '1 minut' : n + ' minutter', lines = u.replikker.map(([w, t]) => [w, t.replace('{tid}', tid)]);
+    if (n > 8 && u.langsom) lines[lines.length - 1] = u.langsom;
+    GAADE.scene({ eyebrow: 'Rigsdagsgården', title: u.navn, lines, efter: () => GAADE.giv(u.giver) });
+  }
+  function tjekStopur() {
+    if (!stopur) return;
+    const d = Math.hypot(P.pos.x - stopur.sidst[0], P.pos.z - stopur.sidst[1]); stopur.sidst = [P.pos.x, P.pos.z];
+    if (d < 20 && !I.on) { if (MYBOAT.on) stopur.baad += d; else stopur.gaa += d; }
+    $('urStop').textContent = 'Stopur ' + Math.round(stopMin()) + ' min';
+    const dor = FT.at(0, 1.7);
+    if ((I.on && I.place === 'folketing') || (!I.on && Math.hypot(P.pos.x - dor[0], P.pos.z - dor[1]) < 2.5)) stopStopur();
+    else if (I.on) { stopur = null; $('urStop').hidden = true; toast('Stopuret er stoppet. Start forfra ved kajen.'); }
+  }
+  const VIS = { blyanten: gnid, tidsproeven: startStopur };
   function her(f) {
+    if (f.baad) return MYBOAT.on && Math.hypot(MYBOAT.x - f.baad[0], MYBOAT.z - f.baad[1]) < f.r;   // from the boat
+    if (f.udsigt) return !!FX.tower?.on && !FX.tower.busy;   // up on Udsigten
     if (f.ude) return !I.on && !MYBOAT.on && !FX.tower?.on && Math.hypot(P.pos.x - f.ude[0], P.pos.z - f.ude[1]) < f.r;
     return I.on && I.place === f.place && Math.hypot(P.pos.x - I.x - f.at[0], P.pos.z - f.at[1]) < f.r;
   }
@@ -6396,6 +6467,7 @@ const LAAS = (() => {
   const inde = new THREE.Group(); inde.userData.keep = true; I.group.add(inde);   // moves with the interiors and is hidden outside
   const ude = new THREE.Group(); dyn.add(ude);
   const ting = {};
+  let vegaObj = null, springStartet = false;
   let ordenObj = null;   // the Order of the Elephant in its case: gone while Ida has borrowed it
   function glasses(parent, x, y, z, ry, mat) {
     const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g);
@@ -6504,6 +6576,33 @@ const LAAS = (() => {
     const taarn = new THREE.Mesh(new THREE.BoxGeometry(.035, .03, .03), guld); taarn.position.set(-.008, .052, 0); orden.add(taarn);
     for (const z of [-.018, .018]) { const sten = new THREE.Mesh(new THREE.SphereGeometry(.006, 6, 4), std('#e8f0ff', { metalness: .9, roughness: .1 })); sten.position.set(.045, .03, z); orden.add(sten); }
     ordenObj = orden;
+    // Act 3. Finansministeriet: the press list on a hook in the cloakroom, and the night's minutes on the long table
+    const ark = (lines, w, h, x, y, z, ry, flat) => {
+      const tex = ctex(256, Math.round(256 * h / w), (c, W, H) => { c.fillStyle = '#fbfaf5'; c.fillRect(0, 0, W, H); c.fillStyle = '#2b2f38'; c.font = 'bold 20px Georgia'; c.textAlign = 'left'; lines.forEach((l, i) => { c.font = (i ? '16px' : 'bold 20px') + ' Georgia'; c.fillText(l, 14, 34 + i * 26, W - 28); }); }, { wrap: false });
+      const q = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide })); q.position.set(x, y, z); q.rotation.y = ry; if (flat) q.rotation.x = -Math.PI / 2; inde.add(q); return q;
+    };
+    ark(['Presseliste', 'Briefing kl. 23', 'Strandvig, Dagbladet', 'Nordlyset: pressekort 17'], .24, .32, 95.2, 1.3, 2.9, 0);
+    for (let i = 0; i < 3; i++) { const r = ark(i < 2 ? [] : ['Referat', '23.40 A. Mørkeberg', '01.30 Dep.chef går', '02.50 Dep.chef tilbage'], .3, .4, 100 + i * .01, .856 + i * .003, -10.55, 0, true); r.rotation.z = .08 - i * .05; }
+    // Reformministeriet: the printer's screen, the rubber wedge at the side door, sailing shoes under the desk and the mail on the screen
+    ark(['RM-DC-01', 'I går 18.05: 1 side', 'I nat 02.36: 14 sider'], .45, .28, 208.2, 1.3, -7.75, 0, true);
+    const kile = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .26, 3), std('#2b2b2b')); kile.rotation.set(0, 0, Math.PI / 2); kile.scale.set(1, 1, .45); kile.position.set(212.9, .05, -15.3); inde.add(kile);
+    for (const dx of [-.12, .12]) { box(.12, .1, .3, std('#24344f'), 194.3 + dx, 0, -13.45, { parent: inde, cast: false }); box(.13, .025, .31, std('#f2f2ee'), 194.3 + dx, 0, -13.45, { parent: inde, cast: false }); }
+    ark(['Nye beregninger til', 'forhandlerne', 'Skrevet 23.12', 'Sendes kl. 02.05'], .95, .55, 194, 1.245, -13.15, 0);
+    // the old mooring post in the canal, and a red glint on the bottom beside it (the thermos)
+    const pael = new THREE.Group(); pael.position.set(PAEL[0], WL, PAEL[1]); ude.add(pael);
+    const stok = new THREE.Mesh(new THREE.CylinderGeometry(.2, .24, 2.6, 10), toon('#4a3a2c')); stok.position.y = .3; pael.add(stok);
+    const hat = new THREE.Mesh(new THREE.CylinderGeometry(.23, .21, .12, 10), toon('#2f2620')); hat.position.y = 1.62; pael.add(hat);
+    const prng = new THREE.Mesh(new THREE.TorusGeometry(.14, .03, 6, 14), toon('#3a3a36')); prng.position.set(0, 1.2, .22); pael.add(prng);
+    const glint = new THREE.Mesh(new THREE.CircleGeometry(.35, 16), new THREE.MeshBasicMaterial({ color: '#c0392b', transparent: true, opacity: .35, depthWrite: false })); glint.rotation.x = -Math.PI / 2; glint.scale.set(1, .45, 1); glint.position.set(.9, .03, .5); pael.add(glint);
+    POIS.push({ n: 'Kanalen ved den gamle fortøjningspæl', quiet: true, t: 'En gammel fortøjningspæl af træ midt i kanalen. Vandet er klart i dag.', x: PAEL[0], z: PAEL[1], r: 7 });
+    // Bibliotekshaven: the torn-out page and the table, floating at the edge after the fountain has sprung
+    const pap = new THREE.Group(); const kp2 = toward(kant, GARDEN.at(-23, 8), .3); pap.position.set(kp2[0], .09, kp2[1]); ude.add(pap);
+    for (const [x, z, r] of [[0, 0, .3], [.35, .2, -.5]]) { const q = new THREE.Mesh(new THREE.PlaneGeometry(.3, .4), new THREE.MeshBasicMaterial({ color: '#f4f1e6', side: THREE.DoubleSide })); q.rotation.set(-Math.PI / 2, 0, r); q.position.set(x, 0, z); pap.add(q); }
+    ting.papirerne = pap;
+    // De Kongelige Stalde: Vega, the big white horse, in front of the saddle room until she gets a carrot
+    vegaObj = buildHorse('#f3f1ea', '#dcd8cc', { nose: '#d8c8bf' }); vegaObj.g.userData.keep = true; vegaObj.g.scale.setScalar(1.12); vegaObj.neck.rotation.x = .3; inde.add(vegaObj.g);
+    vegaObj.g.position.set(300, 0, -18.3); vegaObj.g.rotation.y = Math.PI / 2;
+    vegaObj.obst = [297.6, 302.4, -18.8, -17.8]; I.obstacles.push(vegaObj.obst);
     // Landstingssalen: name cards on the desks for the press conference, ordered by rank
     const navne = ['Rigspolitiet', 'Kommissær Hald', 'Statsministeren', 'Reformministeren', 'A. Mørkeberg', 'Departementschefen', 'Kompaspartiet'];
     navne.forEach((navn, j) => {
@@ -6514,9 +6613,19 @@ const LAAS = (() => {
   }
 
   // ---- every frame: what Ida can do where she stands
-  HOOKS.frame.push(() => {
+  MYBOAT.laast = () => started && !GAADE.ok(['flag:sejlet']);   // the padlock on the boat
+  if (FOUNTAIN) FOUNTAIN.tilladt = () => GAADE.ok(['flag:springvand_09']);   // the fountain springs from 09.00
+  HOOKS.frame.push(dt => {
     if (!started) return;
     for (const [id, obj] of Object.entries(ting)) obj.visible = !!U[id] && GAADE.ok(U[id].kraever);
+    if (FOUNTAIN && !springStartet && GAADE.ok(['flag:springvand_09'])) { springStartet = true; FOUNTAIN.start(); }
+    if (vegaObj) {   // Vega walks a few steps aside when she has had her carrot
+      const V = vegaObj, flyttet = GAADE.ok(['flag:hesten_flyttet']), k = Math.min(1, dt * .8), p = V.g.position;
+      p.x += ((flyttet ? 301.25 : 300) - p.x) * k; p.z += ((flyttet ? -15 : -18.3) - p.z) * k; V.g.rotation.y += ((flyttet ? 0 : Math.PI / 2) - V.g.rotation.y) * k;
+      V.obst.splice(0, 4, ...(flyttet ? [300.85, 301.65, -16.3, -13.7] : [297.6, 302.4, -18.8, -17.8]));
+      V.head.rotation.x = .35 + Math.sin(clockT * 1.3) * .08;   // chewing hay
+    }
+    if (!paused) tjekStopur();
     if (ordenObj) ordenObj.visible = !GAADE.G.ting.includes('elefantorden');
     if (paused) return;
     const st = vedDoer();
@@ -6526,7 +6635,7 @@ const LAAS = (() => {
       else if (st.tekst) offerAction({ id: 'laas-' + st.id, label: 'Døren er låst', prio: 6, run: () => toast(st.tekst) });
     }
     for (const [id, f] of Object.entries(FUND)) {
-      const u = U[id]; if (!u || !her(f) || !GAADE.ok(u.kraever)) continue;
+      const u = U[id]; if (!u || !her(f) || !GAADE.ok(u.kraever) || (f.kunNy && !nyt(u.giver)) || (id === 'tidsproeven' && stopur)) continue;
       offerAction({ id: 'fund-' + id, label: u.navn, prio: nyt(u.giver) ? 10 : (f.prio || 6), run: () => undersoeg(u) });
     }
   });
@@ -6547,7 +6656,7 @@ const LAAS = (() => {
 const PERSONER = (() => {
   const M = GAADE.M, I = INTERIOR;
   // ---- where Ida stands, as a place of the manuscript
-  const INDE = { 'folketing/hall': 'vandrehallen', 'folketing/betjent': 'betjentstuen', 'folketing/samtale': 'samtalevaerelset', 'folketing/kompas': 'kompas_gang', 'folketing/office1': 'kompas_kontor', 'folketing/office2': 'kompas_gang', 'folketing/secretariat': 'sekretariatet', 'folketing/meeting': 'kompas_moedelokale', 'folketing/snap': 'snapstinget', 'folketing/snapgang': 'snapstinget', 'folketing/landsting': 'landstingssalen', 'finance/fm-wardrobe': 'fm_garderoben', 'finance/fm-meeting': 'fm_forhandlingsrummet', 'reform/rm-office': 'valdorfs_kontor', 'reform/rm-print': 'rm_printeren', 'reform/rm-side': 'rm_sidedoeren' };
+  const INDE = { 'folketing/hall': 'vandrehallen', 'folketing/betjent': 'betjentstuen', 'folketing/samtale': 'samtalevaerelset', 'folketing/kompas': 'kompas_gang', 'folketing/office1': 'kompas_kontor', 'folketing/office2': 'kompas_gang', 'folketing/secretariat': 'sekretariatet', 'folketing/meeting': 'kompas_moedelokale', 'folketing/snap': 'snapstinget', 'folketing/snapgang': 'snapstinget', 'folketing/landsting': 'landstingssalen', 'finance/fm-wardrobe': 'fm_garderoben', 'finance/fm-meeting': 'fm_forhandlingsrummet', 'reform/rm-office': 'valdorfs_kontor', 'reform/rm-print': 'rm_printeren', 'reform/rm-side': 'rm_sidedoeren', 'stables/sadel': 'sadelkammeret' };
   const BYG = { folketing: 'folketinget', finance: 'finansministeriet', reform: 'reformministeriet', towerLobby: 'taarnet', towerRestaurant: 'restauranten', stables: 'stalden', riddersal: 'riddersalen' };
   const qR = QUAYS.find(q => q.id === 'reform'), qS = QUAYS.find(q => q.id === 'slots');
   const UDE = [   // smallest first: [place, x, z, radius]
@@ -6611,6 +6720,7 @@ const PERSONER = (() => {
   const handske = (sh, part, m) => { part(new THREE.SphereGeometry(0.064, 10, 8), m('#f6f5f0'), sh, 0, -0.6, 0, 1.05); };
   const protokol = (sh, part, m) => { sh.rotation.z -= 0.08; handske(sh, part, m); part(new THREE.BoxGeometry(0.07, 0.34, 0.3), m('#6b1f27'), sh, 0.03, -0.3, 0.02, 1.05); };   // a thick red book under the arm
   const skilt = (sh, part, m) => { sh.rotation.x = -0.8; const k = part(new THREE.BoxGeometry(0.32, 0.1, 0.012), m('#fbfaf5'), sh, 0, -0.66, 0.06, 1.08); k.rotation.x = 0.8; };
+  const kamera = (sh, part, m) => { sh.rotation.x = -1.1; part(new THREE.BoxGeometry(0.14, 0.1, 0.09), m('#1e1e20'), sh, 0, -0.64, 0.06, 1.06); const l = part(new THREE.CylinderGeometry(0.035, 0.04, 0.26, 10), m('#2b2b2e'), sh, 0, -0.66, 0.2, 1.06); l.rotation.x = Math.PI / 2; };   // a camera with a long lens
   const mappe = (sh, part, m) => { part(new THREE.BoxGeometry(0.09, 0.3, 0.4), m('#4a2e1f'), sh, 0.02, -0.8, 0, 1.04); };   // a briefcase in his hand
   const LOOK = {
     bente: { coat: '#24324a', trousers: '#24324a', hair: '#9b9b9b', hairStyle: 'knold', long: true, scale: 0.95, skin: '#efc6a8',
@@ -6641,6 +6751,13 @@ const PERSONER = (() => {
       extra: (g, head, part, m) => { for (const s of [-1, 1]) part(new THREE.BoxGeometry(0.04, 0.012, 0.01), m('#8d6a6a'), head, s * 0.047, -0.012, 0.132, 0); } },   // dark rings under the eyes
     valdorf: { coat: '#6e7379', trousers: '#5f646a', hair: '#d9d9d6', hairStyle: 'kort', scale: 1.03, skin: '#c98d62', arm: [null, mappe],
       extra: (g, head, part, m) => { part(new THREE.BoxGeometry(0.16, 0.05, 0.02), m('#f4f4f0'), g, 0, 1.52, 0.19, 0); part(new THREE.BoxGeometry(0.06, 0.3, 0.02), m('#e2b33c'), g, 0, 1.33, 0.208, 0); } },   // white collar and yellow tie
+    // Act 3: the old photographer on Højbro, in a woollen hat with his tripod over the shoulder
+    svend: { coat: '#4a5a46', trousers: '#3a3a36', hair: '#cfcfca', hairStyle: 'kort', scale: 0.97, skin: '#e7bf9e', arm: [null, kamera],
+      extra: (g, head, part, m) => {
+        part(new THREE.SphereGeometry(0.155, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.48), m('#a8382c'), head, 0, 0.03, 0, 1.04);
+        part(new THREE.SphereGeometry(0.045, 10, 8), m('#e8e2d4'), head, 0, 0.19, 0, 1.06);
+        for (const [dx, dz] of [[0.05, -0.02], [-0.04, -0.05], [0.0, 0.04]]) { const r = part(new THREE.CylinderGeometry(0.012, 0.012, 1.1, 6), m('#2a2a2a'), g, -0.12 + dx, 1.05, -0.24 + dz, 0); r.rotation.z = 0.55; }
+      } },
     // Riddersalen and Landstingssalen
     hoffourer: { coat: '#1c2233', trousers: '#1c2233', hair: '#a9a9a6', hairStyle: 'skaldet', long: true, scale: 1.02, skin: '#ecc8aa', arm: [protokol, handske],
       extra: (g, head, part, m) => {   // a dark livery with gold buttons and a gold collar
@@ -6675,6 +6792,7 @@ const PERSONER = (() => {
     jonas: { kompas_kontor: { place: 'folketing', at: [19.3, 11], face: Math.PI / 2, r: 2.4 } },
     pernille: { slotspladsen: { ude: PRESS.at(7, 5.6), face: Math.atan2(PRESS.at(4, 1)[0] - PRESS.at(7, 5.6)[0], PRESS.at(4, 1)[1] - PRESS.at(7, 5.6)[1]), r: 2.6 } },
     // Valdorf comes up the stairs at 07.30 and stays in the hall near the commissioner; in act 3 he is in the restaurant
+    svend: { hoejbro: { ude: [4, -164.5], face: 1.0, r: 2.6 } },
     hoffourer: { riddersalen: { place: 'riddersal', at: [641.6, 1.4], face: -Math.PI / 2, r: 2.6 } },
     // Mogens sets out the name cards for the press conference in Landstingssalen
     mogens: { landstingssalen: { place: 'folketing', at: [-60.2, 6.4], face: -Math.PI / 2, r: 2.4 } },

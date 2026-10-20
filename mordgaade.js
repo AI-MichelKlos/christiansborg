@@ -17,6 +17,8 @@
 // Virkninger (giver) er en liste:
 //   "spor:3"   "+ting:noegle"   "-ting:briller"   "flag:x"   "-flag:x"
 // Replikker er [hvem, tekst]. Hvem er en person, "ida" eller "fortaeller".
+// I tidsprøven skriver spillet den målte tid i stedet for {tid}. Er Ida længere om det end 8 minutter,
+// bruges replikken i langsom i stedet for den sidste replik.
 // Tekster må ikke indeholde tankestreg. Brug bindestreg.
 
 const START = {
@@ -67,7 +69,7 @@ const STEDER = {
   marmorbroen:      { navn: "Marmorbroen", spil: "ude: Marmorbroen", status: "bygget" },
   ridebanen:        { navn: "Ridebanen", spil: "ude: Ridebanen", status: "bygget" },
   stalden:          { navn: "De Kongelige Stalde", spil: "inde: stables", status: "bygget" },
-  sadelkammeret:    { navn: "Sadelkammeret", inde_i: "stalden", spil: "inde: stables", status: "skal bygges",
+  sadelkammeret:    { navn: "Sadelkammeret", inde_i: "stalden", spil: "inde: stables/sadel", status: "bygget",
                       laas: { kraever: ["flag:hesten_flyttet"], tekst: "Den store hvide hest Vega står foran døren og tygger hø. Hun flytter sig ikke." } },
   rigsdagsgaarden:  { navn: "Rigsdagsgården", spil: "ude: Rigsdagsgården", status: "bygget" },
   folketinget:      { navn: "Folketinget", spil: "inde: folketing", status: "bygget",
@@ -109,7 +111,7 @@ const STEDER = {
   rm_sidedoeren:    { navn: "Reformministeriets sidedør", inde_i: "reformministeriet", spil: "inde: reform/rm-side", status: "bygget" },
   kajen_reform:     { navn: "Kajen ved Reformministeriet", spil: "ude: Kajen ved Reformministeriet", status: "bygget" },
   kajen_slots:      { navn: "Kajen ved Slotspladsen", spil: "ude: Kajen ved Slotspladsen", status: "bygget" },
-  kanalen:          { navn: "Kanalen ved den gamle fortøjningspæl", spil: "ude: kanalen, fra båden", status: "skal bygges",
+  kanalen:          { navn: "Kanalen ved den gamle fortøjningspæl", spil: "ude: Kanalen ved den gamle fortøjningspæl", status: "bygget",
                       aaben: ["flag:sejlet"], lukketTekst: "Fortøjningspælen står midt i kanalen. Man kan kun komme derud med båd." },
   hoejbro:          { navn: "Højbro", spil: "ude: Højbro", status: "bygget" },
   bibliotekshaven:  { navn: "Bibliotekshaven", spil: "ude: Bibliotekshaven", status: "bygget" },
@@ -776,7 +778,7 @@ const UNDERSOEG = [
   { id: "bassinet", sted: "bibliotekshaven", navn: "Se i bassinet", kraever: ["!flag:springvand_09"], giver: [], replikker: [
     ["fortaeller", "Vandet er mørkt og stille. Springvandet er slukket om natten og springer først kl. 9."],
   ] },
-  { id: "papirerne", sted: "bibliotekshaven", navn: "Saml papirerne op ved kanten", kraever: ["flag:springvand_09"], giver: ["spor:20"], replikker: [
+  { id: "papirerne", sted: "bibliotekshaven", navn: "Saml papirerne op ved kanten", kraever: ["flag:springvand_09", "!spor:20"], giver: ["spor:20"], replikker: [
     ["fortaeller", "Strømmen fra springvandet har skyllet to stykker papir ud til kanten."],
     ["fortaeller", "Det ene er en side revet ud af en lille sort notesbog. Det andet er en våd tabel: »Fremtidsreformen. Beskæftigelseseffekt: 4.000.« Nederst: »Printet 18.05, printer RM-DC-01.«"],
     ["ida", "RM-DC. Reformministeriet, departementschefen. Og siden passer til hullet i Mørkebergs notesbog."],
@@ -829,7 +831,7 @@ const UNDERSOEG = [
     ["fortaeller", "Om stævnen sidder en kæde med en hængelås."],
     ["ida", "Nogen, der kan sine knob, har sejlet den herover."],
   ] },
-  { id: "sejl", sted: "kajen_reform", navn: "Sejl med båden", kraever: ["ting:baadnoegle"], giver: ["flag:sejlet"], replikker: [
+  { id: "sejl", sted: "kajen_reform", navn: "Sejl med båden", kraever: ["ting:baadnoegle", "!flag:sejlet"], giver: ["flag:sejlet"], replikker: [
     ["fortaeller", "Bådnøglen passer i hængelåsen. Kæden falder i vandet med et klask, og motoren starter."],
   ] },
   { id: "termokanden", sted: "kanalen", navn: "Kig ned i vandet ved fortøjningspælen", kraever: [], giver: ["spor:14"], replikker: [
@@ -841,7 +843,7 @@ const UNDERSOEG = [
     ["fortaeller", "Ida starter stopuret, sejler over kanalen, lægger til ved kajen ved Slotspladsen og går gennem porten til døren i Rigsdagsgården."],
     ["fortaeller", "Stopuret viser {tid}."],
     ["ida", "Fra 01.44 til 01.52 er der 8 minutter. Det kan nås."],
-  ] },
+  ], langsom: ["ida", "Jeg tog en omvej. Men den lige vej kan nås på mindre end 8 minutter, fra 01.44 til 01.52."] },
 
   // Udsigten, Slotspladsen og Ridebanen
   { id: "kikkerten", sted: "udsigten", navn: "Kig gennem kikkerten", kraever: [], giver: ["flag:baad_set_oppefra"], replikker: [

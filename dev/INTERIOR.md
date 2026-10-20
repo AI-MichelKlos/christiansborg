@@ -331,3 +331,17 @@ Salen har 17 vævede billeder som de rigtige gobeliner: syv på den lange væg, 
 I Landstingssalen står der nu navneskilte til pressemødet på de syv borde på podiet.
 
 Kontrol: indgangen er lukket i akt 1-2 og åben fra akt 3. Ind og ud, hoffoureren, gobelinerne, lån og aflevering af ordenen og Mogens er gennemprøvet i Chromium på computer og telefon uden JavaScript-fejl.
+
+## Runde 13: sadelkammeret, fortøjningspælen og tingene i akt 3 (20. oktober 2026)
+
+Sadelkammeret er bygget bag den lukkede endevæg i staldgangen. Der er sat en dør i endevæggen med skiltet "Sadelkammeret", og skiltet "De Kongelige Stalde" er flyttet højere op. Rummet er 8 x 7 m med plankegulv, panel, seks sadler på stativer, hovedtøj på kroge og et gammelt mørkt skab med en lille krone på lågen. Hele rummet er digtet til historien.
+
+I staldgangen står den hvide hest Vega foran døren, til hun får en gulerod. Så går hun et par skridt til side og står langs gangen.
+
+Fortøjningspælen står midt i kanalen mellem kajen ved Reformministeriet og kajen ved Slotspladsen. Den er digtet. Den lille røde båd, som før lå ved Gammel Strand, ligger nu ved kajen ved Reformministeriet, fordi historien siger, at nogen har sejlet den derover.
+
+Nye små ting i rummene: presselisten på en knage i Finansministeriets garderobe, referatet på det lange bord i forhandlingsrummet, mailen på skærmen og et par sejlersko på Valdorfs kontor, printerens log og en gummikile ved Reformministeriets sidedør. Den ene tv-vogn på Slotspladsen er en radiovogn fra trin 6.
+
+Springvandet i Bibliotekshaven springer først, når klokken i historien er 09.00. Knappen "Start springvandet" er fjernet.
+
+Kontrol: alle steder er gennemprøvet i Chromium på computer og telefon uden JavaScript-fejl.

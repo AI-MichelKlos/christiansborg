@@ -11,7 +11,7 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 - Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 63 skridt.
 - Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 75 skridt.
 - Fejl: ingen. Advarsler: ingen.
-- Steder, der skal bygges: Sadelkammeret (sadelkammeret), Kanalen ved den gamle fortøjningspæl (kanalen), Betjentstuen, juni 1942 (betjentstuen_1942), Ridebanen, juni 1942 (ridebanen_1942).
+- Steder, der skal bygges: Betjentstuen, juni 1942 (betjentstuen_1942), Ridebanen, juni 1942 (ridebanen_1942).
 - Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 295.
 
 ## Start
@@ -688,7 +688,7 @@ I spillet: inde: stables (bygget).
 
 ### Sadelkammeret
 
-I spillet: inde: stables (skal bygges). Ligger i De Kongelige Stalde.
+I spillet: inde: stables/sadel (bygget). Ligger i De Kongelige Stalde.
 
 Lås: »hesten flyttet«. »Den store hvide hest Vega står foran døren og tygger hø. Hun flytter sig ikke.«
 
@@ -1002,7 +1002,7 @@ I spillet: ude: Kajen ved Reformministeriet (bygget).
 
 **Sejl med båden**
 
-<small>Kræver: har Bådnøglen. Giver: »sejlet«.</small>
+<small>Kræver: har Bådnøglen, endnu ikke »sejlet«. Giver: »sejlet«.</small>
 
 *Bådnøglen passer i hængelåsen. Kæden falder i vandet med et klask, og motoren starter.*
 
@@ -1016,7 +1016,7 @@ I spillet: ude: Kajen ved Reformministeriet (bygget).
 
 ### Kanalen ved den gamle fortøjningspæl
 
-I spillet: ude: kanalen, fra båden (skal bygges).
+I spillet: ude: Kanalen ved den gamle fortøjningspæl (bygget).
 
 Åben, når: »sejlet«. Ellers: »Fortøjningspælen står midt i kanalen. Man kan kun komme derud med båd.«
 
@@ -1062,7 +1062,7 @@ I spillet: ude: Bibliotekshaven (bygget).
 
 **Saml papirerne op ved kanten**
 
-<small>Kræver: »springvand 09«. Giver: spor 20 (Papirerne i springvandet).</small>
+<small>Kræver: »springvand 09«, mangler spor 20 (Papirerne i springvandet). Giver: spor 20 (Papirerne i springvandet).</small>
 
 *Strømmen fra springvandet har skyllet to stykker papir ud til kanten.*  
 *Det ene er en side revet ud af en lille sort notesbog. Det andet er en våd tabel: »Fremtidsreformen. Beskæftigelseseffekt: 4.000.« Nederst: »Printet 18.05, printer RM-DC-01.«*  

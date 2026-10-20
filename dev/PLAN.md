@@ -264,4 +264,16 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Hoffoureren (mørk livré med guldknapper, hvide handsker og en tyk rød protokol under armen) står ved bordets ende. Mogens (brun cardigan, briller med tape, DJØF-nål og et navneskilt i hånden) står ved podiet i Landstingssalen, hvor der nu står navneskilte på bordene.
   - Nye ting at undersøge: gobelinerne, etuiet og navneskiltene. Manuskriptet har fået teksten "Etuiet er tomt", når Ida har ordenen.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: lukket i akt 2, åben i akt 3, hoffoureren, gobelinerne, lån ordenen, vis den til Mogens (koden og det våde hår), læg den tilbage og gå ud igen.
-- [ ] Trin 8: akt 3.
+- [x] Trin 8: akt 3 (20. okt. 2026). Akt 3 kan nu spilles fra kortet "Akt 3 · Ud på Slotsholmen" til kortet "Akt 4 · Afsløringen".
+  - Finansministeriet: presselisten på en knage i garderoben og nattens referat på det lange bord (spor 9).
+  - Reformministeriet: mailen på Valdorfs skærm, sejlersko under skrivebordet, printerens log og en gummikile ved sidedøren. Kodelåsen, kontoret (spor 15) og bådnøglen i jakken (spor 22) fra trin 3 virker nu i historien.
+  - Båden: bådlaugets lille røde båd (den båd, man kunne sejle i før) ligger nu ved kajen ved Reformministeriet og er låst med en hængelås, til Ida har bådnøglen. "Se på båden" (spor 12) og "Sejl med båden" ligger øverst på kajtrappen. Når hængelåsen er åben, sætter Ida sig i båden.
+  - Kanalen: en gammel fortøjningspæl af træ midt i kanalen mellem de to kajer, med et rødt skær på bunden. Fra båden kan Ida kigge ned og finde termokanden (spor 14). Båden kan ikke sejle gennem pælen.
+  - Tidsprøven: "Tag tid på turen til Folketinget" starter et stopur, som står under uret. Det måler vejen i båd og til fods og stopper ved døren i Rigsdagsgården. Tiden skrives i scenen. Manuskriptet har fået en replik til den, der bruger mere end 8 minutter.
+  - Svend (rød hue, stativ over skulderen og kamera med langt objektiv) står på Højbro med sine nattebilleder (spor 13).
+  - Springvandet i Bibliotekshaven springer først kl. 09.00 i historien (knappen "Start springvandet" er fjernet), og så flyder papirerne ud til kanten (spor 20).
+  - Staldene: sadelkammeret er bygget bag staldgangens ende med sadler, hovedtøj og det gamle skab med en krone (spor 21). Den hvide hest Vega står foran døren og går et par skridt til side, når hun får en gulerod fra Bodil.
+  - Udsigten: "Kig gennem kikkerten" kan bruges én gang og viser den røde båd.
+  - En lås uden nøgle eller kode går op af sig selv, når betingelsen er opfyldt (fx når hesten har flyttet sig).
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele akt 3 med referatet, Riddersalen og Mogens, kodelåsen (forkert og rigtig kode), kontoret og jakken, båden, termokanden, tidsprøven, Svend, springvandet og papirerne, hesten og sadelskabet til kortet for akt 4.
+- [ ] Trin 9: afsløringen.
