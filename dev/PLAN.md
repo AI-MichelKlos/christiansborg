@@ -276,4 +276,10 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Udsigten: "Kig gennem kikkerten" kan bruges én gang og viser den røde båd.
   - En lås uden nøgle eller kode går op af sig selv, når betingelsen er opfyldt (fx når hesten har flyttet sig).
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele akt 3 med referatet, Riddersalen og Mogens, kodelåsen (forkert og rigtig kode), kontoret og jakken, båden, termokanden, tidsprøven, Svend, springvandet og papirerne, hesten og sadelskabet til kortet for akt 4.
-- [ ] Trin 9: afsløringen.
+- [x] Trin 9: afsløringen (21. okt. 2026). Gåden kan nu spilles til ende: Udsigten, pressemødet, tilståelsen, stjernerne og efterskriften.
+  - Udsigten: i akt 4 kan Ida tale med Valdorf, når hun er oppe på Udsigten. Han står ved siden af hende ved rækværket, men tegnes ikke, fordi kameraet altid kigger ud over byen. Hans fortalelse giver spor 16, og så kommer sms'en om pressemødet. "Kig gennem kikkerten" kommer efter samtalen.
+  - Pressemødet begynder, når Ida går ind i Landstingssalen efter sms'en. Kommissæren står bag talerstolen, statsministeren og Valdorf sidder ved bordene med navneskilte, Ditte, Kasper, Pernille og Jonas sidder på forreste række, Bente står i døren og Mogens ved siden af. Personer kan nu både stå og sidde, alt efter stedet.
+  - Afsløringen er et vindue med fire spørgsmål. Ida vælger et svar (svarene står i tilfældig rækkefølge) og lægger mindst to spor frem fra notesbogen. Et forkert svar giver en protest fra den, det går ud over, og et forkert spor giver kommissærens "Det spor beviser ikke det, De siger". Tre fejl i træk, og kommissæren anholder Kasper, til Bente stopper ham, og Ida prøver igen. Lægger hun for få spor frem, får hun bare en besked. Lukker hun vinduet, venter det, til hun kommer ind i salen igen. Notesbogen kan åbnes undervejs.
+  - Til sidst: tilståelsen, 1-3 stjerner efter forkerte svar og hint, efterskriften (med elefanten, hvis den ikke er lagt tilbage) og knappen "Spil igen", der starter et nyt spil. Et løst spil kan ikke fortsættes fra startskærmen.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: akt 4 fra Udsigten til pressemødet, forkerte svar og spor, tre fejl i træk, alle fire rigtige svar, stjerner, efterskrift og "Spil igen".
+- [ ] Trin 10: det sidste.

@@ -1,6 +1,6 @@
 # Christiansborg: Mord i Rigets midte
 
-En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Gåden er under opbygning. Slotsholmen og de rum, hvor historien skal foregå, kan allerede udforskes, og uret, notesbogen, rygsækken, låste døre, ting at samle op og akt 1, 2 og 3 virker. Afsløringen i akt 4 kommer som det næste.
+En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Gåden er under opbygning. Slotsholmen og de rum, hvor historien skal foregå, kan allerede udforskes, og uret, notesbogen, rygsækken, låste døre, ting at samle op og hele gåden fra akt 1 til afsløringen virker. Det sidste trin er lyd, lys og en hel gennemspilning.
 
 Spil det her: https://ai-michelklos.github.io/christiansborg/
 

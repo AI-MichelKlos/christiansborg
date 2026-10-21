@@ -135,6 +135,11 @@ body.storTekst .keys{font-size:16px}
 #urKl{font:800 17px var(--display);letter-spacing:.02em}
 #urAkt{font:600 10px var(--body);letter-spacing:.06em;text-transform:uppercase;opacity:.72}
 #urStop{font:700 10px var(--body);color:#b23a2a;white-space:nowrap}
+.stj{color:#e0a823;-webkit-text-stroke:2px var(--ink);margin-right:4px}.stj.tom{color:#efe8da}
+.aSpm{font:800 calc(19px * var(--ts))/1.25 var(--display);margin:4px 0 10px}
+#aValg.aSporValg{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}#aValg.aSporValg>p{grid-column:1/-1;margin:0}
+.aSpor{cursor:pointer;min-height:38px;padding:5px 10px}.aSpor input{width:20px;height:20px;flex:none;margin:0;accent-color:#2f6b4f}
+.aFrem{grid-column:1/-1;position:sticky;bottom:0;margin-top:4px;box-shadow:0 -10px 14px var(--paper)}
 .gd{position:fixed;inset:12px;margin:auto;box-sizing:border-box;width:min(720px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;border:2.5px solid var(--ink);border-radius:18px;padding:0 20px 20px;background:var(--paper);color:var(--ink);font:calc(15px * var(--ts))/1.5 var(--body);box-shadow:4px 5px 0 var(--ink)}
 .gd.gdSmall{width:min(420px,calc(100vw - 24px))}
 .gd::backdrop{background:rgba(20,24,23,.62)}
@@ -5848,9 +5853,11 @@ const GAADE = (() => {
     try { const g = JSON.parse(localStorage.getItem(GKEY) || 'null'); if (g && g.v === 1 && Array.isArray(g.spor) && Array.isArray(g.ting)) return Object.assign(ny(), g); } catch (e) {}
     return null;
   }
-  let G = ny(), gemt = hent(), valg = gemt ? 'fortsaet' : 'nyt';
+  let G = ny(), gemt = hent(), stopGem = false;
+  if (gemt && gemt.flag.includes('loest')) gemt = null;   // a solved game starts again from the beginning
+  let valg = gemt ? 'fortsaet' : 'nyt';
   let stedFn = null;   // (placeId) => is Ida at that place now? Set by the PERSONER block.
-  function gem() { if (!started) return; try { localStorage.setItem(GKEY, JSON.stringify(G)); gemt = G; } catch (e) {} }
+  function gem() { if (!started || stopGem) return; try { localStorage.setItem(GKEY, JSON.stringify(G)); gemt = G; } catch (e) {} }
   addEventListener('pagehide', gem);
   document.addEventListener('visibilitychange', () => { if (document.hidden) gem(); });
 
@@ -5970,7 +5977,7 @@ const GAADE = (() => {
   // Only one of the notebook and the backpack is open at a time. Swapping between them keeps the pause from before.
   // The pause is given back at once when a dialog closes; the browser's own close event can come a frame later.
   let dWas = false;
-  const dialoger = () => [notes, pack, samt];
+  const dialoger = () => [notes, pack, samt, afsl];
   const knapTil = (d, v) => { const b = d === notes ? $('bNotes') : d === pack ? $('bPack') : null; if (b) b.setAttribute('aria-expanded', v); };
   function aabn(d) {
     if (!started || !$('scene').hidden || d.open) return;
@@ -6166,12 +6173,88 @@ const GAADE = (() => {
     visEmner(); aabn(samt);
   }
 
+  // ---- the reveal at the press conference in Landstingssalen (manuscript: afsloering). For each question Ida picks an
+  // answer and lays out at least minSpor clues that prove it. A wrong answer or a wrong clue gets a protest and counts
+  // against the stars. Three in a row, and the commissioner arrests Kasper, until Bente stops him and Ida tries again.
+  const A = M.afsloering;
+  const afsl = dialog('afslDialog', 'Pressemødet');
+  afsl.querySelector('.gdBody').innerHTML = '<p class="gdSted" id="aSted"></p><div class="sLog" id="aLog" aria-live="polite"></div><h3 class="aSpm" id="aSpm"></h3><div class="sEmner" id="aValg"></div>';
+  luk(afsl);
+  let AF = null, afslVent = false;   // afslVent: she closed it herself, so it waits till she has left the hall
+  afsl.querySelector('.gdClose').addEventListener('click', () => { afslVent = true; });
+  afsl.addEventListener('cancel', () => { afslVent = true; });
+  const blandet = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+  const aLog = (lines, ny) => { const l = $('aLog'); if (ny) l.replaceChildren(); for (const [w, t] of lines) l.appendChild(replik(w, t)); };
+  function startAfsl() {
+    if (G.min < toMin(A.kl)) { G.min = toMin(A.kl); visUr(); }
+    AF = { q: 0, svar: null, runde: 0, orden: A.spoergsmaal.map(q => blandet(q.svar)) };
+    for (const [w] of A.intro) if (M.personer[w] && !G.moedt.includes(w)) G.moedt.push(w);
+    gem();
+    scene({ eyebrow: 'Landstingssalen · kl. ' + A.kl, title: 'Pressemødet', lines: A.intro, btn: 'Tag ordet', efter: aabnAfsl });
+  }
+  function aabnAfsl() {
+    aLog([], true); $('aLog').appendChild(el('p', 'gdIntro', 'Svar på spørgsmålene, og læg de spor frem, der viser, at du har ret.'));
+    visAfsl(); aabn(afsl);
+  }
+  function visAfsl() {
+    const q = A.spoergsmaal[AF.q], box = $('aValg'); box.replaceChildren(); box.classList.toggle('aSporValg', !!AF.svar);
+    $('aSted').textContent = `Spørgsmål ${AF.q + 1} af ${A.spoergsmaal.length}`; $('aSpm').textContent = q.tekst;
+    if (!AF.svar) {
+      for (const sv of AF.orden[AF.q]) { const b = el('button', 'sEmne'); b.type = 'button'; b.appendChild(el('span', '', sv.tekst)); b.addEventListener('click', () => vaelg(q, sv)); box.appendChild(b); }
+      return;
+    }
+    box.appendChild(el('p', 'gdIntro', `Læg mindst ${q.minSpor} spor frem, der viser det.`));
+    for (const n of G.spor.slice().sort((a, b) => a - b)) {
+      const lab = el('label', 'sEmne aSpor'), cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = n;
+      lab.append(cb, el('span', '', `${n}. ${M.spor[n].titel}`)); lab.title = M.spor[n].tekst; box.appendChild(lab);
+    }
+    const frem = el('button', 'go aFrem', 'Læg sporene frem'); frem.type = 'button'; frem.addEventListener('click', () => laegFrem(q)); box.appendChild(frem);
+  }
+  function forkert(line) {
+    G.forkert++; AF.runde++; gem(); aLog([line]);
+    if (AF.runde < 3) { visAfsl(); afsl.scrollTop = 0; return; }
+    AF.runde = 0; AF.svar = null;
+    scene({ eyebrow: 'Landstingssalen', title: 'Tre gange forkert', lines: A.treForkerte, btn: 'Prøv igen', efter: aabnAfsl });
+  }
+  function vaelg(q, sv) {
+    aLog([['ida', sv.tekst + '.']], true);
+    if (!sv.rigtig) return forkert(sv.protest || A.forkertSpor);
+    AF.svar = sv; visAfsl(); afsl.scrollTop = 0;
+  }
+  function laegFrem(q) {
+    const valgt = [...$('aValg').querySelectorAll('input:checked')].map(c => +c.value);
+    const gode = valgt.filter(n => q.gyldigeSpor.includes(n)), daarlige = valgt.length - gode.length;
+    if (!valgt.length || (!daarlige && gode.length < q.minSpor)) { toast(`Læg mindst ${q.minSpor} spor frem.`); return; }
+    aLog([['ida', 'Se her: ' + valgt.map(n => M.spor[n].titel).join(', ') + '.']]);
+    if (daarlige) return forkert(A.forkertSpor);
+    AF.q++; AF.svar = null; AF.runde = 0;
+    if (AF.q < A.spoergsmaal.length) { visAfsl(); afsl.scrollTop = 0; return; }
+    loest();
+  }
+  function loest() {
+    AF = null; G.flag.push('loest'); gem();
+    const st = A.stjerner, n = G.forkert <= st.tre.maksForkerte && G.hint <= st.tre.maksHint ? 3 : G.forkert <= st.to.maksForkerte && G.hint <= st.to.maksHint ? 2 : 1;
+    const E = M.efterskrift, slut = ok(E.ordenUde.kraever) ? [...E.replikker, ...E.ordenUde.replikker] : E.replikker;
+    scene({ eyebrow: 'Landstingssalen', title: 'Tilståelsen', lines: A.tilstaaelse, efter: () => {
+      scene({ eyebrow: 'Gåden er løst', title: '★'.repeat(n) + '☆'.repeat(3 - n), lines: [
+        ['fortaeller', `${['Én stjerne', 'To stjerner', 'Tre stjerner'][n - 1]}. Forkerte svar og spor: ${G.forkert}. Hint: ${G.hint}.`],
+        ['fortaeller', `Tre stjerner: ${st.tre.tekst}. To stjerner: ${st.to.tekst}.`]], btn: 'Efterskrift', efter: () =>
+        scene({ eyebrow: 'Efterskrift', title: M.titel, lines: slut, btn: 'Spil igen', efter: nytSpil }) });
+      $('sceneTitle').innerHTML = [0, 1, 2].map(i => `<span class="stj${i < n ? '' : ' tom'}">★</span>`).join('');   // gold stars
+    } });
+  }
+  function nytSpil() { stopGem = true; try { localStorage.removeItem(GKEY); } catch (e) {} location.reload(); }
+
   // ---- events: they happen once when their conditions are met (flag beg_<id>). An event with a time moves the clock on.
   let begT = 0;
   HOOKS.frame.push(dt => {
     if (!started || paused || !$('scene').hidden) { begT = Math.max(begT, 1.2); return; }   // a short breath between two cards
     begT -= dt; if (begT > 0) return; begT = 0.5;
     if (aktKort) { aktKort = false; visAkt(); return; }
+    if (G.akt >= M.akter.length && ok(A.kraever) && !G.flag.includes('loest')) {   // the press conference begins when she comes into the hall
+      if (!ok(['sted:' + A.sted])) afslVent = false;
+      else if (!afslVent) { if (AF) aabnAfsl(); else startAfsl(); return; }
+    }
     for (const b of M.begivenheder) {
       if (G.flag.includes('beg_' + b.id) || !ok(b.naar)) continue;
       G.flag.push('beg_' + b.id);
@@ -6344,7 +6427,7 @@ const LAAS = (() => {
     sejl:       { ude: KAJ.at(0, 6.6), r: 2.8 },
     tidsproeven: { ude: KAJ.at(0, 6.6), r: 2.8 },
     termokanden: { baad: PAEL, r: 5 },
-    kikkerten:  { udsigt: true, kunNy: true },
+    kikkerten:  { udsigt: true, kunNy: true, prioNy: 5 },   // below talking to Valdorf up there
     sadeldoeren: { place: 'stables', at: [300, -16.6], r: 2 },
     gulerod:    { place: 'stables', at: [300, -16.6], r: 2 },
     skabet:     { place: 'stables', at: [300, -25.2], r: 1.5 },
@@ -6636,7 +6719,7 @@ const LAAS = (() => {
     }
     for (const [id, f] of Object.entries(FUND)) {
       const u = U[id]; if (!u || !her(f) || !GAADE.ok(u.kraever) || (f.kunNy && !nyt(u.giver)) || (id === 'tidsproeven' && stopur)) continue;
-      offerAction({ id: 'fund-' + id, label: u.navn, prio: nyt(u.giver) ? 10 : (f.prio || 6), run: () => undersoeg(u) });
+      offerAction({ id: 'fund-' + id, label: u.navn, prio: nyt(u.giver) ? (f.prioNy || 10) : (f.prio || 6), run: () => undersoeg(u) });
     }
   });
   // From the backpack: a key or a card used on the locked door Ida stands at.
@@ -6710,7 +6793,7 @@ const PERSONER = (() => {
     if (o.sidder) for (const l of legs) { l.hip.rotation.x = -Math.PI / 2; l.knee.rotation.x = Math.PI / 2; }
     g.scale.setScalar(o.scale || 1);
     const root = new THREE.Group(); root.add(g);
-    return { root, g, head };
+    return { root, g, head, legs };
   }
   const kop = (sh, part, m) => { sh.rotation.x = -0.9; part(new THREE.CylinderGeometry(0.04, 0.032, 0.11, 10), m('#f3efe6'), sh, 0, -0.66, 0.02, 1.08); };
   const termokop = (sh, part, m) => { sh.rotation.x = -0.9; part(new THREE.CylinderGeometry(0.042, 0.036, 0.17, 10), m('#4f6a5a'), sh, 0, -0.68, 0.02, 1.08); };
@@ -6747,7 +6830,7 @@ const PERSONER = (() => {
         part(new THREE.BoxGeometry(0.1, 0.13, 0.012), m('#f7f5ee'), g, 0, 1.2, 0.215, 0); part(new THREE.BoxGeometry(0.1, 0.03, 0.014), m('#c0392b'), g, 0, 1.3, 0.216, 0);
         const c = part(new THREE.TorusGeometry(0.12, 0.006, 6, 20, Math.PI), m('#c0392b'), g, 0, 1.47, 0.08, 0); c.rotation.set(-1.25, 0, Math.PI);
       } },
-    kasper: { coat: '#cfdcef', trousers: '#2a2d33', hair: '#2f2a26', hairStyle: 'kort', scale: 1.0, skin: '#e9c2a2', sidder: true, arm: [null, rundstykke],
+    kasper: { coat: '#cfdcef', trousers: '#2a2d33', hair: '#2f2a26', hairStyle: 'kort', scale: 1.0, skin: '#e9c2a2', arm: [null, rundstykke],
       extra: (g, head, part, m) => { for (const s of [-1, 1]) part(new THREE.BoxGeometry(0.04, 0.012, 0.01), m('#8d6a6a'), head, s * 0.047, -0.012, 0.132, 0); } },   // dark rings under the eyes
     valdorf: { coat: '#6e7379', trousers: '#5f646a', hair: '#d9d9d6', hairStyle: 'kort', scale: 1.03, skin: '#c98d62', arm: [null, mappe],
       extra: (g, head, part, m) => { part(new THREE.BoxGeometry(0.16, 0.05, 0.02), m('#f4f4f0'), g, 0, 1.52, 0.19, 0); part(new THREE.BoxGeometry(0.06, 0.3, 0.02), m('#e2b33c'), g, 0, 1.33, 0.208, 0); } },   // white collar and yellow tie
@@ -6786,13 +6869,15 @@ const PERSONER = (() => {
     },
     // Act 2. Snapstinget: Bodil at the coffee station, Kasper on a chair at the table nearest the door
     bodil: { snapstinget: { place: 'folketing', at: [-19.4, 30.05], face: Math.PI, r: 2.4 } },
-    kasper: { snapstinget: { place: 'folketing', at: [-17.15, 25.65], face: Math.PI, r: 2.2, dy: -0.21 } },
+    kasper: { snapstinget: { place: 'folketing', at: [-17.15, 25.65], face: Math.PI, r: 2.2, dy: -0.21, sidder: true } },
     // the minister at her table in the tower restaurant, the other side from the prime minister
     ditte: { restauranten: { place: 'towerRestaurant', at: [435.75, -7], face: -Math.PI / 2, r: 2.6 } },
     jonas: { kompas_kontor: { place: 'folketing', at: [19.3, 11], face: Math.PI / 2, r: 2.4 } },
     pernille: { slotspladsen: { ude: PRESS.at(7, 5.6), face: Math.atan2(PRESS.at(4, 1)[0] - PRESS.at(7, 5.6)[0], PRESS.at(4, 1)[1] - PRESS.at(7, 5.6)[1]), r: 2.6 } },
     // Valdorf comes up the stairs at 07.30 and stays in the hall near the commissioner; in act 3 he is in the restaurant
     svend: { hoejbro: { ude: [4, -164.5], face: 1.0, r: 2.6 } },
+    // Act 4: the press conference in Landstingssalen. The panel sits behind the name cards, the suspects on the front row.
+    // (seats: SAL(z) is a front-row chair, PANEL(j) a chair on the platform; see buildLandsting)
     hoffourer: { riddersalen: { place: 'riddersal', at: [641.6, 1.4], face: -Math.PI / 2, r: 2.6 } },
     // Mogens sets out the name cards for the press conference in Landstingssalen
     mogens: { landstingssalen: { place: 'folketing', at: [-60.2, 6.4], face: -Math.PI / 2, r: 2.4 } },
@@ -6801,13 +6886,20 @@ const PERSONER = (() => {
       restauranten: { place: 'towerRestaurant', at: [443.1, 5.4], face: Math.PI / 2, r: 2.4 },
     },
   };
+  const SAL = z => ({ place: 'folketing', at: [-57.8 + 0.028 * z * z, z], face: Math.PI / 2 - Math.atan2(z, 16) + Math.PI, r: 1.6, dy: -0.23, sidder: true });
+  const PANEL = j => ({ place: 'folketing', at: [-63.7, -5.4 + j * 1.8], face: Math.PI / 2, r: 2.2, dy: -0.23, sidder: true });
+  SPOT.bente.landstingssalen = { place: 'folketing', at: [-41.6, 2.4], face: -Math.PI / 2, r: 2.2 };   // in the door
+  SPOT.kommissaer.landstingssalen = { place: 'folketing', at: [-61.5, -5.3], face: Math.PI / 2, r: 2.4 };   // behind the lectern
+  SPOT.statsminister.landstingssalen = PANEL(2); SPOT.valdorf.landstingssalen = PANEL(5);
+  SPOT.ditte.landstingssalen = SAL(-3.8); SPOT.kasper.landstingssalen = SAL(-2.2); SPOT.pernille.landstingssalen = SAL(2.2); SPOT.jonas.landstingssalen = SAL(3.8);
+  SPOT.valdorf.udsigten = { udsigt: true, r: 1 };   // up on Udsigten he stands beside her at the railing (not drawn)
   const inde = new THREE.Group(); inde.userData.keep = true; I.group.add(inde);
   const ude = new THREE.Group(); dyn.add(ude);
   const FIG = {};
   for (const id of Object.keys(SPOT)) {
     const f = figur(LOOK[id]); f.spot = null; f.yaw = 0; FIG[id] = f; f.root.visible = false;
     const sp = Object.values(SPOT[id]).find(s => s.foelge);
-    if (sp) for (const [dx, dz] of sp.foelge) { const v = figur(LOOK.vagt); v.root.position.set(dx, 0, dz); f.root.add(v.root); }
+    f.vagter = []; if (sp) for (const [dx, dz] of sp.foelge) { const v = figur(LOOK.vagt); v.root.position.set(dx, 0, dz); f.root.add(v.root); f.vagter.push(v.root); }
   }
   // Aksel Mørkeberg in one of the green sofas at Rigets midte, until the commissioner has him taken away (act 3)
   const lig = figur(LOOK.moerkeberg); lig.root.position.set(8, I.floor + 0.62 - 0.86, -3.12); inde.add(lig.root);
@@ -6817,19 +6909,22 @@ const PERSONER = (() => {
     const p = M.personer[id], S = SPOT[id];
     if (id === 'bente' && !GAADE.ok(['flag:moedt_bente'])) return S.doer;
     if ((p.lag1942 && !GAADE.G.lag1942) || !GAADE.ok(p.kraever)) return null;
+    if (id === 'valdorf' && GAADE.ok(['flag:pressemoede'])) return S.landstingssalen;   // after Udsigten he goes to the press conference
     const sted = p.steder && p.steder[GAADE.G.akt];
     return (sted && S[sted]) || null;
   }
   function placer(id, sp) {
-    const f = FIG[id]; f.spot = sp; f.root.visible = !!sp;
-    if (!sp) return;
+    const f = FIG[id]; f.spot = sp; f.root.visible = !!sp && !sp.udsigt;
+    if (!sp || sp.udsigt) return;
+    f.sid = !!sp.sidder; for (const l of f.legs) { l.hip.rotation.x = f.sid ? -Math.PI / 2 : 0; l.knee.rotation.x = f.sid ? Math.PI / 2 : 0; }
+    for (const v of f.vagter) v.visible = !!sp.foelge;
     if (sp.ude) { ude.add(f.root); f.root.position.set(sp.ude[0], groundAt(sp.ude[0], sp.ude[1], 2), sp.ude[1]); }
     else { inde.add(f.root); f.root.position.set(sp.at[0], I.height(sp.at[0], sp.at[1]) + (sp.dy || 0), sp.at[1]); }
     f.yaw = sp.face; f.root.rotation.y = sp.face; f.head.rotation.y = 0;
   }
   // World position of a spot, and is Ida in the same space as it?
-  const samme = sp => sp.ude ? !I.on && !FX.tower?.on : I.on && I.place === sp.place;
-  const afstand = sp => sp.ude ? Math.hypot(P.pos.x - sp.ude[0], P.pos.z - sp.ude[1]) : Math.hypot(P.pos.x - I.x - sp.at[0], P.pos.z - sp.at[1]);
+  const samme = sp => sp.udsigt ? !!FX.tower?.on && !FX.tower.busy : sp.ude ? !I.on && !FX.tower?.on : I.on && I.place === sp.place;
+  const afstand = sp => sp.udsigt ? 0 : sp.ude ? Math.hypot(P.pos.x - sp.ude[0], P.pos.z - sp.ude[1]) : Math.hypot(P.pos.x - I.x - sp.at[0], P.pos.z - sp.at[1]);
   let tjekT = 0;
   HOOKS.frame.push(dt => {
     if (!started) return;
@@ -6839,10 +6934,11 @@ const PERSONER = (() => {
     for (const [id, f] of Object.entries(FIG)) {
       const sp = f.spot; if (!sp || !samme(sp)) continue;
       const d = afstand(sp);
+      if (sp.udsigt) { if (d / sp.r < nd) { nd = d / sp.r; naer = id; } continue; }
       // turn towards Ida when she is close, otherwise back to the usual direction. Someone sitting only turns the head.
       const wx = sp.ude ? sp.ude[0] : I.x + sp.at[0], wz = sp.ude ? sp.ude[1] : sp.at[1];
       const want = d < 6 ? Math.atan2(P.pos.x - wx, P.pos.z - wz) : sp.face;
-      if (LOOK[id].sidder) { const h = Math.max(-0.9, Math.min(0.9, angDiff(want, sp.face))); f.head.rotation.y += (h - f.head.rotation.y) * Math.min(1, dt * 4); }
+      if (f.sid) { const h = Math.max(-0.9, Math.min(0.9, angDiff(want, sp.face))); f.head.rotation.y += (h - f.head.rotation.y) * Math.min(1, dt * 4); }
       else { f.yaw += angDiff(want, f.yaw) * Math.min(1, dt * 4); f.root.rotation.y = f.yaw; }
       if (sp.r && d < sp.r && d / sp.r < nd) { nd = d / sp.r; naer = id; }   // when two people are close, the nearest one answers
     }

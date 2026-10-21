@@ -372,7 +372,7 @@ Gåden kan bygges i ti trin, ét trin ad gangen som resten af spillet. Manuskrip
 6. **Akt 2.** De fire mistænkte, Kaspers kort i Proviantpassagen, 50.000-rapporten, Bodil og Kasper i Snapstinget, Dittes bord i tårnet og Pernille på Slotspladsen. Akt 2 kan spilles (gjort 17. oktober 2026).
 7. **Riddersalen.** Det eneste rum, der skal bygges fra bunden: salen, etuiet med Elefantordenen og hoffourerens bog, plus Mogens i Landstingssalen (gjort 19. oktober 2026).
 8. **Akt 3.** Referatet i Finansministeriet, Valdorfs kontor med kodelås og sejlerjakke, bådnøglen, båden ved den forkerte kaj, termokanden, Svend på Højbro, papirerne i springvandet, hesten foran sadelkammeret og tidsprøven. Akt 3 kan spilles (gjort 20. oktober 2026).
-9. **Afsløringen.** Samtalen på Udsigten, pressemødet i Landstingssalen, svarene, stjernerne og efterskriften.
+9. **Afsløringen.** Samtalen på Udsigten, pressemødet i Landstingssalen, svarene, stjernerne og efterskriften (gjort 21. oktober 2026).
 10. **Det sidste.** Hjælp, lyd, lys til natten og daggry og en hel gennemspilning på computer og telefon.
 
 Når de ti trin er færdige, kan det ekstra lag med 1942 bygges som trin 11: radioen, Slotsholmen i 1942 med patruljer, kongen til hest, sadelskabet og kongens nøgle. Bliver det ikke til noget, er gåden færdig uden.
