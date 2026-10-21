@@ -135,6 +135,9 @@ body.storTekst .keys{font-size:16px}
 #urKl{font:800 17px var(--display);letter-spacing:.02em}
 #urAkt{font:600 10px var(--body);letter-spacing:.06em;text-transform:uppercase;opacity:.72}
 #urStop{font:700 10px var(--body);color:#b23a2a;white-space:nowrap}
+#hintBud{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:30;width:min(360px,calc(100vw - 32px));box-sizing:border-box;padding:12px 14px;background:#fff8e6;text-align:center}#hintBud p{margin:0 0 10px;font-weight:600}#hintBud div{display:flex;gap:10px;justify-content:center}#hintBud .go{padding:8px 16px;font-size:16px}
+#naesteSpor{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;max-width:min(380px,calc(100vw - 32px));box-sizing:border-box;padding:8px 12px;font:600 calc(13px * var(--ts))/1.4 var(--body);background:#fffbe9;pointer-events:none}
+.gdNaeste{margin:0 0 12px;padding:10px 12px;border:2px dashed var(--ink);border-radius:12px;background:#fffbe9;font-weight:600}
 .stj{color:#e0a823;-webkit-text-stroke:2px var(--ink);margin-right:4px}.stj.tom{color:#efe8da}
 .aSpm{font:800 calc(19px * var(--ts))/1.25 var(--display);margin:4px 0 10px}
 #aValg.aSporValg{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}#aValg.aSporValg>p{grid-column:1/-1;margin:0}
@@ -243,7 +246,7 @@ body.storTekst .keys{font-size:16px}
   <div class="card sticker">
     <div class="eyebrow">Christiansborg · en mordgåde i 3D</div>
     <h1 id="introTitle">Mord i Rigets midte</h1>
-    <p class="lead" id="introLead">Ida er 24 år og skriver speciale om Christiansborg. Torsdag kl. 6 skal hun møde nattevagten Bente. Samme nat er en politiker fundet død i Vandrehallen. Gåden er under opbygning: Uret, notesbogen og rygsækken virker, og personer og spor kommer i de næste trin.</p>
+    <p class="lead" id="introLead">Ida er 24 år og skriver speciale om Christiansborg. Torsdag kl. 6 skal hun møde nattevagten Bente. Samme nat er en politiker fundet død i Vandrehallen. Find ud af, hvem der gjorde det, før pressemødet kl. 10.</p>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -3224,7 +3227,9 @@ for (let i = 0; i < 12; i++) {
   c.lookAt(0, c.position.y, 0); clouds.add(c);
 }
 const DAY = { top: new THREE.Color('#6aa6dc'), mid: new THREE.Color('#fbe5c6'), bot: new THREE.Color('#ead9bd'), hs: new THREE.Color('#dbe9ff'), hg: new THREE.Color('#b39b7c'), hi: 1.05, sc: new THREE.Color('#fff0d4'), si: 1.7, pos: new THREE.Vector3(-55, 90, 42), cloud: new THREE.Color('#ffffff'), sunC: new THREE.Color('#fff3cf') };
-const EVE = { top: new THREE.Color('#232e5c'), mid: new THREE.Color('#f09a6c'), bot: new THREE.Color('#4f3c58'), hs: new THREE.Color('#8f90cf'), hg: new THREE.Color('#7a5a64'), hi: 0.85, sc: new THREE.Color('#ff9a5a'), si: 0.8, pos: new THREE.Vector3(-120, 26, 18), cloud: new THREE.Color('#f7b8a8'), sunC: new THREE.Color('#ffb36b') };
+// The murder mystery begins at 06.00 in blue dawn light with the street lamps and windows lit (ev = 1) and reaches full
+// daylight at 08.15 (ev = 0). The low sun rises in the east-south-east.
+const EVE = { top: new THREE.Color('#16214d'), mid: new THREE.Color('#8e9cca'), bot: new THREE.Color('#2f3858'), hs: new THREE.Color('#98a6da'), hg: new THREE.Color('#57536a'), hi: 0.68, sc: new THREE.Color('#ffc29a'), si: 0.42, pos: new THREE.Vector3(120, 20, 56), cloud: new THREE.Color('#bcc4e6'), sunC: new THREE.Color('#ffcaa0') };
 const BULB_DAY = new THREE.Color('#efe9da'), BULB_EVE = new THREE.Color('#ffd27a');
 let evening = false, ev = 0, evApplied = -1;
 const sunOff = new THREE.Vector3();
@@ -3513,7 +3518,29 @@ function tone(f0, f1, start, dur, vol = 0.16, type = 'sine') {
 }
 function sparkleSound() { [1320, 1760, 2093].forEach((f, i) => tone(f, f * 1.01, 0.08 + i * 0.07, 0.3, 0.045)); }
 function hop() { tone(300, 520, 0, 0.12, 0.05, 'triangle'); }
-function footstep() { if (soundOn) tone(110, 65, 0, 0.07, 0.018, 'triangle'); }
+function footstep() {   // a soft step outside, a clear tap on the marble and parquet indoors
+  if (!soundOn) return;
+  if (FX.interior?.on) { tone(950, 620, 0, 0.035, 0.016, 'triangle'); tone(150, 95, 0, 0.05, 0.012); } else tone(110, 65, 0, 0.07, 0.018, 'triangle');
+}
+function chime(notes, vol = 0.05) { notes.forEach((f, i) => tone(f, f * 1.002, i * 0.11, 0.5, vol)); }   // a new clue or thing
+function klokke(n) {   // Holmens Kirke strikes the hour: a bell with its overtones, n times
+  for (let i = 0; i < n; i++) for (const [k, v] of [[0.5, 0.02], [1, 0.045], [1.19, 0.018], [1.5, 0.014], [2, 0.02]]) tone(294 * k, 294 * k * 0.998, i * 1.6, 2.8, v);
+}
+let regn = null;
+function regnLyd(styrke) {   // the last drops of the night's rain: soft noise that fades away during the first quarter of an hour
+  const a = actx; if (!a) return;
+  if (!regn && styrke > 0.01 && soundOn) {
+    const buf = a.createBuffer(1, a.sampleRate * 2, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (Math.random() < 0.02 ? 1 : 0.35);
+    const src = a.createBufferSource(); src.buffer = buf; src.loop = true;
+    const f = a.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2600; f.Q.value = 0.7;
+    const g = a.createGain(); g.gain.value = 0; src.connect(f); f.connect(g); g.connect(a.destination); src.start();
+    regn = { src, g };
+  }
+  if (!regn) return;
+  regn.g.gain.setTargetAtTime(soundOn ? styrke * 0.03 : 0, a.currentTime, 0.5);
+  if (styrke <= 0.01 && regn.g.gain.value < 0.0005) { regn.src.stop(); regn = null; }
+}
 function flutterSound() { if (soundOn) { tone(750, 470, 0, 0.10, 0.028, 'triangle'); tone(880, 580, 0.08, 0.09, 0.022, 'triangle'); } }
 
 // ======================================================================== EFFECTS (label + sparkles when an animal is found)
@@ -3641,7 +3668,7 @@ function openIntro(help) {
   paused = true; keys.clear(); resetTouch(); GAADE.startKnapper();
   if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='riddersal'?'I Riddersalen':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='riddersal'?'Gå langs gobelinerne og det dækkede langbord. Hoffoureren står ved bordets ende. Gå tilbage til døren og vælg Gå udenfor for at komme ud i Prins Jørgens Gård. Salens mål er anslået, og gobelinerne er ikke kopier af de rigtige.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
   else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';}
-  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk N for notesbogen, R for rygsækken og M for oversigtskortet. Uret går, når Ida går og taler. Personer og spor kommer i de næste trin af gåden.'; }
+  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk N for notesbogen, R for rygsækken og M for oversigtskortet. Uret går, når Ida går og taler. Går du i stå, kan Bente i betjentstuen give dig et hint, og under Indstillinger kan du slå Næste spor til.'; }
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
@@ -3794,16 +3821,18 @@ function updActions() {
 }
 
 // ======================================================================== STATE / STORAGE
-let soundOn = true, tekstStor = false, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
+let soundOn = true, tekstStor = false, naesteSpor = false, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'mordIRigetsMidte';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor })); } catch (e) {} }   // settings; the game itself is saved by GAADE
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor })); } catch (e) {} }   // settings; the game itself is saved by GAADE
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 
 // ======================================================================== MAIN LOOP
-let last = performance.now(), clockT = 0, poiT = 0, mapT = 0;
+let last = performance.now(), clockT = 0, poiT = 0, mapT = 0, lysInde = false;
+// the light follows the story's clock outdoors; indoors the lamps are on
+const lysMaal = () => FX.interior?.on ? 0 : Math.max(0, Math.min(1, (495 - GAADE.G.min) / 135));
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; clockT += dt;
-  ev += ((evening ? 1 : 0) - ev) * Math.min(1, dt * 1.6); applyEvening();
+  { const inde = !!FX.interior?.on, maal = lysMaal(); if (inde !== lysInde) { lysInde = inde; ev = maal; } else ev += (maal - ev) * Math.min(1, dt * 1.6); } applyEvening();
   if (started) updPlayer(dt);
   updCamera(dt, clockT);
   if (window.__camFix) { camera.position.fromArray(window.__camFix[0]); camera.lookAt(...window.__camFix[1]); }   // for testing only
@@ -5848,7 +5877,7 @@ const GAADE = (() => {
   const kl = n => String(Math.floor(n / 60)).padStart(2, '0') + '.' + String(n % 60).padStart(2, '0');
   // Night times sort after the evening before: 21.30 < 23.50 < 00.15 < 05.50. "02-03" means some time between 2 and 3.
   const natSort = s => { const h = parseInt(s, 10), m = String(s).includes('-') ? 59 : parseInt(String(s).split('.')[1], 10) || 0; return (h < 12 ? h + 24 : h) * 60 + m; };
-  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], spurgt: [], hint: 0, forkert: 0, lag1942: !!M.lag1942.aktiv, pos: null, face: 0 });
+  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], spurgt: [], hint: 0, vist: [], forkert: 0, lag1942: !!M.lag1942.aktiv, pos: null, face: 0 });
   function hent() {
     try { const g = JSON.parse(localStorage.getItem(GKEY) || 'null'); if (g && g.v === 1 && Array.isArray(g.spor) && Array.isArray(g.ting)) return Object.assign(ny(), g); } catch (e) {}
     return null;
@@ -5876,11 +5905,11 @@ const GAADE = (() => {
     for (const raw of list || []) {
       const m = String(raw).match(/^([+-]?)(spor|ting|flag|akt):(\w+)$/); if (!m) continue;
       const [, sign, kind, val] = m;
-      if (kind === 'spor') { const n = +val; if (M.spor[n] && !G.spor.includes(n)) { G.spor.push(n); toast('Nyt spor i notesbogen: ' + M.spor[n].titel); } }
+      if (kind === 'spor') { const n = +val; if (M.spor[n] && !G.spor.includes(n)) { G.spor.push(n); toast('Nyt spor i notesbogen: ' + M.spor[n].titel); chime([784, 988, 1319]); } }
       else if (kind === 'akt') G.akt = Math.max(G.akt, +val);
       else if (kind === 'ting') {
         if (sign === '-') { const i = G.ting.indexOf(val); if (i >= 0) { G.ting.splice(i, 1); if (!G.givet.includes(val)) G.givet.push(val); } }
-        else if (M.ting[val] && !G.ting.includes(val)) { G.ting.push(val); toast('I rygsækken: ' + M.ting[val].navn); }
+        else if (M.ting[val] && !G.ting.includes(val)) { G.ting.push(val); toast('I rygsækken: ' + M.ting[val].navn); chime([660, 880], 0.045); }
       } else if (sign === '-') G.flag = G.flag.filter(f => f !== val);
       else if (!G.flag.includes(val)) G.flag.push(val);
     }
@@ -6027,6 +6056,8 @@ const GAADE = (() => {
     for (const b of tabs.children) { const on = b.dataset.fane === fane; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; b.textContent = FANER.find(f => f[0] === b.dataset.fane)[1] + ` (${tal[b.dataset.fane]})`; }
     const body = notes.querySelector('.gdBody'); body.replaceChildren(); body.setAttribute('role', 'tabpanel');
     if (fane === 'spor') {
+      const h = naesteSpor && !G.flag.includes('loest') && naesteHint();
+      if (h) body.appendChild(el('p', 'gdNaeste', 'Næste spor: ' + h.tekst));
       if (!G.spor.length) body.appendChild(el('p', 'gdTom', 'Ingen spor endnu. Undersøg ting, og tal med folk. Det, du finder, skriver Ida her.'));
       for (const n of [...G.spor].sort((a, b) => a - b)) {
         const s = M.spor[n], row = el('article', 'gdRow'), txt = el('div');
@@ -6106,15 +6137,16 @@ const GAADE = (() => {
 
   // Settings: sound, text size and the small map. Also reachable from the start card and the help card.
   const sets = dialog('setDialog', 'Indstillinger', true);
-  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><button class="go" id="setDone" type="button">Færdig</button>';
+  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><button class="go" id="setDone" type="button">Færdig</button>';
   sets.addEventListener('keydown', e => e.stopPropagation());
   sets.addEventListener('close', () => { if (!intro.hidden) $('setBtn').focus(); else canvas.focus(); });
   $('setDone').addEventListener('click', () => sets.close());
   $('setSound').addEventListener('change', e => setSound(e.target.checked));
   $('setMini').addEventListener('change', e => setMapVisible(e.target.checked));
+  $('setSpor').addEventListener('change', e => { naesteSpor = e.target.checked; save(); });
   for (const r of sets.querySelectorAll('[name=setTs]')) r.addEventListener('change', e => setTekst(e.target.value === 'stor'));
   $('setBtn').addEventListener('click', () => {
-    $('setSound').checked = soundOn; $('setMini').checked = showMap;
+    $('setSound').checked = soundOn; $('setMini').checked = showMap; $('setSpor').checked = naesteSpor;
     for (const r of sets.querySelectorAll('[name=setTs]')) r.checked = (r.value === 'stor') === tekstStor;
     sets.showModal(); $('setSound').focus();
   });
@@ -6245,6 +6277,41 @@ const GAADE = (() => {
   }
   function nytSpil() { stopGem = true; try { localStorage.removeItem(GKEY); } catch (e) {} location.reload(); }
 
+  // ---- help. After 10 minutes of play with nothing new, the game offers one of Bente's hints. With "Næste spor" on in
+  // the settings, the next hint is shown all the time (in the notebook, and in a corner on a computer); each new one counts.
+  const naesteHint = () => M.hint.find(h => ok(h.naar));
+  const bud = el('div', 'sticker'); bud.id = 'hintBud'; bud.hidden = true; bud.setAttribute('role', 'status');
+  bud.innerHTML = '<p>Er du gået i stå? Bente kan give dig et hint.</p><div><button class="go" type="button" id="hintJa">Vis hint</button><button class="sticker btn" type="button" id="hintNej">Nej tak</button></div>';
+  const skilt = el('div', 'sticker'); skilt.id = 'naesteSpor'; skilt.hidden = true;
+  document.body.append(bud, skilt);
+  let staaT = 0, fremskridt = '', vistTekst = '';
+  $('hintJa').addEventListener('click', () => {
+    bud.hidden = true; staaT = 0; const h = naesteHint(); if (!h) return;
+    G.hint++; gem(); scene({ eyebrow: 'Hint fra Bente', title: 'Et hint', lines: [['bente', h.tekst]] });
+  });
+  $('hintNej').addEventListener('click', () => { bud.hidden = true; staaT = 0; canvas.focus(); });
+  HOOKS.frame.push(dt => {
+    if (!started) return;
+    const f = G.spor.length + '.' + G.ting.length + '.' + G.flag.length;
+    if (f !== fremskridt) { fremskridt = f; staaT = 0; bud.hidden = true; }
+    const loest = G.flag.includes('loest');
+    if (!paused && $('scene').hidden && !loest) { staaT += dt; if (staaT > 600 && bud.hidden && naesteHint()) bud.hidden = false; }
+    const h = naesteSpor && !loest ? naesteHint() : null, t = h ? h.tekst : '';
+    if (t !== vistTekst) {
+      vistTekst = t; skilt.textContent = t ? 'Næste spor: ' + t : '';
+      if (t) { if (!(G.vist || (G.vist = [])).includes(t)) { G.vist.push(t); G.hint++; gem(); } if (isTouch) toast('Næste spor: ' + t); }
+    }
+    skilt.hidden = !t || isTouch || paused;
+  });
+  // ---- sounds that follow the clock: the last drops of rain until 06.15, and Holmens Kirke striking the full hours
+  let klokkeH = -1;
+  HOOKS.frame.push(() => {
+    if (!started) { klokkeH = -1; return; }
+    const h = Math.floor(G.min / 60);
+    if (klokkeH < 0) klokkeH = h; else if (h > klokkeH) { klokkeH = h; klokke(h > 12 ? h - 12 : h); }
+    regnLyd(!paused && !FX.interior?.on ? Math.max(0, Math.min(1, (375 - G.min) / 15)) : 0);
+  });
+
   // ---- events: they happen once when their conditions are met (flag beg_<id>). An event with a time moves the clock on.
   let begT = 0;
   HOOKS.frame.push(dt => {
@@ -6276,6 +6343,7 @@ const GAADE = (() => {
     aabnAlle: () => { for (const [id, st] of Object.entries(M.steder)) if (st.laas) aabnet(id); },
     moed: (...ids) => { for (const id of ids) if (!G.moedt.includes(id)) G.moedt.push(id); gem(); },
     alt: () => { giv([...Object.keys(M.spor).map(n => 'spor:' + n), ...Object.keys(M.ting).filter(id => !M.ting[id].lag1942).map(id => '+ting:' + id)]); test.moed(...Object.keys(M.personer).filter(id => !M.personer[id].lag1942)); },
+    staa: sek => { staaT = sek; },   // pretend she has been stuck for a while
     nulstil: () => { try { localStorage.removeItem(GKEY); } catch (e) {} gemt = null; valg = 'nyt'; G = ny(); visUr(); startKnapper(); },
   };
   // The parts of the game that place things in the world tell the backpack what a thing can be used for here.
@@ -6956,8 +7024,8 @@ function boot(data) {
   const st = load();
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
-  setTekst(!!st.tekst);
-  setEvening(typeof data.evening === 'boolean' ? data.evening : false); ev = evening ? 1 : 0;   // the clock will set the light later
+  setTekst(!!st.tekst); naesteSpor = !!st.spor;
+  setEvening(false); ev = lysMaal();   // the light follows the story's clock from the start
   setMapVisible(showMap); sizeMap();
   if (data.pos) { P.pos.fromArray(data.pos); if (typeof data.face === 'number') P.face = data.face; }
   cam.yaw = P.face + Math.PI;
@@ -6969,7 +7037,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { lys: () => ev, MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

@@ -1,14 +1,14 @@
 # Christiansborg: Mord i Rigets midte
 
-En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Gåden er under opbygning. Slotsholmen og de rum, hvor historien skal foregå, kan allerede udforskes, og uret, notesbogen, rygsækken, låste døre, ting at samle op og hele gåden fra akt 1 til afsløringen virker. Det sidste trin er lyd, lys og en hel gennemspilning.
+En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Hele gåden kan spilles fra Marmorbroen kl. 06.00 til afsløringen ved pressemødet kl. 10. Et spil tager 60-90 minutter og kan stoppes og fortsættes på computer og telefon.
 
 Spil det her: https://ai-michelklos.github.io/christiansborg/
 
 ## Historien
 En politiker findes død i Vandrehallen natten før et stort pressemøde. Ida, en historiestuderende med rygsæk, skal finde morderen mellem kl. 06 og pressemødet kl. 10. Planen for gåden står i [dev/MORDGAADE.md](dev/MORDGAADE.md).
 
-## Det kan du allerede
-Gå rundt på Slotsholmen og ind i Folketinget, Finansministeriet, det fiktive Reformministerium, De Kongelige Stalde, Tårnet og indgangene til Statsministeriet og Højesteret. Ved Gammel Strand ligger en lille rød båd, som man selv kan sejle i. Byen lever med duer, ænder, svaner, heste, kanalbåde, trafik og gående, og i Rigsdagsgården kommer statsministeren i en sort bil.
+## Det kan du
+Gå rundt på Slotsholmen og ind i Folketinget, Finansministeriet, det fiktive Reformministerium, De Kongelige Stalde, Tårnet og indgangene til Statsministeriet og Højesteret. Ved kajen ved Reformministeriet ligger en lille rød båd. Ida kan sejle i den, når hun har fundet nøglen. Byen lever med duer, ænder, svaner, heste, kanalbåde, trafik og gående, og i Rigsdagsgården kommer statsministeren i en sort bil.
 
 Gå op ad trappen i Rigsdagsgården og ind gennem den åbne hoveddør, eller vælg Gå ind i Folketinget (E på computer). Indenfor fører trappen op til Vandrehallen, og Ud i gården bringer dig tilbage. Rummene er fortolkninger efter billeder, ikke præcise bygningsmodeller. Se [kilder og begrænsninger](dev/INTERIOR.md).
 
@@ -27,7 +27,7 @@ Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsni
 - Spillet er `index.html` med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
 - Hele historien står i `mordgaade.js` ved siden af spillet. Ret teksterne der, og kør `node dev/tjek-mordgaade.js` bagefter. Spillet skal hentes fra en webserver (fx GitHub Pages), ikke åbnes direkte som fil, fordi det henter `mordgaade.js`.
 - Spillet gemmer selv i browseren, og startskærmen tilbyder Fortsæt og Nyt spil.
-- Husene er enkle klodser med den rigtige grundplan. Spillet bygges op lidt efter lidt. Tjeklisten står i `dev/PLAN.md`, og planen for gåden i `dev/MORDGAADE.md`.
+- Husene er enkle klodser med den rigtige grundplan. Spillet er bygget trin for trin. Tjeklisten står i `dev/PLAN.md`, og planen for gåden i `dev/MORDGAADE.md`.
 - Kortdata: © OpenStreetMap-bidragydere, ODbL (https://www.openstreetmap.org/copyright).
 
 Udarbejdet med AI (Claude) og med begrænset mennesketjek.
@@ -42,7 +42,7 @@ Betjentstuen er åben til højre ved foden af den indvendige trappe. Samtalevær
 Indvendigt fører to trappeløb med repos op til Vandrehallen. Træbalustrader, hvide hvælvinger, messingkroner, siddepladser i nicher og kamin med ur bygger på billedreferencer. Mål og den præcise forbindelse til indgangen er fortsat anslået.
 
 ### Kompaspartiet og Snapstinget
-Ved Vandrehallen mod Folketingssalen kan man gå ind i det fiktive Kompaspartiets gang med to kontorer, sekretariat og mødelokale. Snapstinget nås gennem den åbne dør til venstre ved indgangen, over for betjentstuen. Spisesalen har to gulvniveauer, borde, buffet og kaffeområde. Referencer og usikkerheder står i `dev/INTERIOR.md`. Rummene er til udforskning; mordgådens personer og funktioner følger senere.
+Ved Vandrehallen mod Folketingssalen kan man gå ind i det fiktive Kompaspartiets gang med to kontorer, sekretariat og mødelokale. Snapstinget nås gennem den åbne dør til venstre ved indgangen, over for betjentstuen. Spisesalen har to gulvniveauer, borde, buffet og kaffeområde. Referencer og usikkerheder står i `dev/INTERIOR.md`. I mordgåden står Jonas på kontoret, Kasper og Bodil i Snapstinget, og sekretariatet er låst med et adgangskort.
 
 ### Kamera på telefon
 Joysticket styrer gangretning og hastighed. Kameraet følger roligt gangretningen, og spilleren stopper straks, når joysticket slippes. Træk på højre side for selv at kigge; den manuelle kamerastyring får prioritet. Når man går baglæns, bliver kameraet i sin retning.

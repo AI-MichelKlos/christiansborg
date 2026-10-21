@@ -373,7 +373,7 @@ Gåden kan bygges i ti trin, ét trin ad gangen som resten af spillet. Manuskrip
 7. **Riddersalen.** Det eneste rum, der skal bygges fra bunden: salen, etuiet med Elefantordenen og hoffourerens bog, plus Mogens i Landstingssalen (gjort 19. oktober 2026).
 8. **Akt 3.** Referatet i Finansministeriet, Valdorfs kontor med kodelås og sejlerjakke, bådnøglen, båden ved den forkerte kaj, termokanden, Svend på Højbro, papirerne i springvandet, hesten foran sadelkammeret og tidsprøven. Akt 3 kan spilles (gjort 20. oktober 2026).
 9. **Afsløringen.** Samtalen på Udsigten, pressemødet i Landstingssalen, svarene, stjernerne og efterskriften (gjort 21. oktober 2026).
-10. **Det sidste.** Hjælp, lyd, lys til natten og daggry og en hel gennemspilning på computer og telefon.
+10. **Det sidste.** Hjælp, lyd, lys til natten og daggry og en hel gennemspilning på computer og telefon (gjort 21. oktober 2026).
 
 Når de ti trin er færdige, kan det ekstra lag med 1942 bygges som trin 11: radioen, Slotsholmen i 1942 med patruljer, kongen til hest, sadelskabet og kongens nøgle. Bliver det ikke til noget, er gåden færdig uden.
 

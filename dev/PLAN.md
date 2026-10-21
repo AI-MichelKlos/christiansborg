@@ -282,4 +282,10 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Afsløringen er et vindue med fire spørgsmål. Ida vælger et svar (svarene står i tilfældig rækkefølge) og lægger mindst to spor frem fra notesbogen. Et forkert svar giver en protest fra den, det går ud over, og et forkert spor giver kommissærens "Det spor beviser ikke det, De siger". Tre fejl i træk, og kommissæren anholder Kasper, til Bente stopper ham, og Ida prøver igen. Lægger hun for få spor frem, får hun bare en besked. Lukker hun vinduet, venter det, til hun kommer ind i salen igen. Notesbogen kan åbnes undervejs.
   - Til sidst: tilståelsen, 1-3 stjerner efter forkerte svar og hint, efterskriften (med elefanten, hvis den ikke er lagt tilbage) og knappen "Spil igen", der starter et nyt spil. Et løst spil kan ikke fortsættes fra startskærmen.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: akt 4 fra Udsigten til pressemødet, forkerte svar og spor, tre fejl i træk, alle fire rigtige svar, stjerner, efterskrift og "Spil igen".
-- [ ] Trin 10: det sidste.
+- [x] Trin 10: det sidste (21. okt. 2026). Mordgåden er færdig og kan spilles fra start til slut.
+  - Lys: lyset følger historiens ur. Kl. 06.00 er der blåt morgenlys med tændte vinduer og gadelamper, og kl. 08.15 er det fuldt dagslys. Indenfor er lamperne altid tændt. Det gamle aftenlys er lavet om til morgengry med en lav sol i øst-sydøst.
+  - Lyd: en lille klang ved nyt spor og ved nye ting, klare skridt på marmor og parket indenfor, de sidste dråber af nattens regn, der stilner af til kl. 06.15, og Holmens Kirkes klokke, der slår hele timer (7, 8, 9 og 10 slag).
+  - Hjælp: efter 10 minutters spil uden noget nyt tilbyder spillet et hint fra Bente ("Vis hint" eller "Nej tak"). Under Indstillinger kan "Vis næste spor" slås til. Så står næste hint i notesbogen og på computeren i et lille skilt nederst til venstre (på telefonen som en kort besked). Hvert nyt hint tæller med i stjernerne.
+  - Teksterne på startkortet og i hjælpen fortæller ikke længere, at gåden er under opbygning.
+  - Kontrolleret: en hel gennemspilning i Chromium på computer og telefon fra Marmorbroen kl. 06.00 til efterskriften med tre stjerner, uden JavaScript-fejl. Undervejs blev hint-tilbuddet, "Næste spor" og lyset kl. 06.00 og 09.30 prøvet.
+- [ ] Trin 11 (ekstra): 1942-laget.
