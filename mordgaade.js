@@ -116,9 +116,9 @@ const STEDER = {
   hoejbro:          { navn: "Højbro", spil: "ude: Højbro", status: "bygget" },
   bibliotekshaven:  { navn: "Bibliotekshaven", spil: "ude: Bibliotekshaven", status: "bygget" },
   // Kun i ekstralaget med 1942. Man kommer dertil med radioen i betjentstuen.
-  betjentstuen_1942: { navn: "Betjentstuen, juni 1942", spil: "inde: folketing/betjent (1942)", status: "skal bygges", lag1942: true,
+  betjentstuen_1942: { navn: "Betjentstuen, juni 1942", spil: "inde: folketing/betjent", status: "bygget", lag1942: true,
                       aaben: ["lag1942", "flag:i_1942"] },
-  ridebanen_1942:   { navn: "Ridebanen, juni 1942", spil: "ude: Ridebanen (1942)", status: "skal bygges", lag1942: true,
+  ridebanen_1942:   { navn: "Ridebanen, juni 1942", spil: "ude: Ridebanen", status: "bygget", lag1942: true,
                       aaben: ["lag1942", "flag:i_1942"] },
 };
 
@@ -1081,8 +1081,8 @@ export const MANUS = {
   version: 1,
   opdateret: "2026-10-17",
   lag1942: {
-    aktiv: false,
-    forklaring: "Ekstralaget med 1942 bliver bygget til sidst. Når aktiv er false, er sadelskabet ikke låst, radioen virker ikke, og resten af gåden er den samme.",
+    aktiv: true,
+    forklaring: "Ekstralaget med 1942. Når aktiv er false, er sadelskabet ikke låst, radioen virker ikke, og resten af gåden er den samme. Spilleren kan også slå rejsen fra under Indstillinger, før et nyt spil.",
   },
   start: START,
   ur: UR,

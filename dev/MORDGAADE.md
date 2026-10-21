@@ -375,7 +375,7 @@ Gåden kan bygges i ti trin, ét trin ad gangen som resten af spillet. Manuskrip
 9. **Afsløringen.** Samtalen på Udsigten, pressemødet i Landstingssalen, svarene, stjernerne og efterskriften (gjort 21. oktober 2026).
 10. **Det sidste.** Hjælp, lyd, lys til natten og daggry og en hel gennemspilning på computer og telefon (gjort 21. oktober 2026).
 
-Når de ti trin er færdige, kan det ekstra lag med 1942 bygges som trin 11: radioen, Slotsholmen i 1942 med patruljer, kongen til hest, sadelskabet og kongens nøgle. Bliver det ikke til noget, er gåden færdig uden.
+Når de ti trin er færdige, kan det ekstra lag med 1942 bygges som trin 11: radioen, Slotsholmen i 1942 med patruljer, kongen til hest, sadelskabet og kongens nøgle. Bliver det ikke til noget, er gåden færdig uden (gjort 21. oktober 2026).
 
 ## Valg, der skal træffes
 

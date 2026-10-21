@@ -135,6 +135,9 @@ body.storTekst .keys{font-size:16px}
 #urKl{font:800 17px var(--display);letter-spacing:.02em}
 #urAkt{font:600 10px var(--body);letter-spacing:.06em;text-transform:uppercase;opacity:.72}
 #urStop{font:700 10px var(--body);color:#b23a2a;white-space:nowrap}
+body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
+#aar1942{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:6;padding:6px 14px;font:800 15px var(--display);letter-spacing:.06em;background:#efe1bf;color:#4a3820;pointer-events:none}
+.touch #aar1942{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 #hintBud{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:30;width:min(360px,calc(100vw - 32px));box-sizing:border-box;padding:12px 14px;background:#fff8e6;text-align:center}#hintBud p{margin:0 0 10px;font-weight:600}#hintBud div{display:flex;gap:10px;justify-content:center}#hintBud .go{padding:8px 16px;font-size:16px}
 #naesteSpor{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;max-width:min(380px,calc(100vw - 32px));box-sizing:border-box;padding:8px 12px;font:600 calc(13px * var(--ts))/1.4 var(--body);background:#fffbe9;pointer-events:none}
 .gdNaeste{margin:0 0 12px;padding:10px 12px;border:2px dashed var(--ink);border-radius:12px;background:#fffbe9;font-weight:600}
@@ -379,6 +382,8 @@ const HOOKS = { frame: [], ride: [], key: [], found: [], start: [] };
 // Small moving things far from the camera are hidden: they are too small to see from there, but each of them is
 // something the phone has to draw. hideWhenFar puts them in a group that is only shown within r metres of (x, z).
 const FAR_HIDE = [];
+const NYERE = [];   // things built after 1942, hidden on the trip back in time (murder mystery, extra layer)
+let AAR_ON = false;   // true while Ida is in June 1942
 function hideWhenFar(objs, x, z, r) { const g = new THREE.Group(); dyn.add(g); for (const o of objs) g.add(o); FAR_HIDE.push({ g, x, z, r }); return g; }
 HOOKS.frame.push(() => { for (const f of FAR_HIDE) f.g.visible = Math.hypot(camera.position.x - f.x, camera.position.z - f.z) < f.r; });
 const LOCKED = []; // locked doors: { x, z, y, n } // roofs the camera must stay under: { x0, x1, z0, z1, bot, top }
@@ -2314,7 +2319,7 @@ TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 
   const glass = toon('#ffffff', { map: TX.glassGrid, emissive: '#ffe2b0', emissiveIntensity: 0 });
   nightMats.push(black, glass);
   const C = [164, 297.5], ry = 0.585, LEAN = 4, H = 24, D = 39.7;
-  const g = new THREE.Group(); g.position.set(C[0], 0, C[1]); g.rotation.y = ry; world.add(g);
+  const g = new THREE.Group(); g.position.set(C[0], 0, C[1]); g.rotation.y = ry; g.userData.noMerge = true; NYERE.push(g); world.add(g);
   const leaning = (w, h, d, mat, x, z) => {   // a box whose top is pushed toward the harbour
     const geo = boxGeo(w, h, d); geo.translate(0, h / 2, 0); const p = geo.attributes.position;
     for (let i = 0; i < p.count; i++) p.setZ(i, p.getZ(i) + LEAN * p.getY(i) / H);
@@ -2323,7 +2328,7 @@ TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 
   leaning(35.2, H, D, black, -23.1, 0); leaning(35.2, H, D, black, 23.1, 0);
   leaning(11.2, H - 1, D - 10, glass, 0, 0);   // the glass cut in the middle
   // a glass bridge over Christians Brygge to the old library
-  box(4, 3, 15.4, glass, 137.2, 8, 283, { ry: Math.atan2(0.553, 0.833), edges: true });
+  { const bro = box(4, 3, 15.4, glass, 137.2, 8, 283, { ry: Math.atan2(0.553, 0.833), edges: true }); bro.userData.noMerge = true; NYERE.push(bro); }
   // the low part to the east of the black blocks
   const dia = DATA.B.find(b => b.n === 'Den Sorte Diamant');
   if (dia) {
@@ -3024,7 +3029,7 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
   }
   const lookAtKid = p => { p.h = Math.atan2(P.pos.x - p.x, P.pos.z - p.z); };
   HOOKS.frame.push((dt, t) => {
-    const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && Math.hypot(P.pos.x - ex, P.pos.z - ez) < 45;
+    const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && !AAR_ON && Math.hypot(P.pos.x - ex, P.pos.z - ez) < 45;
     if (S.phase === 'idle') {
       if (S.cool > 0) S.cool -= dt;
       else if (near) { S.phase = 'in'; S.s = GAP + 0.5; S.v = 6; S.ev = {}; FT_CARS.forEach(c => { c.g.visible = true; c.fresh = true; c.want = [0, 0]; c.doors.forEach(d => { d.userData.a = 0; d.rotation.y = 0; }); }); toast('Tre sorte biler kører ind i Rigsdagsgården.'); }
@@ -3821,9 +3826,9 @@ function updActions() {
 }
 
 // ======================================================================== STATE / STORAGE
-let soundOn = true, tekstStor = false, naesteSpor = false, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
+let soundOn = true, tekstStor = false, naesteSpor = false, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'mordIRigetsMidte';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor })); } catch (e) {} }   // settings; the game itself is saved by GAADE
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 
 // ======================================================================== MAIN LOOP
@@ -4607,7 +4612,7 @@ FX.hojbroLight = HOJBRO_LIGHT;
 const PRESS=(()=>{
   const ry=.582,c=Math.cos(ry),sn=Math.sin(ry),x=104,z=-14;
   const at=(a,b)=>[x+c*a+sn*b,z-sn*a+c*b];
-  const r=new THREE.Group();r.position.set(x,0,z);r.rotation.y=ry;world.add(r);
+  const r=new THREE.Group();r.position.set(x,0,z);r.rotation.y=ry;r.userData.noMerge=true;NYERE.push(r);world.add(r);
   const white=new THREE.MeshStandardMaterial({color:'#e0e0d7',roughness:.6}),navy=new THREE.MeshStandardMaterial({color:'#354c59'}),black=new THREE.MeshStandardMaterial({color:'#242925'}),steel=new THREE.MeshStandardMaterial({color:'#9caaa8',metalness:.65,roughness:.4}),glass=new THREE.MeshStandardMaterial({color:'#364d54',roughness:.3}),glow=new THREE.MeshBasicMaterial({color:'#fff1c4'});
   const b=(w,h,d,m,a,y,b,parent=r)=>box(w,h,d,m,a,y,b,{parent,cast:false});
   function rod(a,b,rad=.035,m=steel,parent=r){const av=new THREE.Vector3(...a),bv=new THREE.Vector3(...b),v=bv.clone().sub(av);const q=new THREE.Mesh(new THREE.CylinderGeometry(rad,rad,v.length(),8),m);q.position.copy(av.add(bv).multiplyScalar(.5));q.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());parent.add(q);}
@@ -4801,8 +4806,7 @@ const INTERIOR = (() => {
     }
     obstacle(9.5,22.7,3.8,1.3);
     b(1.5,.05,.58,walnut,9.4,1.04,23.4);chair(9.5,24,0,0,true);
-    b(.7,.47,.055,dark,9.6,1.28,23.2);b(.09,.2,.1,dark,9.6,1.08,23.2);
-    b(.6,.025,.18,dark,9.6,1.13,22.91);b(.32,.07,.2,cream,8.3,1.13,22.8);
+    for(const m of [b(.7,.47,.055,dark,9.6,1.28,23.2),b(.09,.2,.1,dark,9.6,1.08,23.2),b(.6,.025,.18,dark,9.6,1.13,22.91)]){m.userData.keep=true;NYERE.push(m);}   // the computer is hidden in 1942b(.32,.07,.2,cream,8.3,1.13,22.8);
     // Screen and pinboard are blank physical props; no case data or access-log gameplay yet.
     b(1.7,1.7,.16,walnut,7,1.35,25.28);b(1.5,1.45,.17,material('#b6ad92'),7,1.46,25.16);
     for(let row=0;row<3;row++)for(let col=0;col<5;col++){
@@ -5877,7 +5881,7 @@ const GAADE = (() => {
   const kl = n => String(Math.floor(n / 60)).padStart(2, '0') + '.' + String(n % 60).padStart(2, '0');
   // Night times sort after the evening before: 21.30 < 23.50 < 00.15 < 05.50. "02-03" means some time between 2 and 3.
   const natSort = s => { const h = parseInt(s, 10), m = String(s).includes('-') ? 59 : parseInt(String(s).split('.')[1], 10) || 0; return (h < 12 ? h + 24 : h) * 60 + m; };
-  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], spurgt: [], hint: 0, vist: [], forkert: 0, lag1942: !!M.lag1942.aktiv, pos: null, face: 0 });
+  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], spurgt: [], hint: 0, vist: [], forkert: 0, lag1942: !!M.lag1942.aktiv && med1942, pos: null, face: 0 });
   function hent() {
     try { const g = JSON.parse(localStorage.getItem(GKEY) || 'null'); if (g && g.v === 1 && Array.isArray(g.spor) && Array.isArray(g.ting)) return Object.assign(ny(), g); } catch (e) {}
     return null;
@@ -6137,16 +6141,17 @@ const GAADE = (() => {
 
   // Settings: sound, text size and the small map. Also reachable from the start card and the help card.
   const sets = dialog('setDialog', 'Indstillinger', true);
-  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><button class="go" id="setDone" type="button">Færdig</button>';
+  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><label class="gdCheck"><input type="checkbox" id="set1942"> Rejsen til 1942 (et ekstra lag, gælder nye spil)</label><button class="go" id="setDone" type="button">Færdig</button>';
   sets.addEventListener('keydown', e => e.stopPropagation());
   sets.addEventListener('close', () => { if (!intro.hidden) $('setBtn').focus(); else canvas.focus(); });
   $('setDone').addEventListener('click', () => sets.close());
   $('setSound').addEventListener('change', e => setSound(e.target.checked));
   $('setMini').addEventListener('change', e => setMapVisible(e.target.checked));
   $('setSpor').addEventListener('change', e => { naesteSpor = e.target.checked; save(); });
+  $('set1942').addEventListener('change', e => { med1942 = e.target.checked; save(); });
   for (const r of sets.querySelectorAll('[name=setTs]')) r.addEventListener('change', e => setTekst(e.target.value === 'stor'));
   $('setBtn').addEventListener('click', () => {
-    $('setSound').checked = soundOn; $('setMini').checked = showMap; $('setSpor').checked = naesteSpor;
+    $('setSound').checked = soundOn; $('setMini').checked = showMap; $('setSpor').checked = naesteSpor; $('set1942').checked = med1942;
     for (const r of sets.querySelectorAll('[name=setTs]')) r.checked = (r.value === 'stor') === tekstStor;
     sets.showModal(); $('setSound').focus();
   });
@@ -6456,6 +6461,9 @@ const LAAS = (() => {
   const toward = (p, q, d) => { const l = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; return [p[0] + (q[0] - p[0]) / l * d, p[1] + (q[1] - p[1]) / l * d]; };
   // The quay by the Reform ministry, and the old mooring post in the middle of the canal between the two quays
   const KAJ = QUAYS.find(q => q.id === 'reform'), KAJ2 = QUAYS.find(q => q.id === 'slots');
+  // 1942: where the king's glove falls on Ridebanen (a few steps beside the king, see PERSONER), and in front of the stable gate
+  const HANDSKE = [-126.1, 96.7];
+  const STALDPORT = d => { const e = STABLE_ENTRY; return [e.x + e.nx * d, e.z + e.nz * d]; };
   const PAEL = (() => { const a = KAJ.at(0, -6), c = KAJ2.at(0, -6); let p = [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2]; for (let k = 0; k < 40 && !rawWater(p[0], p[1]); k++) p = [p[0] + (c[0] - p[0]) * .1, p[1] + (c[1] - p[1]) * .1]; return p; })();
   BOAT_POSTS.push(PAEL);
   const FUND = {
@@ -6466,7 +6474,7 @@ const LAAS = (() => {
     grundlovene: { place: 'folketing', at: [-24, 3.1], r: 2.4 },
     skaermen:   { place: 'folketing', at: [7.2, 21.9], r: 1.1 },
     noegleskabet: { place: 'folketing', at: [6.6, 24.4], r: 0.9 },
-    radioen:    { place: 'folketing', at: [5.3, 23.7], r: 0.9 },
+    radioen:    { place: 'folketing', at: [5.3, 23.7], r: 1.2 },
     rummet:     { place: 'folketing', at: [1.5, -9.2], r: 2.4 },
     statuen:    { ude: GARDEN.at(-20.6, 7.1), r: 2.2 },
     gruset:     { ude: GARDEN.at(-25.5, 8.9), r: 2 },
@@ -6500,6 +6508,11 @@ const LAAS = (() => {
     gulerod:    { place: 'stables', at: [300, -16.6], r: 2 },
     skabet:     { place: 'stables', at: [300, -25.2], r: 1.5 },
     skabet_laast: { place: 'stables', at: [300, -25.2], r: 1.5 },
+    // the extra layer, June 1942
+    radio_1942: { place: 'folketing', at: [5.3, 23.7], r: 1.2 },
+    radio_tilbage: { place: 'folketing', at: [5.3, 23.7], r: 1.2 },
+    handsken:   { ude: HANDSKE, r: 1.8 },
+    hesteskoen: { ude: STALDPORT(3.4), r: 1.6 },
     kontoret:   { place: 'reform', at: [194, -11.4], r: 2.6 },
     jakken:     { place: 'reform', at: [196.9, -15.4], r: 1.9, prio: 8 },
   };
@@ -6618,7 +6631,7 @@ const LAAS = (() => {
   const inde = new THREE.Group(); inde.userData.keep = true; I.group.add(inde);   // moves with the interiors and is hidden outside
   const ude = new THREE.Group(); dyn.add(ude);
   const ting = {};
-  let vegaObj = null, springStartet = false;
+  let vegaObj = null, springStartet = false, kalender = null;
   let ordenObj = null;   // the Order of the Elephant in its case: gone while Ida has borrowed it
   function glasses(parent, x, y, z, ry, mat) {
     const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g);
@@ -6754,6 +6767,17 @@ const LAAS = (() => {
     vegaObj = buildHorse('#f3f1ea', '#dcd8cc', { nose: '#d8c8bf' }); vegaObj.g.userData.keep = true; vegaObj.g.scale.setScalar(1.12); vegaObj.neck.rotation.x = .3; inde.add(vegaObj.g);
     vegaObj.g.position.set(300, 0, -18.3); vegaObj.g.rotation.y = Math.PI / 2;
     vegaObj.obst = [297.6, 302.4, -18.8, -17.8]; I.obstacles.push(vegaObj.obst);
+    // 1942: a calendar on the wall of the betjentstue, the king's brown glove in the gravel, and old horseshoes over the stable gate
+    kalender = ark(['JUNI 1942', '', 'Ma Ti On To Fr Lø Sø', '1  2  3  4  5  6  7', '8  9 10 11 12 13 14', '15 16 17 18 19 20 21'], .5, .62, 8.25, 1.75, 25.33, Math.PI);
+    const hsk = new THREE.Group(); hsk.position.set(HANDSKE[0], groundAt(HANDSKE[0], HANDSKE[1], 2) + .03, HANDSKE[1]); hsk.rotation.y = .7; hsk.scale.setScalar(1.6); ude.add(hsk);
+    box(.11, .025, .16, std('#6b4226'), 0, 0, 0, { parent: hsk, cast: false });
+    for (let i = 0; i < 4; i++) box(.022, .02, .08, std('#6b4226'), -.04 + i * .027, 0, .11, { parent: hsk, cast: false });
+    box(.03, .02, .06, std('#6b4226'), .07, 0, .03, { parent: hsk, cast: false });
+    ting.handsken = hsk;
+    if (STABLE_ENTRY) {
+      const e = STABLE_ENTRY, hs = new THREE.Group(); hs.position.set(e.x, 0, e.z); hs.rotation.y = e.ry; ude.add(hs);
+      for (let i = 0; i < 5; i++) { const sko = new THREE.Mesh(new THREE.TorusGeometry(.13, .028, 6, 14, Math.PI * 1.35), std('#4a4640', { metalness: .5 })); sko.rotation.z = -Math.PI * .175 + Math.PI; sko.position.set(-1.1 + i * .55, 3.86, .82); hs.add(sko); }
+    }
     // Landstingssalen: name cards on the desks for the press conference, ordered by rank
     const navne = ['Rigspolitiet', 'Kommissær Hald', 'Statsministeren', 'Reformministeren', 'A. Mørkeberg', 'Departementschefen', 'Kompaspartiet'];
     navne.forEach((navn, j) => {
@@ -6785,8 +6809,11 @@ const LAAS = (() => {
       else if (st.kan) offerAction({ id: 'laas-' + st.id, label: st.laas.knap || 'Lås op', prio: 11, run: () => aabn(st) });
       else if (st.tekst) offerAction({ id: 'laas-' + st.id, label: 'Døren er låst', prio: 6, run: () => toast(st.tekst) });
     }
+    const i42 = GAADE.G.lag1942 && GAADE.G.flag.includes('i_1942');
+    if (kalender) kalender.visible = i42;
     for (const [id, f] of Object.entries(FUND)) {
       const u = U[id]; if (!u || !her(f) || !GAADE.ok(u.kraever) || (f.kunNy && !nyt(u.giver)) || (id === 'tidsproeven' && stopur)) continue;
+      if (i42 && !u.lag1942) continue;   // in 1942 only the things of 1942
       offerAction({ id: 'fund-' + id, label: u.navn, prio: nyt(u.giver) ? (f.prioNy || 10) : (f.prio || 6), run: () => undersoeg(u) });
     }
   });
@@ -6815,13 +6842,16 @@ const PERSONER = (() => {
     ['hoejbro', -5, -167, 14], ['marmorbroen', -206, 140, 15], ['prins_joergens_gaard', -36, -62, 16], ['slotspladsen', ...PRESS.at(0, 0), 22],
     ['bibliotekshaven', GARDEN.cx, GARDEN.cz, 40], ['ridebanen', -140, 85, 42],
   ];
-  function stedNu() {
+  function stedNu2026() {
     if (I.on) return INDE[I.place + '/' + I.roomAt(P.pos.x - I.x, P.pos.z)] || BYG[I.place] || null;
     if (FX.tower?.on) return 'udsigten';
     if (MYBOAT.on) return null;
     const hit = UDE.find(([, x, z, r]) => Math.hypot(P.pos.x - x, P.pos.z - z) < r);
     return hit ? hit[0] : null;
   }
+  // in June 1942 (the extra layer) a place with its own 1942 version in the manuscript is that version, e.g. ridebanen_1942
+  const i1942 = () => GAADE.G.lag1942 && GAADE.G.flag.includes('i_1942');
+  function stedNu() { const s = stedNu2026(); return s && i1942() && M.steder[s + '_1942'] ? s + '_1942' : s; }
   GAADE.sted = id => { for (let s = stedNu(), n = 0; s && n < 6; s = M.steder[s]?.inde_i, n++) if (s === id) return true; return false; };
 
   // ---- figures: grown-ups in the same cartoon style as Ida
@@ -6909,6 +6939,20 @@ const PERSONER = (() => {
         part(new THREE.SphereGeometry(0.045, 10, 8), m('#e8e2d4'), head, 0, 0.19, 0, 1.06);
         for (const [dx, dz] of [[0.05, -0.02], [-0.04, -0.05], [0.0, 0.04]]) { const r = part(new THREE.CylinderGeometry(0.012, 0.012, 1.1, 6), m('#2a2a2a'), g, -0.12 + dx, 1.05, -0.24 + dz, 0); r.rotation.z = 0.55; }
       } },
+    // The extra layer, June 1942: Bente's grandfather at the counter, and the king on his morning ride
+    holger: { coat: '#1d2738', trousers: '#1d2738', hair: '#6b5a48', hairStyle: 'kort', scale: 1.0, skin: '#ebc2a0',
+      extra: (g, head, part, m) => {
+        for (const y of [1.08, 1.24, 1.4]) part(new THREE.SphereGeometry(0.02, 8, 6), m('#c9a24b'), g, 0, y, 0.205, 0);
+        part(new THREE.CylinderGeometry(0.15, 0.15, 0.09, 16), m('#1d2738'), head, 0, 0.12, -0.01, 1.04); part(new THREE.BoxGeometry(0.2, 0.02, 0.11), m('#111318'), head, 0, 0.085, 0.12, 0);   // cap
+        part(new THREE.BoxGeometry(0.15, 0.035, 0.035), m('#5a4636'), head, 0, -0.045, 0.135, 0);   // a big moustache
+      } },
+    kongen: { coat: '#2b3240', trousers: '#2b3240', hair: '#d0d0cc', hairStyle: 'kort', scale: 1.06, skin: '#ecc7aa', arm: [handske, null],
+      extra: (g, head, part, m) => {
+        part(new THREE.CylinderGeometry(0.15, 0.14, 0.11, 16), m('#2b3240'), head, 0, 0.13, -0.01, 1.04); part(new THREE.BoxGeometry(0.21, 0.02, 0.12), m('#111318'), head, 0, 0.09, 0.12, 0);   // uniform cap
+        part(new THREE.BoxGeometry(0.03, 0.03, 0.02), m('#c9a24b'), head, 0, 0.15, 0.15, 0);
+        part(new THREE.BoxGeometry(0.13, 0.03, 0.03), m('#e2e2de'), head, 0, -0.045, 0.135, 0);   // white moustache
+        const hest = buildHorse('#ece6d8', '#d6cebd', { nose: '#cdbfb2' }); hest.g.position.set(0, -0.78, -0.2); hest.g.scale.setScalar(1 / 1.06); g.add(hest.g);
+      } },
     // Riddersalen and Landstingssalen
     hoffourer: { coat: '#1c2233', trousers: '#1c2233', hair: '#a9a9a6', hairStyle: 'skaldet', long: true, scale: 1.02, skin: '#ecc8aa', arm: [protokol, handske],
       extra: (g, head, part, m) => {   // a dark livery with gold buttons and a gold collar
@@ -6924,6 +6968,7 @@ const PERSONER = (() => {
   };
   // ---- where each person stands at a place of the manuscript: outdoors {ude:[x,z]} or indoors {place, at:[x,z]}
   const se = STABLE_ENTRY || { x: -165, z: 86, nx: 1, nz: 0 };
+  const KONGE = [-128, 99];   // where the king stops on Ridebanen in 1942 (the route is invented)
   const SPOT = {
     bente: {
       doer: { ude: FT.at(0, 1.7), face: Math.atan2(FT.n[0], FT.n[1]), r: 0 },   // in the door until Ida has met her
@@ -6944,6 +6989,8 @@ const PERSONER = (() => {
     pernille: { slotspladsen: { ude: PRESS.at(7, 5.6), face: Math.atan2(PRESS.at(4, 1)[0] - PRESS.at(7, 5.6)[0], PRESS.at(4, 1)[1] - PRESS.at(7, 5.6)[1]), r: 2.6 } },
     // Valdorf comes up the stairs at 07.30 and stays in the hall near the commissioner; in act 3 he is in the restaurant
     svend: { hoejbro: { ude: [4, -164.5], face: 1.0, r: 2.6 } },
+    holger: { betjentstuen_1942: { place: 'folketing', at: [10.5, 24.5], face: Math.PI, r: 3.5 } },
+    kongen: { ridebanen_1942: { ude: KONGE, face: 0.9, r: 3.4, dy: 0.78, ride: true } },
     // Act 4: the press conference in Landstingssalen. The panel sits behind the name cards, the suspects on the front row.
     // (seats: SAL(z) is a front-row chair, PANEL(j) a chair on the platform; see buildLandsting)
     hoffourer: { riddersalen: { place: 'riddersal', at: [641.6, 1.4], face: -Math.PI / 2, r: 2.6 } },
@@ -6977,6 +7024,7 @@ const PERSONER = (() => {
     const p = M.personer[id], S = SPOT[id];
     if (id === 'bente' && !GAADE.ok(['flag:moedt_bente'])) return S.doer;
     if ((p.lag1942 && !GAADE.G.lag1942) || !GAADE.ok(p.kraever)) return null;
+    if (!p.lag1942 && i1942()) return null;   // in 1942 nobody from 2026 is there
     if (id === 'valdorf' && GAADE.ok(['flag:pressemoede'])) return S.landstingssalen;   // after Udsigten he goes to the press conference
     const sted = p.steder && p.steder[GAADE.G.akt];
     return (sted && S[sted]) || null;
@@ -6984,9 +7032,11 @@ const PERSONER = (() => {
   function placer(id, sp) {
     const f = FIG[id]; f.spot = sp; f.root.visible = !!sp && !sp.udsigt;
     if (!sp || sp.udsigt) return;
-    f.sid = !!sp.sidder; for (const l of f.legs) { l.hip.rotation.x = f.sid ? -Math.PI / 2 : 0; l.knee.rotation.x = f.sid ? Math.PI / 2 : 0; }
+    f.sid = !!sp.sidder || !!sp.ride; f.legs.forEach((l, i) => {   // sitting on a chair, or astride a horse
+      l.hip.rotation.x = sp.ride ? -0.55 : f.sid ? -Math.PI / 2 : 0; l.knee.rotation.x = sp.ride ? 0.75 : f.sid ? Math.PI / 2 : 0; l.hip.rotation.z = sp.ride ? (i ? 0.42 : -0.42) : 0;
+    });
     for (const v of f.vagter) v.visible = !!sp.foelge;
-    if (sp.ude) { ude.add(f.root); f.root.position.set(sp.ude[0], groundAt(sp.ude[0], sp.ude[1], 2), sp.ude[1]); }
+    if (sp.ude) { ude.add(f.root); f.root.position.set(sp.ude[0], groundAt(sp.ude[0], sp.ude[1], 2) + (sp.dy || 0), sp.ude[1]); }
     else { inde.add(f.root); f.root.position.set(sp.at[0], I.height(sp.at[0], sp.at[1]) + (sp.dy || 0), sp.at[1]); }
     f.yaw = sp.face; f.root.rotation.y = sp.face; f.head.rotation.y = 0;
   }
@@ -6997,7 +7047,7 @@ const PERSONER = (() => {
   HOOKS.frame.push(dt => {
     if (!started) return;
     tjekT -= dt;
-    if (tjekT < 0) { tjekT = 0.4; for (const id of Object.keys(FIG)) { const sp = spotFor(id); if (sp !== FIG[id].spot) placer(id, sp); } lig.root.visible = GAADE.G.akt <= 2; }
+    if (tjekT < 0) { tjekT = 0.4; for (const id of Object.keys(FIG)) { const sp = spotFor(id); if (sp !== FIG[id].spot) placer(id, sp); } lig.root.visible = GAADE.G.akt <= 2 && !i1942(); }
     let naer = null, nd = Infinity;
     for (const [id, f] of Object.entries(FIG)) {
       const sp = f.spot; if (!sp || !samme(sp)) continue;
@@ -7015,7 +7065,68 @@ const PERSONER = (() => {
       offerAction({ id: 'tal-' + naer, label: 'Tal med ' + (p.kort || p.navn.split(' ')[0]), prio: 9, run: () => GAADE.samtale(naer) });
     }
   });
-  return { stedNu, SPOT, FIG, spotFor };
+  return { stedNu, SPOT, FIG, spotFor, figur, i1942 };
+})();
+
+// ======================================================================== MURDER MYSTERY: the extra layer, June 1942
+// With the old radio in the betjentstue Ida comes to a summer morning in 1942. Everything built later is hidden, the
+// picture turns old and brown, and German soldiers walk patrol. If one of them sees her, she is sent back to 2026.
+// The routes of the patrols and of the king are invented for the game.
+const AAR1942 = (() => {
+  const M = GAADE.M, I = INTERIOR;
+  const badge = document.createElement('div'); badge.id = 'aar1942'; badge.className = 'sticker'; badge.textContent = 'Juni 1942'; badge.hidden = true; document.body.appendChild(badge);
+  const soldat = { coat: '#5c6150', trousers: '#4d5142', shoes: '#1d1a17', hair: '#3b3026', hairStyle: 'kort', scale: 1.02, skin: '#e3b997',
+    extra: (g, head, part, m) => {
+      const hjelm = part(new THREE.SphereGeometry(0.17, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), m('#4a4e45'), head, 0, 0.03, -0.01, 1.04); hjelm.scale.set(1.08, 1, 1.1);
+      const gevaer = part(new THREE.CylinderGeometry(0.018, 0.022, 1.1, 6), m('#3a2a1e'), g, 0.2, 1.25, -0.16, 0); gevaer.rotation.z = -0.25;   // a rifle on the shoulder
+      part(new THREE.BoxGeometry(0.42, 0.05, 0.05), m('#2d2a24'), g, 0, 0.9, 0.2, 0);   // the belt
+    } };
+  // three patrols, each walking back and forth between two points
+  const RUTER = [[[-52, 52], [-46, 104]], [[-170, 64], [-108, 66]], [[-172, 128], [-150, 112]]];
+  const pat = RUTER.map(([a, b], i) => {
+    const f = PERSONER.figur(soldat); f.root.visible = false; dyn.add(f.root);
+    return { f, a, b, t: i * 0.37, dir: 1, hilst: 0 };
+  });
+  let var1942 = false, fanget = false, advarT = 0, gemt = [];
+  // the modern traffic, boats, tourists and the merman are not there in 1942 (their own visibility comes back afterwards)
+  const moderne = () => [...VEHICLES.filter(v => v.kind === 'car').map(v => v.g), ...FT_CARS.map(c => c.g), ...BOATS.map(b => b.g), ...TOURISTS.map(t => t.root), ...START_WALKERS.map(w => w.root), MERMAN.g].filter(Boolean);
+  function vis(paa) {
+    document.body.classList.toggle('i1942', paa); badge.hidden = !paa;
+    for (const o of NYERE) o.visible = !paa;
+    for (const p of pat) p.f.root.visible = paa;
+    if (paa) gemt = moderne().map(o => [o, o.visible]); else { for (const [o, v] of gemt) o.visible = v; gemt = []; }
+  }
+  function tilbage() {   // the soldiers send her running back to the betjentstue: there she turns the radio back
+    if (!I.on || I.place !== 'folketing') { if (I.on) I.leave(false, true); I.enter('folketing'); }
+    if (!I.on) return;
+    P.pos.set(I.x + 8.2, I.height(8.2, 22.4), 22.4); P.face = -Math.PI / 2; cam.yaw = P.face + Math.PI; P.vel.set(0, 0, 0);
+  }
+  HOOKS.frame.push(dt => {
+    if (!started) return;
+    const nu = PERSONER.i1942();
+    if (nu !== var1942) { var1942 = nu; AAR_ON = nu; fanget = false; vis(nu); }
+    if (!nu) return;
+    for (const [o] of gemt) o.visible = false;
+    // the patrols
+    const ude = !I.on && !FX.tower?.on && !MYBOAT.on;
+    advarT -= dt;
+    for (const p of pat) {
+      const L = Math.hypot(p.b[0] - p.a[0], p.b[1] - p.a[1]);
+      if (!paused) { p.t += p.dir * dt * 1.15 / L; if (p.t > 1) { p.t = 1; p.dir = -1; } if (p.t < 0) { p.t = 0; p.dir = 1; } }
+      const x = p.a[0] + (p.b[0] - p.a[0]) * p.t, z = p.a[1] + (p.b[1] - p.a[1]) * p.t;
+      const face = Math.atan2((p.b[0] - p.a[0]) * p.dir, (p.b[1] - p.a[1]) * p.dir);
+      p.f.root.position.set(x, groundAt(x, z, 2), z); p.f.root.rotation.y = face;
+      const sving = paused ? 0 : Math.sin(clockT * 6.5) * 0.45; p.f.legs.forEach((l, i) => { l.hip.rotation.x = i ? sving : -sving; });
+      if (!ude || paused || fanget) continue;
+      const dx = P.pos.x - x, dz = P.pos.z - z, d = Math.hypot(dx, dz);
+      if (d < 16 && advarT <= 0) { advarT = 12; toast('Pas på! En tysk patrulje. Gå uden om, så de ikke ser dig.'); }
+      if (d < 9 && Math.abs(angDiff(Math.atan2(dx, dz), face)) < 0.9) {   // seen
+        fanget = true;
+        GAADE.scene({ eyebrow: 'Juni 1942', title: 'Halt!', lines: M.fanget1942.replikker, btn: 'Videre', efter: () => { tilbage(); GAADE.giv(M.fanget1942.giver); } });
+      }
+    }
+  });
+  return { pat, RUTER };
 })();
 
 // ======================================================================== BOOT
@@ -7024,7 +7135,7 @@ function boot(data) {
   const st = load();
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
-  setTekst(!!st.tekst); naesteSpor = !!st.spor;
+  setTekst(!!st.tekst); naesteSpor = !!st.spor; med1942 = st.lag1942 !== false;
   setEvening(false); ev = lysMaal();   // the light follows the story's clock from the start
   setMapVisible(showMap); sizeMap();
   if (data.pos) { P.pos.fromArray(data.pos); if (typeof data.face === 'number') P.face = data.face; }
@@ -7037,7 +7148,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { lys: () => ev, MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { lys: () => ev, MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

@@ -345,3 +345,15 @@ Nye små ting i rummene: presselisten på en knage i Finansministeriets garderob
 Springvandet i Bibliotekshaven springer først, når klokken i historien er 09.00. Knappen "Start springvandet" er fjernet.
 
 Kontrol: alle steder er gennemprøvet i Chromium på computer og telefon uden JavaScript-fejl.
+
+## Runde 14: betjentstuen og Slotsholmen i juni 1942 (21. oktober 2026)
+
+Ekstralaget med 1942 bruger de rum og huse, der allerede findes. Der er ikke bygget nye rum.
+
+I betjentstuen står den gamle radio, som Ida kan dreje hen på London. I 1942 hænger der en papirkalender for juni 1942 på væggen, og computeren på skranken er væk. Holger, Bentes farfar, står bag skranken. Kontorstolen er den samme som i 2026.
+
+Udenfor er Den Sorte Diamant, glasbroen, presseområdet på Slotspladsen, bilerne, turbådene, turisterne og havmanden ved Højbro skjult i 1942. Billedet får en gulbrun tone som et gammelt foto. Over porten til De Kongelige Stalde hænger fem gamle hestesko, også i 2026.
+
+Patruljernes ruter og kongens plads på Ridebanen er digtet. Kongens hest er lys som i manuskriptet. Mørklægningsgardiner, gamle biler, cykler og hestevogne er ikke lavet. Det er heller ikke tjekket, om springvandets skulptur i Bibliotekshaven fandtes i 1942.
+
+Kontrol: radioen begge veje, Holger, kongen, handsken, hesteskoen, en patrulje og skabet er gennemprøvet i Chromium på computer og telefon uden JavaScript-fejl.

@@ -11,7 +11,7 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 - Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 63 skridt.
 - Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 75 skridt.
 - Fejl: ingen. Advarsler: ingen.
-- Steder, der skal bygges: Betjentstuen, juni 1942 (betjentstuen_1942), Ridebanen, juni 1942 (ridebanen_1942).
+- Steder, der skal bygges: .
 - Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 295.
 
 ## Start
@@ -1070,7 +1070,7 @@ I spillet: ude: Bibliotekshaven (bygget).
 
 ### Betjentstuen, juni 1942
 
-I spillet: inde: folketing/betjent (1942) (skal bygges).
+I spillet: inde: folketing/betjent (bygget).
 
 Åben, når: 1942-laget er slået til, »i 1942«.
 
@@ -1082,7 +1082,7 @@ I spillet: inde: folketing/betjent (1942) (skal bygges).
 
 ### Ridebanen, juni 1942
 
-I spillet: ude: Ridebanen (1942) (skal bygges).
+I spillet: ude: Ridebanen (bygget).
 
 Åben, når: 1942-laget er slået til, »i 1942«.
 
@@ -1392,4 +1392,4 @@ Hvis Elefantordenen ikke er lagt tilbage:
 
 ## 1942-laget
 
-Ekstralaget med 1942 bliver bygget til sidst. Når aktiv er false, er sadelskabet ikke låst, radioen virker ikke, og resten af gåden er den samme. Laget er slået fra.
+Ekstralaget med 1942. Når aktiv er false, er sadelskabet ikke låst, radioen virker ikke, og resten af gåden er den samme. Spilleren kan også slå rejsen fra under Indstillinger, før et nyt spil. Laget er slået til.
