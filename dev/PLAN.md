@@ -295,3 +295,9 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Nøglen og skabet: over porten til De Kongelige Stalde hænger fem gamle hestesko. Tilbage i 2026 finder Ida nøglen bag den tredje. Uden nøglen er skabet i sadelkammeret låst, og med den finder hun tabellen (spor 21).
   - Uden laget: under Indstillinger kan "Rejsen til 1942" slås fra. Det gælder fra næste nye spil. Så er sadelskabet ikke låst, og radioen er bare en gammel radio.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: radioen begge veje, Holger, kongen, handsken, hesteskoen, skabet med og uden nøgle, en patrulje, der fanger Ida, og et spil uden laget. Den hele gennemspilning fra start til efterskrift går nu også gennem 1942.
+
+### Nyt design af personerne
+- [x] Ida (21. okt. 2026). Ida er bygget om med en blødere krop, et oval ansigt med store øjne, øjenbryn, næse, smil og røde kinder, hår med pandehår og en hestehale, der svinger, når hun går. Den gule regnfrakke har knebel-knapper, lommeklapper, snor i livet og en hætte, der ligger nede på ryggen. Hun har et rustrødt halstørklæde, jeans med opslag og hvide sneakers med rød hæl. Den grønne rygsæk har afrundede hjørner, en klap med to remme og spænder, en forlomme med lynlås, en sidelomme med en sammenfoldet paraply, et lille mærke og skulderremme med brystrem. Albuerne bøjer, når hun svinger med armene.
+  - Hver del af kroppen er nu samlet i én figur med én omrids-skal, så hun tegnes med 26 dele i stedet for 50.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele gennemspilningen, at gå, hoppe og sidde i båden.
+- [ ] De andre personer i samme stil.
