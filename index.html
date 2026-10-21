@@ -331,6 +331,190 @@ const grad = new THREE.DataTexture(new Uint8Array([105,105,105,255, 170,170,170,
 grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true;
 function toon(color, ex = {}) { return new THREE.MeshToonMaterial(Object.assign({ color, gradientMap: grad }, ex)); }
 
+// ---------------------------------------------------------------- people: one figure kit for Ida and everyone else
+// A person is built from simple shapes in a few rigid groups (body, head, arms, thighs, shins). Each group is merged
+// into one mesh with the colours in the vertices, plus one dark outline shell pushed out along smoothed normals, so the
+// outline is equally thick everywhere and there are few things to draw.
+const FIG_M = toon('#ffffff', { vertexColors: true }), FIG_OL = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide });
+function figKit(tyk = 0.012) {
+  const dele = new Map(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), s = new THREE.Vector3();
+  function put(grp, geo, col, m, ol) { if (!dele.has(grp)) dele.set(grp, []); dele.get(grp).push({ geo, col: new THREE.Color(col), m, ol }); }
+  function add(grp, geo, col, x = 0, y = 0, z = 0, o = {}) {   // o: rx, ry, rz, s: [sx, sy, sz], ol: outline thickness (0 = none)
+    put(grp, geo, col, new THREE.Matrix4().compose(v.set(x, y, z), q.setFromEuler(e.set(o.rx || 0, o.ry || 0, o.rz || 0)), s.set(...(o.s || [1, 1, 1]))), o.ol === undefined ? tyk : o.ol);
+  }
+  function samlet(arr) {   // [{pos, nor?, col?}] -> one BufferGeometry
+    let n = 0; for (const a of arr) n += a.pos.length;
+    const pos = new Float32Array(n), nor = arr[0].nor ? new Float32Array(n) : null, col = arr[0].col ? new Float32Array(n) : null; let i = 0;
+    for (const a of arr) { pos.set(a.pos, i); if (nor) nor.set(a.nor, i); if (col) col.set(a.col, i); i += a.pos.length; }
+    const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    if (nor) bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); if (col) bg.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    bg.computeBoundingSphere(); return bg;
+  }
+  function bake(cast = true) {
+    for (const [grp, list] of dele) {
+      const fyld = [], streg = [];
+      for (const d of list) {
+        const g = d.geo.index ? d.geo.toNonIndexed() : d.geo.clone(); g.applyMatrix4(d.m); if (!g.attributes.normal) g.computeVertexNormals();
+        const p = g.attributes.position.array, nn = g.attributes.normal.array, c = new Float32Array(p.length);
+        for (let k = 0; k < p.length; k += 3) { c[k] = d.col.r; c[k + 1] = d.col.g; c[k + 2] = d.col.b; }
+        fyld.push({ pos: p, nor: nn, col: c });
+        if (d.ol > 0) {   // the outline: every corner pushed out along the average normal of the corners in the same place
+          const sum = new Map(), key = k => Math.round(p[k] * 2e4) + ',' + Math.round(p[k + 1] * 2e4) + ',' + Math.round(p[k + 2] * 2e4);
+          for (let k = 0; k < p.length; k += 3) { const kk = key(k), a = sum.get(kk) || [0, 0, 0]; a[0] += nn[k]; a[1] += nn[k + 1]; a[2] += nn[k + 2]; sum.set(kk, a); }
+          const o = new Float32Array(p.length);
+          for (let k = 0; k < p.length; k += 3) { const a = sum.get(key(k)), l = Math.hypot(a[0], a[1], a[2]) || 1; o[k] = p[k] + a[0] / l * d.ol; o[k + 1] = p[k + 1] + a[1] / l * d.ol; o[k + 2] = p[k + 2] + a[2] / l * d.ol; }
+          streg.push({ pos: o });
+        }
+        g.dispose(); d.geo.dispose();
+      }
+      const m = new THREE.Mesh(samlet(fyld), FIG_M); m.castShadow = cast; grp.add(m);
+      if (streg.length) grp.add(new THREE.Mesh(samlet(streg), FIG_OL));
+    }
+    dele.clear();
+  }
+  return { add, put, bake, tyk };
+}
+// Merges the meshes made with part() (userData.fig) into the groups given: each mesh goes to the nearest of the groups
+// above it. Other meshes (a horse, a flash) are left as they are.
+function bagFigur(grupper, o = {}) {
+  const kit = figKit(o.tyk || 0.012), saet = new Set(grupper), ws = new THREE.Vector3(), gs = new THREE.Vector3();
+  for (const grp of grupper) {
+    grp.updateMatrixWorld(true); grp.getWorldScale(gs);
+    const inv = new THREE.Matrix4().copy(grp.matrixWorld).invert(), ud = [];
+    grp.traverse(x => {
+      if (!x.isMesh || !x.userData.fig) return;
+      for (let p = x.parent; p && p !== grp; p = p.parent) if (saet.has(p)) return;
+      ud.push(x);
+    });
+    for (const x of ud) {
+      let ol = x.userData.ol;
+      if (ol < 0) { x.geometry.computeBoundingSphere(); x.getWorldScale(ws); ol = Math.min(kit.tyk, x.geometry.boundingSphere.radius * Math.max(ws.x / gs.x, ws.y / gs.y, ws.z / gs.z) * 0.22); }
+      kit.put(grp, x.geometry, x.material.color, new THREE.Matrix4().multiplyMatrices(inv, x.matrixWorld), ol);
+      x.parent.remove(x);
+    }
+  }
+  kit.bake(o.skygge !== false);
+}
+// shapes for the figure kit
+function rundKasse(w, h, d, r = Math.min(w, h, d) * 0.3) {   // a box with rounded edges, centred
+  const b = Math.min(r, w / 2 - 1e-3, h / 2 - 1e-3, d / 2 - 1e-3), W = w - 2 * b, H = h - 2 * b, sh = new THREE.Shape(), x = -W / 2, y = -H / 2, c = Math.min(b * 0.6, W / 2, H / 2);
+  sh.moveTo(x + c, y); sh.lineTo(x + W - c, y); sh.quadraticCurveTo(x + W, y, x + W, y + c); sh.lineTo(x + W, y + H - c); sh.quadraticCurveTo(x + W, y + H, x + W - c, y + H);
+  sh.lineTo(x + c, y + H); sh.quadraticCurveTo(x, y + H, x, y + H - c); sh.lineTo(x, y + c); sh.quadraticCurveTo(x, y, x + c, y);
+  const g = new THREE.ExtrudeGeometry(sh, { depth: Math.max(1e-3, d - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 2, curveSegments: 2 });
+  g.translate(0, 0, -Math.max(1e-3, d - 2 * b) / 2); g.deleteAttribute('uv'); return g;
+}
+const drej = (pts, seg = 20, start = 0, len = Math.PI * 2) => new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg, start, len);   // a shape turned round the y axis (pts: [radius, height] from the bottom up)
+const kugle = (r, w = 18, h = 14, ...a) => new THREE.SphereGeometry(r, w, h, ...a), kapsel = (r, l, w = 12) => new THREE.CapsuleGeometry(r, l, 3, w), kasse = (w, h, d) => new THREE.BoxGeometry(w, h, d), cyl = (a, b, h, w = 16, open = false) => new THREE.CylinderGeometry(a, b, h, w, 1, open);
+function slange(pts, r, seg = 20, rund = 7) { return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), seg, r, rund, false); }
+const nuance = (c, dl, ds = 0) => '#' + new THREE.Color(c).offsetHSL(0, ds, dl).getHexString();   // a lighter or darker shade of a colour
+const HUD = ['#f2c6a4', '#e9bd99', '#f4d2b8', '#d9a984', '#c98d62', '#a86f4c', '#7d4f36'], HAAR = ['#3b2a20', '#6b4a2f', '#a8794c', '#d9c08a', '#2b2420', '#8c5a3c', '#1f1a18', '#b4612f'];
+
+// A grown-up (or a child) in the same style as Ida. o: coat, trousers, shoes, skin, hair, hairStyle ('kort', 'skaldet',
+// 'knold', 'hestehale', 'bob' or 'lang'), kvinde, long (a long coat), toerklaede (scarf colour), solbriller, taske (a bag
+// across the body), barn, scale, alvor (a serious face), lukket (closed eyes), detalje: 'lav' for people far away,
+// sidder, extra(g, head, part, m, foran) and arm: [left, right] (sh, part, m, el) for things they wear or hold (el: the elbow),
+// foer(f) to set a pose before the parts are merged, statisk (one group), enkel (head on the body, knees on the thighs),
+// bag: false to merge later (several people as one), skygge: false for no shadow.
+// Returns { root, g, head, legs: [{ hip, knee }], hips, arms, grupper }.
+function menneske(o = {}) {
+  const lav = o.detalje === 'lav', kv = !!o.kvinde, seg = n => Math.max(5, Math.round(n * (lav ? 0.6 : 1)));
+  const mats = new Map(), m = c => { c = c || '#888888'; if (!mats.has(c)) mats.set(c, new THREE.MeshBasicMaterial({ color: c })); return mats.get(c); };
+  const part = (geo, mat, parent, x = 0, y = 0, z = 0, ol = 1.05) => { const p = new THREE.Mesh(geo, mat); p.position.set(x, y, z); p.userData.fig = true; p.userData.ol = ol ? -1 : 0; parent.add(p); return p; };
+  const K = (r, w, h, ...a) => kugle(r, seg(w), seg(h), ...a), KP = (r, l, w = 12) => new THREE.CapsuleGeometry(r, l, lav ? 2 : 3, seg(w));
+  const coat = o.coat || '#55606e', trousers = o.trousers || '#2d3340', skin = o.skin || '#efc7a6', hair = o.hair || '#4a3a30', shoes = o.shoes || '#231f20';
+  const bryn = o.bryn || nuance(hair, -0.12), zf = 0.92, g = new THREE.Group();
+  // ---- the body: one turned shape from the hem to the collar, a little flatter front to back
+  const sk = kv ? 0.2 : 0.214, liv = kv ? 0.172 : 0.19, hof = kv ? 0.205 : 0.198;
+  const top = [[liv, 1.08], [sk - 0.012, 1.22], [sk, 1.36], [sk - 0.005, 1.46], [sk - 0.032, 1.535], [0.13, 1.585], [0.07, 1.615]];
+  const prof = o.long ? [[0.002, 0.7], [0.27, 0.66], [0.256, 0.74], [0.236, 0.84], [hof + 0.01, 0.95], ...top] : [[0.002, 0.88], [hof + 0.012, 0.845], [hof, 0.95], ...top];
+  const foran = y => {   // how far the front of the body is from the middle at height y (for buttons and badges)
+    for (let i = 2; i < prof.length; i++) if (prof[i][1] >= y) { const [r0, y0] = prof[i - 1], [r1, y1] = prof[i], t = Math.max(0, Math.min(1, (y - y0) / (y1 - y0 || 1))); return (r0 + (r1 - r0) * t) * zf; }
+    return 0.07;
+  };
+  part(drej(prof, seg(24)), m(coat), g).scale.set(1, 1, zf);
+  for (const s of [-1, 1]) part(K(0.08, 14, 10), m(coat), g, s * (kv ? 0.188 : 0.2), 1.49, 0).scale.set(1, 0.85, 0.92);   // round shoulders
+  if (!o.long) part(drej([[0.002, 0.7], [0.17, 0.72], [0.19, 0.8], [0.19, 0.9]], seg(18)), m(trousers), g, 0, 0, 0, 0).scale.set(1, 1, zf);   // the seat of the trousers under the jacket
+  part(cyl(0.052, 0.056, 0.12, seg(12)), m(skin), g, 0, 1.64, 0, 0);   // neck
+  if (o.toerklaede) {   // a thick scarf round the neck, with one end over the chest
+    const t = part(new THREE.TorusGeometry(0.078, 0.036, seg(8), seg(18)), m(o.toerklaede), g, 0, 1.6, 0.005); t.rotation.x = Math.PI / 2 - 0.12; t.scale.set(1.05, 0.85, 1);
+    part(rundKasse(0.065, 0.16, 0.022, 0.01), m(o.toerklaede), g, 0.06, 1.45, foran(1.45) + 0.014).rotation.set(-0.15, 0, 0.14);
+  } else if (!o.ingenKrave) { const k = part(new THREE.TorusGeometry(0.072, 0.022, 6, seg(16)), m(nuance(coat, -0.04)), g, 0, 1.6, 0.004); k.rotation.x = Math.PI / 2; k.scale.set(1.05, 0.9, 1); }   // collar
+  if (o.taske) {   // a bag on a strap across the body
+    part(slange([[0.16, 1.57, -0.04], [0.13, 1.47, foran(1.45) + 0.01], [-0.04, 1.22, foran(1.22) + 0.012], [-0.17, 1.02, foran(1.02) + 0.01]], 0.011, seg(14), 5), m(nuance(o.taske, -0.08)), g, 0, 0, 0, 0);
+    part(rundKasse(0.2, 0.16, 0.07, 0.025), m(o.taske), g, -0.17, 0.97, foran(0.97) + 0.03).rotation.y = -0.45;
+  }
+  // ---- the head: round with a softer jaw, eyes with a light spot, brows, nose, mouth and ears
+  const head = new THREE.Group(); head.position.set(0, 1.79, 0); g.add(head);
+  part(K(0.14, 22, 16), m(skin), head).scale.set(0.95, 1.06, 1);
+  part(K(0.112, 16, 12), m(skin), head, 0, -0.058, 0.018).scale.set(kv ? 0.86 : 0.93, 0.86, 0.95);
+  for (const s of [-1, 1]) {
+    if (!lav) part(K(0.03, 8, 6), m(skin), head, s * 0.138, -0.012, -0.008).scale.set(0.5, 1, 0.8);
+    if (o.lukket) { const l = part(new THREE.TorusGeometry(0.016, 0.004, 4, 8, Math.PI), m('#231a22'), head, s * 0.047, 0.006, 0.131, 0); l.rotation.z = Math.PI; }   // closed eyes
+    else {
+      part(K(0.0185, 10, 8), m('#231a22'), head, s * 0.047, 0.012, 0.126, 0).scale.set(0.95, 1.25, 0.6);
+      if (!lav) part(K(0.006, 6, 4), m('#ffffff'), head, s * 0.047 + 0.006, 0.021, 0.137, 0);
+      if (kv && !lav) part(kasse(0.017, 0.004, 0.004), m('#231a22'), head, s * 0.063, 0.029, 0.12, 0).rotation.set(0, s * 0.35, -s * 0.55);   // a lash at the outer corner
+    }
+    part(KP(0.0052, 0.028, 6), m(bryn), head, s * 0.047, 0.05, 0.124, 0).rotation.set(0, s * 0.3, Math.PI / 2 + s * (o.alvor ? -0.12 : 0.15));
+    if (kv && !lav) { const c = part(K(0.021, 8, 6), m('#f0a59b'), head, s * 0.074, -0.037, 0.106, 0); c.scale.set(1, 0.6, 0.3); c.rotation.y = s * 0.62; }   // rosy cheeks
+  }
+  part(K(kv ? 0.015 : 0.018, 8, 6), m(nuance(skin, -0.05)), head, 0, -0.02, 0.137, 0).scale.set(0.85, 1, 1);   // nose
+  const mund = part(new THREE.TorusGeometry(kv ? 0.019 : 0.021, 0.0045, 5, 10, Math.PI), m(o.mund || (kv ? '#a8473f' : '#7a3e34')), head, 0, -0.064, 0.127, 0);
+  mund.rotation.set(-0.25, 0, Math.PI); if (o.alvor || o.lukket) mund.scale.y = 0.3;
+  // hair: a shell open over the face, plus the style
+  const H = m(hair), stil = o.hairStyle || 'kort';
+  const skal = (r, a, t0, t1, w = 22, h = 12) => K(r, w, h, Math.PI / 2 + a, Math.PI * 2 - 2 * a, t0, t1 - t0);
+  const hs = (geo, x = 0, y = 0.008, z = -0.006, sx = 0.97, sy = 1.07, sz = 1.02) => { const p = part(geo, H, head, x, y, z); p.scale.set(sx, sy, sz); return p; };
+  if (stil === 'skaldet') hs(skal(0.149, 1.2, Math.PI * 0.4, Math.PI * 0.66));   // a fringe of hair round the back, none on top
+  else if (stil === 'kort') {
+    hs(skal(0.149, 0.95, 0, Math.PI * 0.47)); hs(skal(0.149, 1.9, 0, Math.PI * 0.64)); hs(K(0.149, 22, 6, 0, Math.PI * 2, 0, Math.PI * 0.27));
+    const q = part(KP(0.032, 0.08, 8), H, head, 0.02, 0.118, 0.082); q.rotation.set(-0.75, 0, 1.45); q.scale.z = 0.6;   // a little wave at the front
+  } else {   // the longer styles cover the ears
+    const bob = stil === 'bob' || stil === 'lang';
+    hs(skal(bob ? 0.156 : 0.152, bob ? 0.86 : 0.95, 0, Math.PI * (bob ? 0.8 : 0.64)));
+    hs(K(0.152, 22, 7, 0, Math.PI * 2, 0, Math.PI * (bob ? 0.34 : 0.3)), 0, 0.008, bob ? 0.004 : -0.006);
+    hs(K(0.105, 14, 10), 0, -0.04, -0.06, 1.1, 1, 0.9);   // fullness at the back of the head
+    if (stil === 'knold') part(K(0.07, 12, 10), H, head, 0, 0.1, -0.12);
+    if (stil === 'hestehale') {
+      const t = new THREE.Group(); t.position.set(0, 0.08, -0.13); t.rotation.x = 0.5; head.add(t);
+      part(new THREE.TorusGeometry(0.032, 0.015, 6, seg(12)), m(o.haarbaand || '#c4553a'), t, 0, -0.01, 0).rotation.x = Math.PI / 2;
+      part(drej([[0.002, -0.28], [0.026, -0.24], [0.046, -0.16], [0.052, -0.09], [0.038, -0.025], [0.002, 0]], seg(14)), H, t, 0, -0.01, 0).scale.set(1, 1, 0.8);
+    }
+    if (stil === 'lang') hs(KP(0.11, 0.16, 12), 0, -0.19, -0.075, 1.25, 1, 0.5);   // down over the shoulders at the back
+  }
+  if (o.solbriller) { for (const s of [-1, 1]) part(rundKasse(0.064, 0.042, 0.014, 0.012), m('#15171c'), head, s * 0.049, 0.012, 0.139, 0); part(kasse(0.032, 0.008, 0.008), m('#15171c'), head, 0, 0.022, 0.142, 0); }
+  // ---- arms with a cuff and a hand, legs with knees and shoes with a sole
+  const arms = [], elbows = [], hips = [], legs = [];
+  for (const s of [-1, 1]) {
+    const sh = new THREE.Group(); sh.position.set(s * (kv ? 0.252 : 0.265), 1.53, 0); g.add(sh);
+    part(KP(kv ? 0.06 : 0.064, 0.22, 12), m(coat), sh, 0, -0.15, 0);
+    const el = new THREE.Group(); el.position.set(0, -0.3, 0); sh.add(el);   // the elbow
+    part(KP(kv ? 0.054 : 0.058, 0.2, 12), m(coat), el, 0, -0.09, 0);
+    if (!lav) part(cyl(0.062, 0.058, 0.04, seg(12)), m(nuance(coat, -0.05)), el, 0, -0.2, 0, 0);
+    part(K(0.05, 10, 8), m(skin), el, 0, -0.3, 0.004).scale.set(0.8, 1.12, 0.62);
+    if (!lav) part(KP(0.015, 0.03, 6), m(skin), el, -s * 0.028, -0.285, 0.022).rotation.z = s * 0.5;   // thumb
+    sh.rotation.z = s * 0.08; el.rotation.x = -0.12; arms.push(sh); elbows.push(el);
+    if (o.arm && o.arm[s > 0 ? 1 : 0]) o.arm[s > 0 ? 1 : 0](sh, part, m, el);
+    const hip = new THREE.Group(); hip.position.set(s * 0.1, 0.86, 0); g.add(hip);
+    part(KP(kv ? 0.074 : 0.08, 0.28, 12), m(trousers), hip, 0, -0.2, 0);
+    const knee = new THREE.Group(); knee.position.set(0, -0.42, 0); hip.add(knee);
+    part(KP(kv ? 0.06 : 0.066, 0.27, 12), m(trousers), knee, 0, -0.19, 0);
+    const sko = part(KP(kv ? 0.054 : 0.06, 0.14, 10), m(shoes), knee, 0, -0.42, 0.045); sko.rotation.x = Math.PI / 2; sko.scale.set(1.05, 1, 0.68);
+    if (!lav) { const sa = part(KP(kv ? 0.058 : 0.064, 0.15, 10), m(nuance(shoes, 0.07)), knee, 0, -0.452, 0.045, 0); sa.rotation.x = Math.PI / 2; sa.scale.set(1.08, 1, 0.22); }   // sole
+    hips.push(hip); legs.push({ hip, knee });
+  }
+  if (o.extra) o.extra(g, head, part, m, foran);
+  if (o.sidder) for (const l of legs) { l.hip.rotation.x = -Math.PI / 2; l.knee.rotation.x = Math.PI / 2; }
+  if (o.barn) head.scale.setScalar(1.2);
+  g.scale.setScalar((o.scale || 1) * (o.barn ? 0.64 : 1));
+  const root = new THREE.Group(); root.add(g);
+  const f = { root, g, head, legs, hips, arms, elbows };
+  if (o.foer) o.foer(f);
+  f.grupper = o.statisk ? [g] : o.enkel ? [g, ...arms, ...hips] : [g, head, ...arms, ...hips, ...legs.map(l => l.knee)];
+  if (o.bag !== false) bagFigur(f.grupper, { skygge: o.skygge });
+  return f;
+}
+
 // ---------------------------------------------------------------- canvas textures
 function ctex(w, h, draw, o = {}) {
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
@@ -1918,12 +2102,11 @@ function buildHorse(col, maneCol, o = {}) {
     part(new THREE.CapsuleGeometry(0.08, 0.32, 4, 8), mane, tail, 0, -0.18, -0.07).rotation.x = -0.45;
     part(new THREE.CapsuleGeometry(0.12, 0.5, 4, 10), mane, tail, 0, -0.62, -0.2).rotation.x = -0.12;
   }
-  if (o.rider) {   // a rider from the royal stables in a red jacket and a black helmet
-    const red = toon('#b8322c'), skin = toon('#f6cfb0'), black = toon('#2a2530');
-    part(new THREE.CapsuleGeometry(0.2, 0.36, 4, 10), red, body, 0, 2.08, -0.05);
-    part(new THREE.SphereGeometry(0.17, 12, 10), skin, body, 0, 2.55, -0.02, 1.05);
-    part(new THREE.SphereGeometry(0.18, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), black, body, 0, 2.6, -0.04, 1.04);
-    for (const s of [-1, 1]) { part(new THREE.CapsuleGeometry(0.08, 0.45, 3, 8), black, body, s * 0.36, 1.55, 0.05, 1.05).rotation.z = s * 0.25; part(new THREE.CapsuleGeometry(0.07, 0.3, 3, 8), red, body, s * 0.22, 2.0, 0.15, 1.05).rotation.x = -0.8; }
+  if (o.rider) {   // a rider from the royal stables in a red jacket, light breeches, black boots and a black riding helmet
+    const f = menneske({ coat: '#b8322c', trousers: '#ece6d6', shoes: '#1d1a1c', hair: '#5b4232', skin: '#f2c9a8', kvinde: true, hairStyle: 'hestehale', haarbaand: '#2a2530', statisk: true,
+      extra: (g2, head, part, m) => { const h = part(kugle(0.162, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.52), m('#2a2530'), head, 0, 0.025, -0.004); h.scale.set(1, 1.05, 1.06); part(kasse(0.16, 0.012, 0.06), m('#2a2530'), head, 0, 0.06, 0.15, 0); },
+      foer: ({ legs, arms, elbows }) => { legs.forEach((l, i) => { l.hip.rotation.x = -0.5; l.knee.rotation.x = 0.85; l.hip.rotation.z = i ? 0.68 : -0.68; l.knee.rotation.z = i ? -0.45 : 0.45; }); for (const a of arms) a.rotation.x = -0.55; for (const e of elbows) e.rotation.x = -0.7; } });
+    f.root.position.set(0, 0.78, -0.12); body.add(f.root);
   }
   return { g, body, neck, head, tail, legs };
 }
@@ -2456,29 +2639,27 @@ function hullShape(L, B) {   // seen from above, bow at +y (turned to +z below)
 }
 function flatExtrude(shape, depth) { const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 6 }); g.rotateX(-Math.PI / 2); g.rotateY(Math.PI); return g; }
 TX.flag = ctex(48, 32, (g, w, h) => { g.fillStyle = '#c8102e'; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.fillRect(14, 0, 5, h); g.fillRect(0, 13, w, 5); }, { wrap: false });
-const SHIRTS = ['#e0483c', '#3f7fd0', '#f2c14e', '#4fa36a', '#e98ac0', '#ffffff'], SKIN = tm('#f2c6a4');
-function person(parent, x, y, z, col, arm) {
-  const p = new THREE.Group(); p.position.set(x, y, z); parent.add(p);
-  mesh(new THREE.CapsuleGeometry(0.21, 0.32, 4, 8), tm(col), 0, 0.3, 0, { parent: p });
-  mesh(new THREE.SphereGeometry(0.17, 10, 8), SKIN, 0, 0.72, 0, { parent: p });
-  if (!arm) return null;
-  const a = new THREE.Group(); a.position.set(0.24, 0.5, 0); a.userData.keep = true; p.add(a);
-  mesh(new THREE.CapsuleGeometry(0.06, 0.3, 3, 6), tm(col), 0, -0.2, 0, { parent: a }); a.rotation.z = 0.2;
-  return a;
+const SHIRTS = ['#e0483c', '#3f7fd0', '#f2c14e', '#4fa36a', '#e98ac0', '#ffffff'];
+let folkN = 0;
+function person(parent, x, y, z, col, arm, extra) {   // a passenger sitting in a boat; arm: the right arm can wave. The boat merges them afterwards.
+  const n = folkN++, kv = n % 2 === 0;
+  const f = menneske({ coat: col, trousers: '#344052', skin: HUD[n % HUD.length], hair: HAAR[(n * 3) % HAAR.length], kvinde: kv, hairStyle: kv ? ['bob', 'hestehale', 'lang', 'knold'][n % 4] : ['kort', 'kort', 'skaldet'][n % 3],
+    detalje: 'lav', sidder: true, bag: false, scale: 0.9, extra });
+  f.root.position.set(x, y - 0.8, z); parent.add(f.root);
+  return arm ? f.arms[1] : null;
 }
 const BOATS = [];
 function makeBoat(kind, hullCol) {
-  const g = new THREE.Group(), arms = [];
+  const g = new THREE.Group(), arms = [], folk = new THREE.Group(); folk.userData.keep = true; g.add(folk);
   if (kind === 'canal') {
     const L = 14, B = 3.8;
     const hull = new THREE.Mesh(flatExtrude(hullShape(L, B), 1.05), [tm('#b88a5a'), tm(hullCol)]); hull.position.y = -0.5; hull.castShadow = true; hull.userData.keep = true; edges(hull, 30); g.add(hull);
     const rim = hullShape(L + 0.2, B + 0.2); rim.holes.push(hullShape(L - 0.5, B - 0.5)); mesh(flatExtrude(rim, 0.14), tm('#f4f1ea'), 0, 0.55, 0, { parent: g });
     for (let r = 0; r < 5; r++) {
       const z = 3.6 - r * 1.6; box(B - 0.9, 0.35, 0.45, tm('#7d5a3c'), 0, 0.55, z - 0.3, { parent: g, cast: false });
-      for (const sx of [-0.8, 0.8]) { const a = person(g, sx, 0.75, z - 0.25, pick(SHIRTS), r < 2 || sx > 0); if (a) arms.push(a); }
+      for (const sx of [-0.8, 0.8]) { const a = person(folk, sx, 0.75, z - 0.25, pick(SHIRTS), r < 2 || sx > 0); if (a) arms.push(a); }
     }
-    person(g, 0, 0.75, -L / 2 + 1.2, '#2b3f6b', false);   // the skipper with a cap
-    mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.1, 10), tm('#1f2a44'), 0, 1.68, -L / 2 + 1.2, { parent: g });
+    person(folk, 0, 0.75, -L / 2 + 1.2, '#2b3f6b', false, (g2, head, part, m) => { part(cyl(0.15, 0.155, 0.07, 14), m('#1f2a44'), head, 0, 0.12, -0.01); part(kasse(0.2, 0.015, 0.1), m('#111318'), head, 0, 0.09, 0.12, 0); });   // the skipper with a cap
     mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.4, 6), tm('#f4f1ea'), 0, 1.25, -L / 2 + 0.3, { parent: g });
     const f = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.46), toon('#ffffff', { map: TX.flag, side: THREE.DoubleSide })); f.position.set(0, 1.72, -L / 2 + 0.3 - 0.36); f.rotation.y = Math.PI / 2; f.userData.keep = true; g.add(f);
   } else {   // the harbour bus: a blue hull, a white cabin with windows and a yellow stripe
@@ -2488,9 +2669,9 @@ function makeBoat(kind, hullCol) {
     box(B - 1.0, 2.3, L - 7, tm('#f4f1ea'), 0, 1.0, -1.0, { parent: g, edges: true });
     box(B - 0.8, 0.25, L - 6.6, tm('#24508a'), 0, 3.3, -1.0, { parent: g });
     for (const sx of [-1, 1]) for (let k = 0; k < 6; k++) { const w = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.0), tm('#3b536c')); w.position.set(sx * ((B - 1.0) / 2 + 0.02), 2.3, -1.0 - (L - 7) / 2 + 1.5 + k * 2.4); w.rotation.y = sx * Math.PI / 2; g.add(w); }
-    for (let k = 0; k < 4; k++) { const a = person(g, -1.2 + k * 0.8, 0.85, (L - 7) / 2 + 0.3, pick(SHIRTS), true); if (a) arms.push(a); }
+    for (let k = 0; k < 4; k++) { const a = person(folk, -1.2 + k * 0.8, 0.85, (L - 7) / 2 + 0.3, pick(SHIRTS), true); if (a) arms.push(a); }
   }
-  bakeGroup(g); dyn.add(g);
+  bagFigur([folk, ...arms], { skygge: !isTouch }); bakeGroup(g); dyn.add(g);
   return { g, arms };
 }
 {
@@ -2785,26 +2966,31 @@ function laneOf(R, dir, off) {   // the route seen from one direction, moved sid
   if (R.loop) out.push(out[0].slice());
   return routeOf(out);
 }
-function makeCyclist(i) {
+function makeCyclist(i) {   // a cyclist leaning a little forward, with a helmet; every third has a Christiania bike with a child in the box
   const g = new THREE.Group(), cargo = i % 3 === 2, jacket = ['#3f7cc4', '#d9534f', '#6aa56b', '#8e5bb5', '#e8833a', '#2f3138'][i % 6], helmet = ['#f2c14e', '#ece7dc', '#d9534f', '#3f7cc4'][i % 4];
-  const frame = tm(['#2f3138', '#4a7bd0', '#d9534f', '#6aa56b', '#ece7dc'][i % 5]), skin = tm('#f2c6a4');
-  const zr = cargo ? -0.75 : -0.55, zf = cargo ? 1.15 : 0.55;
+  const frame = tm(['#2f3138', '#4a7bd0', '#d9534f', '#6aa56b', '#ece7dc'][i % 5]);
+  const zr = cargo ? -0.75 : -0.55, zf = cargo ? 1.15 : 0.55, bz = cargo ? 0.3 : 0.4;
   for (const z of [zr, zf]) mesh(new THREE.TorusGeometry(0.31, 0.045, 6, 18), M.dark, 0, 0.34, z, { parent: g, ry: Math.PI / 2 });
   box(0.05, 0.05, zf - zr, frame, 0, 0.6, (zr + zf) / 2, { parent: g });
   box(0.05, 0.55, 0.05, frame, 0, 0.42, -0.25, { parent: g }); box(0.05, 0.6, 0.05, frame, 0, 0.4, zf - 0.1, { parent: g });
-  box(0.56, 0.04, 0.04, M.dark, 0, 1.0, zf - 0.12, { parent: g }); box(0.16, 0.05, 0.28, M.dark, 0, 0.96, -0.3, { parent: g });
+  box(0.04, 0.45, 0.04, frame, 0, 0.9, bz, { parent: g });   // the stem up to the handlebar
+  box(0.56, 0.04, 0.04, M.dark, 0, 1.12, bz, { parent: g }); box(0.16, 0.05, 0.28, M.dark, 0, 0.96, -0.3, { parent: g });
+  const hjelm = c => (g2, head, part, m) => { const h = part(kugle(0.162, 12, 7, 0, Math.PI * 2, 0, Math.PI * 0.5), m(c), head, 0, 0.02, -0.006); h.scale.set(1, 1.05, 1.08); };
   if (cargo) {   // a Christiania bike with a child in the box
     box(0.8, 0.45, 0.8, M.deck || tm('#b48559'), 0, 0.42, 0.75, { parent: g, edges: true });
-    mesh(new THREE.SphereGeometry(0.14, 10, 8), skin, 0, 1.02, 0.7, { parent: g }); mesh(new THREE.SphereGeometry(0.15, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), tm('#f2c14e'), 0, 1.05, 0.7, { parent: g });
+    const barn = menneske({ coat: '#e8833a', trousers: '#3f7cc4', skin: HUD[(i + 2) % HUD.length], hair: HAAR[(i + 3) % HAAR.length], kvinde: i % 2 === 1, hairStyle: 'kort', barn: true, sidder: true, statisk: true, detalje: 'lav', skygge: !isTouch, extra: hjelm('#f2c14e') });
+    barn.root.position.set(0, 0.0, 0.72); barn.root.userData.keep = true; g.add(barn.root);
   }
-  mesh(new THREE.CapsuleGeometry(0.2, 0.42, 4, 8), tm(jacket), 0, 1.38, -0.18, { parent: g, rx: 0.25 });
-  mesh(new THREE.SphereGeometry(0.16, 10, 8), skin, 0, 1.86, -0.05, { parent: g });
-  mesh(new THREE.SphereGeometry(0.18, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), tm(helmet), 0, 1.9, -0.05, { parent: g });
-  for (const s of [-1, 1]) mesh(new THREE.CapsuleGeometry(0.06, 0.45, 3, 6), tm(jacket), s * 0.2, 1.38, 0.15, { parent: g, rx: 1.0 });
-  const legs = [];
-  for (const s of [-1, 1]) { const h = new THREE.Group(); h.position.set(s * 0.12, 1.0, -0.28); h.userData.keep = true; g.add(h); mesh(new THREE.CapsuleGeometry(0.075, 0.55, 3, 6), tm('#2f3e5c'), 0, -0.32, 0.12, { parent: h, rx: -0.35 }); legs.push(h); }
+  const L = 0.42, S = 0.95, kv = i % 2 === 0;
+  const f = menneske({ coat: jacket, trousers: '#2f3e5c', skin: HUD[i % HUD.length], hair: HAAR[i % HAAR.length], kvinde: kv, hairStyle: kv ? 'hestehale' : 'kort', scale: S, enkel: true, detalje: 'lav', skygge: !isTouch, extra: hjelm(helmet),
+    foer: ({ g: k, arms, legs }) => {   // lean forward round the hips, hands on the handlebar, feet on the pedals
+      k.rotation.x = L; k.position.set(0, 0.86 * S * (1 - Math.cos(L)), -0.86 * S * Math.sin(L));
+      for (const a of arms) a.rotation.x = cargo ? -1.0 : -1.12;
+      for (const l of legs) { l.hip.rotation.x = -(L + 0.5); l.knee.rotation.x = 0.7; }
+    } });
+  f.root.position.set(0, 0.243, -0.3); f.root.userData.keep = true; g.add(f.root);
   bakeGroup(g); dyn.add(g);
-  return { g, legs, kind: 'bike', len: cargo ? 2.6 : 1.8 };
+  return { g, legs: f.hips, legBase: -(L + 0.5), kind: 'bike', len: cargo ? 2.6 : 1.8 };
 }
 function makeDrivingCar(i) { const g = new THREE.Group(); carBody(g, CAR_COLS[i % CAR_COLS.length]); bakeGroup(g); dyn.add(g); return { g, kind: 'car', len: 4.2 }; }
 const VEHICLES = [];
@@ -2848,7 +3034,7 @@ const VEHICLES = [];
       v.head += angDiff(nh, v.head) * Math.min(1, dt * (v.kind === 'car' ? 4 : 6));
       v.g.position.set(nx, archH(nx, nz), nz); v.g.rotation.y = v.head;
       v.g.visible = Math.hypot(nx - camera.position.x, nz - camera.position.z) < 170;
-      if (v.legs) { v.crank += v.speed * dt * 2.2; v.legs[0].rotation.x = Math.sin(v.crank) * 0.6; v.legs[1].rotation.x = -Math.sin(v.crank) * 0.6; }
+      if (v.legs) { v.crank += v.speed * dt * 2.2; v.legs[0].rotation.x = v.legBase + Math.sin(v.crank) * 0.45; v.legs[1].rotation.x = v.legBase - Math.sin(v.crank) * 0.45; }
       // she cannot walk through a car or a bike
       if (started && !MYBOAT.on) {
         const ex = P.pos.x - nx, ez = P.pos.z - nz, s1 = Math.sin(v.head), c1 = Math.cos(v.head), lz = ex * s1 + ez * c1, lx = ex * c1 - ez * s1, hx = v.kind === 'car' ? 1.3 : 0.6, hz = v.len / 2 + 0.3;
@@ -2909,31 +3095,13 @@ for (const G of RG_GATES) {
   pcols.push({ rings: [G.mid], ...bboxOf(G.mid), top: 13.5, bot: 5.5 });
 }
 // ---------------- people who walk: the prime minister and the bodyguards
-function walker(o) {   // o: coat, legs, hair, skirt (a woman's coat), glasses (dark sunglasses)
-  const g = new THREE.Group(), legs = [], arms = [], skin = tm('#f2c6a4');
-  for (const s of [-1, 1]) {
-    const h = new THREE.Group(); h.position.set(s * 0.11, 0.85, 0); h.userData.keep = true; g.add(h);
-    mesh(new THREE.CapsuleGeometry(0.075, 0.6, 3, 8), tm(o.legs), 0, -0.42, 0, { parent: h });
-    box(0.14, 0.1, 0.28, M.dark, 0, -0.85, 0.05, { parent: h });
-    legs.push(h);
-  }
-  mesh(new THREE.CapsuleGeometry(0.21, 0.5, 4, 10), tm(o.coat), 0, 1.22, 0, { parent: g });
-  if (o.skirt) mesh(new THREE.CylinderGeometry(0.22, 0.3, 0.45, 12), tm(o.coat), 0, 0.82, 0, { parent: g });
-  mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.12, 8), skin, 0, 1.58, 0, { parent: g });
-  mesh(new THREE.SphereGeometry(0.16, 12, 10), skin, 0, 1.75, 0, { parent: g });
-  mesh(new THREE.SphereGeometry(0.175, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), tm(o.hair), 0, 1.77, -0.01, { parent: g });
-  if (o.skirt) mesh(new THREE.CylinderGeometry(0.17, 0.19, 0.22, 12), tm(o.hair), 0, 1.67, -0.03, { parent: g });   // hair to the chin
-  if (o.glasses) box(0.28, 0.06, 0.04, M.dark, 0, 1.75, 0.15, { parent: g, cast: false });
-  if (o.scarf) mesh(new THREE.TorusGeometry(0.11, 0.045, 6, 12), tm(o.scarf), 0, 1.55, 0, { parent: g, rx: Math.PI / 2 });
-  for (const s of [-1, 1]) {
-    const a = new THREE.Group(); a.position.set(s * 0.27, 1.45, 0); a.userData.keep = true; g.add(a);
-    mesh(new THREE.CapsuleGeometry(0.06, 0.48, 3, 6), tm(o.coat), 0, -0.3, 0, { parent: a }); arms.push(a);
-  }
-  bakeGroup(g); g.visible = false; dyn.add(g);
-  return { g, legs, arms, x: 0, z: 0, y: 0, h: 0, path: [], walkT: 0, wave: 0, on: false };
+function walker(o) {   // o: coat, legs, hair, skirt (a woman's long coat), glasses (dark sunglasses), scarf
+  const f = menneske({ coat: o.coat, trousers: o.legs, hair: o.hair, skin: o.skin, kvinde: !!o.skirt, long: !!o.skirt, hairStyle: o.skirt ? 'bob' : 'kort', toerklaede: o.scarf, solbriller: o.glasses, scale: o.scale, enkel: true });
+  f.root.visible = false; dyn.add(f.root);
+  return { g: f.root, legs: f.hips, arms: f.arms, x: 0, z: 0, y: 0, h: 0, path: [], walkT: 0, wave: 0, on: false };
 }
-const PM = walker({ coat: '#2c3e66', legs: '#2c3e66', hair: '#a8794c', skirt: true, scarf: '#c8102e' });
-const GUARDS = [0, 1, 2].map(() => walker({ coat: '#202226', legs: '#202226', hair: '#3a2a20', glasses: true }));
+const PM = walker({ coat: '#1f2a44', legs: '#1f2a44', hair: '#5a4334', skin: '#f0caa9', skirt: true, scarf: '#c0392b', scale: 0.97 });   // looks like the prime minister of the story
+const GUARDS = [0, 1, 2].map(i => walker({ coat: '#202226', legs: '#202226', hair: ['#3a2a20', '#6b4a2f', '#2b2420'][i], skin: ['#e8b996', '#d9a984', '#f2c6a4'][i], glasses: true, scale: 1.04 }));
 // ---------------- the ministers' black cars: long, low sedans with tinted windows, chrome, hubcaps that turn,
 // and doors on the right-hand side (toward the stairs) that open, so the people can step out of them. Nose at +z.
 const CAR_EDGE = new THREE.LineBasicMaterial({ color: 0x8c96a8, transparent: true, opacity: 0.55 });   // light outlines, so the black shows its shape
@@ -3257,61 +3425,6 @@ const KIDCOL = { hair: '#7b4527', pants: '#2f6f73' };   // her hair and trousers
 function drawDots(g, w, h) { g.fillStyle = KIDCOL.pants; g.fillRect(0, 0, w, h); g.fillStyle = '#e9f3ef'; for (const [x, y] of [[8, 8], [40, 8], [24, 24], [56, 24], [8, 40], [40, 40], [24, 56], [56, 56]]) { g.beginPath(); g.arc(x, y, 3.2, 0, Math.PI * 2); g.fill(); } }
 TX.dots = ctex(64, 64, drawDots, {});
 TX.dots.repeat.set(3, 2);
-// ---------------- figure kit: a person is built from simple shapes in a few rigid groups (body, head, upper arm,
-// forearm, thigh, shin, shoe). Each group is merged into one mesh with the colours in the vertices, plus one dark
-// outline shell pushed out along smoothed normals, so the outline is equally thick everywhere and there are few things to draw.
-const FIG_OL = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide });
-function figKit(tyk = 0.012) {
-  const dele = new Map(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), s = new THREE.Vector3();
-  function add(grp, geo, col, x = 0, y = 0, z = 0, o = {}) {   // o: rx, ry, rz, s: [sx, sy, sz], ol: outline thickness (0 = none)
-    const m = new THREE.Matrix4().compose(v.set(x, y, z), q.setFromEuler(e.set(o.rx || 0, o.ry || 0, o.rz || 0)), s.set(...(o.s || [1, 1, 1])));
-    if (!dele.has(grp)) dele.set(grp, []);
-    dele.get(grp).push({ geo, col: new THREE.Color(col), m, ol: o.ol === undefined ? tyk : o.ol });
-  }
-  function samlet(arr) {   // [{pos, nor?, col?}] -> one BufferGeometry
-    let n = 0; for (const a of arr) n += a.pos.length;
-    const pos = new Float32Array(n), nor = arr[0].nor ? new Float32Array(n) : null, col = arr[0].col ? new Float32Array(n) : null; let i = 0;
-    for (const a of arr) { pos.set(a.pos, i); if (nor) nor.set(a.nor, i); if (col) col.set(a.col, i); i += a.pos.length; }
-    const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    if (nor) bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); if (col) bg.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    bg.computeBoundingSphere(); return bg;
-  }
-  function bake() {
-    for (const [grp, list] of dele) {
-      const fyld = [], streg = [];
-      for (const d of list) {
-        const g = d.geo.index ? d.geo.toNonIndexed() : d.geo.clone(); g.applyMatrix4(d.m); if (!g.attributes.normal) g.computeVertexNormals();
-        const p = g.attributes.position.array, nn = g.attributes.normal.array, c = new Float32Array(p.length);
-        for (let k = 0; k < p.length; k += 3) { c[k] = d.col.r; c[k + 1] = d.col.g; c[k + 2] = d.col.b; }
-        fyld.push({ pos: p, nor: nn, col: c });
-        if (d.ol > 0) {   // the outline: every corner pushed out along the average normal of the corners in the same place
-          const sum = new Map(), key = k => Math.round(p[k] * 2e4) + ',' + Math.round(p[k + 1] * 2e4) + ',' + Math.round(p[k + 2] * 2e4);
-          for (let k = 0; k < p.length; k += 3) { const kk = key(k), a = sum.get(kk) || [0, 0, 0]; a[0] += nn[k]; a[1] += nn[k + 1]; a[2] += nn[k + 2]; sum.set(kk, a); }
-          const o = new Float32Array(p.length);
-          for (let k = 0; k < p.length; k += 3) { const a = sum.get(key(k)), l = Math.hypot(a[0], a[1], a[2]) || 1; o[k] = p[k] + a[0] / l * d.ol; o[k + 1] = p[k + 1] + a[1] / l * d.ol; o[k + 2] = p[k + 2] + a[2] / l * d.ol; }
-          streg.push({ pos: o });
-        }
-        g.dispose(); d.geo.dispose();
-      }
-      const m = new THREE.Mesh(samlet(fyld), VCOL_M); m.castShadow = true; grp.add(m);
-      if (streg.length) grp.add(new THREE.Mesh(samlet(streg), FIG_OL));
-    }
-    dele.clear();
-  }
-  return { add, bake };
-}
-// shapes for the figure kit
-function rundKasse(w, h, d, r = Math.min(w, h, d) * 0.3) {   // a box with rounded edges, centred
-  const b = Math.min(r, w / 2 - 1e-3, h / 2 - 1e-3, d / 2 - 1e-3), W = w - 2 * b, H = h - 2 * b, sh = new THREE.Shape(), x = -W / 2, y = -H / 2, c = Math.min(b * 0.6, W / 2, H / 2);
-  sh.moveTo(x + c, y); sh.lineTo(x + W - c, y); sh.quadraticCurveTo(x + W, y, x + W, y + c); sh.lineTo(x + W, y + H - c); sh.quadraticCurveTo(x + W, y + H, x + W - c, y + H);
-  sh.lineTo(x + c, y + H); sh.quadraticCurveTo(x, y + H, x, y + H - c); sh.lineTo(x, y + c); sh.quadraticCurveTo(x, y, x + c, y);
-  const g = new THREE.ExtrudeGeometry(sh, { depth: Math.max(1e-3, d - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 2, curveSegments: 2 });
-  g.translate(0, 0, -Math.max(1e-3, d - 2 * b) / 2); g.deleteAttribute('uv'); return g;
-}
-const drej = (pts, seg = 20, start = 0, len = Math.PI * 2) => new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg, start, len);   // a shape turned round the y axis (pts: [radius, height] from the bottom up)
-const kugle = (r, w = 18, h = 14, ...a) => new THREE.SphereGeometry(r, w, h, ...a), kapsel = (r, l, w = 12) => new THREE.CapsuleGeometry(r, l, 3, w), kasse = (w, h, d) => new THREE.BoxGeometry(w, h, d), cyl = (a, b, h, w = 16, open = false) => new THREE.CylinderGeometry(a, b, h, w, 1, open);
-function slange(pts, r, seg = 20) { return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), seg, r, 7, false); }
-
 function buildKid() {   // Ida, 24: a history student in a yellow raincoat, a rust-red scarf and a green backpack (the code still calls her "kid")
   const C = { coat: '#f4c22b', coatDark: '#d9a41a', toggle: '#5b4632', skin: '#f2c9a8', cheek: '#f0a59b', hair: '#6e3b22', eye: '#231a22', mouth: '#9c4038',
     scarf: '#c4553a', scarfLight: '#e2896c', bag: '#3f7a5c', bagDark: '#2f5e46', buckle: '#d3d1c8', jeans: '#2f4466', cuff: '#47628c', sock: '#f3f1ea',
@@ -4007,46 +4120,22 @@ if (slotsBalls.length) {
 }
 
 const TOURISTS = [];
-const touristSkin = tm('#e9bd99'), touristPhone = tm('#232831');
-const touristHeadGeo = new THREE.SphereGeometry(1, 10, 8);
+const touristHeadGeo = new THREE.SphereGeometry(1, 10, 8);   // used for the dogs
+let turistN = 0;
 function makePlazaTourist(coat, hair, photo, phase, style = {}) {
-  const root = new THREE.Group(); dyn.add(root);
-  const clothes = tm(coat), dark = tm('#344052');
-  const torso = mesh(touristHeadGeo, clothes, 0, 1.12, 0, { parent: root }); torso.scale.set(0.28, 0.44, 0.20);
-  const skin = style.skin ? tm(style.skin) : touristSkin;
-  const head = mesh(touristHeadGeo, skin, 0, 1.69, 0, { parent: root }); head.scale.setScalar(0.21);
-  const hairstyle = mesh(touristHeadGeo, tm(hair), 0, 1.83, -0.035, { parent: root }); hairstyle.scale.set(0.22, 0.12, 0.22);
-  if (style.woman) {
-    // Bob, bun or ponytail, with ordinary trousers and varied coat colours.
-    const back = mesh(touristHeadGeo, tm(hair), 0, 1.65, -0.13, { parent: root });
-    back.scale.set(0.23, style.hairdo === 'bob' ? 0.24 : 0.16, 0.14);
-    if (style.hairdo !== 'bob') mesh(touristHeadGeo, tm(hair), 0, style.hairdo === 'bun' ? 1.88 : 1.65, -0.27, { parent: root }).scale.set(0.12, style.hairdo === 'bun' ? 0.12 : 0.23, 0.14);
-  }
-  const bag = mesh(touristHeadGeo, tm('#7a614b'), 0, 1.03, -0.24, { parent: root }); bag.scale.set(0.22, 0.29, 0.10);
-  const legs = [], arms = [];
-  for (const side of [-1, 1]) {
-    const leg = new THREE.Group(); leg.position.set(side * 0.13, 0.72, 0); root.add(leg);
-    mesh(new THREE.CapsuleGeometry(0.09, 0.37, 3, 7), dark, 0, -0.29, 0, { parent: leg });
-    mesh(touristHeadGeo, tm('#303038'), 0, -0.61, 0.08, { parent: leg }).scale.set(0.13, 0.07, 0.20); legs.push(leg);
-    const arm = new THREE.Group(); arm.position.set(side * 0.29, 1.4, 0); root.add(arm);
-    mesh(new THREE.CapsuleGeometry(0.07, 0.26, 3, 6), clothes, 0, -0.19, 0, { parent: arm });
-    mesh(touristHeadGeo, skin, 0, -0.42, 0, { parent: arm }).scale.setScalar(0.08); arms.push(arm);
-  }
+  const n = turistN++, woman = !!style.woman;
   let flash = null;
-  if (photo) {
-    // A small phone held at eye level; the white screen lights briefly for each picture.
-    box(0.25, 0.36, 0.045, touristPhone, 0, 1.48, 0.42, { parent: root, cast: false });
-    flash = mesh(new THREE.PlaneGeometry(0.17, 0.26), new THREE.MeshBasicMaterial({ color: '#eaf5ff' }), 0, 1.66, 0.449, { parent: root, cast: false });
-    flash.visible = false;
-    arms[0].rotation.x = arms[1].rotation.x = -1.15;
-    arms[0].rotation.z = 0.2; arms[1].rotation.z = -0.2;
-  }
-  // the ones taking photos stand still, so all of them can be one mesh; the walkers keep their legs and arms.
-  // On a phone the small people cast no shadow (half as much to draw).
-  if (!photo) for (const l of [...legs, ...arms]) { l.userData.keep = true; bakeColored(l, !isTouch); }
-  bakeColored(root, !isTouch);
-  if (style.child) root.scale.setScalar(0.64);
-  return { root, legs, arms, flash, photo, phase, style };
+  const foto = s => (sh, part, m, el) => { sh.rotation.set(-1.25, 0, -s * 0.45); el.rotation.x = -1.25; };   // both hands hold the phone up in front of the face
+  const f = menneske({ coat, trousers: ['#344052', '#3b3f45', '#5a4a3c', '#2f3e5c'][n % 4], shoes: ['#303038', '#f1ede4', '#5a3a2a'][n % 3], skin: style.skin || HUD[(n * 2 + 1) % HUD.length], hair,
+    kvinde: woman, barn: !!style.child, hairStyle: woman ? ({ bob: 'bob', bun: 'knold', ponytail: 'hestehale' }[style.hairdo] || 'lang') : (n % 4 === 3 && !style.child ? 'skaldet' : 'kort'),
+    taske: style.child ? null : ['#7a614b', '#2f3138', '#b5523b', '#c9b48a'][n % 4], scale: woman ? 0.95 : 1, detalje: 'lav', skygge: !isTouch,
+    statisk: photo, enkel: !photo, arm: photo ? [foto(-1), foto(1)] : null,
+    extra: photo ? (g, head, part, m) => {   // a phone; the screen lights briefly for each picture
+      part(rundKasse(0.085, 0.165, 0.016, 0.01), m('#232831'), g, 0, 1.73, 0.44, 0);
+      flash = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.14), new THREE.MeshBasicMaterial({ color: '#eaf5ff' })); flash.position.set(0, 1.73, 0.45); flash.visible = false; g.add(flash);
+    } : null });
+  dyn.add(f.root);
+  return { root: f.root, legs: f.hips, arms: f.arms, flash, photo, phase, style };
 }
 // A group shares its route and turning direction. Companions cannot drift apart.
 function addWalkingCompany(lead, kind, phase) {
@@ -6974,84 +7063,49 @@ const PERSONER = (() => {
   function stedNu() { const s = stedNu2026(); return s && i1942() && M.steder[s + '_1942'] ? s + '_1942' : s; }
   GAADE.sted = id => { for (let s = stedNu(), n = 0; s && n < 6; s = M.steder[s]?.inde_i, n++) if (s === id) return true; return false; };
 
-  // ---- figures: grown-ups in the same cartoon style as Ida
-  const outline = new THREE.MeshBasicMaterial({ color: '#231a22', side: THREE.BackSide }), eye = new THREE.MeshBasicMaterial({ color: '#231a22' });
-  function figur(o) {
-    const g = new THREE.Group(), m = c => toon(c);
-    const coat = m(o.coat), trousers = m(o.trousers || '#2d3340'), skin = m(o.skin || '#efc7a6'), hair = m(o.hair || '#4a3a30'), shoes = m(o.shoes || '#231f20');
-    const part = (geo, mat, parent, x, y, z, ol = 1.05) => { const p = new THREE.Mesh(geo, mat); p.position.set(x, y, z); p.castShadow = true; parent.add(p); if (ol) { const q = new THREE.Mesh(geo, outline); q.scale.setScalar(ol); p.add(q); } return p; };
-    part(new THREE.CapsuleGeometry(0.21, 0.38, 6, 16), coat, g, 0, 1.31, 0);
-    if (o.long) part(new THREE.CylinderGeometry(0.22, 0.27, 0.42, 16), coat, g, 0, 0.88, 0, 1.04);
-    part(new THREE.CylinderGeometry(0.06, 0.065, 0.12, 10), skin, g, 0, 1.64, 0, 0);
-    const head = new THREE.Group(); head.position.set(0, 1.79, 0); g.add(head);
-    part(new THREE.SphereGeometry(0.14, 24, 18), skin, head, 0, 0, 0, 1.05);
-    for (const s of [-1, 1]) part(new THREE.SphereGeometry(0.017, 8, 6), eye, head, s * 0.047, 0.015, 0.13, 0);
-    part(new THREE.SphereGeometry(0.018, 8, 6), skin, head, 0, -0.012, 0.142, 0);
-    const style = o.hairStyle || 'kort';
-    if (style === 'skaldet') part(new THREE.SphereGeometry(0.148, 24, 12, Math.PI * 0.85, Math.PI * 1.3, 1.0, 0.85), hair, head, 0, 0.01, -0.005, 0);   // a fringe of hair round the back, none over the face
-    else { const cap = part(new THREE.SphereGeometry(0.15, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), hair, head, 0, 0.015, -0.012, 1.04); cap.rotation.x = -0.4; }
-    if (style === 'knold') part(new THREE.SphereGeometry(0.07, 14, 10), hair, head, 0, 0.1, -0.13, 1.06);
-    if (style === 'hestehale') { const t = part(new THREE.CapsuleGeometry(0.045, 0.16, 4, 10), hair, head, 0, -0.07, -0.155, 1.08); t.rotation.x = 0.35; }
-    if (style === 'bob') { const b = part(new THREE.SphereGeometry(0.155, 20, 12, Math.PI * 5 / 6, Math.PI * 4 / 3, 0.9, 1.1), hair, head, 0, -0.01, -0.02, 0); b.scale.set(1, 1.15, 1); }   // round the sides and back, not over the face
-    const legs = [];
-    for (const s of [-1, 1]) {
-      const hip = new THREE.Group(); hip.position.set(s * 0.1, 0.86, 0); g.add(hip);
-      part(new THREE.CapsuleGeometry(0.08, 0.28, 4, 14), trousers, hip, 0, -0.2, 0);
-      const knee = new THREE.Group(); knee.position.set(0, -0.42, 0); hip.add(knee);
-      part(new THREE.CapsuleGeometry(0.066, 0.28, 4, 14), trousers, knee, 0, -0.2, 0);
-      part(new THREE.BoxGeometry(0.12, 0.08, 0.26), shoes, knee, 0, -0.42, 0.04, 1.04);
-      legs.push({ hip, knee });
-      const sh = new THREE.Group(); sh.position.set(s * 0.27, 1.54, 0); g.add(sh);
-      part(new THREE.CapsuleGeometry(0.065, 0.46, 4, 10), coat, sh, 0, -0.3, 0);
-      part(new THREE.SphereGeometry(0.058, 10, 8), skin, sh, 0, -0.6, 0);
-      sh.rotation.z = s * 0.08;
-      if (o.arm && o.arm[s > 0 ? 1 : 0]) o.arm[s > 0 ? 1 : 0](sh, part, m);
-    }
-    if (o.extra) o.extra(g, head, part, m);
-    if (o.sidder) for (const l of legs) { l.hip.rotation.x = -Math.PI / 2; l.knee.rotation.x = Math.PI / 2; }
-    g.scale.setScalar(o.scale || 1);
-    const root = new THREE.Group(); root.add(g);
-    return { root, g, head, legs };
-  }
-  const kop = (sh, part, m) => { sh.rotation.x = -0.9; part(new THREE.CylinderGeometry(0.04, 0.032, 0.11, 10), m('#f3efe6'), sh, 0, -0.66, 0.02, 1.08); };
-  const termokop = (sh, part, m) => { sh.rotation.x = -0.9; part(new THREE.CylinderGeometry(0.042, 0.036, 0.17, 10), m('#4f6a5a'), sh, 0, -0.68, 0.02, 1.08); };
-  const tlf = (sh, part, m) => { sh.rotation.x = -1.05; part(new THREE.BoxGeometry(0.075, 0.012, 0.15), m('#1d2027'), sh, 0, -0.64, 0.05, 1.1); };
-  const kande = (sh, part, m) => { sh.rotation.x = -0.35; part(new THREE.CylinderGeometry(0.07, 0.085, 0.24, 12), m('#c9ccd0'), sh, 0, -0.76, 0.03, 1.06); };
-  const rundstykke = (sh, part, m) => { sh.rotation.x = -1.25; part(new THREE.SphereGeometry(0.06, 10, 8), m('#c98c4a'), sh, 0, -0.66, 0.05, 1.08); };
-  const handske = (sh, part, m) => { part(new THREE.SphereGeometry(0.064, 10, 8), m('#f6f5f0'), sh, 0, -0.6, 0, 1.05); };
-  const protokol = (sh, part, m) => { sh.rotation.z -= 0.08; handske(sh, part, m); part(new THREE.BoxGeometry(0.07, 0.34, 0.3), m('#6b1f27'), sh, 0.03, -0.3, 0.02, 1.05); };   // a thick red book under the arm
-  const skilt = (sh, part, m) => { sh.rotation.x = -0.8; const k = part(new THREE.BoxGeometry(0.32, 0.1, 0.012), m('#fbfaf5'), sh, 0, -0.66, 0.06, 1.08); k.rotation.x = 0.8; };
-  const kamera = (sh, part, m) => { sh.rotation.x = -1.1; part(new THREE.BoxGeometry(0.14, 0.1, 0.09), m('#1e1e20'), sh, 0, -0.64, 0.06, 1.06); const l = part(new THREE.CylinderGeometry(0.035, 0.04, 0.26, 10), m('#2b2b2e'), sh, 0, -0.66, 0.2, 1.06); l.rotation.x = Math.PI / 2; };   // a camera with a long lens
-  const mappe = (sh, part, m) => { part(new THREE.BoxGeometry(0.09, 0.3, 0.4), m('#4a2e1f'), sh, 0.02, -0.8, 0, 1.04); };   // a briefcase in his hand
+  // ---- figures: grown-ups in the same style as Ida (see menneske)
+  const figur = o => menneske(o);
+  // things they hold: the arm is bent at the elbow, and the thing sits in a holder that keeps it upright
+  const holder = (el, x = 0, z = 0.004) => { const h = new THREE.Group(); h.position.set(x, -0.3, z); let r = 0; for (let p = el; p && p.isGroup && p.parent && !p.userData.krop; p = p.parent) r += p.rotation.x; h.rotation.x = -r; el.add(h); return h; };
+  const boej = (sh, el, a, b) => { sh.rotation.x = a; el.rotation.x = b; };
+  const kop = (sh, part, m, el) => { boej(sh, el, -0.3, -1.25); part(new THREE.CylinderGeometry(0.04, 0.032, 0.11, 10), m('#f3efe6'), holder(el), 0, 0.055, 0.03, 1.08); };
+  const termokop = (sh, part, m, el) => { boej(sh, el, -0.3, -1.25); part(new THREE.CylinderGeometry(0.042, 0.036, 0.17, 10), m('#4f6a5a'), holder(el), 0, 0.08, 0.03, 1.08); };
+  const tlf = (sh, part, m, el) => { boej(sh, el, -0.35, -1.25); const t = part(rundKasse(0.075, 0.014, 0.15, 0.006), m('#1d2027'), holder(el), 0, 0.03, 0.04, 1.1); t.rotation.x = -0.75; };   // looking at the phone
+  const kande = (sh, part, m, el) => { boej(sh, el, -0.12, -0.25); part(new THREE.CylinderGeometry(0.07, 0.085, 0.24, 12), m('#c9ccd0'), holder(el), 0, -0.1, 0.03, 1.06); };
+  const rundstykke = (sh, part, m, el) => { boej(sh, el, -0.35, -1.3); part(new THREE.SphereGeometry(0.06, 10, 8), m('#c98c4a'), holder(el), 0, 0.04, 0.03, 1.08).scale.set(1.2, 0.8, 1); };
+  const handske = (sh, part, m, el) => { part(new THREE.SphereGeometry(0.064, 10, 8), m('#f6f5f0'), el, 0, -0.3, 0.004, 1.05).scale.set(0.85, 1.1, 0.75); };
+  const protokol = (sh, part, m, el) => { sh.rotation.z -= 0.08; handske(sh, part, m, el); part(new THREE.BoxGeometry(0.07, 0.34, 0.3), m('#6b1f27'), sh, 0.03, -0.3, 0.02, 1.05); };   // a thick red book under the arm
+  const skilt = (sh, part, m, el) => { boej(sh, el, -0.45, -1.0); part(new THREE.BoxGeometry(0.32, 0.1, 0.012), m('#fbfaf5'), holder(el), 0, 0.06, 0.03, 1.08); };
+  const kamera = (sh, part, m, el) => { boej(sh, el, -0.35, -1.2); const h = holder(el); part(new THREE.BoxGeometry(0.14, 0.1, 0.09), m('#1e1e20'), h, 0, 0.05, 0.03, 1.06); const l = part(new THREE.CylinderGeometry(0.035, 0.04, 0.22, 10), m('#2b2b2e'), h, 0, 0.05, 0.17, 1.06); l.rotation.x = Math.PI / 2; };   // a camera with a long lens
+  const mappe = (sh, part, m, el) => { boej(sh, el, 0, -0.1); part(new THREE.BoxGeometry(0.09, 0.3, 0.4), m('#4a2e1f'), holder(el, 0.02), 0, -0.16, 0, 1.04); };   // a briefcase in his hand
   const LOOK = {
-    bente: { coat: '#24324a', trousers: '#24324a', hair: '#9b9b9b', hairStyle: 'knold', long: true, scale: 0.95, skin: '#efc6a8',
+    bente: { kvinde: true, coat: '#24324a', trousers: '#24324a', hair: '#9b9b9b', hairStyle: 'knold', long: true, scale: 0.95, skin: '#efc6a8',
       extra: (g, head, part, m) => { const c = part(new THREE.TorusGeometry(0.1, 0.006, 6, 20, Math.PI), m('#7a5a3a'), g, 0, 1.52, 0.1, 0); c.rotation.set(-1.1, 0, Math.PI); } },   // the empty glasses cord
-    kommissaer: { coat: '#b59a6a', trousers: '#3b3a36', hair: '#8e8e8e', hairStyle: 'skaldet', long: true, scale: 1.02, skin: '#e8b996', arm: [null, kop],
+    kommissaer: { alvor: true, coat: '#b59a6a', trousers: '#3b3a36', hair: '#8e8e8e', hairStyle: 'skaldet', long: true, scale: 1.02, skin: '#e8b996', arm: [null, kop],
       extra: (g, head, part, m) => { part(new THREE.BoxGeometry(0.11, 0.025, 0.03), m('#7e7e7e'), head, 0, -0.045, 0.135, 0); } },   // grey moustache
-    statsminister: { coat: '#1f2a44', trousers: '#1f2a44', hair: '#5a4334', hairStyle: 'bob', long: true, scale: 0.97, skin: '#f0caa9',
-      extra: (g, head, part, m) => { const t = part(new THREE.TorusGeometry(0.165, 0.045, 8, 18), m('#c0392b'), g, 0, 1.6, 0, 0); t.rotation.x = Math.PI / 2; } },   // a red scarf
-    vagt: { coat: '#1e2023', trousers: '#1e2023', hair: '#2b2420', hairStyle: 'kort', scale: 1.04, skin: '#d9a984' },
-    gry: { coat: '#3f6b4f', trousers: '#d9caa5', shoes: '#3a2a20', hair: '#3b2a20', hairStyle: 'hestehale', scale: 0.96,
-      arm: [(sh, part, m) => { sh.rotation.x = -0.25; part(new THREE.SphereGeometry(0.13, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), m('#1c1c1c'), sh, 0.05, -0.55, 0.12, 1.06); }, null] },   // helmet under the arm
-    moerkeberg: { coat: '#4f5459', trousers: '#4f5459', hair: '#bdbdbd', hairStyle: 'skaldet', skin: '#e6cdb8', sidder: true },
+    statsminister: { kvinde: true, coat: '#1f2a44', trousers: '#1f2a44', hair: '#5a4334', hairStyle: 'bob', long: true, scale: 0.97, skin: '#f0caa9', toerklaede: '#c0392b' },   // a red scarf
+    vagt: { coat: '#1e2023', trousers: '#1e2023', hair: '#2b2420', hairStyle: 'kort', scale: 1.04, skin: '#d9a984', solbriller: true },
+    gry: { kvinde: true, coat: '#3f6b4f', trousers: '#d9caa5', shoes: '#3a2a20', hair: '#3b2a20', hairStyle: 'hestehale', scale: 0.96,
+      arm: [(sh, part, m, el) => { boej(sh, el, -0.15, -0.9); part(new THREE.SphereGeometry(0.13, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), m('#1c1c1c'), holder(el, 0.08), 0, -0.02, 0.06, 1.06); }, null] },   // helmet under the arm
+    moerkeberg: { coat: '#4f5459', trousers: '#4f5459', hair: '#bdbdbd', hairStyle: 'skaldet', skin: '#e6cdb8', sidder: true, lukket: true },
     // Act 2: the cook, the four suspects and the head of department
-    bodil: { coat: '#f4f2ec', trousers: '#3b3b3b', hair: '#cbbfae', hairStyle: 'knold', scale: 0.93, skin: '#efc4a4', arm: [kande, kande],
-      extra: (g, head, part, m) => {   // a double-breasted chef's jacket and the glasses pushed up on her forehead
-        for (const s of [-1, 1]) for (const y of [1.18, 1.32, 1.46]) part(new THREE.SphereGeometry(0.018, 8, 6), m('#9a9a9a'), g, s * 0.07, y, 0.2, 0);
+    bodil: { kvinde: true, coat: '#f4f2ec', trousers: '#3b3b3b', hair: '#cbbfae', hairStyle: 'knold', scale: 0.93, skin: '#efc4a4', arm: [kande, kande],
+      extra: (g, head, part, m, foran) => {   // a double-breasted chef's jacket and the glasses pushed up on her forehead
+        for (const s of [-1, 1]) for (const y of [1.18, 1.32, 1.46]) part(new THREE.SphereGeometry(0.018, 8, 6), m('#9a9a9a'), g, s * 0.07, y, foran(y) - 0.004, 0);
         for (const s of [-1, 1]) { const r = part(new THREE.TorusGeometry(0.036, 0.008, 6, 14), m('#2b2b2b'), head, s * 0.045, 0.09, 0.118, 0); r.rotation.x = -0.6; }
       } },
-    ditte: { coat: '#4a4d55', trousers: '#4a4d55', hair: '#2e211b', hairStyle: 'bob', long: true, scale: 0.96, skin: '#f0c9aa', arm: [tlf, tlf],
-      extra: (g, head, part, m) => { part(new THREE.BoxGeometry(0.05, 0.014, 0.014), m('#b8232f'), head, 0, -0.062, 0.134, 0); } },   // red lipstick
-    jonas: { coat: '#24324d', trousers: '#1b2232', shoes: '#f2f1ec', hair: '#6b4a2f', hairStyle: 'kort', scale: 1.0, skin: '#ecc19f', arm: [tlf, tlf] },
-    pernille: { coat: '#a38c5e', trousers: '#2f3138', hair: '#b4612f', hairStyle: 'bob', long: true, scale: 0.97, skin: '#f1cdb0', arm: [null, termokop],
-      extra: (g, head, part, m) => {   // the press card on a cord round her neck
-        part(new THREE.BoxGeometry(0.1, 0.13, 0.012), m('#f7f5ee'), g, 0, 1.2, 0.215, 0); part(new THREE.BoxGeometry(0.1, 0.03, 0.014), m('#c0392b'), g, 0, 1.3, 0.216, 0);
+    ditte: { kvinde: true, mund: '#b8232f', coat: '#4a4d55', trousers: '#4a4d55', hair: '#2e211b', hairStyle: 'bob', long: true, scale: 0.96, skin: '#f0c9aa', arm: [null, tlf],
+      extra: (g, head, part, m) => { const l = part(new THREE.SphereGeometry(0.02, 10, 6), m('#b8232f'), head, 0, -0.066, 0.124, 0); l.scale.set(1.15, 0.42, 0.45); } },   // red lipstick
+    jonas: { coat: '#24324d', trousers: '#1b2232', shoes: '#f2f1ec', hair: '#6b4a2f', hairStyle: 'kort', scale: 1.0, skin: '#ecc19f', arm: [termokop, tlf] },
+    pernille: { kvinde: true, coat: '#a38c5e', trousers: '#2f3138', hair: '#b4612f', hairStyle: 'bob', long: true, scale: 0.97, skin: '#f1cdb0', arm: [null, termokop],
+      extra: (g, head, part, m, foran) => {   // the press card on a cord round her neck
+        part(new THREE.BoxGeometry(0.1, 0.13, 0.012), m('#f7f5ee'), g, 0, 1.2, foran(1.2) + 0.012, 0); part(new THREE.BoxGeometry(0.1, 0.03, 0.014), m('#c0392b'), g, 0, 1.25, foran(1.25) + 0.013, 0);
         const c = part(new THREE.TorusGeometry(0.12, 0.006, 6, 20, Math.PI), m('#c0392b'), g, 0, 1.47, 0.08, 0); c.rotation.set(-1.25, 0, Math.PI);
       } },
     kasper: { coat: '#cfdcef', trousers: '#2a2d33', hair: '#2f2a26', hairStyle: 'kort', scale: 1.0, skin: '#e9c2a2', arm: [null, rundstykke],
       extra: (g, head, part, m) => { for (const s of [-1, 1]) part(new THREE.BoxGeometry(0.04, 0.012, 0.01), m('#8d6a6a'), head, s * 0.047, -0.012, 0.132, 0); } },   // dark rings under the eyes
     valdorf: { coat: '#6e7379', trousers: '#5f646a', hair: '#d9d9d6', hairStyle: 'kort', scale: 1.03, skin: '#c98d62', arm: [null, mappe],
-      extra: (g, head, part, m) => { part(new THREE.BoxGeometry(0.16, 0.05, 0.02), m('#f4f4f0'), g, 0, 1.52, 0.19, 0); part(new THREE.BoxGeometry(0.06, 0.3, 0.02), m('#e2b33c'), g, 0, 1.33, 0.208, 0); } },   // white collar and yellow tie
+      extra: (g, head, part, m, foran) => { part(new THREE.BoxGeometry(0.16, 0.05, 0.02), m('#f4f4f0'), g, 0, 1.53, foran(1.53) + 0.006, 0); const t = part(new THREE.BoxGeometry(0.06, 0.3, 0.02), m('#e2b33c'), g, 0, 1.36, foran(1.36) + 0.006, 0); t.rotation.x = -0.06; } },   // white collar and yellow tie
     // Act 3: the old photographer on Højbro, in a woollen hat with his tripod over the shoulder
     svend: { coat: '#4a5a46', trousers: '#3a3a36', hair: '#cfcfca', hairStyle: 'kort', scale: 0.97, skin: '#e7bf9e', arm: [null, kamera],
       extra: (g, head, part, m) => {
@@ -7061,8 +7115,8 @@ const PERSONER = (() => {
       } },
     // The extra layer, June 1942: Bente's grandfather at the counter, and the king on his morning ride
     holger: { coat: '#1d2738', trousers: '#1d2738', hair: '#6b5a48', hairStyle: 'kort', scale: 1.0, skin: '#ebc2a0',
-      extra: (g, head, part, m) => {
-        for (const y of [1.08, 1.24, 1.4]) part(new THREE.SphereGeometry(0.02, 8, 6), m('#c9a24b'), g, 0, y, 0.205, 0);
+      extra: (g, head, part, m, foran) => {
+        for (const y of [1.08, 1.24, 1.4]) part(new THREE.SphereGeometry(0.02, 8, 6), m('#c9a24b'), g, 0, y, foran(y) - 0.004, 0);
         part(new THREE.CylinderGeometry(0.15, 0.15, 0.09, 16), m('#1d2738'), head, 0, 0.12, -0.01, 1.04); part(new THREE.BoxGeometry(0.2, 0.02, 0.11), m('#111318'), head, 0, 0.085, 0.12, 0);   // cap
         part(new THREE.BoxGeometry(0.15, 0.035, 0.035), m('#5a4636'), head, 0, -0.045, 0.135, 0);   // a big moustache
       } },
@@ -7075,15 +7129,15 @@ const PERSONER = (() => {
       } },
     // Riddersalen and Landstingssalen
     hoffourer: { coat: '#1c2233', trousers: '#1c2233', hair: '#a9a9a6', hairStyle: 'skaldet', long: true, scale: 1.02, skin: '#ecc8aa', arm: [protokol, handske],
-      extra: (g, head, part, m) => {   // a dark livery with gold buttons and a gold collar
-        for (const y of [1.06, 1.2, 1.34, 1.48]) part(new THREE.SphereGeometry(0.02, 8, 6), m('#d4af37'), g, 0, y, 0.205, 0);
+      extra: (g, head, part, m, foran) => {   // a dark livery with gold buttons and a gold collar
+        for (const y of [1.06, 1.2, 1.34, 1.48]) part(new THREE.SphereGeometry(0.02, 8, 6), m('#d4af37'), g, 0, y, foran(y) - 0.004, 0);
         const k = part(new THREE.TorusGeometry(0.155, 0.03, 8, 18), m('#c9a24b'), g, 0, 1.6, 0, 0); k.rotation.x = Math.PI / 2;
       } },
     mogens: { coat: '#7a5a3c', trousers: '#4a4a46', hair: '#8c7c6c', hairStyle: 'skaldet', scale: 0.98, skin: '#eac3a3', arm: [null, skilt],
-      extra: (g, head, part, m) => {   // glasses with tape on one side, and the DJØF pin on his cardigan
+      extra: (g, head, part, m, foran) => {   // glasses with tape on one side, and the DJØF pin on his cardigan
         for (const s of [-1, 1]) { const r = part(new THREE.TorusGeometry(0.034, 0.007, 6, 14), m('#2b2b2b'), head, s * 0.047, 0.015, 0.138, 0); }
         part(new THREE.BoxGeometry(0.03, 0.03, 0.02), m('#f4f4ee'), head, 0.08, 0.015, 0.136, 0);
-        part(new THREE.SphereGeometry(0.018, 8, 6), m('#d4af37'), g, -0.1, 1.45, 0.2, 0);
+        part(new THREE.SphereGeometry(0.018, 8, 6), m('#d4af37'), g, -0.1, 1.45, foran(1.45) - 0.01, 0);
       } },
   };
   // ---- where each person stands at a place of the manuscript: outdoors {ude:[x,z]} or indoors {place, at:[x,z]}
@@ -7153,7 +7207,7 @@ const PERSONER = (() => {
     const f = FIG[id]; f.spot = sp; f.root.visible = !!sp && !sp.udsigt;
     if (!sp || sp.udsigt) return;
     f.sid = !!sp.sidder || !!sp.ride; f.legs.forEach((l, i) => {   // sitting on a chair, or astride a horse
-      l.hip.rotation.x = sp.ride ? -0.55 : f.sid ? -Math.PI / 2 : 0; l.knee.rotation.x = sp.ride ? 0.75 : f.sid ? Math.PI / 2 : 0; l.hip.rotation.z = sp.ride ? (i ? 0.42 : -0.42) : 0;
+      l.hip.rotation.x = sp.ride ? -0.5 : f.sid ? -Math.PI / 2 : 0; l.knee.rotation.x = sp.ride ? 0.85 : f.sid ? Math.PI / 2 : 0; l.hip.rotation.z = sp.ride ? (i ? 0.68 : -0.68) : 0; l.knee.rotation.z = sp.ride ? (i ? -0.45 : 0.45) : 0;
     });
     for (const v of f.vagter) v.visible = !!sp.foelge;
     if (sp.ude) { ude.add(f.root); f.root.position.set(sp.ude[0], groundAt(sp.ude[0], sp.ude[1], 2) + (sp.dy || 0), sp.ude[1]); }
@@ -7196,10 +7250,11 @@ const AAR1942 = (() => {
   const M = GAADE.M, I = INTERIOR;
   const badge = document.createElement('div'); badge.id = 'aar1942'; badge.className = 'sticker'; badge.textContent = 'Juni 1942'; badge.hidden = true; document.body.appendChild(badge);
   const soldat = { coat: '#5c6150', trousers: '#4d5142', shoes: '#1d1a17', hair: '#3b3026', hairStyle: 'kort', scale: 1.02, skin: '#e3b997',
-    extra: (g, head, part, m) => {
+    extra: (g, head, part, m, foran) => {
       const hjelm = part(new THREE.SphereGeometry(0.17, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), m('#4a4e45'), head, 0, 0.03, -0.01, 1.04); hjelm.scale.set(1.08, 1, 1.1);
       const gevaer = part(new THREE.CylinderGeometry(0.018, 0.022, 1.1, 6), m('#3a2a1e'), g, 0.2, 1.25, -0.16, 0); gevaer.rotation.z = -0.25;   // a rifle on the shoulder
-      part(new THREE.BoxGeometry(0.42, 0.05, 0.05), m('#2d2a24'), g, 0, 0.9, 0.2, 0);   // the belt
+      const b = part(new THREE.TorusGeometry(0.2, 0.022, 6, 24), m('#2d2a24'), g, 0, 0.95, 0, 0); b.rotation.x = Math.PI / 2; b.scale.set(1, 0.92, 1);   // the belt
+      part(new THREE.BoxGeometry(0.07, 0.055, 0.02), m('#8a8676'), g, 0, 0.95, foran(0.95) + 0.018, 0);
     } };
   // three patrols, each walking back and forth between two points
   const RUTER = [[[-52, 52], [-46, 104]], [[-170, 64], [-108, 66]], [[-172, 128], [-150, 112]]];
@@ -7268,7 +7323,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { lys: () => ev, MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { lys: () => ev, MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
