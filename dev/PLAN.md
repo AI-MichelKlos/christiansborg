@@ -307,3 +307,11 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Folk i byen har forskellig hudfarve og hårfarve, og turisterne har en taske over skulderen. De, der tager billeder, holder telefonen op foran ansigtet med begge hænder.
   - Folk langt væk er bygget med færre hjørner. Spillet tegner lidt færre ting end før, men med cirka en femtedel flere trekanter.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: hele gennemspilningen med 1942, personerne i mordgåden, byens folk, bådene, cyklisterne og rytteren.
+
+### Udsynet og de første bygninger
+- [x] Færre skilte og pænere bygninger ved Marmorbroen (22. okt. 2026).
+  - Skilte: de kort med stednavn og tekst, der kommer frem nederst på skærmen, vises nu kun ved steder med betydning for mordgåden (Ridebanen, staldene, Rigsdagsgården, Proviantpassagen, Prins Jørgens Gård, ministerierne, Tårnet, Højbro, Bibliotekshaven, presseområdet, kajerne, indgangene og båden). Seværdighederne, broerne og kanalerne har ikke længere et kort, heller ikke Marmorbroen. De står i `POI_HIDE` og kan slås til igen derfra.
+  - Et kort forsvinder af sig selv efter 6 sekunder, så det ikke dækker udsynet. Det kommer først igen, når Ida har været et andet sted med et kort. Trykker man Læs mere, bliver det stående, til man går videre.
+  - Marmorbroens pavilloner er bygget i hånden: lys sandsten med kvadre, hjørnepilastre, en bue på tre sider og en blind bue mod fløjen, rocaille over buerne, frise og gesims, et svungent kobbertag og en guldkrone på en sokkel. Smedejernslågerne er lukket, og en lygte brænder inde i hver pavillon. Grundplan og højder er fra OpenStreetMap, formen efter beskrivelsen i Den Store Danske (lex.dk, Marmorbroen), og resten er forenklet.
+  - Fløjene omkring Ridebanen har fået en lidt varmere puds, en sokkel og en gesims. Soklen stopper ved staldportene.
+  - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: startstedet kl. 06.00, pavillonerne fra broen og fra Ridebanen, Ridebanen og kortene ved Rigsdagsgården og presseområdet.

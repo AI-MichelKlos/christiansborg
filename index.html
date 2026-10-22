@@ -1677,9 +1677,10 @@ TX.granite.repeat.set(1 / 4.8, 1 / 2.4);
 TX.granBase = ctex(256, 128, (g, w, h) => { g.fillStyle = '#4e4943'; g.fillRect(0, 0, w, h); for (let r = 0; r < 2; r++) { const off = r * 64; for (let c = -1; c < 3; c++) { const x = c * 128 + off; g.fillStyle = jit('#958c80', 0.06); g.fillRect(x + 5, r * 64 + 5, 118, 54); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(x + 5, r * 64 + 5, 118, 5); g.fillStyle = 'rgba(0,0,0,.15)'; g.fillRect(x + 5, r * 64 + 52, 118, 7); } } speckle(g, w, h, 600, 0.08, 2); }, {});
 TX.granBase.repeat.set(1 / 3.6, 1 / 1.8);
 const GRANITE = toon('#ffffff', { map: TX.granite });
+const PLASTER = '#e9e0cf';   // the light plaster of the wings (OpenStreetMap: ded8d3), a little warmer
 function partBlock(p) {
   const rc = p.rcol === '#46323c' ? COPPER : lit(p.rcol, 0.05);
-  const wallM = p.wall === '#9d908f' ? GRANITE : tm(lit(p.wall)), roofM = tm(rc);
+  const wallM = p.wall === '#9d908f' ? GRANITE : p.wall === '#ded8d3' ? tm(PLASTER) : tm(lit(p.wall)), roofM = tm(rc);
   if (!p.ring && p.wall === '#46323c') { const y0 = p.h - 4.6; box(1.5, 4.6, 1.5, GRANITE, p.x, y0, p.z, { edges: true }); box(1.9, 0.3, 1.9, tm(COPPER), p.x, p.h, p.z, { cast: false }); return; }   // chimneys
   if (!p.ring) { const y0 = Math.max(p.mh, p.h - 4), r = Math.max(0.5, p.r * 0.8); mesh(new THREE.CylinderGeometry(r, r, p.h - y0, 8), p.wall === '#46323c' ? tm(COPPER) : wallM, p.x, (p.h + y0) / 2, p.z, { edges: 40 }); return; }
   const sloped = p.roof && p.roof !== 'flat' && p.rh > 0.2, eave = sloped ? p.h - p.rh : p.h;
@@ -1713,13 +1714,30 @@ function cutGate(px, pz, d0, d1) {
   const lo = clip(p.ring, q => d0 - gateD(q)), hi = clip(p.ring, q => gateD(q) - d1), mid = clip(clip(p.ring, q => gateD(q) - d0), q => d1 - gateD(q));
   for (const q of mid) { G.s0 = Math.min(G.s0, gateS(q)); G.s1 = Math.max(G.s1, gateS(q)); }
   const cut = [d0, d1];
-  PARTS.splice(i, 1, { ...p, ring: lo, cut }, { ...p, ring: hi, cut }, { ...p, ring: mid, mh: 5.5, cut });
+  PARTS.splice(i, 1, { ...p, ring: lo, cut, whole: p.ring }, { ...p, ring: hi, cut }, { ...p, ring: mid, mh: 5.5, cut });
   G.mid = mid; G.lo = lo; G.hi = hi; RG_GATES.push(G);
 }
 cutGate(-2.5, 96.8, 31, 38);   // toward Tøjhusgade
 cutGate(79, 45, 18, 25);       // toward Christiansborg Slotsplads
 const FT_GATE = RG_GATES[0] || {};
-for (const p of PARTS) if(p!==COURT_PART)partBlock(p);
+// The two pavilions at the end of Marmorbroen and the figures on their roofs are built by hand (see MARMORBROENS PAVILLONER).
+const PAVILIONS = PARTS.filter(p => p.ring && p.h === 11.3 && p.roof === 'pyramidal');
+const PAV_SKIP = new Set([...PAVILIONS, ...PARTS.filter(p => !p.ring && p.h === 12.6 && p.roof === 'saltbox')]);
+{   // the thin 7.7 m walls along Ridebanen also trace the walls of the pavilions; they stop at the pavilions instead
+  const grown = PAVILIONS.map(p => insetRing(p.ring, -0.3)), inPav = q => grown.some(g => ptIn(g, q[0], q[1]));
+  for (const p of PARTS) if (p.ring && p.h === 7.7 && p.ring.some(inPav)) p.ring = p.ring.filter(q => !inPav(q));
+  // the two long 6.6 m wings include the pavilions' footprints: their outline goes round the far side of each pavilion instead
+  const same = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.25;
+  for (const pv of PAVILIONS) for (const p of PARTS) if (p.ring && p.h === 6.6) {
+    const pr = pv.ring, m = pr.length, r = p.ring, n = r.length;
+    for (let i = 0; i < n; i++) {
+      const ia = pr.findIndex(q => same(q, r[i])), ib = pr.findIndex(q => same(q, r[(i + 1) % n])); if (ia < 0 || ib < 0) continue;
+      const step = (ib - ia + m) % m === 1 ? 1 : -1;
+      r[i] = pr[(ia - step + m) % m]; r[(i + 1) % n] = pr[(ib + step + m) % m]; break;
+    }
+  }
+}
+for (const p of PARTS) if(p!==COURT_PART&&!PAV_SKIP.has(p))partBlock(p);
 
 // Projecting stone surrounds keep the palace windows legible from the square without changing their glass.
 function palaceWindowSurround(kind, x, y, z, ry, w, h, mat) {
@@ -2023,7 +2041,7 @@ const RIDE = DATA.A.find(a => a.n === 'Christiansborg Ridebane').ring;
   const solid = PARTS.filter(p => p.ring), seen = new Set(), doors = [];
   const covered = (x, z, y, self) => solid.some(q => q !== self && y > q.mh && y < q.h && ptIn(q.ring, x, z));
   for (const p of solid) {
-    if (p===COURT_PART || p.h === 38.6 || p.h === 25.9) continue;   // the big block has its own windows; the courtyard blocks cannot be seen
+    if (p===COURT_PART || p.h === 38.6 || p.h === 25.9 || PAV_SKIP.has(p)) continue;   // the big block has its own windows; the courtyard blocks cannot be seen; the pavilions are built by hand
     const eave = p.roof && p.roof !== 'flat' && p.rh > 0.2 ? p.h - p.rh : p.h;
     const rows = []; for (let y = 3.0; y + 1.4 < eave - 0.6; y += 4.2) rows.push(y);
     const r = p.ring;
@@ -2047,6 +2065,24 @@ const RIDE = DATA.A.find(a => a.n === 'Christiansborg Ridebane').ring;
   }
   const entry=doors.filter(([x,z,nx,nz])=>!inBuilding(x+nx*3,z+nz*3)).sort((a,b)=>Math.hypot(a[0]+105,a[1]-135)-Math.hypot(b[0]+105,b[1]-135))[0];
   if(entry){const [x,z,nx,nz]=entry;STABLE_ENTRY={x,z,nx,nz,ry:Math.atan2(nx,nz)};}
+  // The plastered wings get a stone plinth and a cornice, so the long walls around Ridebanen are not bare boxes. A wing
+  // cut by a gate gets one cornice round the whole wing; the plinth stops at the stable doors. Merged into one thing per colour.
+  const trim = new THREE.Group(); world.add(trim);
+  const corniceM = tm('#f3ebdc'), plinthM = tm('#c9bca4');
+  for (const p of solid) {
+    if (p.wall !== '#ded8d3' || PAV_SKIP.has(p) || p === COURT_PART || 2 * areaOf(p.ring) / perimOf(p.ring) < 2) continue;   // not the thin walls
+    const eave = p.roof && p.roof !== 'flat' && p.rh > 0.2 ? p.h - p.rh : p.h;
+    if (!p.cut || p.whole) { const g = new THREE.ExtrudeGeometry(shapeOf([insetRing(p.whole || p.ring, -0.22)]), { depth: eave === p.h ? 0.65 : 0.55, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2); mesh(g, corniceM, 0, eave - 0.55, 0, { parent: trim }); }
+    if (p.mh) continue;
+    const r = p.ring;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      const [ax, az] = r[j], [bx, bz] = r[i], len = Math.hypot(bx - ax, bz - az); if (len < 0.4) continue;
+      if (doors.some(([x, z]) => segDist(x, z, ax, az, bx, bz) < 0.6)) continue;
+      let nx = -(bz - az) / len, nz = (bx - ax) / len; if (ptIn(r, (ax + bx) / 2 + nx * 0.3, (az + bz) / 2 + nz * 0.3)) { nx = -nx; nz = -nz; }
+      box(len + 0.3, 0.85, 0.2, plinthM, (ax + bx) / 2 + nx * 0.05, 0, (az + bz) / 2 + nz * 0.05, { parent: trim, ry: Math.atan2(-(bz - az), bx - ax) });
+    }
+  }
+  bakeGroup(trim); trim.traverse(m => { if (m.isMesh) { m.receiveShadow = true; edges(m, 25); } });
   // horses looking out over every other stable door
   const COATS = [['#8a5a3c', '#3a2a22'], ['#f1ece2', '#cfc6b8'], ['#3a2f2b', '#1f1a18'], ['#b0703f', '#5a3420']];
   // The upper half of those doors stands open (dark), so the horse's head comes out of the stall, not through glass.
@@ -2339,6 +2375,100 @@ const LOENGANG = { C: [-5.5, -86.5], u: [0.543, 0.840], v: [0.844, -0.537], L: 4
       put(11.4, 2.2, WOFF, 'pane');
     }
   }
+}
+
+// ======================================================================== MARMORBROENS PAVILLONER
+// The two pavilions at the end of Marmorbroen (Nicolai Eigtved, 1740s) flank the road into Ridebanen and are the first
+// buildings Ida sees. Light sandstone with corner pilasters, arches with rocaille over them, a frieze and
+// a cornice, and a heavy, swept copper roof with a gold crown on top. Foot passengers walk through them; in the game
+// the iron gates are still shut at this hour, and a lantern burns inside. Footprint and heights from OpenStreetMap
+// (PAVILIONS); the arches, the ornaments, the gates and the lantern are a simplified guess.
+function gateTex(w, h) {   // an iron gate with a round top, gilt spear tips and a band of lattice; transparent around it
+  const W = 128, H = Math.round(W * h / w), r = W / 2;
+  return ctex(W, H, (g) => {
+    g.beginPath(); g.moveTo(0, H); g.lineTo(0, r); g.arc(r, r, r, Math.PI, 0); g.lineTo(W, H); g.closePath(); g.save(); g.clip();
+    g.fillStyle = '#26232b'; g.strokeStyle = '#26232b';
+    for (let x = 7; x < W; x += 13) g.fillRect(x - 1.5, 0, 3, H);   // bars
+    const mid = H * 0.52; for (const y of [mid - 2, mid + 22, H - 7, r + 3]) g.fillRect(0, y, W, 4);   // rails
+    g.lineWidth = 2.5; g.beginPath(); for (let x = -13; x < W + 13; x += 13) { g.moveTo(x, mid + 2); g.lineTo(x + 13, mid + 22); g.moveTo(x + 13, mid + 2); g.lineTo(x, mid + 22); } g.stroke();   // a band of lattice
+    g.lineWidth = 6; g.beginPath(); g.arc(r, r, r - 3, Math.PI, 0); g.stroke();
+    g.lineWidth = 3; for (let k = 1; k < 6; k++) { const a = Math.PI + k * Math.PI / 6; g.beginPath(); g.moveTo(r, r + 4); g.lineTo(r + Math.cos(a) * r, r + 4 + Math.sin(a) * r); g.stroke(); }   // a fan over the rail
+    g.fillStyle = '#e2b347'; for (let x = 7; x < W; x += 13) { g.beginPath(); g.moveTo(x - 4, mid - 2); g.lineTo(x, mid - 13); g.lineTo(x + 4, mid - 2); g.fill(); }
+    g.restore();
+  }, { wrap: false });
+}
+TX.ashlar = ctex(128, 128, (g, w, h) => {   // sandstone blocks of 1.2 x 0.6 m with faint joints
+  g.fillStyle = '#f1e6cf'; g.fillRect(0, 0, w, h); g.fillStyle = 'rgba(95,75,50,.16)';
+  for (let r = 0; r < 4; r++) { g.fillRect(0, r * 32, w, 2); for (const x of [0, 64]) g.fillRect((x + (r % 2) * 32) % w, r * 32, 2, 32); }
+  speckle(g, w, h, 300, 0.04, 2);
+}, {});
+TX.ashlar.repeat.set(1 / 2.4, 1 / 2.4);
+const PAV = [];   // { x, z, th, W, D } for each pavilion (for tests)
+if (PAVILIONS.length === 2) {
+  const sand = toon('#fff4e0', { map: TX.ashlar }), stone = tm('#f4ecdc'), base = tm('#cbbfa8'), iron = tm('#26232b');
+  const cu = toon(lit('#6f9a88', 0.03), { side: THREE.DoubleSide });
+  const T = 0.7, RISE = 3.0, BR = [24 / Math.hypot(24, 15), -15 / Math.hypot(24, 15)];   // wall thickness, roof rise, the road over the bridge toward Ridebanen
+  const gates = {};
+  const mid = r => r.reduce((a, q) => [a[0] + q[0] / r.length, a[1] + q[1] / r.length], [0, 0]), cens = PAVILIONS.map(p => mid(p.ring));
+  PAVILIONS.forEach((p, pi) => {
+    const r = p.ring, n = r.length, c = cens[pi], o = cens[1 - pi];
+    let d = null, best = -1;   // the passage runs along the side of the footprint that lies along the road
+    for (let i = 0; i < n; i++) { const a = r[i], b = r[(i + 1) % n], l = Math.hypot(b[0] - a[0], b[1] - a[1]), e = [(b[0] - a[0]) / l, (b[1] - a[1]) / l], k = Math.abs(e[0] * BR[0] + e[1] * BR[1]); if (k > best) { best = k; d = e[0] * BR[0] + e[1] * BR[1] > 0 ? e : [-e[0], -e[1]]; } }
+    const xa = [d[1], -d[0]];   // local x across the road
+    let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+    for (const q of r) { const lx = (q[0] - c[0]) * xa[0] + (q[1] - c[1]) * xa[1], lz = (q[0] - c[0]) * d[0] + (q[1] - c[1]) * d[1]; x0 = Math.min(x0, lx); x1 = Math.max(x1, lx); z0 = Math.min(z0, lz); z1 = Math.max(z1, lz); }
+    const W = x1 - x0, D = z1 - z0, EAVE = p.h - p.rh, TOP = EAVE - 1.0;
+    const cx = c[0] + xa[0] * (x0 + x1) / 2 + d[0] * (z0 + z1) / 2, cz = c[1] + xa[1] * (x0 + x1) / 2 + d[1] * (z0 + z1) / 2, th = Math.atan2(d[0], d[1]);
+    const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = th; world.add(g);
+    PAV.push({ x: cx, z: cz, th, W, D });
+    const back = (o[0] - c[0]) * xa[0] + (o[1] - c[1]) * xa[1] > 0 ? 3 : 1;   // the side away from the road, where the wing joins
+    // four walls: an arch on the bridge side, the Ridebanen side and the road side (the passage arches are the widest),
+    // and a blind arch on the side against the wing
+    for (let k = 0; k < 4; k++) {
+      const along = k % 2 === 0, half = along ? D / 2 : W / 2, fw = along ? W : D - 2 * T, aw = along ? 2.8 : 2.3, sh = along ? 3.5 : 3.2, open = k !== back;
+      const f = new THREE.Group(); f.rotation.y = k * Math.PI / 2; g.add(f);
+      const s = new THREE.Shape(); s.moveTo(-fw / 2, 0); if (open) { s.lineTo(-aw / 2, 0); s.lineTo(-aw / 2, sh); s.absarc(0, sh, aw / 2, Math.PI, 0, true); s.lineTo(aw / 2, 0); } s.lineTo(fw / 2, 0); s.lineTo(fw / 2, TOP); s.lineTo(-fw / 2, TOP); s.closePath();
+      const wg = new THREE.ExtrudeGeometry(s, { depth: T, bevelEnabled: false, curveSegments: 14 }); wg.translate(0, 0, half - T);
+      mesh(wg, sand, 0, 0, 0, { parent: f, edges: 25 });
+      const fz = half + 0.02, top = sh + aw / 2;
+      mesh(new THREE.TorusGeometry(aw / 2 + 0.16, 0.16, 6, 20, Math.PI), stone, 0, sh, fz, { parent: f });   // the arch, its imposts and the keystone
+      for (const sx of [-1, 1]) { box(0.5, 0.24, 0.24, stone, sx * (aw / 2 + 0.16), sh - 0.24, fz, { parent: f }); const pw = (fw - aw) / 2 - 0.55; if (pw > 0.3) box(pw, 0.2, 0.16, stone, sx * (aw / 2 + 0.38 + pw / 2), sh - 0.2, fz, { parent: f }); }
+      box(0.46, 0.66, 0.34, stone, 0, top - 0.12, fz, { parent: f });
+      const shell = mesh(new THREE.CircleGeometry(0.6, 10, 0, Math.PI), stone, 0, top + 0.62, fz + 0.1, { parent: f, cast: false });   // rocaille: a stone shell with a gilt cartouche
+      shell.scale.set(1.15, 0.85, 1);
+      mesh(new THREE.SphereGeometry(0.2, 12, 8), GOLD, 0, top + 0.78, fz + 0.12, { parent: f, cast: false }).scale.set(0.85, 1.15, 0.35);
+      const key = aw + ':' + sh, gh = sh + aw / 2;
+      gates[key] = gates[key] || toon('#ffffff', { map: gateTex(aw, gh), alphaTest: 0.5, side: THREE.DoubleSide });
+      if (open) mesh(new THREE.PlaneGeometry(aw, gh), gates[key], 0, gh / 2, half - T * 0.55, { parent: f, cast: false });
+      if (along) for (const sx of [-1, 1]) box(1.0, 0.46, 0.46, stone, sx * (aw / 2 + 0.75), 0, half - T - 0.24, { parent: f });   // benches for passers-by
+    }
+    // corner pilasters on a base, a frieze and a cornice in two steps
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      box(0.98, 0.9, 0.98, base, sx * (W / 2 - 0.36), 0, sz * (D / 2 - 0.36), { parent: g, edges: true });
+      box(0.84, TOP - 0.9, 0.84, stone, sx * (W / 2 - 0.36), 0.9, sz * (D / 2 - 0.36), { parent: g, edges: true });
+    }
+    box(W + 0.24, 0.55, D + 0.24, stone, 0, TOP, 0, { parent: g, edges: true });
+    box(W + 0.62, 0.24, D + 0.62, stone, 0, TOP + 0.55, 0, { parent: g, edges: true });
+    box(W + 0.94, 0.21, D + 0.94, stone, 0, TOP + 0.79, 0, { parent: g, edges: true });
+    // the roof: a square bell, wide and flat at the eaves and steep at the top (a lathe with four sides)
+    const pts = [new THREE.Vector2(Math.SQRT2, 0)];
+    for (let i = 1; i <= 9; i++) { const t = i / 9; pts.push(new THREE.Vector2((0.17 + 0.83 * Math.pow(1 - t, 1.75)) * Math.SQRT2, RISE * t)); }
+    pts.push(new THREE.Vector2(0, RISE));
+    const rg = new THREE.LatheGeometry(pts, 4, Math.PI / 4).toNonIndexed(); rg.scale(W / 2 + 0.4, 1, D / 2 + 0.4); rg.computeVertexNormals();
+    mesh(rg, cu, 0, EAVE, 0, { parent: g, edges: 30 });
+    // on top a stone pedestal with a gold crown (the real ones carry seated figures beside the crowns)
+    box(1.4, 0.5, 1.4, stone, 0, EAVE + RISE - 0.08, 0, { parent: g, edges: true });
+    box(1.0, 0.45, 1.0, stone, 0, EAVE + RISE + 0.42, 0, { parent: g, edges: true });
+    crownAt(g, 0, EAVE + RISE + 1.25, 0, 0.42);
+    // a lantern on a chain in the middle of the vault, and setts under it
+    const fl = new THREE.PlaneGeometry(W - 2 * T, D - 2 * T); fl.rotateX(-Math.PI / 2); worldUV(fl, 0, 0); mesh(fl, SM.setts, 0, 0.03, 0, { parent: g, cast: false });
+    box(0.04, TOP - 5.4, 0.04, iron, 0, 5.4, 0, { parent: g, cast: false });
+    mesh(new THREE.ConeGeometry(0.26, 0.24, 6), iron, 0, 5.32, 0, { parent: g, cast: false });
+    mesh(new THREE.CylinderGeometry(0.17, 0.12, 0.46, 6), M.bulb, 0, 4.97, 0, { parent: g, cast: false });
+    mesh(new THREE.ConeGeometry(0.1, 0.14, 6), iron, 0, 4.67, 0, { parent: g, cast: false, rx: Math.PI });
+    addGlow(cx, 4.95, cz, 3.4);
+    bakeGroup(g); g.traverse(m => { if (m.isMesh) m.receiveShadow = true; });
+  });
 }
 
 // ---------------- Thorvaldsens Museum (Bindesbøll, 1848): ochre walls, a painted frieze, five tall doors and the quadriga
@@ -3368,7 +3498,13 @@ const POIS = [
   { n: 'Prinsens Bro', t: 'Stenbroen over Frederiksholms Kanal.', x: -152, z: 214, r: 15 },
   { n: 'Stormbroen', t: 'Broen ved Nationalmuseet.', x: -262, z: 57, r: 15 },
 ];
-function poiAt(x, z) { if(FX.press){const [a,b]=FX.press.loc(x,z);if(Math.abs(a)<10.5&&b> -10&&b<12.5)return POIS.find(p=>p.n==='Slotspladsens presseområde');}for(const q of QUAYS){const [s,d]=q.loc(x,z);if(Math.abs(s)<3&&d>q.bottom&&d<7.5)return POIS.find(p=>p.n===q.name);}let best = null, bs = 1; for (const p of POIS) { const s = Math.hypot(x - p.x, z - p.z) / p.r; if (s < bs) { bs = s; best = p; } } return best; }
+// Only places that matter in the murder mystery (and the quays, entrances and the boat) get a card when she comes near.
+// The cards for the sights below are switched off so they do not cover the view; the texts stay here in case they come back.
+const POI_HIDE = new Set(['Christiansborg Slot', 'Slotspladsen', 'Christian den Niende', 'Slotskirken', 'Kirkeløngangsbygningen', 'Thorvaldsens Museum',
+  'Børsen', 'Holmens Kirke', 'Proviantgården', 'Tøjhusmuseet', 'Det Kongelige Bibliotek', 'Den Sorte Diamant', 'Inderhavnen', 'Søren Kierkegaards Plads',
+  'Christian den Fjerdes Bryghus', 'Frederiksholms Kanal', 'Slotsholmskanalen', 'Højbro Plads', 'Gammel Strand', 'Holmens Bro', 'Børsbroen', 'Marmorbroen',
+  'Prinsens Bro', 'Stormbroen', 'Svanerne']);
+function poiAt(x, z) { if(FX.press){const [a,b]=FX.press.loc(x,z);if(Math.abs(a)<10.5&&b> -10&&b<12.5)return POIS.find(p=>p.n==='Slotspladsens presseområde');}for(const q of QUAYS){const [s,d]=q.loc(x,z);if(Math.abs(s)<3&&d>q.bottom&&d<7.5)return POIS.find(p=>p.n===q.name);}let best = null, bs = 1; for (const p of POIS) { if (POI_HIDE.has(p.n)) continue; const s = Math.hypot(x - p.x, z - p.z) / p.r; if (s < bs) { bs = s; best = p; } } return best; }
 
 
 // ======================================================================== SKY & LIGHT
@@ -3876,7 +4012,8 @@ function setSound(v) { soundOn = v; $('bSound').setAttribute('aria-pressed', Str
 function setTekst(v) { tekstStor = v; document.body.classList.toggle('storTekst', v); save(); }
 let toastTimer = 0;
 function toast(msg) { const t = $('toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; toastTimer = 3.4; }
-let curPoi = null, poiExpanded = false;
+let curPoi = null, poiExpanded = false, poiUntil = 0, poiShut = null;   // a card hides itself after a few seconds and comes back only at another place
+const POI_SECS = 6;
 function shortPoi(text) { const end = text.search(/[.!?]\s/); return end < 0 ? text : text.slice(0, end + 1); }
 function renderPoiText() {
   if (!curPoi) return;
@@ -3889,11 +4026,16 @@ function showPoi(p) {
   if (p === curPoi) return;
   curPoi = p; poiExpanded = false; const el = $('poi');
   if (p) seenPoi.add(p.n);
-  if (!p) { el.hidden = true; setPoiH(); return; }
+  if (!p || p === poiShut) { el.hidden = true; setPoiH(); return; }
+  poiShut = null; poiUntil = performance.now() + POI_SECS * 1000;
   $('poiName').textContent = p.n;
   el.hidden = false; renderPoiText();
 }
-$('poiMore').addEventListener('click', () => { poiExpanded = !poiExpanded; renderPoiText(); });
+function tickPoi() {   // called every frame: the card goes away by itself unless she has opened Læs mere
+  const el = $('poi'); if (el.hidden || poiExpanded) return;
+  if (performance.now() > poiUntil) { el.hidden = true; poiShut = curPoi; setPoiH(); }
+}
+$('poiMore').addEventListener('click', () => { poiExpanded = !poiExpanded; if (!poiExpanded) poiUntil = performance.now() + 3000; renderPoiText(); });
 
 $('bMap').addEventListener('click', () => FX.mapView?.open());
 $('bNight').addEventListener('click', () => setEvening(!evening));
@@ -4082,7 +4224,7 @@ function frame(now) {
   sky.position.copy(camera.position);
   tmpA.copy(sunOff).normalize().multiplyScalar(420).add(camera.position); sunSprite.position.copy(tmpA);
   if (started) {
-    poiT -= dt; if (poiT < 0) { poiT = 0.25; showPoi(paused ? null : poiAt(P.pos.x, P.pos.z)); }
+    poiT -= dt; if (poiT < 0) { poiT = 0.25; showPoi(paused ? null : poiAt(P.pos.x, P.pos.z)); } if (!paused) tickPoi();
     mapT -= dt; if (mapT < 0) { mapT = 1 / 30; drawMap(); }
     if (toastTimer > 0) { toastTimer -= dt; if (toastTimer <= 0) $('toast').hidden = true; }
   }
@@ -7323,7 +7465,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { lys: () => ev, MAPVIEW, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>
