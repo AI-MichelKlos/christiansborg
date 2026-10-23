@@ -181,6 +181,12 @@ for (const [pid, p] of Object.entries(M.personer)) for (const n of p.noter || []
 for (const t of M.tidslinje) pushC(t.kraever, `tidslinje ${t.kl}`);
 for (const [n, s] of Object.entries(M.spor)) if (s.opdatering) pushC(s.opdatering.kraever, `spor ${n}`);
 for (const h of M.hint) pushC(h.naar, `hint "${h.tekst.slice(0, 30)}"`);
+// every hint also has a goal for the corner of the screen (maal) and a place (hen) for the arrow, or null
+for (const h of M.hint) {
+  if (typeof h.maal !== 'string' || !h.maal.trim()) F(`Hint uden mål: "${h.tekst.slice(0, 40)}"`);
+  else if (h.maal.length > 70) A(`Langt mål (${h.maal.length} tegn): "${h.maal}"`);
+  if (h.hen !== null && !M.steder[h.hen]) F(`Ukendt sted "${h.hen}" i målet "${h.maal}"`);
+}
 pushC(M.efterskrift.ordenUde.kraever, 'efterskrift');
 pushC(M.afsloering.kraever, 'afsløringen');
 pushE(M.fanget1942.giver, 'fanget1942');
@@ -384,8 +390,8 @@ o(`## Begivenheder\n`);
 for (const b of M.begivenheder) o(`### ${b.kl ? `Kl. ${b.kl}: ` : ''}${b.id.replace(/_/g, ' ')}\n\n<small>Sker, når: ${condTxt(b.naar)}.${b.giver && b.giver.length ? ` Giver: ${effTxt(b.giver)}.` : ''}</small>\n\n${rep(b.replikker)}\n`);
 o(`### Hvis en patrulje ser Ida i 1942\n\n${rep(M.fanget1942.replikker)}\n`);
 o(`## Bentes hint\n`);
-o(`Spillet viser det første hint på listen, hvis betingelse passer.\n`);
-M.hint.forEach((h, i) => o(`${i + 1}. ${h.tekst} <small>(${condTxt(h.naar)})</small>`));
+o(`Spillet viser det første hint på listen, hvis betingelse passer. Målet i fed skrift står hele tiden øverst på skærmen, og en pil peger hen til stedet.\n`);
+M.hint.forEach((h, i) => o(`${i + 1}. **${h.maal}**${h.hen ? ` (${M.steder[h.hen]?.navn || h.hen})` : ''}. ${h.tekst} <small>(${condTxt(h.naar)})</small>`));
 o('');
 o(`## Afsløringen\n`);
 o(`I ${(M.steder[M.afsloering.sted]?.navn || M.afsloering.sted)} kl. ${M.afsloering.kl}. Begynder, når: ${condTxt(M.afsloering.kraever)}.\n`);

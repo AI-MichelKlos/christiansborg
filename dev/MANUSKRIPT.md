@@ -12,7 +12,7 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 - Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 75 skridt.
 - Fejl: ingen. Advarsler: ingen.
 - Steder, der skal bygges: .
-- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 295.
+- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 297.
 
 ## Start
 
@@ -257,7 +257,9 @@ I notesbogen: Beridder med nattevagt i staldene. Talte med Mørkeberg ved midnat
 **Gry:** Godmorgen! Du er tidligt oppe. Det var Aksel Mørkeberg også. Han gik sin faste runde her ved midnat, som han altid gør, når han skal tænke.  
 **Gry:** Han var i strålende humør. »I morgen kl. 10 falder der en bombe, Gry«, sagde han.  
 **Gry:** Og så gik han et øjeblik ind i sadelkammeret. Det plejer han ikke. Politikere.  
-**Ida:** En bombe kl. 10? Det skriver jeg ned. Det lyder som en god historie.
+**Ida:** En bombe kl. 10? Det skriver jeg ned. Det lyder som en god historie.  
+**Ida:** Jeg skal møde Bente fra nattevagten ved Folketingets dør. Kan jeg gå gennem slottet herfra?  
+**Gry:** Nej, der er ingen vej igennem. Gå tilbage mod Marmorbroen, men ikke over den. Drej til venstre langs kanalen, og følg Tøjhusgade. For enden af gaden er porten ind til Rigsdagsgården.
 
 #### Så du nogen i nat?
 
@@ -1228,49 +1230,50 @@ I spillet: ude: Ridebanen (bygget).
 
 ## Bentes hint
 
-Spillet viser det første hint på listen, hvis betingelse passer.
+Spillet viser det første hint på listen, hvis betingelse passer. Målet i fed skrift står hele tiden øverst på skærmen, og en pil peger hen til stedet.
 
-1. Gå til Folketingets indgang i Rigsdagsgården. Bente venter i døren. <small>(endnu ikke »mødt bente«)</small>
-2. Gå ud til Ridebanen. Kongen rider forbi hver morgen. Pas på patruljerne. <small>(»i 1942«, endnu ikke »kongen takket«)</small>
-3. Drej radioen tilbage for at komme hjem til 2026. <small>(»i 1942«)</small>
-4. Gå op i Vandrehallen. Han sidder i den grønne sofa ved Rigets midte. <small>(mangler spor 1 (Liget og termokanden))</small>
-5. Se på bordet ved sofaen. Der står noget, der ikke burde stå der. <small>(mangler spor 2 (Koppen med læbestift))</small>
-6. Aksel havde altid sin lille sorte notesbog på sig, men den er ikke i hans lommer. Lys under sofaen med din mobil. <small>(endnu ikke »notesbog fundet«)</small>
-7. Når nogen skriver hårdt på en side, kan man se trykket på den næste. Har du ikke en blyant i rygsækken? <small>(mangler spor 6 (Notesbogen))</small>
-8. Kommissæren og statsministeren kommer om lidt. Lad os høre, hvad de siger. <small>(endnu ikke »bente beder«)</small>
-9. Er det mine briller? Giv mig dem, så kan vi se loggen. <small>(har Bentes læsebriller)</small>
-10. Uden mine briller kan jeg ikke se tasterne. Jeg satte mig vist på en bænk i Bibliotekshaven på min runde. <small>(endnu ikke »briller givet«)</small>
-11. Kl. 01.52? Spørg mig, hvad der skete omkring kl. 2. Der var noget med Samtaleværelset. <small>(mangler spor 4 (Mødet kl. 2))</small>
-12. Nøglen passer til Samtaleværelset. Dørene er midt i Vandrehallen. <small>(mangler spor 5 (Samtaleværelset))</small>
-13. Bodil i Snapstinget fylder Aksels termokande hver aften. Spørg hende. <small>(akt 2 eller senere, mangler spor 18 (Bodil og termokanden))</small>
-14. Kaspers kort gik ind ved Proviantpassagen. Det har regnet i nat. Se efter i vandpytterne. <small>(akt 2 eller senere, endnu ikke »kort fundet«)</small>
-15. Kaspers gamle kort åbner nok stadig Kompaspartiets sekretariat. Ingen har spærret det. <small>(akt 2 eller senere, mangler spor 10 (Kopimaskinens log))</small>
-16. Pressen står på Slotspladsen. Spørg, hvem der havde pressekort 17. <small>(akt 2 eller senere, mangler spor 7 (Pernille og pressekort 17))</small>
-17. Jonas leder efter sin telefon. Giv ham den, og hør, hvad han siger. <small>(akt 2 eller senere, mangler spor 8 (Jonas Fengers telefon), har Jonas' telefon)</small>
-18. Jonas holdt videomøde i Kompaspartiets mødelokale i nat. Måske har han glemt noget derinde. <small>(akt 2 eller senere, mangler spor 8 (Jonas Fengers telefon))</small>
-19. Ministeren er i restauranten i tårnet. Hun vil gøre meget for en god rapport. <small>(akt 2 eller senere, endnu ikke »ditte renset«, har 50.000-rapporten)</small>
-20. Der lå vist en rapport på kopimaskinen i Kompaspartiets sekretariat. <small>(akt 2 eller senere, endnu ikke »ditte renset«, endnu ikke »rapport taget«)</small>
-21. Ministeren drak kaffe med Aksel i nat. Hun er i restauranten i tårnet. <small>(akt 2 eller senere, endnu ikke »ditte renset«)</small>
-22. Vis Kasper kopimaskinens log. Så tør han måske fortælle, hvad han så. <small>(spor 10 (Kopimaskinens log), mangler spor 11 (Manden på trappen))</small>
-23. Med ministerens gæstekort kommer du ind i Finansministeriet. Referatet ligger i forhandlingsrummet. <small>(akt 3 eller senere, mangler spor 9 (Referatet))</small>
-24. Springvandet i Bibliotekshaven springer om lidt. Gå derud, og se efter i bassinet. <small>(akt 3 eller senere, mangler spor 20 (Papirerne i springvandet))</small>
-25. Se på båden ved kajen over for Reformministeriet. Hvem har bundet den? <small>(akt 3 eller senere, mangler spor 12 (Den røde båd))</small>
-26. Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har Elefantordenen)</small>
-27. Hoffet dækker op i Riddersalen. Hoffoureren holder af folk, der kender hans gobeliner. <small>(akt 3 eller senere, endnu ikke »mogens talt«, endnu ikke »gobelin kendt«)</small>
-28. Lån Elefantordenen hos hoffoureren i Riddersalen, og vis den til Mogens i Landstingssalen. <small>(akt 3 eller senere, endnu ikke »mogens talt«)</small>
-29. Året for den første grundlov. Det står i montrerne i Vandrehallen. Departementschefens kontor ligger i Reformministeriet. <small>(akt 3 eller senere, mangler spor 15 (Valdorfs kontor))</small>
-30. Se i lommerne på den jakke. <small>(spor 15 (Valdorfs kontor), mangler spor 22 (Bådnøglen))</small>
-31. En bådnøgle? Den røde båd ligger ved kajen over for Reformministeriet. <small>(har Bådnøglen, endnu ikke »sejlet«)</small>
-32. Sejl ud til den gamle fortøjningspæl midt i kanalen, og kig ned. Vandet er klart i dag. <small>(»sejlet«, mangler spor 14 (Termokanden))</small>
-33. Giv Vega en gulerod. Hun står foran sadelkammeret i staldene. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«, har Gulerødder)</small>
-34. Gry siger, at Aksel var i sadelkammeret i nat. Men Vega står i vejen, og hun flytter sig kun for en gulerod fra Snapstinget. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«)</small>
-35. Kongen sagde: bag den tredje hestesko over staldporten. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle, »kongen takket«)</small>
-36. Er skabet låst? Min farfar sagde altid, at kongen gemte nøgler bag hestesko. Og hans gamle radio har altid været lidt mærkelig. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle)</small>
-37. Se i det gamle sadelskab inderst i sadelkammeret. <small>(mangler spor 21 (Den gemte tabel))</small>
-38. Har du stadig Elefantordenen? Hoffoureren tæller elefanter. Riddersalen er åben. <small>(akt 4 eller senere, »orden ude«)</small>
-39. Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
-40. Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
-41. Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
+1. **Mød Bente ved Folketingets dør i Rigsdagsgården** (Rigsdagsgården). Gå til Folketingets indgang i Rigsdagsgården. Bente venter i døren. <small>(endnu ikke »mødt bente«)</small>
+2. **Find kongen på Ridebanen, og pas på patruljerne** (Ridebanen, juni 1942). Gå ud til Ridebanen. Kongen rider forbi hver morgen. Pas på patruljerne. <small>(»i 1942«, endnu ikke »kongen takket«)</small>
+3. **Gå tilbage til radioen i betjentstuen, og kom hjem til 2026** (Betjentstuen, juni 1942). Drej radioen tilbage for at komme hjem til 2026. <small>(»i 1942«)</small>
+4. **Gå op i Vandrehallen, og se, hvad der er sket** (Vandrehallen og Rigets midte). Gå op i Vandrehallen. Han sidder i den grønne sofa ved Rigets midte. <small>(mangler spor 1 (Liget og termokanden))</small>
+5. **Undersøg sofaen og bordet ved Rigets midte** (Vandrehallen og Rigets midte). Se på bordet ved sofaen. Der står noget, der ikke burde stå der. <small>(mangler spor 2 (Koppen med læbestift))</small>
+6. **Find Mørkebergs lille sorte notesbog** (Vandrehallen og Rigets midte). Aksel havde altid sin lille sorte notesbog på sig, men den er ikke i hans lommer. Lys under sofaen med din mobil. <small>(endnu ikke »notesbog fundet«)</small>
+7. **Find ud af, hvad Mørkeberg skrev i sin notesbog**. Når nogen skriver hårdt på en side, kan man se trykket på den næste. Har du ikke en blyant i rygsækken? <small>(mangler spor 6 (Notesbogen))</small>
+8. **Bliv i Vandrehallen. Politiet er på vej** (Vandrehallen og Rigets midte). Kommissæren og statsministeren kommer om lidt. Lad os høre, hvad de siger. <small>(endnu ikke »bente beder«)</small>
+9. **Giv Bente brillerne i betjentstuen** (Betjentstuen). Er det mine briller? Giv mig dem, så kan vi se loggen. <small>(har Bentes læsebriller)</small>
+10. **Spørg Bente i betjentstuen om nattens adgangslog** (Betjentstuen). Jeg har nattens adgangslog her i betjentstuen. Spørg mig, om vi kan se den. <small>(endnu ikke »briller givet«, endnu ikke »briller hint«)</small>
+11. **Find Bentes læsebriller** (Bibliotekshaven). Uden mine briller kan jeg ikke se tasterne. Jeg satte mig vist på en bænk i Bibliotekshaven på min runde. <small>(endnu ikke »briller givet«)</small>
+12. **Spørg Bente, hvad der skete omkring kl. 2** (Betjentstuen). Kl. 01.52? Spørg mig, hvad der skete omkring kl. 2. Der var noget med Samtaleværelset. <small>(mangler spor 4 (Mødet kl. 2))</small>
+13. **Lås Samtaleværelset op, og se dig om derinde** (Samtaleværelset). Nøglen passer til Samtaleværelset. Dørene er midt i Vandrehallen. <small>(mangler spor 5 (Samtaleværelset))</small>
+14. **Spørg Bodil i Snapstinget om termokanden** (Snapstinget). Bodil i Snapstinget fylder Aksels termokande hver aften. Spørg hende. <small>(akt 2 eller senere, mangler spor 18 (Bodil og termokanden))</small>
+15. **Undersøg Proviantpassagen, hvor Kaspers kort gik ind** (Proviantpassagen). Kaspers kort gik ind ved Proviantpassagen. Det har regnet i nat. Se efter i vandpytterne. <small>(akt 2 eller senere, endnu ikke »kort fundet«)</small>
+16. **Find ud af, hvad Kasper lavede i Folketinget i nat** (Kompaspartiets gang). Kaspers gamle kort åbner nok stadig Kompaspartiets sekretariat. Ingen har spærret det. <small>(akt 2 eller senere, mangler spor 10 (Kopimaskinens log))</small>
+17. **Find ud af, hvem der havde pressekort 17** (Slotspladsens presseområde). Pressen står på Slotspladsen. Spørg, hvem der havde pressekort 17. <small>(akt 2 eller senere, mangler spor 7 (Pernille og pressekort 17))</small>
+18. **Giv Jonas hans telefon** (Kompaspartiets kontor). Jonas leder efter sin telefon. Giv ham den, og hør, hvad han siger. <small>(akt 2 eller senere, mangler spor 8 (Jonas Fengers telefon), har Jonas' telefon)</small>
+19. **Find ud af, hvor Jonas Fenger var i nat** (Kompaspartiets gang). Jonas holdt videomøde i Kompaspartiets mødelokale i nat. Måske har han glemt noget derinde. <small>(akt 2 eller senere, mangler spor 8 (Jonas Fengers telefon))</small>
+20. **Vis ministeren rapporten i restauranten i tårnet** (Restauranten i tårnet). Ministeren er i restauranten i tårnet. Hun vil gøre meget for en god rapport. <small>(akt 2 eller senere, endnu ikke »ditte renset«, har 50.000-rapporten)</small>
+21. **Find noget, ministeren gerne vil have** (Kompaspartiets sekretariat). Der lå vist en rapport på kopimaskinen i Kompaspartiets sekretariat. <small>(akt 2 eller senere, endnu ikke »ditte renset«, endnu ikke »rapport taget«)</small>
+22. **Tal med ministeren i restauranten i tårnet** (Restauranten i tårnet). Ministeren drak kaffe med Aksel i nat. Hun er i restauranten i tårnet. <small>(akt 2 eller senere, endnu ikke »ditte renset«)</small>
+23. **Vis Kasper kopimaskinens log i Snapstinget** (Snapstinget). Vis Kasper kopimaskinens log. Så tør han måske fortælle, hvad han så. <small>(spor 10 (Kopimaskinens log), mangler spor 11 (Manden på trappen))</small>
+24. **Find referatet i Finansministeriet** (Finansministeriets forhandlingsrum). Med ministerens gæstekort kommer du ind i Finansministeriet. Referatet ligger i forhandlingsrummet. <small>(akt 3 eller senere, mangler spor 9 (Referatet))</small>
+25. **Gå til springvandet i Bibliotekshaven** (Bibliotekshaven). Springvandet i Bibliotekshaven springer om lidt. Gå derud, og se efter i bassinet. <small>(akt 3 eller senere, mangler spor 20 (Papirerne i springvandet))</small>
+26. **Undersøg den røde båd ved Reformministeriet** (Kajen ved Reformministeriet). Se på båden ved kajen over for Reformministeriet. Hvem har bundet den? <small>(akt 3 eller senere, mangler spor 12 (Den røde båd))</small>
+27. **Vis Mogens Brask Elefantordenen i Landstingssalen** (Landstingssalen). Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har Elefantordenen)</small>
+28. **Tal med hoffoureren i Riddersalen** (Riddersalen). Hoffet dækker op i Riddersalen. Hoffoureren holder af folk, der kender hans gobeliner. <small>(akt 3 eller senere, endnu ikke »mogens talt«, endnu ikke »gobelin kendt«)</small>
+29. **Få Mogens Brask til at tale** (Riddersalen). Lån Elefantordenen hos hoffoureren i Riddersalen, og vis den til Mogens i Landstingssalen. <small>(akt 3 eller senere, endnu ikke »mogens talt«)</small>
+30. **Kom ind på departementschefens kontor i Reformministeriet** (Departementschefens kontor). Året for den første grundlov. Det står i montrerne i Vandrehallen. Departementschefens kontor ligger i Reformministeriet. <small>(akt 3 eller senere, mangler spor 15 (Valdorfs kontor))</small>
+31. **Undersøg jakken på departementschefens kontor** (Departementschefens kontor). Se i lommerne på den jakke. <small>(spor 15 (Valdorfs kontor), mangler spor 22 (Bådnøglen))</small>
+32. **Sejl ud med den røde båd ved Reformministeriet** (Kajen ved Reformministeriet). En bådnøgle? Den røde båd ligger ved kajen over for Reformministeriet. <small>(har Bådnøglen, endnu ikke »sejlet«)</small>
+33. **Sejl ud til den gamle fortøjningspæl midt i kanalen** (Kanalen ved den gamle fortøjningspæl). Sejl ud til den gamle fortøjningspæl midt i kanalen, og kig ned. Vandet er klart i dag. <small>(»sejlet«, mangler spor 14 (Termokanden))</small>
+34. **Få Vega til at flytte sig fra sadelkammeret** (De Kongelige Stalde). Giv Vega en gulerod. Hun står foran sadelkammeret i staldene. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«, har Gulerødder)</small>
+35. **Kom ind i sadelkammeret i De Kongelige Stalde** (De Kongelige Stalde). Gry siger, at Aksel var i sadelkammeret i nat. Men Vega står i vejen, og hun flytter sig kun for en gulerod fra Snapstinget. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«)</small>
+36. **Find kongens nøgle ved staldporten** (Ridebanen). Kongen sagde: bag den tredje hestesko over staldporten. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle, »kongen takket«)</small>
+37. **Find en nøgle til det gamle sadelskab**. Er skabet låst? Min farfar sagde altid, at kongen gemte nøgler bag hestesko. Og hans gamle radio har altid været lidt mærkelig. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle)</small>
+38. **Undersøg det gamle sadelskab i sadelkammeret** (Sadelkammeret). Se i det gamle sadelskab inderst i sadelkammeret. <small>(mangler spor 21 (Den gemte tabel))</small>
+39. **Læg Elefantordenen tilbage i Riddersalen** (Riddersalen). Har du stadig Elefantordenen? Hoffoureren tæller elefanter. Riddersalen er åben. <small>(akt 4 eller senere, »orden ude«)</small>
+40. **Mød departementschefen på Udsigten i tårnet** (Udsigten). Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
+41. **Gå til pressemødet i Landstingssalen** (Landstingssalen). Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
+42. **Tal med Svend på Højbro** (Højbro). Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
 
 ## Afsløringen
 

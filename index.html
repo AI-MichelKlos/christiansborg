@@ -36,8 +36,16 @@ body{margin:0;overflow:hidden;background:var(--sky);color:var(--ink);font-family
 .btn[aria-pressed="true"]{background:#ffe4bd}
 #map{position:fixed;right:14px;top:calc(68px + env(safe-area-inset-top,0px));border-radius:12px;background:#a7c46f}
 #poi{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(470px,calc(100% - 32px));padding:11px 16px 13px;box-sizing:border-box;animation:pop .25s ease-out}
-#guide{position:fixed;left:14px;top:calc(134px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff1b8;font:700 13px var(--body)}
-#guideArrow{display:inline-block;font:800 25px var(--display);line-height:1;transform-origin:center}
+#maal{position:fixed;left:14px;top:calc(14px + env(safe-area-inset-top,0px));z-index:4;display:flex;align-items:center;gap:10px;max-width:min(380px,calc(100vw - 28px));box-sizing:border-box;padding:7px 13px 8px 9px;background:#fff1b8;font:600 14px/1.3 var(--body);pointer-events:none}
+#maal small{display:block;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;opacity:.72}
+#maal b{display:block;font-weight:700;text-wrap:balance}
+#maalHvor{display:block;font-size:12.5px;font-weight:600;opacity:.78;font-variant-numeric:tabular-nums}
+#maalPil{flex:none;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--paper);border:2px solid var(--ink);font:800 21px var(--display);line-height:1;transition:transform .15s linear}
+#maal.ny{animation:bump .5s ease-out}
+body.storTekst #maal{font-size:16.5px}body.storTekst #maalHvor{font-size:14.5px}
+.inFolketing #maal{top:calc(96px + env(safe-area-inset-top,0px))}
+@media (max-width:600px){#maal{top:calc(66px + env(safe-area-inset-top,0px));font-size:13px;padding:6px 11px 7px 8px}#maal small{display:none}#maalPil{width:28px;height:28px;font-size:18px}.inFolketing #maal{top:calc(92px + env(safe-area-inset-top,0px))}}
+@media (prefers-reduced-motion:reduce){#maal.ny{animation:none}#maalPil{transition:none}}
 #poiActions{display:flex;gap:8px;margin-top:7px}
 #poiActions button{font:700 12px var(--body);border:1.5px solid var(--ink);border-radius:9px;background:var(--paper-2);color:var(--ink);padding:4px 9px;cursor:pointer;pointer-events:auto}
 #poiActions button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
@@ -96,7 +104,7 @@ body.touch #poi{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .inFolketing #indoorBadge{display:flex;position:fixed;left:18px;top:calc(18px + env(safe-area-inset-top));flex-direction:column;gap:5px;color:#f7edcf;background:rgba(33,43,36,.94);padding:13px 18px;border:1px solid #b9a36b;border-radius:5px;max-width:calc(100% - 160px);pointer-events:none}
 #indoorBadge strong{font:600 18px var(--body)}#indoorBadge span{font:12px var(--body);opacity:.8}
 .inFolketing #indoorExit{display:block;position:fixed;right:14px;top:calc(70px + env(safe-area-inset-top));background:#eee5cf}
-.inFolketing #guide,.inFolketing #map,.inFolketing #poi,.inFolketing #bMap,.inFolketing #bNight,.inFolketing #jump,.inFolketing #touchHint{display:none!important}
+.inFolketing #map,.inFolketing #poi,.inFolketing #bMap,.inFolketing #bNight,.inFolketing #jump,.inFolketing #touchHint{display:none!important}
 .inFolketing #tools{top:auto;bottom:calc(18px + env(safe-area-inset-bottom))}
 .inFolketing #actBtn{bottom:calc(100px + env(safe-area-inset-bottom));font:600 16px var(--body);border-radius:5px;background:#eee5cf}
 @media(max-width:600px){#indoorBadge strong{font-size:14px}#indoorBadge span{font-size:10px}.inFolketing #tools .btn{font-size:11px;padding:6px}}
@@ -122,7 +130,7 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 #towerFloors{display:none;position:fixed;right:14px;top:168px;width:210px;max-width:55vw;background:#eee5cf}
 .inTowerRooms #towerFloors,.inTowerView #towerFloors{display:block}
 .inTowerView #towerFloors{top:78px}
-.inTowerView #guide,.inTowerView #poi,.inTowerView #map,.inTowerView #bMap,.inTowerView #bNight{display:none!important}
+.inTowerView #poi,.inTowerView #map,.inTowerView #bMap,.inTowerView #bNight{display:none!important}
 @media(max-height:500px){.inTowerRooms #towerFloors{top:112px}}
 /* Murder mystery: clock, notebook, backpack, settings and the scene card */
 :root{--ts:1}
@@ -236,7 +244,6 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
     <button id="bHelp" class="sticker btn" type="button" aria-label="Hjælp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 114 2c-1 .7-1.6 1.2-1.6 2.4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg><span>Hjælp</span></button>
   </div>
   <canvas id="map" class="sticker" aria-label="Kort over Slotsholmen"></canvas>
-  <div id="guide" class="sticker" role="status" aria-live="off" hidden><span id="guideArrow" aria-hidden="true">↑</span><span id="guideText"></span></div>
   <div id="poi" class="sticker" hidden><b id="poiName"></b><p id="poiText"></p><div id="poiActions"><button id="poiMore" type="button">Læs mere</button></div></div>
   <div id="toast" class="sticker" hidden></div>
   <div id="touchHint" hidden><span>✥</span>Træk for at gå</div><div id="lookHint" hidden>Kig rundt (valgfrit)</div>
@@ -3994,6 +4001,8 @@ function drawMap() {
   const k = mapCv.width / (MX1 - MX0);
   const px = mpx(P.pos.x), pz = mpz(P.pos.z);
   if (!MYBOAT.on) { g.fillStyle = '#d9534f'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1, k * 0.5); g.beginPath(); g.arc(mpx(MYBOAT.x), mpz(MYBOAT.z), Math.max(3, k * 2.4), 0, Math.PI * 2); g.fill(); g.stroke(); }   // the little boat
+  const mp = FX.maal?.punkt;
+  if (mp) { const r = Math.max(6, k * 5) * (1 + 0.12 * Math.sin(performance.now() / 260)); g.fillStyle = 'rgba(242,193,78,.55)'; g.strokeStyle = '#2a2238'; g.lineWidth = Math.max(1.5, k * 0.7); g.beginPath(); g.arc(mpx(mp[0]), mpz(mp[1]), r, 0, Math.PI * 2); g.fill(); g.stroke(); }   // where Ida should go
   const cy = cam.yaw; const fx = -Math.sin(cy), fz = -Math.cos(cy); const L = 22 * k;
   g.fillStyle = 'rgba(255,250,240,.35)'; g.beginPath(); g.moveTo(px, pz);
   g.lineTo(px + (fx * Math.cos(0.5) - fz * Math.sin(0.5)) * L, pz + (fz * Math.cos(0.5) + fx * Math.sin(0.5)) * L);
@@ -4199,9 +4208,9 @@ function updActions() {
 }
 
 // ======================================================================== STATE / STORAGE
-let soundOn = true, tekstStor = false, naesteSpor = false, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
+let soundOn = true, tekstStor = false, naesteSpor = false, visMaal = true, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'mordIRigetsMidte';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor, maal: visMaal, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 
 // ======================================================================== MAIN LOOP
@@ -6212,6 +6221,7 @@ const MAPVIEW=(()=>{
     pins=sites.map(site=>{const [ax,ay]=project(site.at);return {site,ax,ay,x:ax+site.offset[0],y:ay+site.offset[1]};});
     for(let pass=0;pass<60;pass++)for(let i=0;i<pins.length;i++){const a=pins[i];for(let j=i+1;j<pins.length;j++){const b=pins[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.1;if(d<33){const m=(33-d)/2,ux=d===.1?1:dx/d,uy=d===.1?0:dy/d;a.x-=ux*m;a.y-=uy*m;b.x+=ux*m;b.y+=uy*m;}}a.x=Math.max(16,Math.min(w-16,a.x));a.y=Math.max(16,Math.min(h-16,a.y));}
     pins.forEach(p=>{const active=p.site===selected;ctx.strokeStyle=active?'#a45f16':'#3c4d3c';ctx.lineWidth=active?2:1;ctx.beginPath();ctx.moveTo(p.ax,p.ay);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.fillStyle=active?'#e68d30':'#344b3b';ctx.beginPath();ctx.arc(p.ax,p.ay,active?4:2.5,0,Math.PI*2);ctx.fill();const b=$('overviewPins').querySelector('[data-place="'+p.site.id+'"]');b.style.left=p.x+'px';b.style.top=p.y+'px';});
+    const gp=FX.maal?.punkt;if(gp){const [gx,gy]=project(gp);ctx.fillStyle='rgba(242,193,78,.6)';ctx.strokeStyle='#30283c';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(gx,gy,12,0,Math.PI*2);ctx.fill();ctx.stroke();}   // where Ida should go
     const anchor=location(),at=anchor?anchor.at:[P.pos.x,P.pos.z],[px,py]=project(at);ctx.fillStyle='#f59b35';ctx.strokeStyle='#30283c';ctx.lineWidth=2;ctx.beginPath();if(anchor)ctx.arc(px,py,6,0,Math.PI*2);else {const a=P.face;ctx.moveTo(px+Math.sin(a)*8,py+Math.cos(a)*8);ctx.lineTo(px+Math.sin(a+2.5)*7,py+Math.cos(a+2.5)*7);ctx.lineTo(px+Math.sin(a-2.5)*7,py+Math.cos(a-2.5)*7);ctx.closePath();}ctx.fill();ctx.stroke();
   }
   function open(){if(dialog.open||!started)return;wasPaused=paused;paused=true;keys.clear();resetTouch();P.vel.set(0,0,0);jumpReq=false;const anchor=location();$('overviewPosition').textContent=anchor?(INTERIOR.on?'Inde: '+$('indoorName').textContent:'På Udsigten i Tårnet')+'. Kortet viser indgangen.':'Din position vises med en orange pil.';$('overviewMini').checked=showMap;dialog.showModal();dialog.scrollTop=0;$('bMap').setAttribute('aria-expanded','true');choose(anchor||sites.reduce((best,s)=>Math.hypot(P.pos.x-s.at[0],P.pos.z-s.at[1])<Math.hypot(P.pos.x-best.at[0],P.pos.z-best.at[1])?s:best));$('overviewClose').focus();requestAnimationFrame(draw);}
@@ -6334,7 +6344,7 @@ const GAADE = (() => {
   }
   function efterStart(nyt) {
     gem();
-    if (nyt && !TESTMODE) scene({ eyebrow: `Akt 1 · ${akt().navn} · kl. ${kl(G.min)}`, title: 'Torsdag morgen', lines: M.start.replikker.map(r => r[1]), btn: 'Gå over broen' });
+    if (nyt && !TESTMODE) scene({ eyebrow: `Akt 1 · ${akt().navn} · kl. ${kl(G.min)}`, title: 'Torsdag morgen', lines: M.start.replikker.map(r => r[1]), btn: 'Gå over broen', efter: () => setTimeout(() => toast(visMaal ? 'Øverst til venstre står hele tiden, hvad Ida skal nu. Pilen peger derhen.' : 'Tryk N for notesbogen.'), 900) });
     else if (!nyt) setTimeout(() => toast(`Velkommen tilbage. Klokken er ${kl(G.min)}.`), 900);
   }
   function startKnapper() {
@@ -6492,17 +6502,18 @@ const GAADE = (() => {
 
   // Settings: sound, text size and the small map. Also reachable from the start card and the help card.
   const sets = dialog('setDialog', 'Indstillinger', true);
-  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><label class="gdCheck"><input type="checkbox" id="set1942"> Rejsen til 1942 (et ekstra lag, gælder nye spil)</label><button class="go" id="setDone" type="button">Færdig</button>';
+  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setMaal"> Vis, hvad Ida skal nu (øverst til venstre)</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><label class="gdCheck"><input type="checkbox" id="set1942"> Rejsen til 1942 (et ekstra lag, gælder nye spil)</label><button class="go" id="setDone" type="button">Færdig</button>';
   sets.addEventListener('keydown', e => e.stopPropagation());
   sets.addEventListener('close', () => { if (!intro.hidden) $('setBtn').focus(); else canvas.focus(); });
   $('setDone').addEventListener('click', () => sets.close());
   $('setSound').addEventListener('change', e => setSound(e.target.checked));
   $('setMini').addEventListener('change', e => setMapVisible(e.target.checked));
   $('setSpor').addEventListener('change', e => { naesteSpor = e.target.checked; save(); });
+  $('setMaal').addEventListener('change', e => { visMaal = e.target.checked; if (FX.maal) { FX.maal.vis = visMaal; FX.maal.opdater(); } save(); });
   $('set1942').addEventListener('change', e => { med1942 = e.target.checked; save(); });
   for (const r of sets.querySelectorAll('[name=setTs]')) r.addEventListener('change', e => setTekst(e.target.value === 'stor'));
   $('setBtn').addEventListener('click', () => {
-    $('setSound').checked = soundOn; $('setMini').checked = showMap; $('setSpor').checked = naesteSpor; $('set1942').checked = med1942;
+    $('setSound').checked = soundOn; $('setMini').checked = showMap; $('setSpor').checked = naesteSpor; $('setMaal').checked = visMaal; $('set1942').checked = med1942;
     for (const r of sets.querySelectorAll('[name=setTs]')) r.checked = (r.value === 'stor') === tekstStor;
     sets.showModal(); $('setSound').focus();
   });
@@ -7381,7 +7392,132 @@ const PERSONER = (() => {
       offerAction({ id: 'tal-' + naer, label: 'Tal med ' + (p.kort || p.navn.split(' ')[0]), prio: 9, run: () => GAADE.samtale(naer) });
     }
   });
-  return { stedNu, SPOT, FIG, spotFor, figur, i1942 };
+  return { stedNu, SPOT, FIG, spotFor, figur, i1942, UDE };
+})();
+
+// ======================================================================== MURDER MYSTERY: what Ida should do now
+// A card in the top left corner always says what Ida should do next: the goal (maal) of the first of Bente's hints that
+// fits (mordgaade.js). It says what and where, not how, and it does not count as a hint. Outdoors an arrow points to the
+// place (hen) and says how far it is, and the place gets a gold ring on the small map and on the overview map.
+// Inside a building the card names the room. It can be turned off under Indstillinger.
+const MAAL = (() => {
+  const M = GAADE.M, I = INTERIOR;
+  const card = document.createElement('div'); card.id = 'maal'; card.className = 'sticker'; card.hidden = true; card.setAttribute('role', 'status');
+  card.innerHTML = '<span id="maalPil" aria-hidden="true">↑</span><span id="maalTekst"><small>Det skal Ida nu</small><b id="maalHvad"></b><span id="maalHvor"></span></span>';
+  $('hud').appendChild(card);
+  const door = k => { const d = MINISTRY_DOORS[k]; return d ? [d.x + d.nx * 4, d.z + d.nz * 4] : null; };
+  const qR = QUAYS.find(q => q.id === 'reform').at(0, -6), qS = QUAYS.find(q => q.id === 'slots').at(0, -6);
+  // a place of the manuscript that is not inside another: where it is outdoors, and the building it is (for places inside)
+  const TOP = {
+    rigsdagsgaarden: { ude: FT.at(0, 9) }, folketinget: { ude: FT.at(0, 4), hus: 'folketing' },
+    stalden: { ude: door('stables'), hus: 'stables' }, taarnet: { ude: TOWER.door, hus: 'tower' }, riddersalen: { ude: door('riddersal'), hus: 'riddersal' },
+    finansministeriet: { ude: door('finance'), hus: 'finance' }, reformministeriet: { ude: door('reform'), hus: 'reform' },
+    kanalen: { ude: [(qR[0] + qS[0]) / 2, (qR[1] + qS[1]) / 2] },
+  };
+  for (const [id, x, z] of PERSONER.UDE) if (!TOP[id]) TOP[id] = { ude: [x, z] };
+  const kaede = id => { const out = []; for (let s = id, n = 0; s && n < 6; s = M.steder[s]?.inde_i, n++) out.push(s.replace(/_1942$/, '')); return out; };
+  const husNu = () => I.on ? (I.place.startsWith('tower') ? 'tower' : I.place) : (FX.tower?.on ? 'tower' : null);
+  // ---- the way there. A grid of where Ida can walk outdoors (2.5 m squares) is built a little at a time after loading.
+  // For a goal the grid is flooded from the goal, and the arrow points along the shortest way about 15 m ahead, so it
+  // leads round the buildings (out of Ridebanen, through the gates into Rigsdagsgården) and not through them.
+  const ST = 2.5, [GX0, GX1, GZ0, GZ1] = BOUNDS, GW = Math.floor((GX1 - GX0) / ST) + 1, GH = Math.floor((GZ1 - GZ0) / ST) + 1, N = GW * GH;
+  const fri = new Uint8Array(N); let bygget = 0;
+  function friPlads(x, z) {   // no wall (a gate through a building is open), no post or box she cannot step over
+    for (const c of pcols) { if (x < c.x0 || x > c.x1 || z < c.z0 || z > c.z1 || (c.bot || 0) > 1.7) continue; if (c.cut && c.cut.some(h => ptIn(h, x, z))) continue; if (inRings(c.rings, x, z)) return false; }
+    for (const c of cols) { if (c.t === 'c') { if (c.top > 0.7 && c.r > 0.6 && (x - c.x) ** 2 + (z - c.z) ** 2 <= c.r * c.r) return false; } else if (c.t === 'b' && c.top > 0.7 && x >= c.x0 && x <= c.x1 && z >= c.z0 && z <= c.z1) return false; }
+    return true;
+  }
+  function byg(n) { for (const slut = Math.min(N, bygget + n); bygget < slut; bygget++) { const i = bygget % GW, j = (bygget - i) / GW, x = GX0 + i * ST, z = GZ0 + j * ST; fri[bygget] = !waterAt(x, z) && friPlads(x, z) ? 1 : 0; } }
+  const celle = (x, z) => { const i = Math.round((x - GX0) / ST), j = Math.round((z - GZ0) / ST); return i < 0 || j < 0 || i >= GW || j >= GH ? -1 : j * GW + i; };
+  const cx = c => GX0 + (c % GW) * ST, cz = c => GZ0 + Math.floor(c / GW) * ST;
+  function naerFri(c0, r0 = 3) {   // the nearest square she can stand on
+    if (c0 < 0) return -1; if (fri[c0]) return c0;
+    const i0 = c0 % GW, j0 = (c0 - i0) / GW;
+    for (let r = 1; r <= r0; r++) for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) { const i = i0 + di, j = j0 + dj; if (i >= 0 && j >= 0 && i < GW && j < GH && fri[j * GW + i]) return j * GW + i; }
+    return -1;
+  }
+  const NB = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+  const floder = new Map();   // goal square → metres from every square to the goal
+  const DI = [1, -1, 0, 0, 1, 1, -1, -1], DJ = [0, 0, 1, -1, 1, -1, 1, -1], DC = [ST, ST, ST, ST, ST * Math.SQRT2, ST * Math.SQRT2, ST * Math.SQRT2, ST * Math.SQRT2];
+  let HK = new Float64Array(1 << 16), HC = new Int32Array(1 << 16);   // a heap of (metres, square), reused
+  function flod(m) {
+    let d = floder.get(m); if (d) return d;
+    if (floder.size > 6) floder.clear();
+    d = new Float64Array(N).fill(Infinity); d[m] = 0;
+    let hn = 0;
+    const push = (k, c) => {
+      if (hn >= HK.length) { const k2 = new Float64Array(HK.length * 2), c2 = new Int32Array(HK.length * 2); k2.set(HK); c2.set(HC); HK = k2; HC = c2; }
+      let i = hn++; while (i) { const p = (i - 1) >> 1; if (HK[p] <= k) break; HK[i] = HK[p]; HC[i] = HC[p]; i = p; } HK[i] = k; HC[i] = c;
+    };
+    push(0, m);
+    while (hn) {
+      const k = HK[0], c = HC[0], lk = HK[--hn], lc = HC[hn];   // take the nearest; an old entry is skipped
+      let i = 0; for (;;) { let j = 2 * i + 1; if (j >= hn) break; if (j + 1 < hn && HK[j + 1] < HK[j]) j++; if (HK[j] >= lk) break; HK[i] = HK[j]; HC[i] = HC[j]; i = j; } HK[i] = lk; HC[i] = lc;
+      if (k > d[c]) continue;
+      const ci = c % GW, cj = (c - ci) / GW;
+      for (let e = 0; e < 8; e++) {
+        const ni = ci + DI[e], nj = cj + DJ[e]; if (ni < 0 || nj < 0 || ni >= GW || nj >= GH) continue;
+        const n = nj * GW + ni; if (!fri[n]) continue;
+        if (e > 3 && (!fri[cj * GW + ni] || !fri[nj * GW + ci])) continue;   // no corner cutting
+        const nk = k + DC[e]; if (nk < d[n]) { d[n] = nk; push(nk, n); }
+      }
+    }
+    floder.set(m, d); return d;
+  }
+  const frit = (ax, az, bx, bz) => { const l = Math.hypot(bx - ax, bz - az), n = Math.ceil(l / 1); for (let k = 1; k < n; k++) { const c = celle(ax + (bx - ax) * k / n, az + (bz - az) * k / n); if (c < 0 || !fri[c]) return false; } return true; };
+  // from (x, z) toward goal g: the point to aim at and the length of the way, or null if the grid cannot help
+  function vej(x, z, g) {
+    if (bygget < N) return null;
+    const m = naerFri(celle(g[0], g[1])), c0 = naerFri(celle(x, z), 2); if (m < 0 || c0 < 0) return null;
+    const d = flod(m); if (d[c0] === Infinity) return null;
+    let c = c0, sigte = null, gaaet = 0;
+    for (let k = 0; k < 900 && d[c] > 0; k++) {
+      const i = c % GW, j = (c - i) / GW; let best = -1, bd = d[c];
+      for (const [di, dj] of NB) {   // the next square on the shortest way
+        const ni = i + di, nj = j + dj; if (ni < 0 || nj < 0 || ni >= GW || nj >= GH) continue;
+        const n = nj * GW + ni; if (di && dj && (!fri[j * GW + ni] || !fri[nj * GW + i])) continue;
+        const nd = d[n] + (di && dj ? ST * Math.SQRT2 : ST); if (d[n] < d[c] && nd <= bd + 1e-3) { bd = nd; best = n; }
+      }
+      if (best < 0) break;
+      gaaet += Math.hypot(cx(best) - cx(c), cz(best) - cz(c)); c = best;
+      if (gaaet <= 35 && frit(x, z, cx(c), cz(c))) sigte = [cx(c), cz(c)];   // aim as far along the way as she can see, up to 35 m
+      if (gaaet > 35) break;
+    }
+    if (d[c] === 0 && frit(x, z, g[0], g[1]) && gaaet <= 35) sigte = g;
+    return { sigte: sigte || [cx(c), cz(c)], len: d[c0] + Math.hypot(x - cx(c0), z - cz(c0)) };
+  }
+  HOOKS.frame.push(() => { if (bygget < N) byg(started ? 2500 : 8000); });
+
+  const S = { punkt: null, vis: true, maal: null, vej, get klar() { return bygget >= N; } };
+  let t = 0, sidst = '';
+  function opdater() {
+    const G = GAADE.G, h = S.vis && started && G && !G.flag.includes('loest') ? M.hint.find(h => GAADE.ok(h.naar)) : null;
+    if (!h || !h.maal) { card.hidden = true; S.punkt = null; S.maal = null; return; }
+    S.maal = h;
+    if (h.maal !== sidst) { sidst = h.maal; $('maalHvad').textContent = h.maal; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
+    const hen = h.hen && h.hen.replace(/_1942$/, ''), led = hen ? kaede(hen) : [], top = TOP[led[led.length - 1]];
+    const her = !!hen && kaede(PERSONER.stedNu()).includes(hen), hus = husNu();
+    let pil = null, hvor = '';
+    S.punkt = top && top.ude && !her ? top.ude : null;
+    if (!hen) hvor = '';
+    else if (her) hvor = 'Du er her';
+    else if (hus && top && top.hus === hus) hvor = M.steder[hen].navn;   // in the right building: name the room
+    else if (hus) hvor = 'Gå ud, og find ' + (M.steder[led[led.length - 1]]?.navn || M.steder[hen].navn);
+    else if (top && top.ude && !FX.tower?.on) {
+      const v = MYBOAT.on ? null : vej(P.pos.x, P.pos.z, top.ude), aim = v ? v.sigte : top.ude;   // along the way, or straight if the grid cannot help
+      const dx = aim[0] - P.pos.x, dz = aim[1] - P.pos.z, d = v ? v.len : Math.hypot(top.ude[0] - P.pos.x, top.ude[1] - P.pos.z);
+      pil = Math.atan2(dx, dz) - (cam.yaw + Math.PI);   // from the way the camera looks
+      hvor = `${M.steder[led[led.length - 1]]?.navn || M.steder[hen].navn} · ${d < 8 ? 'lige her' : Math.round(d / 5) * 5 + ' m'}`;
+    }
+    $('maalHvor').textContent = hvor; $('maalHvor').hidden = !hvor;
+    const el = $('maalPil'); el.hidden = pil === null;
+    if (pil !== null) el.style.transform = `rotate(${-pil}rad)`;   // positive pil is to the left on the screen
+    card.hidden = false;
+  }
+  HOOKS.frame.push(dt => { t -= dt; if (t < 0) { t = 0.15; opdater(); } });
+  S.opdater = opdater;
+  FX.maal = S;
+  return S;
 })();
 
 // ======================================================================== MURDER MYSTERY: the extra layer, June 1942
@@ -7452,7 +7588,7 @@ function boot(data) {
   const st = load();
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
-  setTekst(!!st.tekst); naesteSpor = !!st.spor; med1942 = st.lag1942 !== false;
+  setTekst(!!st.tekst); naesteSpor = !!st.spor; visMaal = st.maal !== false; if (FX.maal) FX.maal.vis = visMaal; med1942 = st.lag1942 !== false;
   setEvening(false); ev = lysMaal();   // the light follows the story's clock from the start
   setMapVisible(showMap); sizeMap();
   if (data.pos) { P.pos.fromArray(data.pos); if (typeof data.face === 'number') P.face = data.face; }
@@ -7465,7 +7601,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { MAAL, lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

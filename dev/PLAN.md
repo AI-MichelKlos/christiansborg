@@ -315,3 +315,20 @@ Planen står i `dev/MORDGAADE.md`. Ét trin ad gangen efter dens rækkefølge, o
   - Marmorbroens pavilloner er bygget i hånden: lys sandsten med kvadre, hjørnepilastre, en bue på tre sider og en blind bue mod fløjen, rocaille over buerne, frise og gesims, et svungent kobbertag og en guldkrone på en sokkel. Smedejernslågerne er lukket, og en lygte brænder inde i hver pavillon. Grundplan og højder er fra OpenStreetMap, formen efter beskrivelsen i Den Store Danske (lex.dk, Marmorbroen), og resten er forenklet.
   - Fløjene omkring Ridebanen har fået en lidt varmere puds, en sokkel og en gesims. Soklen stopper ved staldportene.
   - Kontrolleret i Chromium på computer og telefon uden JavaScript-fejl: startstedet kl. 06.00, pavillonerne fra broen og fra Ridebanen, Ridebanen og kortene ved Rigsdagsgården og presseområdet.
+
+## Gør spillet lettere at forstå (fra 23. okt. 2026)
+Michel: efter samtalen med Gry vidste man ikke, hvor man skulle hen, og det var uklart, hvad man egentlig skal. Det tages i bidder, én ad gangen.
+- [x] 1. Hvad Ida skal nu (23. okt. 2026)
+  - Et kort øverst til venstre (`MAAL`, `#maal`) viser hele tiden målet fra det første af Bentes hint, der passer. Hvert hint i `mordgaade.js` har fået `maal` (hvad, ikke hvordan) og `hen` (et sted fra `STEDER` eller null). Et nyt hint før brillerne: spørg Bente om adgangsloggen. Målet tæller ikke som hint og kan slås fra under Indstillinger (`visMaal`, gemt som `maal`).
+  - Udenfor peger en pil langs den korteste vej, man kan gå, og viser afstanden. Vejen findes i et gitter på 2,5 m over hele kortet (`fri`, bygget lidt ad gangen efter indlæsning, ca. 0,2 s i alt), og for hvert mål regnes afstanden ud fra målet (`flod`, ca. 15 ms). Pilen sigter så langt frem ad vejen, som Ida kan se, op til 35 m. Fra Gry: ud ved Marmorbroen, langs kanalen, ad Tøjhusgade og gennem porten til Rigsdagsgården (ca. 390 m). I båden og over vandet peger pilen lige derhen.
+  - Indenfor står rummets navn eller "Du er her". Målet har en gul ring på minikortet og på oversigtskortet (`FX.maal.punkt`).
+  - Gry fortæller nu, at der ikke er nogen vej gennem slottet, og hvordan man går til Rigsdagsgården. Efter startscenen siger en besked, at målet står øverst til venstre.
+  - `dev/tjek-mordgaade.js` tjekker, at alle hint har et mål og et kendt sted.
+- [ ] 2. Samtalerne: skjul emner, der ikke kan føre nogen vegne endnu (fx sadelkammeret i akt 1 og hesteskoene), vis tydeligt nye emner, og lad personerne sige, hvor man skal hen bagefter.
+- [ ] 3. Begynderhjælp: en kort forklaring ved nyt spil af, hvad man skal (find morderen før kl. 10), og hvordan (spor i notesbogen, ting i rygsækken, giv og vis, afsløringen), og små tips første gang man finder et spor eller en ting.
+- [ ] 4. Ridebanen: i dag kommer man kun ud ved Marmorbroen og må gå rundt ad Tøjhusgade. Jeg har ikke fundet en port mellem Ridebanen og Rigsdagsgården i virkeligheden (Altinget nævner kun Tøjhusgade og Slotspladsen). Michel skal vælge: behold den rigtige vej, eller lav en genvej.
+
+## Til senere
+- [ ] Pænere heste. Michel synes, de er meget grimme (Ridebanen, staldene, Vega, kongens hest i 1942).
+- [ ] Bygningerne rundt omkring flottere, én ad gangen. Spørg Michel om den næste, når der ikke er andre opgaver i gang.
+
