@@ -73,7 +73,8 @@ kbd{display:inline-block;min-width:1.6em;text-align:center;padding:1px 6px;borde
 .foot{font-size:12px;opacity:.7;margin:12px 0 0;line-height:1.45}
 .err{background:#ffe0d6;border:2px solid var(--ink);border-radius:10px;padding:8px 12px;font-size:13.5px;margin:0 0 12px}
 #joy{position:fixed;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;border:2.5px solid var(--ink);background:rgba(255,250,240,.55);pointer-events:none}
-#knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--paper);border:2.5px solid var(--ink);box-shadow:2px 3px 0 var(--ink)}
+#knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--paper);border:2.5px solid var(--ink);box-shadow:2px 3px 0 var(--ink);transition:background .2s}
+#knob.run{background:var(--leaf)}
 #findBtn{position:fixed;left:14px;top:calc(84px + env(safe-area-inset-top,0px));background:#fff1b8;font-size:14px;padding:8px 13px}
 #findBtn svg{width:20px;height:20px}
 .sw{width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);cursor:pointer;padding:0}
@@ -294,7 +295,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
       <span><kbd>M</kbd></span><span>Oversigtskort</span>
     </div>
     <div class="keys" id="keysTouch" hidden>
-      <span>Venstre tommel</span><span>Træk i den retning, du vil gå. Træk lidt for at gå langsomt. Slip for at stoppe</span>
+      <span>Venstre tommel</span><span>Træk i den retning, du vil gå. Træk lidt for at gå langsomt. Hold tommelen helt ude et øjeblik for at løbe. Slip for at stoppe</span>
       <span>Kamera</span><span>Følger roligt med. Træk på højre side for selv at kigge</span>
       <span>Hop-knappen</span><span>Hop</span>
       <span>Handlingsknappen</span><span>Tryk for at undersøge, tale eller bruge ting</span>
@@ -3524,13 +3525,15 @@ for (const G of RG_GATES) {
   pcols.push({ rings: [G.mid], ...bboxOf(G.mid), top: 13.5, bot: 5.5 });
 }
 // ---------------- people who walk: the prime minister and the bodyguards
-function walker(o) {   // o: coat, legs, hair, skirt (a woman's long coat), glasses (dark sunglasses), scarf
-  const f = menneske({ coat: o.coat, trousers: o.legs, hair: o.hair, skin: o.skin, kvinde: !!o.skirt, long: !!o.skirt, hairStyle: o.skirt ? 'bob' : 'kort', toerklaede: o.scarf, solbriller: o.glasses, scale: o.scale, enkel: true });
+// The knees and the head are their own parts, so the legs bend (more on the stairs) and the guards can look around.
+function walker(o) {   // o: coat, legs, hair, skirt (a woman's long coat), glasses (dark sunglasses), scarf, swing (arm swing)
+  const f = menneske({ coat: o.coat, trousers: o.legs, hair: o.hair, skin: o.skin, kvinde: !!o.skirt, long: !!o.skirt, hairStyle: o.skirt ? 'bob' : 'kort', toerklaede: o.scarf, solbriller: o.glasses, scale: o.scale });
   f.root.visible = false; dyn.add(f.root);
-  return { g: f.root, legs: f.hips, arms: f.arms, x: 0, z: 0, y: 0, h: 0, path: [], walkT: 0, wave: 0, on: false };
+  return { g: f.root, body: f.g, head: f.head, legs: f.legs, arms: f.arms, arm1z: f.arms[1].rotation.z, swing: o.swing ?? 0.35, phase: o.phase ?? 0,
+    x: 0, z: 0, y: 0, h: 0, dir: 0, vx: 0, vz: 0, k: 0, climb: 0, path: [], walkT: 0, wave: 0, look: null, lead: null, off: null, on: false };
 }
-const PM = walker({ coat: '#1f2a44', legs: '#1f2a44', hair: '#5a4334', skin: '#f0caa9', skirt: true, scarf: '#c0392b', scale: 0.97 });   // looks like the prime minister of the story
-const GUARDS = [0, 1, 2].map(i => walker({ coat: '#202226', legs: '#202226', hair: ['#3a2a20', '#6b4a2f', '#2b2420'][i], skin: ['#e8b996', '#d9a984', '#f2c6a4'][i], glasses: true, scale: 1.04 }));
+const PM = walker({ coat: '#1f2a44', legs: '#1f2a44', hair: '#5a4334', skin: '#f0caa9', skirt: true, scarf: '#c0392b', scale: 0.97, swing: 0.3 });   // looks like the prime minister of the story
+const GUARDS = [0, 1, 2].map(i => walker({ coat: '#202226', legs: '#202226', hair: ['#3a2a20', '#6b4a2f', '#2b2420'][i], skin: ['#e8b996', '#d9a984', '#f2c6a4'][i], glasses: true, scale: 1.04, swing: 0.22, phase: i * 2.1 }));
 // ---------------- the ministers' black cars: long, low sedans with tinted windows, chrome, hubcaps that turn,
 // and doors on the right-hand side (toward the stairs) that open, so the people can step out of them. Nose at +z.
 const CAR_EDGE = new THREE.LineBasicMaterial({ color: 0x8c96a8, transparent: true, opacity: 0.55 });   // light outlines, so the black shows its shape
@@ -3600,7 +3603,7 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
   // In the murder mystery the prime minister's cars come once in a game (flag biler_kom), the first time Ida is near
   const S = { phase: 'idle', s: 0, v: 0, t: 0, cool: 0, waved: false, ev: {} };
   FT.state = S; FT.route = R; FT.stopS = stopS;
-  const spawn = (p, lx, lz) => { const [x, z] = FT.at(lx, lz); Object.assign(p, { x, z, y: 0, path: [], on: true, wave: 0, h: Math.atan2(-FT.n[0], -FT.n[1]) }); p.g.visible = true; };
+  const spawn = (p, lx, lz) => { const [x, z] = FT.at(lx, lz), h = Math.atan2(-FT.n[0], -FT.n[1]); Object.assign(p, { x, z, y: 0, path: [], on: true, wave: 0, h, dir: h, vx: 0, vz: 0, k: 0, climb: 0, look: null, lead: null }); if (p === PM) p.trail = [[x, z, 0]]; p.g.visible = true; };
   const goTo = (p, ...lpts) => { p.path = lpts.map(([lx, lz]) => FT.at(lx, lz)); };
   const carPos = (off) => { const [x, z, h] = routeAt(R, Math.max(0, Math.min(R.len, S.s + off))); return [x, z, h]; };
   const carLoc = c => FT.loc(c.g.position.x, c.g.position.z);   // the car's middle in the yard's own coordinates
@@ -3612,20 +3615,70 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
     else { tone(62, 88, 0, 1.1, 0.05 * v, 'triangle'); tone(124, 150, 0.05, 0.9, 0.02 * v, 'triangle'); }   // the engines
   }
   const door = (c, k, open) => { if (c.want[k] === (open ? 1 : 0)) return; c.want[k] = open ? 1 : 0; carSound(c, open ? 'open' : 'shut'); };
-  function upd(p, dt, speed = 1.3) {   // walk along the path; on the stairs she goes up
+  // On the stairs in front of Folketinget the height follows the slope of the steps. (Ida's ground there is many small
+  // round tops with gaps between them, so a guard walking off the middle sank into the steps.) Behind the door: the landing.
+  const stairY = (x, z) => { const [lx, lz] = FT.loc(x, z); if (Math.abs(lx) > 6.1 || lz > 5.7 || lz < -4) return null; return Math.min(1.2, Math.max(0, 1.1 - (lz - 3.2) / 2.25)); };   // through the middle of each step
+  function upd(p, dt) {   // walk along the path, or (a guard) keep a step behind the prime minister
     if (!p.on) return;
-    if (p.path.length) {
+    const x0 = p.x, z0 = p.z;
+    let tvx = 0, tvz = 0;   // the speed they want (m/s)
+    if (p.lead) {   // beside and a step behind her on the way she has walked, at her pace; in single file past Bente at the door
+      const L = p.lead, wide = Math.min(1, Math.max(0, (FT.loc(L.x, L.z)[1] - 2.0) / 1.4));
+      const [bx, bz, bd] = trailAt(L, p.off[1] + (p.off[2] - p.off[1]) * (1 - wide)), sd = p.off[0] * wide;
+      const ex = bx + Math.cos(bd) * sd - p.x, ez = bz - Math.sin(bd) * sd - p.z;
+      if (Math.hypot(ex, ez) > 0.06) { tvx = L.vx + ex * 1.6; tvz = L.vz + ez * 1.6; }
+      const m = Math.hypot(tvx, tvz); if (m > 2) { tvx *= 2 / m; tvz *= 2 / m; } else if (m < 0.1) tvx = tvz = 0;
+    } else if (p.path.length) {
       const [tx, tz] = p.path[0], dx = tx - p.x, dz = tz - p.z, d = Math.hypot(dx, dz);
-      if (d < 0.15) p.path.shift(); else { const st = Math.min(d, speed * dt); p.x += dx / d * st; p.z += dz / d * st; p.h += angDiff(Math.atan2(dx, dz), p.h) * Math.min(1, dt * 8); p.walkT += dt * 7; }
+      if (d < (p.path.length > 1 ? 0.45 : 0.08)) p.path.shift();   // round the corners a little
+      else {
+        let left = d; for (let i = 1; i < p.path.length; i++) left += Math.hypot(p.path[i][0] - p.path[i - 1][0], p.path[i][1] - p.path[i - 1][1]);
+        const want = Math.min(p.speed || 1.3, Math.sqrt(2 * 1.1 * left));   // slow down before the last point
+        tvx = dx / d * want; tvz = dz / d * want;
+      }
     }
-    const moving = p.path.length > 0, k = moving ? 1 : 0;
-    p.legs[0].rotation.x = Math.sin(p.walkT) * 0.5 * k; p.legs[1].rotation.x = -Math.sin(p.walkT) * 0.5 * k;
-    p.arms[0].rotation.x = -Math.sin(p.walkT) * 0.4 * k;
-    if (p.wave > 0) { p.wave -= dt; p.arms[1].rotation.z = 2.6 + Math.sin(clockT * 12) * 0.35; p.arms[1].rotation.x = 0; } else { p.arms[1].rotation.z = 0; p.arms[1].rotation.x = Math.sin(p.walkT) * 0.4 * k; }
-    p.y += (groundAt(p.x, p.z, p.y + 0.6) - p.y) * Math.min(1, dt * 12);
+    const a = Math.min(1, dt * 4); p.vx += (tvx - p.vx) * a; p.vz += (tvz - p.vz) * a;   // start and stop gently
+    if (!p.lead && !p.path.length && Math.hypot(p.vx, p.vz) < 0.05) p.vx = p.vz = 0;
+    p.x += p.vx * dt; p.z += p.vz * dt;
+    const sp = Math.hypot(p.vx, p.vz);
+    if (sp > 0.2) p.dir = Math.atan2(p.vx, p.vz);   // the way they walk (the guards follow this, not the way she looks)
+    const face = sp > 0.25 ? p.dir : p.look ?? (p.lead ? p.lead.dir : p.h);
+    p.h += angDiff(face, p.h) * Math.min(1, dt * (sp > 0.25 ? 6 : 3.5));
+    const y0 = p.y, gy = stairY(p.x, p.z) ?? groundAt(p.x, p.z, p.y + 0.6);
+    p.y += (gy - p.y) * Math.min(1, dt * 10);
+    p.climb += (Math.min(1, Math.max(0, (p.y - y0) / Math.max(dt, 1e-3) / 0.45)) - p.climb) * Math.min(1, dt * 6);
+    // legs: steps of about 0.7 m, so the feet do not slide; knees bend as a leg swings forward, and more on the stairs
+    p.walkT += Math.hypot(p.x - x0, p.z - z0) * 4.4;
+    p.k += ((sp > 0.12 ? Math.min(1, sp / 0.9) : 0) - p.k) * Math.min(1, dt * 6);
+    const k = p.k, ph = p.walkT, cl = p.climb, s0 = Math.sin(ph) * (0.42 + 0.12 * cl) * k;
+    p.legs[0].hip.rotation.x = s0 - 0.18 * cl * k; p.legs[1].hip.rotation.x = -s0 - 0.18 * cl * k;
+    p.legs[0].knee.rotation.x = (Math.max(0, Math.sin(ph - Math.PI / 2)) * (0.6 + 0.7 * cl) + 0.06) * k;
+    p.legs[1].knee.rotation.x = (Math.max(0, Math.sin(ph + Math.PI / 2)) * (0.6 + 0.7 * cl) + 0.06) * k;
+    const as = Math.sin(ph) * p.swing * k;
+    p.arms[0].rotation.x = -as;
+    if (p.wave > 0) { p.wave -= dt; p.arms[1].rotation.z = 2.6 + Math.sin(clockT * 12) * 0.35; p.arms[1].rotation.x = 0; } else { p.arms[1].rotation.z = p.arm1z; p.arms[1].rotation.x = as; }
+    p.body.position.y = Math.abs(Math.sin(ph)) * 0.03 * k;
+    if (p !== PM) p.head.rotation.y = Math.sin(clockT * 0.7 + p.phase) * (0.12 + 0.45 * (1 - k));   // the guards look around, most when they stand still
     p.g.position.set(p.x, p.y, p.z); p.g.rotation.y = p.h;
+    if (p.trail) { const e = p.trail[p.trail.length - 1], d = Math.hypot(p.x - e[0], p.z - e[1]); if (d > 0.1) p.trail.push([p.x, p.z, e[2] + d]); }   // where she has walked
   }
-  const lookAtKid = p => { p.h = Math.atan2(P.pos.x - p.x, P.pos.z - p.z); };
+  function trailAt(L, back) {   // the point [x, z, heading] on her trail, back metres behind her
+    const t = L.trail, e = t[t.length - 1], s = e[2] + Math.hypot(L.x - e[0], L.z - e[1]) - back;
+    let b = [L.x, L.z, s + back];
+    for (let i = t.length - 1; i >= 0; i--) {
+      const a = t[i];
+      if (a[2] <= s || i === 0) { const l = b[2] - a[2], f = l > 1e-4 ? (s - a[2]) / l : 0, d = l > 1e-4 ? Math.atan2(b[0] - a[0], b[1] - a[1]) : L.dir; return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, d]; }
+      b = a;
+    }
+  }
+  // a direction in the yard (lx along the facade, lz out from it) as a heading
+  const yardDir = (lx, lz) => Math.atan2(FT.u[0] * lx + FT.n[0] * lz, FT.u[1] * lx + FT.n[1] * lz);
+  const follow = (g, back, file) => {   // a guard falls in a step behind her on the side he is on (file: his place in single file)
+    const [bx, bz, bd] = trailAt(PM, back), lat = (g.x - bx) * Math.cos(bd) - (g.z - bz) * Math.sin(bd);
+    Object.assign(g, { lead: PM, off: [Math.sign(lat || 1) * 0.8, back, file], look: null, path: [] });
+  };
+  const hide = p => { Object.assign(p, { on: false, lead: null, path: [], vx: 0, vz: 0 }); p.g.visible = false; };
+  const depthOf = p => FT.loc(p.x, p.z)[1];   // how far out from the facade
   HOOKS.frame.push((dt, t) => {
     const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && !AAR_ON && Math.hypot(P.pos.x - ex, P.pos.z - ez) < 45;
     if (S.phase === 'idle') {
@@ -3657,31 +3710,48 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
       }
     });
     if (S.phase === 'stop') {
-      S.t += dt; const T = S.t, [C0, C1, C2] = FT_CARS, l0 = carLoc(C0), l1 = carLoc(C1), l2 = carLoc(C2);
+      S.t += dt; const T = S.t, [C0, C1, C2] = FT_CARS, l0 = carLoc(C0), l1 = carLoc(C1), l2 = carLoc(C2), [G0, G1, G2] = GUARDS, E = S.ev;
       // In the yard's own coordinates the cars point toward -x, and their right-hand doors face the stairs (-z).
       // The front door is around x - 0.3, the back door around x + 0.6, and the side of the car is at z - 0.93.
+      // Two guards get out of the first and the last car and stand on each side of her door, looking out over the yard.
+      // The third gets out of her car and opens her door. She walks to the foot of the stairs (and waves to Ida if Ida is
+      // close), the two guards fall in a step behind her, and the three go up and in together. The third keeps watch at
+      // the foot of the stairs and gets back into the car when they are inside. Then the cars drive off.
       once('d0', T, 0.3, () => { door(C0, 0, true); door(C2, 0, true); });
       once('g01', T, 0.75, () => {
-        spawn(GUARDS[0], l0[0] - 0.3, l0[1] - 0.7); goTo(GUARDS[0], [l0[0] - 0.3, l0[1] - 2.1], [Math.sign(l0[0]) * 3, 6.4]);
-        spawn(GUARDS[1], l2[0] - 0.3, l2[1] - 0.7); goTo(GUARDS[1], [l2[0] - 0.3, l2[1] - 2.1], [Math.sign(l2[0]) * 3, 6.4]);
+        spawn(G0, l0[0] - 0.3, l0[1] - 0.7); goTo(G0, [l0[0] - 0.3, l0[1] - 1.9], [l1[0] - 1.8, l1[1] - 2.9]); G0.look = yardDir(-1, 0.5);
+        spawn(G1, l2[0] - 0.3, l2[1] - 0.7); goTo(G1, [l2[0] - 0.3, l2[1] - 1.9], [l1[0] + 2.7, l1[1] - 2.6]); G1.look = yardDir(1, 0.5);
       });
       once('d1', T, 1.05, () => door(C1, 0, true));
-      once('g2', T, 1.4, () => { spawn(GUARDS[2], l1[0] - 0.3, l1[1] - 0.7); goTo(GUARDS[2], [l1[0] - 0.3, l1[1] - 2.1], [l1[0] + 1.4, l1[1] - 1.8]); });
+      once('g2', T, 1.4, () => { spawn(G2, l1[0] - 0.3, l1[1] - 0.7); goTo(G2, [l1[0] - 0.3, l1[1] - 2.0], [l1[0] + 1.5, l1[1] - 1.75]); G2.look = yardDir(-1, -0.2); });
       once('c02', T, 2.0, () => { door(C0, 0, false); door(C2, 0, false); });
       once('c1', T, 2.6, () => { door(C1, 0, false); door(C1, 1, true); });   // the guard shuts his own door and opens hers
       once('pm', T, 3.0, () => {
-        spawn(PM, l1[0] + 0.6, l1[1] - 0.6); goTo(PM, [l1[0] + 0.75, l1[1] - 2.2], [0, 6.2]);
+        spawn(PM, l1[0] + 0.6, l1[1] - 0.6); PM.speed = 1.2; goTo(PM, [l1[0] + 0.75, l1[1] - 2.2], [0, 7.0], [0, 6.1]);
         const close = Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16;
         toast(close ? 'Statsministeren stiger ud og går op ad trappen.' : 'Statsministeren er ankommet til Folketinget.');
       });
-      once('c1b', T, 4.4, () => { door(C1, 1, false); goTo(GUARDS[2], [0.9, 6.8]); });
-      if (T > 5.2 && !S.waved) { S.waved = true; if (Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16) { lookAtKid(PM); PM.wave = 2; } }   // she waves to the girl if she is close
-      if (T > 7.2 && PM.on && !PM.path.length && PM.y < 0.5) { goTo(PM, [0, 3.0], [0, 0.9]); goTo(GUARDS[2], [0.9, 3.4], [0.6, 1.6]); goTo(GUARDS[0], [-1.2, 4.0], [-1.0, 2.0]); goTo(GUARDS[1], [1.6, 4.4], [1.4, 2.2]); }
-      // The public game entrance stays open throughout the motorcade scene.
-      if (PM.on && FT.loc(PM.x, PM.z)[1] < 1.2 && T > 7.7) { PM.on = false; PM.g.visible = false; }
-      if (!PM.on && T > 9.7) for (const [i, gd] of GUARDS.entries()) if (gd.on && !gd.path.length) { goTo(gd, [0, 0.9]); gd.inside = true; }
-      for (const gd of GUARDS) if (gd.on && gd.inside && FT.loc(gd.x, gd.z)[1] < 1.2) { gd.on = false; gd.inside = false; gd.g.visible = false; }
-      if (T > 9.7 && !PM.on && GUARDS.every(gd => !gd.on)) { S.phase = 'out'; S.t = 0; }
+      once('c1b', T, 4.4, () => { door(C1, 1, false); G2.look = yardDir(-0.6, -1); });   // he shuts her door and watches her go
+      if (PM.on && !E.foot && T > 3.5 && !PM.path.length) {   // at the foot of the stairs
+        E.foot = T; follow(G0, 1.15, 1.05); follow(G1, 1.15, 2.0);
+        if (Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16) { PM.look = Math.atan2(P.pos.x - PM.x, P.pos.z - PM.z); PM.wave = 2.2; E.go = T + 2.8; }   // she turns and waves to Ida
+        else E.go = T + 1.2;
+      }
+      once('op', T, E.go ?? 1e9, () => { PM.look = null; goTo(PM, [0.85, 3.4], [0.85, 1.8], [0.45, 0.3], [0.3, -3.4]);   // past Bente in the door
+        goTo(G2, [2.3, 6.5]); G2.look = yardDir(0.3, 1); });
+      // through the open door: they go out of sight just behind the doorway (the dark opening hides them)
+      if (E.op && PM.g.visible && depthOf(PM) < 0) PM.g.visible = false;
+      for (const gd of [G0, G1]) if (gd.on && gd.lead && depthOf(gd) < 0) hide(gd);
+      if (PM.on && !PM.g.visible && !G0.on && !G1.on) hide(PM);
+      if (E.op && !PM.on && !E.back) { E.back = T; goTo(G2, [l1[0] - 0.3, l1[1] - 2.0]); }
+      if (E.back && !E.aaben && T > E.back + 0.5 && !G2.path.length) { E.aaben = T; door(C1, 0, true); }
+      if (E.aaben && !E.ind && T > E.aaben + 0.5) { E.ind = T; goTo(G2, [l1[0] - 0.3, l1[1] - 0.55]); }
+      if (E.ind && G2.on && T > E.ind + 0.3 && !G2.path.length) { hide(G2); door(C1, 0, false); E.lukket = T; }
+      if (E.lukket && T > E.lukket + 0.8) { S.phase = 'out'; S.t = 0; }
+      if (S.phase === 'stop' && T > 45) {   // never wait for ever, if something got stuck
+        for (const p of [PM, ...GUARDS]) if (p.on) hide(p);
+        FT_CARS.forEach(c => { c.want = [0, 0]; }); S.phase = 'out'; S.t = 0;
+      }
     }
     for (const p of [PM, ...GUARDS]) upd(p, dt);
   });
@@ -4101,8 +4171,12 @@ function resolveQuays(p,ox,oz) {
   }
 }
 let splashT = 0, lastStep = 0;
+// Running. Shift runs at once (computer). On the phone, holding the left thumb all the way out for a moment makes her
+// start to run; she slows to a walk when the thumb comes back in or lets go. k: how much she runs (0 to 1), vis: the
+// same smoothed from her real speed, for the body.
+const RUN = { hold: 0, k: 0, vis: 0, AFTER: 0.8 };
 function updPlayer(dt) {
-  for (const h of HOOKS.ride) if (h(dt)) return;
+  for (const h of HOOKS.ride) if (h(dt)) { RUN.hold = RUN.k = RUN.vis = 0; kid.g.rotation.x = 0; return; }
   const ox = P.pos.x, oz = P.pos.z;
   let fwd = 0, turn = 0;
   if (!paused) {
@@ -4113,15 +4187,21 @@ function updPlayer(dt) {
     // Walking uses camera-relative analog input below.
   }
   fwd = Math.max(-1, Math.min(1, fwd)); turn = Math.max(-1, Math.min(1, turn)); turnIn = turn;
-  const run = keys.has('ShiftLeft') || keys.has('ShiftRight') || (joy.id !== null && -joy.y > 0.92);
-  const PM = P.mod || {};
-  let speed = (fwd > 0 ? (run ? 9.5 : 5.2) * fwd : 2.8 * fwd) * (PM.speed ?? 1);
-  P.face += turn * (run && fwd > 0 ? 2.0 : 2.5) * dt * (PM.turn ?? 1);
+  const shift = keys.has('ShiftLeft') || keys.has('ShiftRight'), joyLen = joy.id !== null ? Math.hypot(joy.x, joy.y) : 0;
+  const out = joyLen > (RUN.k > 0.3 ? 0.6 : 0.85);   // the thumb is (still) out near the edge of the ring
+  RUN.hold = !paused && out ? RUN.hold + dt : 0;
+  const runWant = !paused && ((shift && fwd > 0) || RUN.hold > RUN.AFTER) ? 1 : 0;
+  RUN.k += (runWant - RUN.k) * (1 - Math.exp(-dt * (runWant ? (shift ? 8 : 2.6) : 5)));
+  const runV = shift ? 9.5 : FX.interior?.on ? 6.8 : 8.6;   // a little slower indoors when it comes from holding the thumb out
+  (RUN.knob ||= $('knob')).classList.toggle('run', RUN.k > 0.5);   // the knob turns orange while she runs
+  const PM = P.mod || {}, walkV = 5.2 + (runV - 5.2) * RUN.k;
+  let speed = (fwd > 0 ? walkV * fwd : 2.8 * fwd) * (PM.speed ?? 1);
+  P.face += turn * (fwd > 0 ? 2.5 - 0.5 * RUN.k : 2.5) * dt * (PM.turn ?? 1);
   let fx = Math.sin(P.face), fz = Math.cos(P.face);
-  if (!paused && joy.id !== null && Math.hypot(joy.x, joy.y) > 0) {
+  if (!paused && joy.id !== null && joyLen > 0) {
     followTouchCamera(dt);
     const v = touchWalk();
-    speed = 5.2 * Math.hypot(joy.x, joy.y) * (PM.speed ?? 1);
+    speed = walkV * joyLen * (PM.speed ?? 1);
     fx = v.x; fz = v.z;
     P.face += angDiff(Math.atan2(fx, fz), P.face) * (1 - Math.exp(-dt * 14));
   }
@@ -4151,21 +4231,25 @@ function updPlayer(dt) {
   const hs = Math.hypot(P.vel.x, P.vel.z);
   const k = Math.max(Math.min(1, hs / 5), hs < 0.6 ? Math.abs(turn) * 0.35 : 0);
   const back = (fx * P.vel.x + fz * P.vel.z) < -0.2 ? -1 : 1;
-  P.walkT += dt * (2.5 + hs * 1.5) * (k > 0.02 ? 1 : 0);
+  P.walkT += dt * (2.5 + Math.min(hs, 5.2) * 1.5 + Math.max(0, hs - 5.2) * 0.9) * (k > 0.02 ? 1 : 0);   // longer strides when she runs
   const step = Math.floor(P.walkT / Math.PI);
   if (!paused && P.onGround && hs > 1 && step !== lastStep) { lastStep = step; footstep(); }
   const ph = P.walkT * back;
   const L = kid.legs, A = kid.arms;
+  RUN.vis += (Math.min(1, Math.max(0, (hs - 5.6) / 2.6)) * (back > 0 ? 1 : 0) - RUN.vis) * Math.min(1, dt * 6);
+  const r = RUN.vis;   // running: she leans forward, bends her elbows, kicks her heels up and bounces more
   if (P.onGround) {
-    const s0 = Math.sin(ph) * 0.7 * k;
+    const s0 = Math.sin(ph) * (0.7 + 0.2 * r) * k;
     L[0].hip.rotation.x = s0; L[1].hip.rotation.x = -s0;
-    L[0].knee.rotation.x = Math.max(0, Math.sin(ph - Math.PI / 2)) * 1.05 * k;
-    L[1].knee.rotation.x = Math.max(0, Math.sin(ph + Math.PI / 2)) * 1.05 * k;
+    L[0].knee.rotation.x = Math.max(0, Math.sin(ph - Math.PI / 2)) * (1.05 + 0.55 * r) * k + 0.15 * r;
+    L[1].knee.rotation.x = Math.max(0, Math.sin(ph + Math.PI / 2)) * (1.05 + 0.55 * r) * k + 0.15 * r;
     A[0].rotation.x = -s0 * 0.9; A[1].rotation.x = s0 * 0.9; A[0].rotation.z = -0.12; A[1].rotation.z = 0.12;
-    kid.elbows.forEach((e, i) => { e.rotation.x = -0.18 - Math.max(0, -A[i].rotation.x) * 0.7 - 0.2 * k; });   // elbows bend more as the arm swings forward
-    kid.tail.rotation.x = 0.55 + 0.25 * k + Math.sin(ph * 2) * 0.1 * k; kid.tail.rotation.z = Math.sin(ph) * 0.18 * k + Math.sin(clockT * 1.1) * 0.03;   // the ponytail swings
-    kid.g.position.y = Math.abs(Math.sin(ph)) * 0.05 * k;
+    kid.elbows.forEach((e, i) => { e.rotation.x = -0.18 - Math.max(0, -A[i].rotation.x) * 0.7 - 0.2 * k - 0.95 * r; });   // elbows bend more as the arm swings forward
+    kid.tail.rotation.x = 0.55 + 0.25 * k + 0.3 * r + Math.sin(ph * 2) * 0.1 * k * (1 + r); kid.tail.rotation.z = Math.sin(ph) * 0.18 * k + Math.sin(clockT * 1.1) * 0.03;   // the ponytail swings
+    kid.g.position.y = Math.abs(Math.sin(ph)) * (0.05 + 0.06 * r) * k;
+    kid.g.rotation.x = 0.13 * r;
   } else {
+    kid.g.rotation.x = 0;
     L[0].hip.rotation.x = -0.6; L[1].hip.rotation.x = 0.25; L[0].knee.rotation.x = 0.95; L[1].knee.rotation.x = 0.45;
     A[0].rotation.z = -1.1; A[1].rotation.z = 1.1; A[0].rotation.x = 0; A[1].rotation.x = 0;
     for (const e of kid.elbows) e.rotation.x = -0.35;
@@ -8079,9 +8163,10 @@ const TIPS = (() => {
     spor: isTouch ? 'Ida har skrevet sit første spor i notesbogen. Tryk på Notesbog for at læse det. Til sidst skal du bruge sporene som bevis.' : 'Ida har skrevet sit første spor i notesbogen. Tryk N for at læse det. Til sidst skal du bruge sporene som bevis.',
     ting: isTouch ? 'Tingen ligger nu i rygsækken. Tryk på Rygsæk for at se den. Nogle ting kan Ida give til folk eller bruge et sted.' : 'Tingen ligger nu i rygsækken. Tryk R for at se den. Nogle ting kan Ida give til folk eller bruge et sted.',
     giv: 'Et emne med et billede betyder, at Ida kan give en ting eller vise et spor.',
+    loeb: 'Hold tommelen helt ude ved kanten et øjeblik, så begynder Ida at løbe.',
   };
   const koe = [];
-  let tilbage = 0, nu = null;
+  let tilbage = 0, nu = null, gaaet = 0;
   const set = id => tipsSet.includes(id);
   const marker = id => { if (!set(id)) { tipsSet.push(id); save(); } };
   function vis(id) { if (!TEKST[id] || set(id) || koe.includes(id)) return; koe.push(id); }
@@ -8092,6 +8177,10 @@ const TIPS = (() => {
   HOOKS.frame.push(dt => {
     if (!started) return;
     if (ACT.cur && !set('knap')) vis('knap');
+    if (isTouch && !set('loeb')) {   // on the phone: after a while of walking, say how to run (not needed once she has run)
+      if (RUN.k > 0.5) marker('loeb');
+      else if (joy.id !== null && Math.hypot(P.vel.x, P.vel.z) > 2.5 && (gaaet += dt) > 8) vis('loeb');
+    }
     if (card.hidden) {
       if (!koe.length || aabent()) return;
       const id = koe.shift(); if (set(id)) return;

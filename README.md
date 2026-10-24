@@ -22,7 +22,7 @@ Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsni
 
 ## Styring
 - Computer: W eller pil op for at gå, A og D eller pilene for at dreje, Shift for at løbe, mellemrum for at hoppe og E for at gå ind, undersøge eller bruge det, knappen viser. Træk med musen for at kigge. N åbner notesbogen, R rygsækken og M oversigtskortet.
-- Telefon: venstre tommel styrer, højre tommel kigger, og der er en hop-knap og en handlingsknap. Uret, notesbogen, rygsækken og kortet ligger som knapper øverst.
+- Telefon: venstre tommel styrer (hold den helt ude et øjeblik for at løbe), højre tommel kigger, og der er en hop-knap og en handlingsknap. Uret, notesbogen, rygsækken og kortet ligger som knapper øverst.
 - Tårnet: gå hen til Kongeporten, og vælg Gå ind i tårnet. Vælg derefter etage til restauranten eller Udsigten. Deroppe drejer pilene eller tommelen dig rundt, og mellemrum eller knappen Kikkert zoomer ind.
 
 ## Om spillet
@@ -35,7 +35,7 @@ Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsni
 Udarbejdet med AI (Claude) og med begrænset mennesketjek.
 
 ### Mobilstyring
-Træk med venstre tommel nederst til venstre for at gå i den ønskede retning på skærmen. Et lille træk giver langsom gang. Træk med højre tommel for at kigge dig omkring. Handlingsknappen nederst til højre viser, hvad du kan gøre tæt på. Inde i Folketinget kan du gå sidelæns, mens du kigger fremad. Båden bruger fortsat joysticket til fart og drejning.
+Træk med venstre tommel nederst til venstre for at gå i den ønskede retning på skærmen. Et lille træk giver langsom gang. Holder du tommelen helt ude ved kanten et øjeblik, begynder Ida at løbe, og knappen bliver orange. Hun går igen, når tommelen kommer længere ind, og stopper, når du slipper. Træk med højre tommel for at kigge dig omkring. Handlingsknappen nederst til højre viser, hvad du kan gøre tæt på. Inde i Folketinget kan du gå sidelæns, mens du kigger fremad. Båden bruger fortsat joysticket til fart og drejning.
 
 ### Første to siderum i Folketinget
 Betjentstuen er åben til højre ved foden af den indvendige trappe. Samtaleværelset har to åbne døre midt i Vandrehallen og har salonindretning med grønne vægge, mørke paneler og blå stole. Billedreferencer og forskellen mellem dokumenterede træk og anslået indretning står i `dev/INTERIOR.md`.
