@@ -5414,11 +5414,36 @@ const INTERIOR = (() => {
   }
   function rail(x1,z1,y1,x2,z2,y2) {
     const a=new THREE.Vector3(x1,y1+1.1,z1),b2=new THREE.Vector3(x2,y2+1.1,z2),v=b2.clone().sub(a);
-    const hand=new THREE.Mesh(new THREE.CylinderGeometry(.085,.085,v.length(),10),oak);hand.position.copy(a.clone().add(b2).multiplyScalar(.5));hand.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.clone().normalize());g.add(hand);
+    // A broad polished handrail over a darker underside and a continuous base rail.
+    // All pieces are merged by the existing material batching before rendering.
+    function beam(radius,offset,m){
+      const q=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,v.length(),12),m);
+      q.position.copy(a.clone().add(b2).multiplyScalar(.5));q.position.y+=offset;
+      q.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.clone().normalize());g.add(q);
+    }
+    beam(.102,0,oak);beam(.062,-.075,trim);beam(.07,-.96,trim);
     const n=Math.ceil(Math.hypot(x2-x1,z2-z1)/.36);
-    const profile=[[.045,0],[.07,.08],[.045,.18],[.065,.28],[.09,.43],[.045,.56],[.055,.78],[.07,.87],[.045,1.05]].map(p=>new THREE.Vector2(...p));
-    const baluster=new THREE.LatheGeometry(profile,8);
-    for(let i=0;i<=n;i++){const t=i/n;mesh(baluster,oak,x1+(x2-x1)*t,y1+(y2-y1)*t,z1+(z2-z1)*t,{parent:g});}
+    const profile=[[.045,.14],[.066,.18],[.066,.23],[.043,.28],[.052,.34],[.077,.43],[.077,.48],[.052,.57],[.037,.63],[.037,.79],[.059,.84],[.059,.9],[.04,.97],[.04,1.04]].map(p=>new THREE.Vector2(...p));
+    const baluster=new THREE.LatheGeometry(profile,12);
+    for(let i=0;i<=n;i++){
+      const t=i/n,x=x1+(x2-x1)*t,y=y1+(y2-y1)*t,z=z1+(z2-z1)*t;
+      mesh(baluster,oak,x,y,z,{parent:g});
+      b(.13,.065,.13,trim,x,y+.12,z);b(.11,.055,.11,trim,x,y+.95,z);
+    }
+  }
+
+  function stairNewel(x,z,y,w=.3){
+    b(w+.12,.15,w+.12,trim,x,y,z);
+    b(w,.92,w,oak,x,y+.15,z);
+    b(w+.045,.06,w+.045,trim,x,y+.25,z);
+    b(w+.07,.07,w+.07,trim,x,y+.96,z);
+    b(w+.14,.08,w+.14,oak,x,y+1.06,z);
+    mesh(new THREE.SphereGeometry(.105,12,8),oak,x,y+1.23,z,{parent:g});
+    // Recessed panels on the four post faces suggest carved joinery.
+    for(const side of [-1,1]){
+      b(w*.55,.48,.014,trim,x,y+.38,z+side*(w/2+.008));
+      b(.014,.48,w*.55,trim,x+side*(w/2+.008),y+.38,z);
+    }
   }
   function buildHallVaults() {
     // Barrel vault with a low elliptical rise, plus transverse white arches.
@@ -6266,13 +6291,18 @@ const INTERIOR = (() => {
     b(.35,8.3,3,plaster,4.4,3,20.4);openDoor(4.4,20.4,Math.PI/2,0,'Betjentstuen');
     b(.35,8.3,3,plaster,-4.4,3,20.4);openDoor(-4.4,20.4,-Math.PI/2,0,'Snapstinget');
     b(8.8,.25,18,plaster,0,11.3,14);b(8.8,11.3,.3,plaster,0,0,23);
-    const tread=material('#77756b');
+    const tread=material('#817d70',{roughness:.88}),riserShade=material('#625f55');
     for(const [start,base] of [[18.5,0],[12,2.4]])for(let i=0;i<14;i++) {
       const y=base+(i+1)*2.4/14,z=start-(i+.5)*4.5/14;
-      b(5.6,y,.325,stone,0,0,z);b(4.65,.025,.325,tread,0,y+.006,z);
-      b(5.65,.04,.055,stone,0,y-.025,z+.145);
+      b(5.6,y,.325,stone,0,0,z);b(5.16,.022,.325,tread,0,y+.004,z);
+      // A rounded-looking nosing, darker riser joint and restrained brass inset.
+      b(5.22,.035,.065,stone,0,y-.012,z+.145);
+      b(5.16,.018,.014,riserShade,0,y-.047,z+.166);
+      b(5.0,.006,.014,brass,0,y+.027,z+.109);
     }
-    b(5.6,2.4,2,stone,0,0,13);b(4.65,.025,2,tread,0,2.406,13);
+    b(5.6,2.4,2,stone,0,0,13);b(5.16,.022,2,tread,0,2.404,13);
+    for(const x of [-2.68,2.68])b(.12,.024,2,trim,x,2.404,13);
+    for(const z of [12.08,13.92])b(5.16,.006,.025,brass,0,2.428,z);
     b(8.4,.25,2.7,woodFloor,0,I.floor-.25,6.15);
     for(const side of [-1,1]) {
       b(1.0,.25,11.1,woodFloor,side*3.72,I.floor-.25,13);
@@ -6280,6 +6310,13 @@ const INTERIOR = (() => {
       rail(side*2.92,14,2.4,side*2.92,12,2.4);
       rail(side*2.92,12,2.4,side*2.92,7.5,4.8);
       rail(side*3.12,18.5,4.8,side*3.12,7.5,4.8);
+      for(const [z,y] of [[18.5,0],[14,2.4],[12,2.4]])stairNewel(side*2.92,z,y);
+      stairNewel(side*3.02,7.5,4.8,.4);
+      stairNewel(side*3.12,18.5,4.8);
+      // Layered skirts beneath the gallery and along the landing edge.
+      b(.12,.24,11.1,trim,side*3.23,I.floor-.24,13);
+      b(.17,.055,11.1,oak,side*3.23,I.floor-.04,13);
+      b(.14,.25,2,oak,side*2.82,2.15,13);
     }
     for(const z of [8.2,15.2])archFrame(0,z,0,0,8.4,7.7,.65);
     b(2.8,3.4,.18,oak,0,0,22.75);sign('Ud til Rigsdagsgården',3.7,.65,0,3.9,22.6,Math.PI);
