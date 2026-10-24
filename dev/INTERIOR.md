@@ -375,3 +375,14 @@ Trappens eksisterende to løb og repos er forfinet. Gelænderne har bredere rund
 Ændringen følger den eksisterende model og er en æstetisk fortolkning. Der er ikke foretaget en ny fotobaseret rekonstruktion. Ganggrænser, gulvhøjdeberegning, kollisioner, forbindelser og historiefunktioner er bevaret. De nye dele bruger den eksisterende samling af geometri efter materiale; der er ingen nye billedfiler eller realtidslys.
 
 Kontrol: hele spilmodulet består JavaScript-syntakskontrol. Interiørets build-funktion er kørt med three.js 0.160.0 og lokal 2D-canvas, med samme afgrænsninger som runde 15 (tomme hestegrupper og ingen browser-UI). Alle geometrikoordinater er endelige. Ti ruter med 251 kontrolpunkter hver består fits- og height-kontrollen: de fem tidligere adgangsruter, op og ned i begge sider af trappen samt på tværs af reposen. Niveauspring er under 18 cm. Den færdige 3D-gengivelse og mobilbetjening er ikke visuelt efterprøvet, da testbrowseren ved den forrige runde rapporterede manglende WebGL.
+
+
+## Runde 17: kamin og siddegruppe i Vandrehallen (24. oktober 2026)
+
+Kaminen ved Rigets midte har fået en fordybet åbning mellem separate sidepartier, profilerede stenkanter, en lagdelt hylde og en enkel, uoplyst ildkurv. Der er ikke tilføjet ild eller nye lyskilder. Uret har et buet træhus, messingramme og en rund urskive med tal og minutstreger. Viserne er faste og har samme position som før; det dekorative ur viser ikke historiens aktuelle spilletid.
+
+Den centrale siddegruppe har fire mere detaljerede lænestole med ben, hynder og armlæn, et rundt bord med drejet fod og tre lave fødder samt et originalt proceduretegnet tæppemønster. De to sidestole vender nu ind mod bordet. De øvrige siddegrupper og marmorsøjlerne er bevaret.
+
+Dette er en æstetisk fortolkning af den eksisterende model, uden nye påstande om det virkelige rums præcise indretning eller genstande. Der er ingen importerede kunstværker, referencefotos, nye spor eller handlinger. Kaminens, bordets og stolenes kollisionsrektangler er identiske med før ændringen. De nye geometrier bruger den eksisterende samling efter materiale; tæppe og urskive er egne canvas-teksturer.
+
+Kontrol: hele spilmodulet består JavaScript-syntakskontrol. Interiørets build-funktion er kørt før og efter med three.js 0.160.0 og lokal 2D-canvas, med samme afgrænsninger som runde 15 (tomme hestegrupper og ingen browser-UI). Alle geometrikoordinater er endelige, og de komplette kollisionslister er identiske. Tretten ruter med 251 kontrolpunkter hver består fits- og height-kontrollen, herunder passage foran siddegruppen og langs begge sider af kaminen samt de tidligere adgangs- og trapperuter. Den færdige 3D-gengivelse og mobilbetjening er ikke visuelt efterprøvet; testbrowseren rapporterede tidligere manglende WebGL.
