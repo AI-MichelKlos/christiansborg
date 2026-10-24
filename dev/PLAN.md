@@ -324,7 +324,12 @@ Michel: efter samtalen med Gry vidste man ikke, hvor man skulle hen, og det var 
   - Indenfor står rummets navn eller "Du er her". Målet har en gul ring på minikortet og på oversigtskortet (`FX.maal.punkt`).
   - Gry fortæller nu, at der ikke er nogen vej gennem slottet, og hvordan man går til Rigsdagsgården. Efter startscenen siger en besked, at målet står øverst til venstre.
   - `dev/tjek-mordgaade.js` tjekker, at alle hint har et mål og et kendt sted.
-- [ ] 2. Samtalerne: skjul emner, der ikke kan føre nogen vegne endnu (fx sadelkammeret i akt 1 og hesteskoene), vis tydeligt nye emner, og lad personerne sige, hvor man skal hen bagefter.
+- [x] 2. Tydeligere samtaler (24. okt. 2026)
+  - Samtalevinduet (`visEmner`): emner, Ida ikke har spurgt om, står øverst. Et emne, der er kommet til, siden hun sidst så personens liste, er mærket Nyt (`G.emneSet` husker, hvad hun har set). Emner, hun har spurgt om, ligger under "Spurgt før (n)" og kan læses igen. Er der ikke flere, står der "Ida har ikke flere spørgsmål til ... lige nu."
+  - Efter et svar står det nederst i svaret, hvis Ida fik et nyt spor eller en ting, og "Det skal Ida nu: ..." fra målet, hvis målet skiftede eller hun fik noget (`giv(list, stille)` giver nu en liste over det, hun fik, og viser ingen besked øverst, når samtalen er åben).
+  - Manuskriptet: Gry spørges først om sadelkammeret i akt 2 (Snapstinget med gulerødderne åbner kl. 7), og om hesteskoene først når det gamle sadelskab er låst (`flag:skab_laast`). Bente siger, hvor man skal hen: Vandrehallen fra døren, betjentstuen efter statsministeren, gangen i Rigsdagsgården til Bibliotekshaven og dørene ved kaminen til Samtaleværelset.
+  - Aktens kort har fået linjer om, hvem der er hvor (`hvor` i `AKTER`, akt 2 og 3). Notesbogen viser under hver person, hvor de er nu ("Er nu: Betjentstuen").
+  - Et mål i vand (dammen i Bibliotekshaven, kanalen) peger nu på det nærmeste tørre sted inden for 25 m, så pilen også følger vejen dertil.
 - [ ] 3. Begynderhjælp: en kort forklaring ved nyt spil af, hvad man skal (find morderen før kl. 10), og hvordan (spor i notesbogen, ting i rygsækken, giv og vis, afsløringen), og små tips første gang man finder et spor eller en ting.
 - [ ] 4. Ridebanen: i dag kommer man kun ud ved Marmorbroen og må gå rundt ad Tøjhusgade. Jeg har ikke fundet en port mellem Ridebanen og Rigsdagsgården i virkeligheden (Altinget nævner kun Tøjhusgade og Slotspladsen). Michel skal vælge: behold den rigtige vej, eller lav en genvej.
 

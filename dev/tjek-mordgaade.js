@@ -346,7 +346,7 @@ o(`## Akterne\n`);
 o(`| Akt | Navn | Tid | Begynder, når |\n| --- | --- | --- | --- |`);
 for (const a of M.akter) o(`| ${a.nr} | ${a.navn} | ${a.fra}-${a.til} | ${a.kraever.length ? condTxt(a.kraever) : 'Spillet starter'} |`);
 o('');
-for (const a of M.akter) o(`**Akt ${a.nr}, ${a.navn}.** ${a.intro}\n`);
+for (const a of M.akter) o(`**Akt ${a.nr}, ${a.navn}.** ${a.intro}${a.hvor ? ' ' + a.hvor.join(' ') : ''}\n`);
 const best = resultater[0].best;
 if (best) {
   o(`## Eksempel på en gennemspilning\n`);

@@ -39,6 +39,7 @@ const UR = {
   tekst: "Uret kan ikke løbe ud. Det står stille 5 minutter før aktens slut, til de vigtigste spor er fundet. Når en begivenhed har et klokkeslæt, springer uret frem til det, hvis det er bagud.",
 };
 
+// hvor: korte linjer på aktens kort om, hvem der er hvor (valgfri).
 const AKTER = [
   {
     nr: 1, navn: "Fundet", fra: "06.00", til: "07.00", kraever: [],
@@ -48,11 +49,22 @@ const AKTER = [
     nr: 2, navn: "De mistænkte", fra: "07.00", til: "08.30",
     kraever: ["spor:1", "spor:2", "spor:3", "spor:4", "spor:5", "spor:6", "flag:bente_beder"],
     intro: "Fem mennesker havde en grund til at ønske Aksel Mørkeberg væk. Tal med dem, og find ud af, hvem der lyver.",
+    hvor: [
+      "Snapstinget har åbnet. Kasper Lindved spiser morgenmad, og Bodil står ved kaffen.",
+      "Reformministeren holder morgenmøde med statsministeren i restauranten i tårnet.",
+      "Jonas Fenger er på Kompaspartiets kontor ved Vandrehallen.",
+      "Pernille Strandvig står blandt journalisterne på Slotspladsen.",
+    ],
   },
   {
     nr: 3, navn: "Ud på Slotsholmen", fra: "08.30", til: "09.30",
     kraever: ["spor:7", "spor:8", "spor:10", "spor:18", "flag:ditte_renset", "flag:jonas_renset"],
     intro: "Sporene fører ud af Folketinget: over kanalen, ind i ministerierne og ned til vandet.",
+    hvor: [
+      "Reformministeriet over kanalen har åbnet, og hoffet dækker op i Riddersalen.",
+      "Mogens Brask sætter pressemødet op i Landstingssalen.",
+      "Svend står på Højbro med sit kamera, og Gry er i staldene.",
+    ],
   },
   {
     nr: 4, navn: "Afsløringen", fra: "09.30", til: "10.00",
@@ -244,6 +256,7 @@ const PERSONER = {
       { id: "briller", spoerg: "Kan vi se adgangsloggen?", kraever: ["!flag:briller_givet"], giver: ["flag:briller_hint"], replikker: [
         ["bente", "Det kan vi, hvis jeg kan se tasterne. Mine læsebriller er væk."],
         ["bente", "Jeg havde dem på min runde i nat. Jeg satte mig vist et øjeblik ude i Bibliotekshaven. Mine knæ er ikke, hvad de har været."],
+        ["bente", "Gå gennem den lille gang i Rigsdagsgården, så kommer du lige ned i haven."],
       ] },
       { id: "giv_briller", spoerg: "Giv Bente brillerne", kraever: ["ting:briller"], giver: ["-ting:briller", "flag:briller_givet", "spor:3"], replikker: [
         ["ida", "Jeg fandt dem på bænken ved Kierkegaard."],
@@ -257,6 +270,7 @@ const PERSONER = {
         ["bente", "Vent. Kl. halv to bad Aksel mig låse Samtaleværelset op. Han skulle mødes kl. 2 med »en fra den anden side af kanalen«, sagde han og blinkede."],
         ["bente", "Kl. 3 låste jeg igen, som jeg plejer. Aksel sad i sofaen ved Rigets midte. Jeg troede, han sov."],
         ["bente", "Her er nøglen. Jeg kiggede aldrig derind. Det var mørkt, og jeg var træt."],
+        ["bente", "Dørene til Samtaleværelset er ved Rigets midte, på hver side af kaminen."],
       ] },
       { id: "runden", spoerg: "Hvordan gik din runde i nat?", kraever: ["flag:briller_givet"], giver: ["spor:19"], replikker: [
         ["bente", "Kl. 02.25 gik jeg gennem Rigsdagsgården med lommelygten. Gruset knasede i gangen ned mod Bibliotekshaven."],
@@ -361,11 +375,11 @@ const PERSONER = {
         ["gry", "Vi trækker dem ud, før byen vågner. Så får de ro, og vi får ro."],
         ["gry", "Vega er den store hvide. Hun er sød, men hun flytter sig ikke for nogen uden en gulerod. Køkkenet i Snapstinget plejer at sende nogle over."],
       ] },
-      { id: "sadelkammeret", spoerg: "Kan jeg komme ind i sadelkammeret?", kraever: ["flag:sadelkammer_hint", "!flag:hesten_flyttet"], giver: ["flag:vega_hint"], replikker: [
+      { id: "sadelkammeret", spoerg: "Kan jeg komme ind i sadelkammeret?", kraever: ["akt>=2", "flag:sadelkammer_hint", "!flag:hesten_flyttet"], giver: ["flag:vega_hint"], replikker: [
         ["gry", "Hvis du kan få Vega væk fra døren. Hun har stillet sig der i nat og vil ikke flytte sig."],
         ["gry", "Prøv med en gulerod. Bodil i Snapstinget har altid nogle."],
       ] },
-      { id: "hestesko", spoerg: "Hvad er det for hestesko over porten?", kraever: ["lag1942"], giver: ["flag:hestesko_hint"], replikker: [
+      { id: "hestesko", spoerg: "Hvad er det for hestesko over porten?", kraever: ["lag1942", "flag:skab_laast"], giver: ["flag:hestesko_hint"], replikker: [
         ["gry", "De har hængt der siden Christian 10.s tid. Under krigen red han gennem byen hver morgen."],
         ["gry", "Man siger, han gemte noget bag en af dem. Men ingen tør pille ved dem."],
       ] },
@@ -900,6 +914,7 @@ const BEGIVENHEDER = [
     ["bente", "Ida? Du kommer på en dårlig dag."],
     ["bente", "Aksel Mørkeberg er død. Rengøringen fandt ham for tyve minutter siden i sofaen ved Rigets midte. Politiet er på vej."],
     ["bente", "Kom indenfor. Men rør ikke ved noget."],
+    ["bente", "Han sidder oppe i Vandrehallen. Trappen er lige herinde."],
   ] },
   { id: "kommissaeren", titel: "Kommissæren kommer", kl: "06.20", naar: ["spor:1"], giver: ["flag:kommissaer_kommet"], replikker: [
     ["fortaeller", "En mand i våd trenchcoat kommer op ad trappen med en kaffe i papkrus."],
@@ -917,6 +932,7 @@ const BEGIVENHEDER = [
     ["fortaeller", "Hun går igen. Bente trækker Ida til side."],
     ["bente", "Kasper er en klovn, men han er ikke en morder. Jeg har kendt ham, siden han var praktikant."],
     ["bente", "Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10."],
+    ["bente", "Jeg sidder i betjentstuen til højre for indgangen. Kom ned til mig, så kigger vi på nattens adgangslog."],
   ] },
   { id: "valdorf_kommer", titel: "Departementschefen", kl: "07.30", naar: ["akt>=2", "spor:7|spor:8|spor:10|spor:18"], giver: ["flag:valdorf_her"], replikker: [
     ["fortaeller", "En mand i gråt jakkesæt kommer op ad trappen med en mappe under armen. Han nikker venligt til alle."],

@@ -9,10 +9,10 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 ## Tjek af logikken
 
 - Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 63 skridt.
-- Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 75 skridt.
+- Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 76 skridt.
 - Fejl: ingen. Advarsler: ingen.
 - Steder, der skal bygges: .
-- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 297.
+- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 301.
 
 ## Start
 
@@ -35,9 +35,9 @@ Uret kan ikke løbe ud. Det står stille 5 minutter før aktens slut, til de vig
 
 **Akt 1, Fundet.** En politiker er fundet død i Vandrehallen. Find ud af, hvad der skete i nat.
 
-**Akt 2, De mistænkte.** Fem mennesker havde en grund til at ønske Aksel Mørkeberg væk. Tal med dem, og find ud af, hvem der lyver.
+**Akt 2, De mistænkte.** Fem mennesker havde en grund til at ønske Aksel Mørkeberg væk. Tal med dem, og find ud af, hvem der lyver. Snapstinget har åbnet. Kasper Lindved spiser morgenmad, og Bodil står ved kaffen. Reformministeren holder morgenmøde med statsministeren i restauranten i tårnet. Jonas Fenger er på Kompaspartiets kontor ved Vandrehallen. Pernille Strandvig står blandt journalisterne på Slotspladsen.
 
-**Akt 3, Ud på Slotsholmen.** Sporene fører ud af Folketinget: over kanalen, ind i ministerierne og ned til vandet.
+**Akt 3, Ud på Slotsholmen.** Sporene fører ud af Folketinget: over kanalen, ind i ministerierne og ned til vandet. Reformministeriet over kanalen har åbnet, og hoffet dækker op i Riddersalen. Mogens Brask sætter pressemødet op i Landstingssalen. Svend står på Højbro med sit kamera, og Gry er i staldene.
 
 **Akt 4, Afsløringen.** Om en halv time begynder pressemødet. Kommissæren vil sige, at Kasper Lindved er anholdt.
 
@@ -45,63 +45,63 @@ Uret kan ikke løbe ud. Det står stille 5 minutter før aktens slut, til de vig
 
 Den korteste af de tilfældige gennemspilninger uden 1942-laget. Den kan bruges, når spillet skal testes.
 
-1. Gry Strigle: Godmorgen
-2. Begivenhed: moede_bente
-3. Bente Holmsgaard: Fortæl om huset
-4. Bente Holmsgaard: Kan vi se adgangsloggen?
-5. Vandrehallen og Rigets midte: Se på Mørkeberg
-6. Begivenhed: kommissaeren
-7. Begivenhed: statsministeren
-8. De Kongelige Stalde: Gå hen til sadelkammeret
-9. Proviantpassagen: Se i vandpytten ved døren
-10. Kompaspartiets mødelokale: Se på bordet i mødelokalet
-11. Kajen ved Reformministeriet: Se på båden
-12. Kompaspartiets sekretariat: Se på kopimaskinens låg
-13. Bibliotekshaven: Se på bænken ved Kierkegaard
-14. Vandrehallen og Rigets midte: Se på bordet ved sofaen
-15. Vandrehallen og Rigets midte: Se grundlovene
+1. Begivenhed: moede_bente
+2. Bibliotekshaven: Se på gruset
+3. Vandrehallen og Rigets midte: Se på Mørkeberg
+4. Begivenhed: kommissaeren
+5. Begivenhed: statsministeren
+6. Kompaspartiets mødelokale: Se på bordet i mødelokalet
+7. Gry Strigle: Så du nogen i nat?
+8. Vandrehallen og Rigets midte: Se grundlovene
+9. Gry Strigle: Fortæl om hestene
+10. Bibliotekshaven: Se på bænken ved Kierkegaard
+11. Bente Holmsgaard: Fortæl om huset
+12. Bente Holmsgaard: Giv Bente brillerne
+13. Kajen ved Reformministeriet: Se på båden
+14. Bente Holmsgaard: Hvad skete der omkring kl. 2?
+15. De Kongelige Stalde: Gå hen til sadelkammeret
 16. Vandrehallen og Rigets midte: Lys under sofaen
-17. Kompaspartiets sekretariat: Se på kopimaskinens skærm
-18. Vandrehallen og Rigets midte: Gnid blyanten over notesbogen
-19. Bente Holmsgaard: Giv Bente brillerne
-20. Gry Strigle: Kan jeg komme ind i sadelkammeret?
-21. Bente Holmsgaard: Hvordan gik din runde i nat?
-22. Bente Holmsgaard: Hvad skete der omkring kl. 2?
-23. Samtaleværelset: Undersøg rummet
-24. Akt 2 begynder: De mistænkte
-25. Begivenhed: valdorf_kommer
-26. Udsigten: Kig gennem kikkerten
-27. Mogens Brask: Var De på arbejde i nat?
-28. Pernille Strandvig: Hvor var du i nat?
-29. Bibliotekshaven: Se på gruset
-30. Pernille Strandvig: Er pressekort 17 dit?
-31. Jonas Fenger: Giv ham telefonen fra mødelokalet
-32. Bodil Kryddal: Fyldte du Mørkebergs termokande i går?
-33. Henrik Valdorf: De ser ud til at være meget ude i vejret
-34. Ditte Rosenvinge: Giv hende 50.000-rapporten
-35. Akt 3 begynder: Ud på Slotsholmen
-36. Begivenhed: retsmed
-37. Ditte Rosenvinge: Vis hende koppen med læbestift
-38. Begivenhed: springvandet
-39. Svend Lysholt: Hvad fotograferer De?
-40. Bibliotekshaven: Saml papirerne op ved kanten
-41. Reformministeriets sidedør: Se på sidedøren
-42. Kasper Lindved: Vis ham kopimaskinens log
-43. Finansministeriets forhandlingsrum: Læs referatet
-44. Bodil Kryddal: Har du gulerødder til staldene?
-45. Reformministeriets printerområde: Se på printerens log
-46. Finansministeriets garderobe: Se på knagerne
-47. Mogens Brask: Holder tallene?
+17. Proviantpassagen: Se i vandpytten ved døren
+18. Bente Holmsgaard: Hvordan gik din runde i nat?
+19. Samtaleværelset: Undersøg rummet
+20. Vandrehallen og Rigets midte: Se på bordet ved sofaen
+21. Kompaspartiets sekretariat: Se på kopimaskinens låg
+22. Vandrehallen og Rigets midte: Gnid blyanten over notesbogen
+23. Akt 2 begynder: De mistænkte
+24. Udsigten: Kig gennem kikkerten
+25. Ditte Rosenvinge: Giv hende 50.000-rapporten
+26. Kasper Lindved: Vis ham kortet fra vandpytten
+27. Ditte Rosenvinge: Hvad lavede Deres departementschef i nat?
+28. Svend Lysholt: Hvad fotograferer De?
+29. Bodil Kryddal: Fyldte du Mørkebergs termokande i går?
+30. Begivenhed: valdorf_kommer
+31. Bodil Kryddal: Har du gulerødder til staldene?
+32. Jonas Fenger: Giv ham telefonen fra mødelokalet
+33. Mogens Brask: Holder tallene?
+34. Finansministeriets garderobe: Se på knagerne
+35. Pernille Strandvig: Er pressekort 17 dit?
+36. De Kongelige Stalde: Giv Vega en gulerod
+37. Finansministeriets forhandlingsrum: Læs referatet
+38. Sadelkammeret: Åbn det gamle sadelskab
+39. Ditte Rosenvinge: Vis hende koppen med læbestift
+40. Henrik Valdorf: De ser ud til at være meget ude i vejret
+41. Henrik Valdorf: Hvad tænkte De om Mørkeberg?
+42. Kompaspartiets sekretariat: Se på kopimaskinens skærm
+43. Akt 3 begynder: Ud på Slotsholmen
+44. Begivenhed: retsmed
+45. Begivenhed: springvandet
+46. Kasper Lindved: Vis ham kopimaskinens log
+47. Viggo Aagaard: Hvad ligger der i etuiet?
 48. Riddersalen: Se på gobelinerne
-49. Viggo Aagaard: Hvad ligger der i etuiet?
-50. Jonas Fenger: Hvad skændtes du og Mørkeberg om kl. 23.50?
-51. Viggo Aagaard: Lån Elefantordenen
-52. De Kongelige Stalde: Giv Vega en gulerod
-53. Sadelkammeret: Åbn det gamle sadelskab
-54. Mogens Brask: Vis ham Elefantordenen
-55. Departementschefens kontor: Se dig om på kontoret
-56. Viggo Aagaard: Læg Elefantordenen tilbage
-57. Departementschefens kontor: Se i jakkens lommer
+49. Reformministeriets sidedør: Se på sidedøren
+50. Viggo Aagaard: Lån Elefantordenen
+51. Jonas Fenger: Hvad skændtes du og Mørkeberg om kl. 23.50?
+52. Mogens Brask: Vis ham Elefantordenen
+53. Bibliotekshaven: Saml papirerne op ved kanten
+54. Departementschefens kontor: Se dig om på kontoret
+55. Reformministeriets printerområde: Se på printerens log
+56. Departementschefens kontor: Se i jakkens lommer
+57. Viggo Aagaard: Læg Elefantordenen tilbage
 58. Kajen ved Reformministeriet: Sejl med båden
 59. Kanalen ved den gamle fortøjningspæl: Kig ned i vandet ved fortøjningspælen
 60. Akt 4 begynder: Afsløringen
@@ -129,7 +129,8 @@ I notesbogen: Folketingsbetjent på nattevagt gennem 31 år. Hendes farfar var b
 <small>Kræver: endnu ikke »briller givet«. Giver: »briller hint«.</small>
 
 **Bente:** Det kan vi, hvis jeg kan se tasterne. Mine læsebriller er væk.  
-**Bente:** Jeg havde dem på min runde i nat. Jeg satte mig vist et øjeblik ude i Bibliotekshaven. Mine knæ er ikke, hvad de har været.
+**Bente:** Jeg havde dem på min runde i nat. Jeg satte mig vist et øjeblik ude i Bibliotekshaven. Mine knæ er ikke, hvad de har været.  
+**Bente:** Gå gennem den lille gang i Rigsdagsgården, så kommer du lige ned i haven.
 
 #### Giv Bente brillerne
 
@@ -148,7 +149,8 @@ I notesbogen: Folketingsbetjent på nattevagt gennem 31 år. Hendes farfar var b
 
 **Bente:** Vent. Kl. halv to bad Aksel mig låse Samtaleværelset op. Han skulle mødes kl. 2 med »en fra den anden side af kanalen«, sagde han og blinkede.  
 **Bente:** Kl. 3 låste jeg igen, som jeg plejer. Aksel sad i sofaen ved Rigets midte. Jeg troede, han sov.  
-**Bente:** Her er nøglen. Jeg kiggede aldrig derind. Det var mørkt, og jeg var træt.
+**Bente:** Her er nøglen. Jeg kiggede aldrig derind. Det var mørkt, og jeg var træt.  
+**Bente:** Dørene til Samtaleværelset er ved Rigets midte, på hver side af kaminen.
 
 #### Hvordan gik din runde i nat?
 
@@ -278,14 +280,14 @@ I notesbogen: Beridder med nattevagt i staldene. Talte med Mørkeberg ved midnat
 
 #### Kan jeg komme ind i sadelkammeret?
 
-<small>Kræver: »sadelkammer hint«, endnu ikke »hesten flyttet«. Giver: »vega hint«.</small>
+<small>Kræver: akt 2 eller senere, »sadelkammer hint«, endnu ikke »hesten flyttet«. Giver: »vega hint«.</small>
 
 **Gry:** Hvis du kan få Vega væk fra døren. Hun har stillet sig der i nat og vil ikke flytte sig.  
 **Gry:** Prøv med en gulerod. Bodil i Snapstinget har altid nogle.
 
 #### Hvad er det for hestesko over porten?
 
-<small>Kræver: 1942-laget er slået til. Giver: »hestesko hint«.</small>
+<small>Kræver: 1942-laget er slået til, »skab låst«. Giver: »hestesko hint«.</small>
 
 **Gry:** De har hængt der siden Christian 10.s tid. Under krigen red han gennem byen hver morgen.  
 **Gry:** Man siger, han gemte noget bag en af dem. Men ingen tør pille ved dem.
@@ -1150,7 +1152,8 @@ I spillet: ude: Ridebanen (bygget).
 *Bente står i døren til Folketinget. Hun er bleg og holder om en kop kaffe, hun har glemt at drikke.*  
 **Bente:** Ida? Du kommer på en dårlig dag.  
 **Bente:** Aksel Mørkeberg er død. Rengøringen fandt ham for tyve minutter siden i sofaen ved Rigets midte. Politiet er på vej.  
-**Bente:** Kom indenfor. Men rør ikke ved noget.
+**Bente:** Kom indenfor. Men rør ikke ved noget.  
+**Bente:** Han sidder oppe i Vandrehallen. Trappen er lige herinde.
 
 ### Kl. 06.20: kommissaeren
 
@@ -1173,7 +1176,8 @@ I spillet: ude: Ridebanen (bygget).
 **Statsministeren:** Så holder pressemødet. Danmark venter på en reform, ikke på en krimi.  
 *Hun går igen. Bente trækker Ida til side.*  
 **Bente:** Kasper er en klovn, men han er ikke en morder. Jeg har kendt ham, siden han var praktikant.  
-**Bente:** Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10.
+**Bente:** Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10.  
+**Bente:** Jeg sidder i betjentstuen til højre for indgangen. Kom ned til mig, så kigger vi på nattens adgangslog.
 
 ### Kl. 07.30: valdorf kommer
 

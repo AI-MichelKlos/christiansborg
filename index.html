@@ -223,7 +223,20 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .sEmne{display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 12px;border:2px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);font:600 calc(14.5px * var(--ts))/1.3 var(--body);text-align:left;cursor:pointer;box-shadow:2px 3px 0 var(--ink)}
 .sEmne svg{width:32px;height:32px;flex:none}
 .sEmne.spurgt{background:var(--paper);box-shadow:none;color:#5d5368}
-.sEmne.spurgt span::after{content:" (spurgt)";font-weight:400;font-size:.9em}
+.sEmne span{flex:1;min-width:0}
+.gdNu{margin:2px 0 0;font-weight:700;font-size:calc(13px * var(--ts));color:var(--leaf-deep)}
+.sNyMaerke{flex:none;font:700 11px/1 var(--body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:999px;background:var(--leaf);color:var(--ink);border:1.5px solid var(--ink)}
+.sEmne.sNy{background:#fffaf0;border-width:2.5px}
+.sTomt{margin:2px 2px 4px;color:#5d5368;font-size:calc(13.5px * var(--ts))}
+.sGamle{margin-top:4px}
+.sGamle summary{cursor:pointer;color:#5d5368;font:600 calc(13px * var(--ts)) var(--body);padding:6px 2px;list-style-position:inside}
+.sGamle summary:focus-visible{outline:3px solid var(--leaf);outline-offset:2px;border-radius:6px}
+.sGamle .sEmne{margin-top:8px;width:100%;box-sizing:border-box}
+.sRes{margin-top:10px;padding-top:10px;border-top:1.5px dashed rgba(42,34,56,.3);display:grid;gap:6px}
+.sRes p{margin:0;font-weight:700;font-size:calc(14px * var(--ts))}
+.sResSpor::before{content:"★ ";color:#c98a1b}
+.sResTing::before{content:"+ ";color:var(--leaf-deep)}
+.sResMaal{background:#fff1b8;border:1.5px solid var(--ink);border-radius:10px;padding:7px 10px}
 .sEmne.sTing{background:#ffe8c4}
 .sEmne.sHjaelp{background:#fff1b8}
 .sEmne:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
@@ -6242,7 +6255,7 @@ const GAADE = (() => {
   const kl = n => String(Math.floor(n / 60)).padStart(2, '0') + '.' + String(n % 60).padStart(2, '0');
   // Night times sort after the evening before: 21.30 < 23.50 < 00.15 < 05.50. "02-03" means some time between 2 and 3.
   const natSort = s => { const h = parseInt(s, 10), m = String(s).includes('-') ? 59 : parseInt(String(s).split('.')[1], 10) || 0; return (h < 12 ? h + 24 : h) * 60 + m; };
-  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], spurgt: [], hint: 0, vist: [], forkert: 0, lag1942: !!M.lag1942.aktiv && med1942, pos: null, face: 0 });
+  const ny = () => ({ v: 1, manus: M.version, akt: 1, min: toMin(M.start.kl), meter: 0, spor: [], ting: [...M.start.ting], givet: [], flag: [], laast: [], renset: [], moedt: [], spurgt: [], emneSet: [], hint: 0, vist: [], forkert: 0, lag1942: !!M.lag1942.aktiv && med1942, pos: null, face: 0 });
   function hent() {
     try { const g = JSON.parse(localStorage.getItem(GKEY) || 'null'); if (g && g.v === 1 && Array.isArray(g.spor) && Array.isArray(g.ting)) return Object.assign(ny(), g); } catch (e) {}
     return null;
@@ -6266,19 +6279,21 @@ const GAADE = (() => {
     return neg ? !v : v;
   }
   const ok = list => (list || []).every(item => String(item).split('|').some(term));
-  function giv(list) {
+  function giv(list, stille) {   // stille: no message at the top (a conversation shows it in its own window). Returns what Ida got.
+    const fik = [];
     for (const raw of list || []) {
       const m = String(raw).match(/^([+-]?)(spor|ting|flag|akt):(\w+)$/); if (!m) continue;
       const [, sign, kind, val] = m;
-      if (kind === 'spor') { const n = +val; if (M.spor[n] && !G.spor.includes(n)) { G.spor.push(n); toast('Nyt spor i notesbogen: ' + M.spor[n].titel); chime([784, 988, 1319]); } }
+      if (kind === 'spor') { const n = +val; if (M.spor[n] && !G.spor.includes(n)) { G.spor.push(n); fik.push(['spor', M.spor[n].titel]); if (!stille) toast('Nyt spor i notesbogen: ' + M.spor[n].titel); chime([784, 988, 1319]); } }
       else if (kind === 'akt') G.akt = Math.max(G.akt, +val);
       else if (kind === 'ting') {
         if (sign === '-') { const i = G.ting.indexOf(val); if (i >= 0) { G.ting.splice(i, 1); if (!G.givet.includes(val)) G.givet.push(val); } }
-        else if (M.ting[val] && !G.ting.includes(val)) { G.ting.push(val); toast('I rygsækken: ' + M.ting[val].navn); chime([660, 880], 0.045); }
+        else if (M.ting[val] && !G.ting.includes(val)) { G.ting.push(val); fik.push(['ting', M.ting[val].navn, val]); if (!stille) toast('I rygsækken: ' + M.ting[val].navn); chime([660, 880], 0.045); }
       } else if (sign === '-') G.flag = G.flag.filter(f => f !== val);
       else if (!G.flag.includes(val)) G.flag.push(val);
     }
     tjekAkt(); visUr(); gem();
+    return fik;
   }
 
   // ---- acts and the clock. The clock waits 5 minutes before the end of an act until the next act opens.
@@ -6291,7 +6306,7 @@ const GAADE = (() => {
     if (skift && started) { gem(); if (dialoger().some(d => d.open)) aktKort = true; else visAkt(); }   // in a conversation the card waits until it is closed
   }
   let aktKort = false;
-  const visAkt = () => scene({ eyebrow: `Akt ${akt().nr} · kl. ${akt().fra}`, title: akt().navn, lines: [akt().intro] });
+  const visAkt = () => scene({ eyebrow: `Akt ${akt().nr} · kl. ${akt().fra}`, title: akt().navn, lines: [akt().intro, ...(akt().hvor || [])] });
   function tid(minutter) { const f = G.min; G.min = Math.max(G.min, Math.min(G.min + minutter, loft())); if (G.min !== f) visUr(); }
   function visUr() {
     $('urKl').textContent = kl(G.min); $('urAkt').textContent = 'Akt ' + G.akt;
@@ -6439,6 +6454,8 @@ const GAADE = (() => {
         const p = M.personer[id], row = el('article', 'gdRow'), txt = el('div');
         row.append(el('div', 'gdNum gdAv', initialer(p.navn)), txt);
         txt.append(el('h3', '', p.alder ? `${p.navn}, ${p.alder}` : p.navn), el('p', 'gdSted', p.rolle));
+        const nu = id === 'valdorf' && G.flag.includes('pressemoede') ? 'landstingssalen' : p.steder && p.steder[G.akt];   // where the person is now
+        if (nu && M.steder[nu] && ok(p.kraever)) txt.appendChild(el('p', 'gdNu', 'Er nu: ' + M.steder[nu].navn));
         const ul = el('ul'); for (const n of p.noter || []) if (ok(n.kraever)) ul.appendChild(el('li', '', n.tekst));
         if (ul.children.length) txt.appendChild(ul);
         body.appendChild(row);
@@ -6538,18 +6555,32 @@ const GAADE = (() => {
   }
   const tingI = e => (e.kraever || []).map(k => (k.match(/^ting:(\w+)$/) || [])[1]).find(Boolean);
   const handling = e => /^(Giv|Vis)\b/.test(e.spoerg);
+  // The topics she has not asked come first. A topic that has come since she last saw the list is marked Nyt.
+  // The ones she has asked are at the bottom under "Spurgt før" and can be read again.
   function visEmner() {
     const p = M.personer[samtP], box = $('sEmner'); box.replaceChildren();
-    for (const e of p.emner) {
-      if (!ok(e.kraever)) continue;
+    const synlige = p.emner.filter(e => ok(e.kraever)), key = e => samtP + '.' + e.id;
+    const kendt = synlige.some(e => G.emneSet.includes(key(e)));   // she has seen this person's list before
+    const knap = (e, ny) => {
       const b = el('button', 'sEmne'); b.type = 'button';
       const t = tingI(e); if (t && handling(e)) { b.innerHTML = ikon(t); b.classList.add('sTing'); }
       if (e.hjaelp) b.classList.add('sHjaelp');
       b.appendChild(el('span', '', e.spoerg));
-      if (!e.hjaelp && G.spurgt.includes(samtP + '.' + e.id)) b.classList.add('spurgt');
+      if (ny) { b.classList.add('sNy'); b.appendChild(el('em', 'sNyMaerke', 'Nyt')); }
       b.addEventListener('click', () => spoerg(e));
-      box.appendChild(b);
+      return b;
+    };
+    const nye = synlige.filter(e => e.hjaelp || !G.spurgt.includes(key(e))), gamle = synlige.filter(e => !e.hjaelp && G.spurgt.includes(key(e)));
+    const ikkeHjaelp = nye.filter(e => !e.hjaelp);
+    for (const e of [...ikkeHjaelp.filter(e => kendt && !G.emneSet.includes(key(e))), ...ikkeHjaelp.filter(e => !kendt || G.emneSet.includes(key(e)))]) box.appendChild(knap(e, kendt && !G.emneSet.includes(key(e))));
+    if (!ikkeHjaelp.length) box.appendChild(el('p', 'sTomt', `Ida har ikke flere spørgsmål til ${p.kort || p.navn.split(' ')[0]} lige nu.`));
+    for (const e of nye.filter(e => e.hjaelp)) box.appendChild(knap(e, false));
+    if (gamle.length) {
+      const d = el('details', 'sGamle'), sum = el('summary', '', `Spurgt før (${gamle.length})`); d.appendChild(sum);
+      for (const e of gamle) { const b = knap(e, false); b.classList.add('spurgt'); d.appendChild(b); }
+      box.appendChild(d);
     }
+    for (const e of synlige) if (!G.emneSet.includes(key(e))) G.emneSet.push(key(e));
   }
   function spoerg(e) {
     const key = samtP + '.' + e.id, log = $('sLog');
@@ -6560,7 +6591,13 @@ const GAADE = (() => {
     for (const [w, t] of lines) log.appendChild(replik(w, t));
     if (!G.spurgt.includes(key)) { G.spurgt.push(key); if (!e.hjaelp) tid(M.ur.minutterPrSamtale); }
     samt.scrollTop = 0;
-    giv(e.giver);   // a new act shows its card when the conversation is closed
+    const maalFoer = FX.maal?.maal?.maal;
+    const fik = giv(e.giver, true);   // a new act shows its card when the conversation is closed
+    const res = el('div', 'sRes');
+    for (const [k, txt] of fik) res.appendChild(el('p', k === 'spor' ? 'sResSpor' : 'sResTing', (k === 'spor' ? 'Nyt spor i notesbogen: ' : 'I rygsækken: ') + txt));
+    FX.maal?.opdater(); const maalNu = FX.maal?.vis ? FX.maal?.maal?.maal : null;
+    if (maalNu && (maalNu !== maalFoer || fik.length)) res.appendChild(el('p', 'sResMaal', 'Det skal Ida nu: ' + maalNu));
+    if (res.children.length) log.appendChild(res);
     if (samt.open) visEmner();
   }
   function samtale(id) {
@@ -7468,7 +7505,7 @@ const MAAL = (() => {
   // from (x, z) toward goal g: the point to aim at and the length of the way, or null if the grid cannot help
   function vej(x, z, g) {
     if (bygget < N) return null;
-    const m = naerFri(celle(g[0], g[1])), c0 = naerFri(celle(x, z), 2); if (m < 0 || c0 < 0) return null;
+    const m = naerFri(celle(g[0], g[1]), 10), c0 = naerFri(celle(x, z), 2); if (m < 0 || c0 < 0) return null;   // a goal in water (the pond, the canal): the nearest dry place within 25 m
     const d = flod(m); if (d[c0] === Infinity) return null;
     let c = c0, sigte = null, gaaet = 0;
     for (let k = 0; k < 900 && d[c] > 0; k++) {
