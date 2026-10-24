@@ -932,7 +932,7 @@ const BEGIVENHEDER = [
     ["fortaeller", "Bente er kommet op ad trappen. Hun trækker Ida til side."],
     ["bente", "Kasper er en klovn, men han er ikke en morder. Jeg har kendt ham, siden han var praktikant."],
     ["bente", "Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10."],
-    ["bente", "Jeg sidder i betjentstuen til højre for indgangen. Kom ned til mig, så kigger vi på nattens adgangslog."],
+    ["bente", "Se dig godt omkring heroppe først. Så kom ned til mig i betjentstuen til højre for indgangen, så kigger vi på nattens adgangslog."],
   ] },
   { id: "valdorf_kommer", titel: "Departementschefen", kl: "07.30", naar: ["akt>=2", "spor:7|spor:8|spor:10|spor:18"], giver: ["flag:valdorf_her"], replikker: [
     ["fortaeller", "En mand i gråt jakkesæt kommer op ad trappen med en mappe under armen. Han nikker venligt til alle."],
@@ -990,7 +990,7 @@ const HINT = [
   { naar: ["!flag:notesbog_fundet"], tekst: "Aksel havde altid sin lille sorte notesbog på sig, men den er ikke i hans lommer. Lys under sofaen med din mobil.",
     maal: "Find Mørkebergs lille sorte notesbog", hen: "vandrehallen" },
   { naar: ["!spor:6"], tekst: "Når nogen skriver hårdt på en side, kan man se trykket på den næste. Har du ikke en blyant i rygsækken?",
-    maal: "Find ud af, hvad Mørkeberg skrev i sin notesbog", hen: null },
+    maal: "Find ud af, hvad Mørkeberg skrev i notesbogen ved sofaen", hen: "vandrehallen" },
   { naar: ["!flag:bente_beder"], tekst: "Kommissæren og statsministeren kommer om lidt. Lad os høre, hvad de siger.",
     maal: "Bliv i Vandrehallen. Politiet er på vej", hen: "vandrehallen" },
   { naar: ["ting:briller"], tekst: "Er det mine briller? Giv mig dem, så kan vi se loggen.",

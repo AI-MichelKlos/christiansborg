@@ -1177,7 +1177,7 @@ I spillet: ude: Ridebanen (bygget).
 *Bente er kommet op ad trappen. Hun trækker Ida til side.*  
 **Bente:** Kasper er en klovn, men han er ikke en morder. Jeg har kendt ham, siden han var praktikant.  
 **Bente:** Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10.  
-**Bente:** Jeg sidder i betjentstuen til højre for indgangen. Kom ned til mig, så kigger vi på nattens adgangslog.
+**Bente:** Se dig godt omkring heroppe først. Så kom ned til mig i betjentstuen til højre for indgangen, så kigger vi på nattens adgangslog.
 
 ### Kl. 07.30: valdorf kommer
 
@@ -1242,7 +1242,7 @@ Spillet viser det første hint på listen, hvis betingelse passer. Målet i fed 
 4. **Gå op i Vandrehallen, og se, hvad der er sket** (Vandrehallen og Rigets midte). Gå op i Vandrehallen. Han sidder i den grønne sofa ved Rigets midte. <small>(mangler spor 1 (Liget og termokanden))</small>
 5. **Undersøg sofaen og bordet ved Rigets midte** (Vandrehallen og Rigets midte). Se på bordet ved sofaen. Der står noget, der ikke burde stå der. <small>(mangler spor 2 (Koppen med læbestift))</small>
 6. **Find Mørkebergs lille sorte notesbog** (Vandrehallen og Rigets midte). Aksel havde altid sin lille sorte notesbog på sig, men den er ikke i hans lommer. Lys under sofaen med din mobil. <small>(endnu ikke »notesbog fundet«)</small>
-7. **Find ud af, hvad Mørkeberg skrev i sin notesbog**. Når nogen skriver hårdt på en side, kan man se trykket på den næste. Har du ikke en blyant i rygsækken? <small>(mangler spor 6 (Notesbogen))</small>
+7. **Find ud af, hvad Mørkeberg skrev i notesbogen ved sofaen** (Vandrehallen og Rigets midte). Når nogen skriver hårdt på en side, kan man se trykket på den næste. Har du ikke en blyant i rygsækken? <small>(mangler spor 6 (Notesbogen))</small>
 8. **Bliv i Vandrehallen. Politiet er på vej** (Vandrehallen og Rigets midte). Kommissæren og statsministeren kommer om lidt. Lad os høre, hvad de siger. <small>(endnu ikke »bente beder«)</small>
 9. **Giv Bente brillerne i betjentstuen** (Betjentstuen). Er det mine briller? Giv mig dem, så kan vi se loggen. <small>(har Bentes læsebriller)</small>
 10. **Spørg Bente i betjentstuen om nattens adgangslog** (Betjentstuen). Jeg har nattens adgangslog her i betjentstuen. Spørg mig, om vi kan se den. <small>(endnu ikke »briller givet«, endnu ikke »briller hint«)</small>

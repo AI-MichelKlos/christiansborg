@@ -343,6 +343,9 @@ Michel: efter samtalen med Gry vidste man ikke, hvor man skulle hen, og det var 
   - Samtalevinduet viser ikke længere, hvordan personen ser ud (kun navn og rolle). `udseende` står stadig i manuskriptet.
   - Skiltet "Folketingets indgang" hang foran døren til Snapstinget (væggene ved dørene er kun døre). Nu hænger det på sidevæggen ved foden af trappen, hvor man ser det fra hoveddøren.
   - Telefon, inde i Folketinget: kortet med målet ligger nu under knapperne og uret i stedet for oven på dem.
+- [x] 6. Notesbogen i Vandrehallen (24. okt. 2026). Michel: efter Vandrehallen sagde spillet ikke, hvad man skulle. Målet efter notesbogen ("Find ud af, hvad Mørkeberg skrev i sin notesbog") havde intet sted, så der stod ikke "Du er her" eller hvor man skulle hen, selv om det kun kan gøres ved sofaen. Nu hedder det "Find ud af, hvad Mørkeberg skrev i notesbogen ved sofaen" med stedet Vandrehallen. Ved sofaen viser knappen "Gnid blyanten over notesbogen".
+  - Bente sagde "Kom ned til mig" i scenen med statsministeren, mens målet stadig var i Vandrehallen. Nu siger hun "Se dig godt omkring heroppe først. Så kom ned til mig ...".
+  - Kontrolleret i Chromium: målet for hvert trin i akt 1 både i Vandrehallen og i betjentstuen, frem til akt 2.
 
 ## Til senere
 - [x] Pænere heste (24. okt. 2026)
