@@ -255,7 +255,7 @@ const PERSONER = {
       ] },
       { id: "briller", spoerg: "Kan vi se adgangsloggen?", kraever: ["!flag:briller_givet"], giver: ["flag:briller_hint"], replikker: [
         ["bente", "Det kan vi, hvis jeg kan se tasterne. Mine læsebriller er væk."],
-        ["bente", "Jeg havde dem på min runde i nat. Jeg satte mig vist et øjeblik ude i Bibliotekshaven. Mine knæ er ikke, hvad de har været."],
+        ["bente", "Jeg havde dem på min runde i nat. Jeg satte mig vist et øjeblik på bænken ved Kierkegaard-statuen i Bibliotekshaven. Mine knæ er ikke, hvad de har været."],
         ["bente", "Gå gennem den lille gang i Rigsdagsgården, så kommer du lige ned i haven."],
       ] },
       { id: "giv_briller", spoerg: "Giv Bente brillerne", kraever: ["ting:briller"], giver: ["-ting:briller", "flag:briller_givet", "spor:3"], replikker: [
@@ -975,6 +975,7 @@ const FANGET_1942 = {
 // Hint fra Bente (og skiltet »Næste spor«). Spillet viser det første hint, hvis betingelse er opfyldt.
 // tekst er Bentes hint. maal er det, der hele tiden står øverst på skærmen: hvad Ida skal nu, men ikke hvordan.
 // hen er stedet for målet (et sted fra STEDER eller null). Udenfor peger en pil derhen, og stedet vises på kortet.
+// ved (valgfri) er noget at undersøge udenfor (et id fra UNDERSOEG). Så peger pilen helt hen til det, også når Ida er nået til stedet.
 const HINT = [
   { naar: ["!flag:moedt_bente"], tekst: "Gå til Folketingets indgang i Rigsdagsgården. Bente venter i døren.",
     maal: "Mød Bente ved Folketingets dør i Rigsdagsgården", hen: "rigsdagsgaarden" },
@@ -996,8 +997,8 @@ const HINT = [
     maal: "Giv Bente brillerne i betjentstuen", hen: "betjentstuen" },
   { naar: ["!flag:briller_givet", "!flag:briller_hint"], tekst: "Jeg har nattens adgangslog her i betjentstuen. Spørg mig, om vi kan se den.",
     maal: "Spørg Bente i betjentstuen om nattens adgangslog", hen: "betjentstuen" },
-  { naar: ["!flag:briller_givet"], tekst: "Uden mine briller kan jeg ikke se tasterne. Jeg satte mig vist på en bænk i Bibliotekshaven på min runde.",
-    maal: "Find Bentes læsebriller", hen: "bibliotekshaven" },
+  { naar: ["!flag:briller_givet"], tekst: "Uden mine briller kan jeg ikke se tasterne. Jeg satte mig vist på bænken ved Kierkegaard-statuen i Bibliotekshaven på min runde.",
+    maal: "Find Bentes briller på bænken ved Kierkegaard", hen: "bibliotekshaven", ved: "baenken" },
   { naar: ["!spor:4"], tekst: "Kl. 01.52? Spørg mig, hvad der skete omkring kl. 2. Der var noget med Samtaleværelset.",
     maal: "Spørg Bente, hvad der skete omkring kl. 2", hen: "betjentstuen" },
   { naar: ["!spor:5"], tekst: "Nøglen passer til Samtaleværelset. Dørene er midt i Vandrehallen.",
@@ -1005,7 +1006,7 @@ const HINT = [
   { naar: ["akt>=2", "!spor:18"], tekst: "Bodil i Snapstinget fylder Aksels termokande hver aften. Spørg hende.",
     maal: "Spørg Bodil i Snapstinget om termokanden", hen: "snapstinget" },
   { naar: ["akt>=2", "!flag:kort_fundet"], tekst: "Kaspers kort gik ind ved Proviantpassagen. Det har regnet i nat. Se efter i vandpytterne.",
-    maal: "Undersøg Proviantpassagen, hvor Kaspers kort gik ind", hen: "proviantpassagen" },
+    maal: "Undersøg Proviantpassagen, hvor Kaspers kort gik ind", hen: "proviantpassagen", ved: "vandpytten" },
   { naar: ["akt>=2", "!spor:10"], tekst: "Kaspers gamle kort åbner nok stadig Kompaspartiets sekretariat. Ingen har spærret det.",
     maal: "Find ud af, hvad Kasper lavede i Folketinget i nat", hen: "kompas_gang" },
   { naar: ["akt>=2", "!spor:7"], tekst: "Pressen står på Slotspladsen. Spørg, hvem der havde pressekort 17.",
@@ -1025,9 +1026,9 @@ const HINT = [
   { naar: ["akt>=3", "!spor:9"], tekst: "Med ministerens gæstekort kommer du ind i Finansministeriet. Referatet ligger i forhandlingsrummet.",
     maal: "Find referatet i Finansministeriet", hen: "fm_forhandlingsrummet" },
   { naar: ["akt>=3", "!spor:20"], tekst: "Springvandet i Bibliotekshaven springer om lidt. Gå derud, og se efter i bassinet.",
-    maal: "Gå til springvandet i Bibliotekshaven", hen: "bibliotekshaven" },
+    maal: "Gå til springvandet i Bibliotekshaven", hen: "bibliotekshaven", ved: "papirerne" },
   { naar: ["akt>=3", "!spor:12"], tekst: "Se på båden ved kajen over for Reformministeriet. Hvem har bundet den?",
-    maal: "Undersøg den røde båd ved Reformministeriet", hen: "kajen_reform" },
+    maal: "Undersøg den røde båd ved Reformministeriet", hen: "kajen_reform", ved: "baaden" },
   { naar: ["akt>=3", "!flag:mogens_talt", "ting:elefantorden"], tekst: "Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den.",
     maal: "Vis Mogens Brask Elefantordenen i Landstingssalen", hen: "landstingssalen" },
   { naar: ["akt>=3", "!flag:mogens_talt", "!flag:gobelin_kendt"], tekst: "Hoffet dækker op i Riddersalen. Hoffoureren holder af folk, der kender hans gobeliner.",
@@ -1047,7 +1048,7 @@ const HINT = [
   { naar: ["akt>=3", "!flag:hesten_flyttet"], tekst: "Gry siger, at Aksel var i sadelkammeret i nat. Men Vega står i vejen, og hun flytter sig kun for en gulerod fra Snapstinget.",
     maal: "Kom ind i sadelkammeret i De Kongelige Stalde", hen: "stalden" },
   { naar: ["lag1942", "!spor:21", "!ting:kongens_noegle", "flag:kongen_takket"], tekst: "Kongen sagde: bag den tredje hestesko over staldporten.",
-    maal: "Find kongens nøgle ved staldporten", hen: "ridebanen" },
+    maal: "Find kongens nøgle ved staldporten", hen: "ridebanen", ved: "hesteskoen" },
   { naar: ["lag1942", "!spor:21", "!ting:kongens_noegle"], tekst: "Er skabet låst? Min farfar sagde altid, at kongen gemte nøgler bag hestesko. Og hans gamle radio har altid været lidt mærkelig.",
     maal: "Find en nøgle til det gamle sadelskab", hen: null },
   { naar: ["!spor:21"], tekst: "Se i det gamle sadelskab inderst i sadelkammeret.",

@@ -186,6 +186,7 @@ for (const h of M.hint) {
   if (typeof h.maal !== 'string' || !h.maal.trim()) F(`Hint uden mål: "${h.tekst.slice(0, 40)}"`);
   else if (h.maal.length > 70) A(`Langt mål (${h.maal.length} tegn): "${h.maal}"`);
   if (h.hen !== null && !M.steder[h.hen]) F(`Ukendt sted "${h.hen}" i målet "${h.maal}"`);
+  if (h.ved !== undefined && !M.undersoeg.some(u => u.id === h.ved)) F(`Ukendt ting at undersøge "${h.ved}" i målet "${h.maal}"`);
 }
 pushC(M.efterskrift.ordenUde.kraever, 'efterskrift');
 pushC(M.afsloering.kraever, 'afsløringen');

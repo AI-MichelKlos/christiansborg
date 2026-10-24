@@ -129,7 +129,7 @@ I notesbogen: Folketingsbetjent på nattevagt gennem 31 år. Hendes farfar var b
 <small>Kræver: endnu ikke »briller givet«. Giver: »briller hint«.</small>
 
 **Bente:** Det kan vi, hvis jeg kan se tasterne. Mine læsebriller er væk.  
-**Bente:** Jeg havde dem på min runde i nat. Jeg satte mig vist et øjeblik ude i Bibliotekshaven. Mine knæ er ikke, hvad de har været.  
+**Bente:** Jeg havde dem på min runde i nat. Jeg satte mig vist et øjeblik på bænken ved Kierkegaard-statuen i Bibliotekshaven. Mine knæ er ikke, hvad de har været.  
 **Bente:** Gå gennem den lille gang i Rigsdagsgården, så kommer du lige ned i haven.
 
 #### Giv Bente brillerne
@@ -1246,7 +1246,7 @@ Spillet viser det første hint på listen, hvis betingelse passer. Målet i fed 
 8. **Bliv i Vandrehallen. Politiet er på vej** (Vandrehallen og Rigets midte). Kommissæren og statsministeren kommer om lidt. Lad os høre, hvad de siger. <small>(endnu ikke »bente beder«)</small>
 9. **Giv Bente brillerne i betjentstuen** (Betjentstuen). Er det mine briller? Giv mig dem, så kan vi se loggen. <small>(har Bentes læsebriller)</small>
 10. **Spørg Bente i betjentstuen om nattens adgangslog** (Betjentstuen). Jeg har nattens adgangslog her i betjentstuen. Spørg mig, om vi kan se den. <small>(endnu ikke »briller givet«, endnu ikke »briller hint«)</small>
-11. **Find Bentes læsebriller** (Bibliotekshaven). Uden mine briller kan jeg ikke se tasterne. Jeg satte mig vist på en bænk i Bibliotekshaven på min runde. <small>(endnu ikke »briller givet«)</small>
+11. **Find Bentes briller på bænken ved Kierkegaard** (Bibliotekshaven). Uden mine briller kan jeg ikke se tasterne. Jeg satte mig vist på bænken ved Kierkegaard-statuen i Bibliotekshaven på min runde. <small>(endnu ikke »briller givet«)</small>
 12. **Spørg Bente, hvad der skete omkring kl. 2** (Betjentstuen). Kl. 01.52? Spørg mig, hvad der skete omkring kl. 2. Der var noget med Samtaleværelset. <small>(mangler spor 4 (Mødet kl. 2))</small>
 13. **Lås Samtaleværelset op, og se dig om derinde** (Samtaleværelset). Nøglen passer til Samtaleværelset. Dørene er midt i Vandrehallen. <small>(mangler spor 5 (Samtaleværelset))</small>
 14. **Spørg Bodil i Snapstinget om termokanden** (Snapstinget). Bodil i Snapstinget fylder Aksels termokande hver aften. Spørg hende. <small>(akt 2 eller senere, mangler spor 18 (Bodil og termokanden))</small>
