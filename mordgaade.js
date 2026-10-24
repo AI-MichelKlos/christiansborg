@@ -293,8 +293,8 @@ const PERSONER = {
   },
 
   kommissaer: {
-    navn: "Torben Hald", kort: "Hald", alder: 60, rolle: "Kriminalkommissær, Københavns Politi",
-    udseende: "Våd trenchcoat, gråt overskæg og kaffe i papkrus.",
+    navn: "Lone Hald", kort: "Hald", alder: 58, rolle: "Kriminalkommissær, Københavns Politi",
+    udseende: "Våd trenchcoat, kort gråt hår og kaffe i papkrus.",
     steder: { 1: "vandrehallen", 2: "vandrehallen", 3: "vandrehallen", 4: "landstingssalen" },
     kraever: ["flag:kommissaer_kommet"],
     noter: [
@@ -316,7 +316,7 @@ const PERSONER = {
         ["kommissaer", "De må gå, hvor De vil, så længe De ikke rører ved noget."],
         ["kommissaer", "Og De rører ikke ved noget."],
       ] },
-      { id: "vis_log", spoerg: "Vis ham kopimaskinens log", kraever: ["spor:10"], giver: [], replikker: [
+      { id: "vis_log", spoerg: "Vis hende kopimaskinens log", kraever: ["spor:10"], giver: [], replikker: [
         ["kommissaer", "Så Lindved kopierede papirer, mens han var her. Det gør ham også til tyv. Det gør det ikke bedre."],
       ] },
       { id: "vis_manden", spoerg: "Fortæl om manden på trappen", kraever: ["spor:11"], giver: [], replikker: [
@@ -331,15 +331,15 @@ const PERSONER = {
   statsminister: {
     navn: "Statsministeren", alder: null, rolle: "Statsminister",
     udseende: "Mørkeblå frakke, rødt halstørklæde og to livvagter et skridt bagved.",
-    steder: { 2: "restauranten", 3: "restauranten", 4: "landstingssalen" },
-    kraever: [],
+    steder: { 1: "vandrehallen", 2: "restauranten", 3: "restauranten", 4: "landstingssalen" },
+    kraever: ["flag:beg_statsministeren"],
     noter: [
       { kraever: [], tekst: "Holder fast i pressemødet kl. 10 i Landstingssalen." },
     ],
     emner: [
       { id: "pressemoedet", spoerg: "Bliver pressemødet holdt?", kraever: [], giver: [], replikker: [
-        ["statsminister", "Danmark venter på en reform, og kommissæren siger, han har sin mand. Pressemødet holder kl. 10."],
-        ["statsminister", "Hvis De ved noget, han ikke ved, så har De til kl. 10."],
+        ["statsminister", "Danmark venter på en reform, og kommissæren siger, hun har sin mand. Pressemødet holder kl. 10."],
+        ["statsminister", "Hvis De ved noget, hun ikke ved, så har De til kl. 10."],
       ] },
       { id: "moerkeberg", spoerg: "Kendte De Aksel Mørkeberg?", kraever: [], giver: [], replikker: [
         ["statsminister", "Alle kendte Aksel. Han kunne trække et forlig ud i tre døgn for at få et ekstra kapitel i sine erindringer."],
@@ -917,7 +917,7 @@ const BEGIVENHEDER = [
     ["bente", "Han sidder oppe i Vandrehallen. Trappen er lige herinde."],
   ] },
   { id: "kommissaeren", titel: "Kommissæren kommer", kl: "06.20", naar: ["spor:1"], giver: ["flag:kommissaer_kommet"], replikker: [
-    ["fortaeller", "En mand i våd trenchcoat kommer op ad trappen med en kaffe i papkrus."],
+    ["fortaeller", "En kvinde i våd trenchcoat kommer op ad trappen med en kaffe i papkrus."],
     ["kommissaer", "Hald, Københavns Politi. Og hvem er De?"],
     ["ida", "Ida. Jeg læser historie. Jeg skriver om huset."],
     ["kommissaer", "Så skriv om noget andet i dag."],
@@ -925,11 +925,11 @@ const BEGIVENHEDER = [
     ["kommissaer", "Og alle taler om en forsvundet termokande. Termokander forsvinder hver dag på Christiansborg."],
   ] },
   { id: "statsministeren", titel: "Statsministeren", kl: "06.30", naar: ["flag:kommissaer_kommet"], giver: ["flag:bente_beder"], replikker: [
-    ["fortaeller", "Tre sorte biler kører ind i Rigsdagsgården. Lidt efter står statsministeren i Vandrehallen med to livvagter bag sig."],
+    ["fortaeller", "Statsministeren kommer ind i Vandrehallen med to livvagter et skridt bagved. Hun stiller sig ved siden af Hald."],
     ["statsminister", "Hald. Hvad ved vi?"],
     ["kommissaer", "Vi har vores mand. Kasper Lindved. Jeg kan sige det på pressemødet kl. 10."],
     ["statsminister", "Så holder pressemødet. Danmark venter på en reform, ikke på en krimi."],
-    ["fortaeller", "Hun går igen. Bente trækker Ida til side."],
+    ["fortaeller", "Bente er kommet op ad trappen. Hun trækker Ida til side."],
     ["bente", "Kasper er en klovn, men han er ikke en morder. Jeg har kendt ham, siden han var praktikant."],
     ["bente", "Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10."],
     ["bente", "Jeg sidder i betjentstuen til højre for indgangen. Kom ned til mig, så kigger vi på nattens adgangslog."],

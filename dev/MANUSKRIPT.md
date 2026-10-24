@@ -179,9 +179,9 @@ I notesbogen: Folketingsbetjent på nattevagt gennem 31 år. Hendes farfar var b
 
 Bente giver det første hint fra listen under »Bentes hint«, der passer.
 
-### Torben Hald (60)
+### Lone Hald (58)
 
-Kriminalkommissær, Københavns Politi. Våd trenchcoat, gråt overskæg og kaffe i papkrus.
+Kriminalkommissær, Københavns Politi. Våd trenchcoat, kort gråt hår og kaffe i papkrus.
 
 Hvor: akt 1: Vandrehallen og Rigets midte, akt 2: Vandrehallen og Rigets midte, akt 3: Vandrehallen og Rigets midte, akt 4: Landstingssalen. Med i spillet, når: »kommissær kommet«.
 
@@ -208,7 +208,7 @@ I notesbogen: Kriminalkommissær. Vil sige på pressemødet kl. 10, at Kasper Li
 **Hald:** De må gå, hvor De vil, så længe De ikke rører ved noget.  
 **Hald:** Og De rører ikke ved noget.
 
-#### Vis ham kopimaskinens log
+#### Vis hende kopimaskinens log
 
 <small>Kræver: spor 10 (Kopimaskinens log).</small>
 
@@ -230,14 +230,14 @@ I notesbogen: Kriminalkommissær. Vil sige på pressemødet kl. 10, at Kasper Li
 
 Statsminister. Mørkeblå frakke, rødt halstørklæde og to livvagter et skridt bagved.
 
-Hvor: akt 2: Restauranten i tårnet, akt 3: Restauranten i tårnet, akt 4: Landstingssalen.
+Hvor: akt 1: Vandrehallen og Rigets midte, akt 2: Restauranten i tårnet, akt 3: Restauranten i tårnet, akt 4: Landstingssalen. Med i spillet, når: »beg statsministeren«.
 
 I notesbogen: Holder fast i pressemødet kl. 10 i Landstingssalen.
 
 #### Bliver pressemødet holdt?
 
-**Statsministeren:** Danmark venter på en reform, og kommissæren siger, han har sin mand. Pressemødet holder kl. 10.  
-**Statsministeren:** Hvis De ved noget, han ikke ved, så har De til kl. 10.
+**Statsministeren:** Danmark venter på en reform, og kommissæren siger, hun har sin mand. Pressemødet holder kl. 10.  
+**Statsministeren:** Hvis De ved noget, hun ikke ved, så har De til kl. 10.
 
 #### Kendte De Aksel Mørkeberg?
 
@@ -1159,7 +1159,7 @@ I spillet: ude: Ridebanen (bygget).
 
 <small>Sker, når: spor 1 (Liget og termokanden). Giver: »kommissær kommet«.</small>
 
-*En mand i våd trenchcoat kommer op ad trappen med en kaffe i papkrus.*  
+*En kvinde i våd trenchcoat kommer op ad trappen med en kaffe i papkrus.*  
 **Hald:** Hald, Københavns Politi. Og hvem er De?  
 **Ida:** Ida. Jeg læser historie. Jeg skriver om huset.  
 **Hald:** Så skriv om noget andet i dag.  
@@ -1170,11 +1170,11 @@ I spillet: ude: Ridebanen (bygget).
 
 <small>Sker, når: »kommissær kommet«. Giver: »bente beder«.</small>
 
-*Tre sorte biler kører ind i Rigsdagsgården. Lidt efter står statsministeren i Vandrehallen med to livvagter bag sig.*  
+*Statsministeren kommer ind i Vandrehallen med to livvagter et skridt bagved. Hun stiller sig ved siden af Hald.*  
 **Statsministeren:** Hald. Hvad ved vi?  
 **Hald:** Vi har vores mand. Kasper Lindved. Jeg kan sige det på pressemødet kl. 10.  
 **Statsministeren:** Så holder pressemødet. Danmark venter på en reform, ikke på en krimi.  
-*Hun går igen. Bente trækker Ida til side.*  
+*Bente er kommet op ad trappen. Hun trækker Ida til side.*  
 **Bente:** Kasper er en klovn, men han er ikke en morder. Jeg har kendt ham, siden han var praktikant.  
 **Bente:** Du kender husets historie bedre end politiet, og du er god til at finde ting i gamle papirer. Hjælp mig. Vi har til kl. 10.  
 **Bente:** Jeg sidder i betjentstuen til højre for indgangen. Kom ned til mig, så kigger vi på nattens adgangslog.

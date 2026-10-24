@@ -336,6 +336,13 @@ Michel: efter samtalen med Gry vidste man ikke, hvor man skulle hen, og det var 
   - Små tips første gang (`TIPS`, `FX.tip`): ved kortet med målet efter start, første gang knappen nederst kommer (forsvinder, når den bruges), første spor og første ting (i samtalevinduet, hvis det sker i en samtale) og første gang et emne har et billede (giv eller vis). Hvert tip kommer én gang og huskes med indstillingerne (`tipsSet`, gemt som `tips`). Et tip venter, til der ikke er et kort eller vindue åbent, og forsvinder efter 15 sekunder eller med OK.
   - Kortet med målet og tippet ligger nu under kort og vinduer (ingen z-index), så de ikke dækker teksten på telefonen.
 - [x] 4. Ridebanen (24. okt. 2026): Michel valgte at beholde den rigtige vej. Man kommer kun ud ved Marmorbroen og går rundt ad Tøjhusgade til Rigsdagsgården (ca. 390 m fra Gry). Pilen og Gry viser vejen. Jeg har ikke fundet en port mellem Ridebanen og Rigsdagsgården i virkeligheden (Altinget nævner kun Tøjhusgade og Slotspladsen).
+- [x] 5. Rettelser efter Michels test (24. okt. 2026)
+  - Statsministerens tre biler (fra børneudgaven) kørte ind hvert halvandet minut. Nu kommer de én gang i et spil: første gang Ida er nær Rigsdagsgården (flaget `biler_kom`, gemmes med spillet), aldrig efter scenen med statsministeren og aldrig i 1942.
+  - Scenen kl. 06.30 siger ikke længere, at bilerne kører ind (det har man lige set). Statsministeren kommer ind i Vandrehallen og stiller sig ved siden af Hald, og hun står der med livvagterne resten af akt 1 (`steder: { 1: "vandrehallen" }`, `kraever: ["flag:beg_statsministeren"]`). Man kan tale med hende der.
+  - Kommissæren er nu en kvinde: Lone Hald (58), kort gråt hår, våd trenchcoat og kaffe i papkrus. Teksterne siger hun/hende.
+  - Samtalevinduet viser ikke længere, hvordan personen ser ud (kun navn og rolle). `udseende` står stadig i manuskriptet.
+  - Skiltet "Folketingets indgang" hang foran døren til Snapstinget (væggene ved dørene er kun døre). Nu hænger det på sidevæggen ved foden af trappen, hvor man ser det fra hoveddøren.
+  - Telefon, inde i Folketinget: kortet med målet ligger nu under knapperne og uret i stedet for oven på dem.
 
 ## Til senere
 - [x] Pænere heste (24. okt. 2026)

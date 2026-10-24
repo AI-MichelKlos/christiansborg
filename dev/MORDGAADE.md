@@ -26,7 +26,7 @@ Kl. 05.50 finder en rengøringsassistent ham i en af de grønne sofaer ved Riget
 
 Hovedpersonen er Ida (24), som læser historie og skriver speciale om Christiansborg. Hun har aftalt at møde Bente fra nattevagten kl. 06, for ingen kender huset bedre. Hun kommer ind ad døren i Rigsdagsgården med sin rygsæk ti minutter efter, at Mørkeberg er fundet.
 
-Kl. 06.20 kommer kriminalkommissær Torben Hald. Han finder hurtigt ud af, at Kasper Lindved var i huset om natten med et gammelt adgangskort, og han vil sige på pressemødet kl. 10, at Kasper er anholdt. Bente tror ikke på det og beder Ida om hjælp. Ida er ikke politi, så hun må låne nøgler, bytte sig til ting og bruge det, hun ved om huset og dets historie.
+Kl. 06.20 kommer kriminalkommissær Lone Hald. Hun finder hurtigt ud af, at Kasper Lindved var i huset om natten med et gammelt adgangskort, og hun vil sige på pressemødet kl. 10, at Kasper er anholdt. Bente tror ikke på det og beder Ida om hjælp. Ida er ikke politi, så hun må låne nøgler, bytte sig til ting og bruge det, hun ved om huset og dets historie.
 
 Bygningen på Ved Stranden 8 er i spillet det rigtige Beskæftigelsesministerium. Spillet ligger offentligt, og ministeriet har en rigtig departementschef. Derfor hedder ministeriet *Reformministeriet* i mordgåden, og skiltet på facaden skifter, når man spiller den.
 
@@ -45,7 +45,7 @@ Fem personer er mistænkte, og alle har noget at skjule. Fire af dem bliver rens
 Vidner og hjælpere:
 
 - **Bente Holmsgaard (59)**, folketingsbetjent på nattevagt gennem 31 år og Idas bedste kilde til husets historie. Hun har adgangsloggen og nøgleskabet og ved, at Mørkeberg bad hende låse Samtaleværelset op til et møde kl. 2. Men hun har mistet sine læsebriller.
-- **Torben Hald (60)**, kriminalkommissær. Han er sikker på, at Kasper er morderen, og vil sige det på pressemødet kl. 10.
+- **Lone Hald (58)**, kriminalkommissær. Hun er sikker på, at Kasper er morderen, og vil sige det på pressemødet kl. 10.
 - **Mogens Brask (56)**, kontorchef i Reformministeriet og medlem af DJØF i 31 år. Han har drømt om Elefantordenen hele sit arbejdsliv, selv om kun fire borgerlige danskere har fået den siden 1900. Om morgenen sætter han pressemødet op i Landstingssalen. Han ved mere, end han siger.
 - Viggo Aagaard (63), hoffourer. Han passer på Elefantordenen i Riddersalen og låner den kun ud til en, der kan fortælle, hvem der har lavet gobelinerne.
 - **Gry Strigle (34)**, beridder med nattevagt i De Kongelige Stalde ved Ridebanen. Hun talte med Mørkeberg på hans faste runde ved midnat.
@@ -313,7 +313,7 @@ Et spil tager 60-90 minutter og kan stoppes og fortsættes når som helst, på c
 - **Begyndelsen.** Nyt spil starter med en kort scene: Ida på vej over Marmorbroen kl. 06.00 i blåt morgenlys med sin rygsæk. Så kommer et kort, "Sådan opklarer du mordet", med målet og de vigtigste greb, og derefter styrer spilleren selv. Første gang noget nyt sker (knappen nederst, det første spor, den første ting, giv og vis), forklarer et lille tip det.
 - **Styring.** Som i dag: W og piletasterne for at gå, Shift for at løbe, musen for at kigge, E for at gøre noget og M for kortet. Nyt: R åbner rygsækken og N åbner notesbogen. På telefonen er rygsæk og notesbog to knapper øverst.
 - **Uret.** Uret starter kl. 06.00 og går frem, når Ida går og taler. En samtale tager fx 5 minutter. Uret stopper kl. 09.55 og venter, til de sidste spor er fundet, så man ikke kan tabe på tid.
-- **Faste begivenheder.** Kl. 06.20 kommer kommissæren, kl. 06.30 bilerne med statsministeren, kl. 07.30 Valdorf, kl. 08.30 retsmedicinerens besked og kl. 09.00 springvandet. Pressemødet begynder, når Ida går ind i Landstingssalen i akt 4.
+- **Faste begivenheder.** Statsministerens biler kører ind i Rigsdagsgården, når Ida kommer dertil første gang (kun én gang). Kl. 06.20 kommer kommissæren, kl. 06.30 står statsministeren ved siden af hende i Vandrehallen (og bliver der resten af akt 1), kl. 07.30 Valdorf, kl. 08.30 retsmedicinerens besked og kl. 09.00 springvandet. Pressemødet begynder, når Ida går ind i Landstingssalen i akt 4.
 - **Akterne.** En ny akt åbner, når de vigtigste spor i den forrige er fundet. Et kort med aktens navn og klokkeslættet vises ved skiftet.
 - **Gemning.** Spillet gemmer af sig selv, hver gang Ida finder et spor eller en ting, og ved hvert aktskifte. Fortsæt starter, hvor man slap.
 - **Samtaler.** Emner, Ida ikke har spurgt om, står øverst, og et emne, der er kommet siden sidst, er mærket Nyt. Det, hun har spurgt om, ligger under "Spurgt før" og kan læses igen. Efter et svar står det i vinduet, hvis hun har fået et nyt spor eller en ting, og hvad hun skal nu. Har hun ikke flere spørgsmål, står det også. Aktens kort fortæller, hvem der er hvor, og notesbogen viser, hvor hver person er nu.
