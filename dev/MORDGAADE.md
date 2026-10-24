@@ -310,7 +310,7 @@ Det største nye stykke arbejde er ikke bygningerne, men det at kunne tale med f
 Et spil tager 60-90 minutter og kan stoppes og fortsættes når som helst, på computer og telefon.
 
 - **Startskærmen.** Titlen, en kort tekst om Ida og knapperne Nyt spil, Fortsæt og Indstillinger med lyd og tekststørrelse.
-- **Begyndelsen.** Nyt spil starter med en kort scene: Ida på vej over Marmorbroen kl. 06.00 i blåt morgenlys med sin rygsæk. Derefter styrer spilleren selv.
+- **Begyndelsen.** Nyt spil starter med en kort scene: Ida på vej over Marmorbroen kl. 06.00 i blåt morgenlys med sin rygsæk. Så kommer et kort, "Sådan opklarer du mordet", med målet og de vigtigste greb, og derefter styrer spilleren selv. Første gang noget nyt sker (knappen nederst, det første spor, den første ting, giv og vis), forklarer et lille tip det.
 - **Styring.** Som i dag: W og piletasterne for at gå, Shift for at løbe, musen for at kigge, E for at gøre noget og M for kortet. Nyt: R åbner rygsækken og N åbner notesbogen. På telefonen er rygsæk og notesbog to knapper øverst.
 - **Uret.** Uret starter kl. 06.00 og går frem, når Ida går og taler. En samtale tager fx 5 minutter. Uret stopper kl. 09.55 og venter, til de sidste spor er fundet, så man ikke kan tabe på tid.
 - **Faste begivenheder.** Kl. 06.20 kommer kommissæren, kl. 06.30 bilerne med statsministeren, kl. 07.30 Valdorf, kl. 08.30 retsmedicinerens besked og kl. 09.00 springvandet. Pressemødet begynder, når Ida går ind i Landstingssalen i akt 4.

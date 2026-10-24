@@ -36,7 +36,7 @@ body{margin:0;overflow:hidden;background:var(--sky);color:var(--ink);font-family
 .btn[aria-pressed="true"]{background:#ffe4bd}
 #map{position:fixed;right:14px;top:calc(68px + env(safe-area-inset-top,0px));border-radius:12px;background:#a7c46f}
 #poi{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(470px,calc(100% - 32px));padding:11px 16px 13px;box-sizing:border-box;animation:pop .25s ease-out}
-#maal{position:fixed;left:14px;top:calc(14px + env(safe-area-inset-top,0px));z-index:4;display:flex;align-items:center;gap:10px;max-width:min(380px,calc(100vw - 28px));box-sizing:border-box;padding:7px 13px 8px 9px;background:#fff1b8;font:600 14px/1.3 var(--body);pointer-events:none}
+#maal{position:fixed;left:14px;top:calc(14px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;max-width:min(380px,calc(100vw - 28px));box-sizing:border-box;padding:7px 13px 8px 9px;background:#fff1b8;font:600 14px/1.3 var(--body);pointer-events:none}
 #maal small{display:block;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;opacity:.72}
 #maal b{display:block;font-weight:700;text-wrap:balance}
 #maalHvor{display:block;font-size:12.5px;font-weight:600;opacity:.78;font-variant-numeric:tabular-nums}
@@ -195,6 +195,17 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .gdFs legend{font-weight:700;padding:0 6px}
 #setDone{margin-top:12px}
 #scene .card{max-width:560px}
+#scene .trinLinje{font-size:calc(15px * var(--ts));margin:0 0 9px;line-height:1.45}
+#scene .trinLinje b,.trin b{font-weight:700}
+.trin{display:grid;gap:7px;margin:0 0 16px;font-size:calc(14.5px * var(--ts));line-height:1.45}
+.trin p{margin:0}
+#tip{position:fixed;left:14px;top:calc(110px + env(safe-area-inset-top,0px));max-width:min(330px,calc(100vw - 28px));box-sizing:border-box;padding:8px 12px 10px;background:#e8f3ec;font:600 calc(13.5px * var(--ts))/1.4 var(--body);animation:pop .3s ease-out}
+#tip small{display:block;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:#2f6b4a}
+#tip p{margin:2px 0 8px}
+#tip button{font:700 12.5px var(--body);border:1.5px solid var(--ink);border-radius:9px;background:var(--paper);color:var(--ink);padding:4px 14px;cursor:pointer}
+#tip button:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+.sTip{margin:2px 2px 0;padding:7px 10px;border-radius:10px;background:#e8f3ec;font-size:calc(13.5px * var(--ts));font-weight:600}
+.sTip b{color:#2f6b4a}
 #scene .replik b{font-weight:700}
 #scene .ida b{color:var(--leaf-deep)}
 .gdBrug{margin-top:6px;background:#ffe08a}
@@ -270,6 +281,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
     <div class="eyebrow">Christiansborg · en mordgåde i 3D</div>
     <h1 id="introTitle">Mord i Rigets midte</h1>
     <p class="lead" id="introLead">Ida er 24 år og skriver speciale om Christiansborg. Torsdag kl. 6 skal hun møde nattevagten Bente. Samme nat er en politiker fundet død i Vandrehallen. Find ud af, hvem der gjorde det, før pressemødet kl. 10.</p>
+    <div id="introTrin" class="trin" hidden></div>
     <p class="err" id="loadErr" hidden>3D-motoren kunne ikke hentes. Tjek internetforbindelsen og genindlæs siden.</p>
     <div class="keys" id="keysDesk">
       <span><kbd>W</kbd> <kbd>↑</kbd></span><span>Gå frem (<kbd>S</kbd> går baglæns)</span>
@@ -4064,11 +4076,25 @@ $('bNight').addEventListener('click', () => setEvening(!evening));
 $('bSound').addEventListener('click', () => { setSound(!soundOn); if (soundOn) sparkleSound(); });
 $('bHelp').addEventListener('click', () => openIntro(true));
 
+// How to solve the murder, in a few short points: shown at a new game and on the help card.
+function opklarTrin() {
+  return [
+    { b: 'Målet.', t: 'Find ud af, hvem der slog Aksel Mørkeberg ihjel, før pressemødet kl. 10.' },
+    { b: 'Tal med folk.', t: isTouch ? 'Gå hen til en person, og tryk på knappen nederst. Vælg så, hvad Ida skal spørge om.' : 'Gå hen til en person, og tryk E. Vælg så, hvad Ida skal spørge om.' },
+    { b: 'Undersøg ting.', t: 'Når knappen nederst siger fx "Se på bordet", kan Ida kigge nærmere på noget.' },
+    { b: 'Spor og ting.', t: isTouch ? 'Det, Ida finder ud af, skriver hun som spor i notesbogen. Ting kommer i rygsækken. I en samtale kan hun give en ting eller vise et spor.' : 'Det, Ida finder ud af, skriver hun som spor i notesbogen (N). Ting kommer i rygsækken (R). I en samtale kan hun give en ting eller vise et spor.' },
+    { b: 'Hvad nu?', t: 'Øverst til venstre står hele tiden, hvad Ida skal nu, og pilen viser vejen. Går du i stå, kan Bente give et hint.' },
+    { b: 'Uret.', t: 'Uret går, når Ida går og taler, men du kan ikke løbe tør for tid. Kl. 10 skal du bevise med dine spor, hvem der gjorde det.' },
+  ];
+}
+function visTrin(box) { box.replaceChildren(...opklarTrin().map(({ b, t }) => { const p = document.createElement('p'), s = document.createElement('b'); s.textContent = b + ' '; p.append(s, t); return p; })); }
 function openIntro(help) {
   paused = true; keys.clear(); resetTouch(); GAADE.startKnapper();
   if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='riddersal'?'I Riddersalen':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='riddersal'?'Gå langs gobelinerne og det dækkede langbord. Hoffoureren står ved bordets ende. Gå tilbage til døren og vælg Gå udenfor for at komme ud i Prins Jørgens Gård. Salens mål er anslået, og gobelinerne er ikke kopier af de rigtige.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
   else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';}
-  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan går du rundt'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk N for notesbogen, R for rygsækken og M for oversigtskortet. Uret går, når Ida går og taler. Går du i stå, kan Bente i betjentstuen give dig et hint, og under Indstillinger kan du slå Næste spor til.'; }
+  else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan opklarer du mordet'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk N for notesbogen, R for rygsækken og M for oversigtskortet. Uret går, når Ida går og taler. Går du i stå, kan Bente i betjentstuen give dig et hint, og under Indstillinger kan du slå Næste spor til.'; }
+  if (help) visTrin($('introTrin'));
+  $('introTrin').hidden = !help;
   intro.hidden = false; goBtn.focus();
 }
 goBtn.addEventListener('click', () => {
@@ -4221,9 +4247,9 @@ function updActions() {
 }
 
 // ======================================================================== STATE / STORAGE
-let soundOn = true, tekstStor = false, naesteSpor = false, visMaal = true, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
+let tipsSet = [], soundOn = true, tekstStor = false, naesteSpor = false, visMaal = true, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'mordIRigetsMidte';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor, maal: visMaal, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor, maal: visMaal, tips: tipsSet, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 
 // ======================================================================== MAIN LOOP
@@ -6284,11 +6310,11 @@ const GAADE = (() => {
     for (const raw of list || []) {
       const m = String(raw).match(/^([+-]?)(spor|ting|flag|akt):(\w+)$/); if (!m) continue;
       const [, sign, kind, val] = m;
-      if (kind === 'spor') { const n = +val; if (M.spor[n] && !G.spor.includes(n)) { G.spor.push(n); fik.push(['spor', M.spor[n].titel]); if (!stille) toast('Nyt spor i notesbogen: ' + M.spor[n].titel); chime([784, 988, 1319]); } }
+      if (kind === 'spor') { const n = +val; if (M.spor[n] && !G.spor.includes(n)) { G.spor.push(n); fik.push(['spor', M.spor[n].titel]); if (!stille) { toast('Nyt spor i notesbogen: ' + M.spor[n].titel); FX.tip?.vis('spor'); } chime([784, 988, 1319]); } }
       else if (kind === 'akt') G.akt = Math.max(G.akt, +val);
       else if (kind === 'ting') {
         if (sign === '-') { const i = G.ting.indexOf(val); if (i >= 0) { G.ting.splice(i, 1); if (!G.givet.includes(val)) G.givet.push(val); } }
-        else if (M.ting[val] && !G.ting.includes(val)) { G.ting.push(val); fik.push(['ting', M.ting[val].navn, val]); if (!stille) toast('I rygsækken: ' + M.ting[val].navn); chime([660, 880], 0.045); }
+        else if (M.ting[val] && !G.ting.includes(val)) { G.ting.push(val); fik.push(['ting', M.ting[val].navn, val]); if (!stille) { toast('I rygsækken: ' + M.ting[val].navn); FX.tip?.vis('ting'); } chime([660, 880], 0.045); }
       } else if (sign === '-') G.flag = G.flag.filter(f => f !== val);
       else if (!G.flag.includes(val)) G.flag.push(val);
     }
@@ -6334,6 +6360,7 @@ const GAADE = (() => {
     $('sceneEyebrow').textContent = o.eyebrow; $('sceneTitle').textContent = o.title;
     $('sceneText').replaceChildren(...o.lines.map(line => {
       const p = document.createElement('p'); p.className = 'lead';
+      if (line && line.b) { const b = document.createElement('b'); b.textContent = line.b + ' '; p.append(b, line.t); p.classList.add('trinLinje'); return p; }
       const [who, text] = Array.isArray(line) ? line : ['fortaeller', line], name = hvem(who);
       if (name) { const b = document.createElement('b'); b.textContent = name + ': '; p.append(b, text); p.classList.add('replik'); if (who === 'ida') p.classList.add('ida'); } else p.textContent = text;
       return p;
@@ -6359,7 +6386,8 @@ const GAADE = (() => {
   }
   function efterStart(nyt) {
     gem();
-    if (nyt && !TESTMODE) scene({ eyebrow: `Akt 1 · ${akt().navn} · kl. ${kl(G.min)}`, title: 'Torsdag morgen', lines: M.start.replikker.map(r => r[1]), btn: 'Gå over broen', efter: () => setTimeout(() => toast(visMaal ? 'Øverst til venstre står hele tiden, hvad Ida skal nu. Pilen peger derhen.' : 'Tryk N for notesbogen.'), 900) });
+    if (nyt && !TESTMODE) scene({ eyebrow: `Akt 1 · ${akt().navn} · kl. ${kl(G.min)}`, title: 'Torsdag morgen', lines: M.start.replikker.map(r => r[1]), btn: 'Videre', efter: () =>
+      scene({ eyebrow: 'Før du går i gang', title: 'Sådan opklarer du mordet', lines: opklarTrin(), btn: 'Gå over broen', efter: () => FX.tip?.vis('maal') }) });
     else if (!nyt) setTimeout(() => toast(`Velkommen tilbage. Klokken er ${kl(G.min)}.`), 900);
   }
   function startKnapper() {
@@ -6581,6 +6609,7 @@ const GAADE = (() => {
       box.appendChild(d);
     }
     for (const e of synlige) if (!G.emneSet.includes(key(e))) G.emneSet.push(key(e));
+    if (nye.some(e => tingI(e) && handling(e))) { const tip = FX.tip?.tekst('giv'); if (tip) { const p = el('p', 'sTip'); p.append(el('b', '', 'Tip: '), tip); box.prepend(p); } }
   }
   function spoerg(e) {
     const key = samtP + '.' + e.id, log = $('sLog');
@@ -6597,6 +6626,7 @@ const GAADE = (() => {
     for (const [k, txt] of fik) res.appendChild(el('p', k === 'spor' ? 'sResSpor' : 'sResTing', (k === 'spor' ? 'Nyt spor i notesbogen: ' : 'I rygsækken: ') + txt));
     FX.maal?.opdater(); const maalNu = FX.maal?.vis ? FX.maal?.maal?.maal : null;
     if (maalNu && (maalNu !== maalFoer || fik.length)) res.appendChild(el('p', 'sResMaal', 'Det skal Ida nu: ' + maalNu));
+    for (const k of new Set(fik.map(f => f[0]))) { const tip = FX.tip?.tekst(k); if (tip) { const p = el('p', 'sTip'); p.append(el('b', '', 'Tip: '), tip); res.appendChild(p); } }
     if (res.children.length) log.appendChild(res);
     if (samt.open) visEmner();
   }
@@ -7557,6 +7587,49 @@ const MAAL = (() => {
   return S;
 })();
 
+// ======================================================================== MURDER MYSTERY: tips for beginners
+// The first time something happens (the action button, the first clue, the first thing in the backpack, a thing to give
+// or show in a conversation) a small tip under the goal card says what it means. Each tip comes once, and the tips seen
+// are remembered with the settings. A tip waits until no card or window is open, and goes away after 15 seconds or OK.
+const TIPS = (() => {
+  const card = document.createElement('div'); card.id = 'tip'; card.className = 'sticker'; card.hidden = true; card.setAttribute('role', 'status');
+  card.innerHTML = '<small>Tip</small><p id="tipTekst"></p><button type="button" id="tipOk">OK</button>';
+  $('hud').appendChild(card);
+  const TEKST = {
+    maal: 'Her står hele tiden, hvad Ida skal nu. Pilen viser vejen, og stedet har en gul ring på kortet.',
+    knap: isTouch ? 'Knappen nederst viser, hvad Ida kan gøre her. Tryk på den.' : 'Knappen nederst viser, hvad Ida kan gøre her. Tryk E, eller klik på knappen.',
+    spor: isTouch ? 'Ida har skrevet sit første spor i notesbogen. Tryk på Notesbog for at læse det. Til sidst skal du bruge sporene som bevis.' : 'Ida har skrevet sit første spor i notesbogen. Tryk N for at læse det. Til sidst skal du bruge sporene som bevis.',
+    ting: isTouch ? 'Tingen ligger nu i rygsækken. Tryk på Rygsæk for at se den. Nogle ting kan Ida give til folk eller bruge et sted.' : 'Tingen ligger nu i rygsækken. Tryk R for at se den. Nogle ting kan Ida give til folk eller bruge et sted.',
+    giv: 'Et emne med et billede betyder, at Ida kan give en ting eller vise et spor.',
+  };
+  const koe = [];
+  let tilbage = 0, nu = null;
+  const set = id => tipsSet.includes(id);
+  const marker = id => { if (!set(id)) { tipsSet.push(id); save(); } };
+  function vis(id) { if (!TEKST[id] || set(id) || koe.includes(id)) return; koe.push(id); }
+  function tekst(id) { if (!TEKST[id] || set(id)) return null; marker(id); const i = koe.indexOf(id); if (i >= 0) koe.splice(i, 1); return TEKST[id]; }   // for a tip shown inside a window
+  function skjul() { card.hidden = true; tilbage = 0; }
+  $('tipOk').addEventListener('click', () => { skjul(); canvas.focus(); });
+  const aabent = () => paused || !$('scene').hidden || !!document.querySelector('dialog[open]');
+  HOOKS.frame.push(dt => {
+    if (!started) return;
+    if (ACT.cur && !set('knap')) vis('knap');
+    if (card.hidden) {
+      if (!koe.length || aabent()) return;
+      const id = koe.shift(); if (set(id)) return;
+      marker(id); $('tipTekst').textContent = TEKST[id]; card.hidden = false; tilbage = 15; nu = id;
+    } else if (nu === 'knap' && aabent()) skjul();   // she has used the button
+    else if (!aabent()) { tilbage -= dt; if (tilbage <= 0) skjul(); }
+    if (!card.hidden) {   // just under the goal card
+      const m = $('maal'), top = m && !m.hidden ? m.getBoundingClientRect().bottom + 10 : 14;
+      card.style.top = Math.round(top) + 'px';
+    }
+  });
+  const T = { vis, tekst, skjul };
+  FX.tip = T;
+  return T;
+})();
+
 // ======================================================================== MURDER MYSTERY: the extra layer, June 1942
 // With the old radio in the betjentstue Ida comes to a summer morning in 1942. Everything built later is hidden, the
 // picture turns old and brown, and German soldiers walk patrol. If one of them sees her, she is sent back to 2026.
@@ -7625,7 +7698,7 @@ function boot(data) {
   const st = load();
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
-  setTekst(!!st.tekst); naesteSpor = !!st.spor; visMaal = st.maal !== false; if (FX.maal) FX.maal.vis = visMaal; med1942 = st.lag1942 !== false;
+  setTekst(!!st.tekst); naesteSpor = !!st.spor; visMaal = st.maal !== false; if (FX.maal) FX.maal.vis = visMaal; tipsSet = Array.isArray(st.tips) ? st.tips : []; med1942 = st.lag1942 !== false;
   setEvening(false); ev = lysMaal();   // the light follows the story's clock from the start
   setMapVisible(showMap); sizeMap();
   if (data.pos) { P.pos.fromArray(data.pos); if (typeof data.face === 'number') P.face = data.face; }
@@ -7638,7 +7711,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { MAAL, lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { MAAL, TIPS, lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

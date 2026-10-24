@@ -330,8 +330,12 @@ Michel: efter samtalen med Gry vidste man ikke, hvor man skulle hen, og det var 
   - Manuskriptet: Gry spørges først om sadelkammeret i akt 2 (Snapstinget med gulerødderne åbner kl. 7), og om hesteskoene først når det gamle sadelskab er låst (`flag:skab_laast`). Bente siger, hvor man skal hen: Vandrehallen fra døren, betjentstuen efter statsministeren, gangen i Rigsdagsgården til Bibliotekshaven og dørene ved kaminen til Samtaleværelset.
   - Aktens kort har fået linjer om, hvem der er hvor (`hvor` i `AKTER`, akt 2 og 3). Notesbogen viser under hver person, hvor de er nu ("Er nu: Betjentstuen").
   - Et mål i vand (dammen i Bibliotekshaven, kanalen) peger nu på det nærmeste tørre sted inden for 25 m, så pilen også følger vejen dertil.
-- [ ] 3. Begynderhjælp: en kort forklaring ved nyt spil af, hvad man skal (find morderen før kl. 10), og hvordan (spor i notesbogen, ting i rygsækken, giv og vis, afsløringen), og små tips første gang man finder et spor eller en ting.
-- [ ] 4. Ridebanen: i dag kommer man kun ud ved Marmorbroen og må gå rundt ad Tøjhusgade. Jeg har ikke fundet en port mellem Ridebanen og Rigsdagsgården i virkeligheden (Altinget nævner kun Tøjhusgade og Slotspladsen). Michel skal vælge: behold den rigtige vej, eller lav en genvej.
+- [x] 3. Begynderhjælp (24. okt. 2026)
+  - Ved nyt spil kommer kortet "Sådan opklarer du mordet" efter "Torsdag morgen": målet, tal med folk, undersøg ting, spor og ting, hvad nu og uret (`opklarTrin()`, teksten passer til computer eller telefon). En linje i en scene kan nu være `{ b, t }`: et ord med fed og en tekst.
+  - Hjælp-knappen viser de samme punkter over tasterne (`#introTrin`, `visTrin`). Udenfor hedder kortet nu "Sådan opklarer du mordet".
+  - Små tips første gang (`TIPS`, `FX.tip`): ved kortet med målet efter start, første gang knappen nederst kommer (forsvinder, når den bruges), første spor og første ting (i samtalevinduet, hvis det sker i en samtale) og første gang et emne har et billede (giv eller vis). Hvert tip kommer én gang og huskes med indstillingerne (`tipsSet`, gemt som `tips`). Et tip venter, til der ikke er et kort eller vindue åbent, og forsvinder efter 15 sekunder eller med OK.
+  - Kortet med målet og tippet ligger nu under kort og vinduer (ingen z-index), så de ikke dækker teksten på telefonen.
+- [x] 4. Ridebanen (24. okt. 2026): Michel valgte at beholde den rigtige vej. Man kommer kun ud ved Marmorbroen og går rundt ad Tøjhusgade til Rigsdagsgården (ca. 390 m fra Gry). Pilen og Gry viser vejen. Jeg har ikke fundet en port mellem Ridebanen og Rigsdagsgården i virkeligheden (Altinget nævner kun Tøjhusgade og Slotspladsen).
 
 ## Til senere
 - [ ] Pænere heste. Michel synes, de er meget grimme (Ridebanen, staldene, Vega, kongens hest i 1942).
