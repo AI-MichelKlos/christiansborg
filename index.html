@@ -5543,10 +5543,10 @@ const INTERIOR = (() => {
     for(const part of salonParts)salon.add(part);salon.position.x=12;salon.rotation.y=Math.PI;
     for(let i=salonObstacleStart;i<I.obstacles.length;i++){const o=I.obstacles[i];I.obstacles[i]=[12-o[1],12-o[0],-o[3],-o[2]];}
     // Betjentstuen: inferred layout; the oak reception counter is based on JJI's real work.
-    const bx=8.4,bz=22.1;
+    const bx=8.4,bz=22.1,officePaint=material('#b4bca8');
     b(8,.2,6.8,woodFloor,bx,-.2,bz);b(8,.2,6.8,cream,bx,3.65,bz);
-    wall(4.4,12.4,18.7,0,3.65,cream);wall(4.4,12.4,25.5,0,3.65,cream);wall(18.7,25.5,12.4,0,3.65,cream,false);
-    for(const [a,c] of [[18.7,18.9],[21.9,25.5]])wall(a,c,4.4,0,3.65,cream,false);
+    wall(4.4,12.4,18.7,0,3.65,officePaint);wall(4.4,12.4,25.5,0,3.65,officePaint);wall(18.7,25.5,12.4,0,3.65,officePaint,false);
+    for(const [a,c] of [[18.7,18.9],[21.9,25.5]])wall(a,c,4.4,0,3.65,officePaint,false);
     b(.25,.65,3,cream,4.4,3,20.4);
     // Rounded front: individual slats with raised panels and a curved wooden worktop.
     for(let k=0;k<18;k++){
@@ -5569,6 +5569,58 @@ const INTERIOR = (() => {
     for(const z of [20.15,20.7,21.25])b(.025,.45,.34,cream,11.97,1.8,z);
     chair(5.3,23.25,-Math.PI/2,0);chair(5.3,24.3,-Math.PI/2,0);
     b(4.7,.12,.5,cream,8.4,3.32,22.1);b(4.4,.07,.38,lamp,8.4,3.24,22.1);
+    buildReceptionDetails();
+  }
+
+  function buildReceptionDetails(){
+    const warm=material('#e9e1cb'),sage=material('#596d5b'),ivory=material('#f7efdb');
+    // Decorative additions stay on the existing walls and furniture footprints.
+    // The curved worktop is one continuous solid instead of separate slat tops.
+    const topShape=new THREE.Shape();
+    for(let k=0;k<=40;k++){const a=-1.12+k*2.24/40,x=9.5+Math.sin(a)*2.2,z=23.45-Math.cos(a)*1.29;k?topShape.lineTo(x,-z):topShape.moveTo(x,-z);}
+    for(let k=40;k>=0;k--){const a=-1.12+k*2.24/40;topShape.lineTo(9.5+Math.sin(a)*1.88,-(23.45-Math.cos(a)*.78));}
+    topShape.closePath();
+    const top=new THREE.Mesh(new THREE.ExtrudeGeometry(topShape,{depth:.09,bevelEnabled:false,curveSegments:12}),trim);
+    top.rotation.x=-Math.PI/2;top.position.y=1.12;g.add(top);
+    for(let k=0;k<18;k++){
+      const a=-1.12+k*2.24/17,x=9.5+Math.sin(a)*2.05,z=23.45-Math.cos(a)*1.05;
+      const r=new THREE.Group();r.position.set(x,0,z);r.rotation.y=-a*.6;g.add(r);
+      const add=(w,h,d,m,x,y,z)=>box(w,h,d,m,x,y,z,{parent:r,cast:false});
+      add(.27,.13,.2,trim,0,.025,-.025);add(.27,.065,.2,trim,0,.99,-.025);
+      add(.19,.63,.022,trim,0,.24,-.091);add(.145,.54,.026,oak,0,.285,-.105);
+      add(.27,.018,.03,brass,0,1.045,-.11);
+    }
+    // Skirting, raised wall panels and a layered ceiling cornice.
+    for(const z of [18.9,25.28]){
+      b(7.6,.16,.09,trim,8.4,0,z);
+      b(7.6,.065,.13,oak,8.4,1.24,z);
+      b(7.6,.13,.22,warm,8.4,3.4,z);b(7.6,.07,.3,ivory,8.4,3.53,z);
+      for(let x=4.9;x<12;x+=.95){
+        for(const dx of [-.36,.36])b(.035,.78,.035,oak,x+dx,.25,z+(z<22?.025:-.025));
+        for(const y of [.25,1.0])b(.75,.035,.035,oak,x,y,z+(z<22?.025:-.025));
+      }
+    }
+    b(.18,.13,6.3,warm,12.13,3.4,22.1);
+    b(.26,.07,6.3,ivory,12.1,3.53,22.1);
+    // A readable welcome plaque on the wall opposite the doorway.
+    sign('Betjentstuen',1.65,.36,12.08,2.85,20.7,-Math.PI/2);
+    // Small wall sconces: emissive shades without extra real-time light sources.
+    for(const x of [5.7,10.8]){
+      b(.17,.36,.07,brass,x,2.25,25.21);
+      b(.035,.25,.18,brass,x,2.36,25.09);
+      mesh(new THREE.CylinderGeometry(.16,.23,.25,16),ivory,x,2.64,25.04,{parent:g});
+      mesh(new THREE.CylinderGeometry(.14,.21,.02,16),new THREE.MeshBasicMaterial({color:'#fce6b2'}),x,2.51,25.04,{parent:g});
+    }
+    // Cabinet drawer fronts and handles. The original key rings remain visible.
+    for(const y of [.13,.44,.73]){
+      b(1.4,.24,.035,trim,6.9,y,24.6);b(1.3,.18,.04,oak,6.9,y+.03,24.57);
+      for(const x of [6.53,7.27])b(.18,.025,.05,brass,x,y+.12,24.53);
+    }
+    // Desk lamp and a green blotter add a working atmosphere, without new clues.
+    b(.48,.012,.28,sage,8.45,1.213,22.62);
+    mesh(new THREE.CylinderGeometry(.12,.15,.035,16),brass,10.8,1.23,22.65,{parent:g});
+    mesh(new THREE.CylinderGeometry(.018,.018,.37,10),brass,10.8,1.43,22.65,{parent:g});
+    const shade=mesh(new THREE.SphereGeometry(.23,16,8,0,Math.PI*2,0,Math.PI/2),sage,10.8,1.62,22.65,{parent:g});shade.scale.set(1,.6,.7);
   }
 
 
@@ -7852,8 +7904,24 @@ const PERSONER = (() => {
   const kamera = (sh, part, m, el) => { boej(sh, el, -0.35, -1.2); const h = holder(el); part(new THREE.BoxGeometry(0.14, 0.1, 0.09), m('#1e1e20'), h, 0, 0.05, 0.03, 1.06); const l = part(new THREE.CylinderGeometry(0.035, 0.04, 0.22, 10), m('#2b2b2e'), h, 0, 0.05, 0.17, 1.06); l.rotation.x = Math.PI / 2; };   // a camera with a long lens
   const mappe = (sh, part, m, el) => { boej(sh, el, 0, -0.1); part(new THREE.BoxGeometry(0.09, 0.3, 0.4), m('#4a2e1f'), holder(el, 0.02), 0, -0.16, 0, 1.04); };   // a briefcase in his hand
   const LOOK = {
-    bente: { kvinde: true, coat: '#24324a', trousers: '#24324a', hair: '#9b9b9b', hairStyle: 'knold', long: true, scale: 0.95, skin: '#efc6a8',
-      extra: (g, head, part, m) => { const c = part(new THREE.TorusGeometry(0.1, 0.006, 6, 20, Math.PI), m('#7a5a3a'), g, 0, 1.52, 0.1, 0); c.rotation.set(-1.1, 0, Math.PI); } },   // the empty glasses cord
+    bente: { kvinde: true, coat: '#293c50', trousers: '#253344', shoes: '#292a2b', hair: '#b9b9b0', bryn: '#77786f', hairStyle: 'knold', long: false, scale: 0.95, skin: '#efc6a8',
+      extra: (g, head, part, m, foran) => {
+        // A short service jacket with shirt, lapels and understated brass fittings.
+        part(rundKasse(.105,.2,.025,.008),m('#f1ead8'),g,0,1.48,foran(1.48)+.012,0);
+        for(const side of [-1,1]){
+          const lapel=part(kasse(.055,.15,.024),m('#3d5368'),g,side*.078,1.47,foran(1.47)+.024,0);lapel.rotation.z=-side*.3;
+          part(kasse(.09,.018,.05),m('#465a6b'),g,side*.173,1.54,.035,0);
+          part(kugle(.009,8,6),m('#c7ad71'),g,side*.173,1.553,.063,0);
+          part(kugle(.012,8,6),m('#bcae87'),head,side*.139,-.052,.008,0);
+        }
+        for(const y of [1.12,1.23,1.34]){const button=part(cyl(.011,.011,.012,10),m('#c7ad71'),g,0,y,foran(y)+.018,0);button.rotation.x=Math.PI/2;}
+        // A small fabric name badge is left unmerged so its lettering survives.
+        const badge=ctex(256,80,(c,W,H)=>{c.fillStyle='#e9e4d5';c.fillRect(0,0,W,H);c.fillStyle='#263d50';c.font='bold 40px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('BENTE',W/2,H/2);},{wrap:false});
+        const name=new THREE.Mesh(new THREE.PlaneGeometry(.13,.041),new THREE.MeshBasicMaterial({map:badge}));name.position.set(.11,1.405,foran(1.405)+.026);g.add(name);
+        for(const side of [-1,1]){const lock=part(kapsel(.012,.075,8),m('#deddd2'),head,side*.105,.065,.045,0);lock.rotation.z=side*.55;lock.rotation.x=.25;}
+        // Her glasses are still missing in the story: keep only the empty cord.
+        const c=part(new THREE.TorusGeometry(.1,.006,6,20,Math.PI),m('#7a5a3a'),g,0,1.52,.1,0);c.rotation.set(-1.1,0,Math.PI);
+      } },
     kommissaer: { kvinde: true, alvor: true, coat: '#b59a6a', trousers: '#3b3a36', hair: '#b4b2ac', hairStyle: 'bob', long: true, scale: 0.98, skin: '#e8b996', arm: [null, kop] },   // short grey hair, a wet trench coat and coffee in a paper cup
     statsminister: { kvinde: true, coat: '#1f2a44', trousers: '#1f2a44', hair: '#5a4334', hairStyle: 'bob', long: true, scale: 0.97, skin: '#f0caa9', toerklaede: '#c0392b' },   // a red scarf
     vagt: { coat: '#1e2023', trousers: '#1e2023', hair: '#2b2420', hairStyle: 'kort', scale: 1.04, skin: '#d9a984', solbriller: true },
