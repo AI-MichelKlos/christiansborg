@@ -357,3 +357,12 @@ Udenfor er Den Sorte Diamant, glasbroen, presseområdet på Slotspladsen, bilern
 Patruljernes ruter og kongens plads på Ridebanen er digtet. Kongens hest er lys som i manuskriptet. Mørklægningsgardiner, gamle biler, cykler og hestevogne er ikke lavet. Det er heller ikke tjekket, om springvandets skulptur i Bibliotekshaven fandtes i 1942.
 
 Kontrol: radioen begge veje, Holger, kongen, handsken, hesteskoen, en patrulje og skabet er gennemprøvet i Chromium på computer og telefon uden JavaScript-fejl.
+
+
+## Runde 15: detaljer ved Folketingets indgang (24. oktober 2026)
+
+Første lille forbedring af det eksisterende interiør er afgrænset til ankomstområdet mellem hoveddøren og trappens fod (z 18,5 til 23 i modellen). Der er tilføjet en proceduretegnet lys stenbelægning med smal mørk kant, fyldningspaneler på bagvæggen, en lagdelt indfatning omkring den eksisterende udgangsdør, dørfyldninger, messinggreb og hængsler. De to sidepassager har fået supplerende indfatninger. To væglanterner med emissivt glas og enkle gesimser afslutter området. Lanternerne tilfører ingen ekstra realtidslys. De almindelige geometrier samles fortsat af den eksisterende bakeGroup-funktion.
+
+Detaljerne er en æstetisk fortolkning af den eksisterende spilmodel, ikke en ny fotobaseret rekonstruktion eller dokumentation for materialer i den virkelige indgang. Ingen referencefotos er indsat. Ganggrænser, gulvhøjder, kollisioner, historie, figurer, eksisterende udgangshandling og de andre rum er bevaret.
+
+Kontrol: hele spilmodulets JavaScript-syntaks er kontrolleret. Interiørets faktiske build-funktion er kørt med three.js 0.160.0 og en lokal 2D-canvas; alle genererede geometrikoordinater er endelige. I denne isolerede kontrol er hestemodeller erstattet af tomme grupper og browserens UI udeladt. Fem ruter med 251 kontrolpunkter hver er kontrolleret mod modellens fits- og height-funktioner: ankomst til trappefod, betjentstuen, Snapstinget, udgangsområdet og Vandrehallen. Ingen blokeringer eller niveauspring over 18 cm blev fundet. Testbrowseren rapporterede, at WebGL ikke var tilgængeligt. Den færdige gengivelse, lys og mobilbetjening er derfor ikke visuelt efterprøvet i denne runde.
