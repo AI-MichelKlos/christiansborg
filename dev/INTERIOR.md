@@ -366,3 +366,12 @@ Første lille forbedring af det eksisterende interiør er afgrænset til ankomst
 Detaljerne er en æstetisk fortolkning af den eksisterende spilmodel, ikke en ny fotobaseret rekonstruktion eller dokumentation for materialer i den virkelige indgang. Ingen referencefotos er indsat. Ganggrænser, gulvhøjder, kollisioner, historie, figurer, eksisterende udgangshandling og de andre rum er bevaret.
 
 Kontrol: hele spilmodulets JavaScript-syntaks er kontrolleret. Interiørets faktiske build-funktion er kørt med three.js 0.160.0 og en lokal 2D-canvas; alle genererede geometrikoordinater er endelige. I denne isolerede kontrol er hestemodeller erstattet af tomme grupper og browserens UI udeladt. Fem ruter med 251 kontrolpunkter hver er kontrolleret mod modellens fits- og height-funktioner: ankomst til trappefod, betjentstuen, Snapstinget, udgangsområdet og Vandrehallen. Ingen blokeringer eller niveauspring over 18 cm blev fundet. Testbrowseren rapporterede, at WebGL ikke var tilgængeligt. Den færdige gengivelse, lys og mobilbetjening er derfor ikke visuelt efterprøvet i denne runde.
+
+
+## Runde 16: trappe og repos (24. oktober 2026)
+
+Trappens eksisterende to løb og repos er forfinet. Gelænderne har bredere runde håndlister med mørk underside, gennemgående bundlister, mere detaljeret drejede balustre og fyldningsstolper ved trappefod, repos og øverste afslutning. Gallerikanterne har lagdelte træafslutninger. Trinbelægningen er bredere og har profilerede forkantlister, mørke samlinger og diskrete messingindlæg. Reposen har tilsvarende kantlister.
+
+Ændringen følger den eksisterende model og er en æstetisk fortolkning. Der er ikke foretaget en ny fotobaseret rekonstruktion. Ganggrænser, gulvhøjdeberegning, kollisioner, forbindelser og historiefunktioner er bevaret. De nye dele bruger den eksisterende samling af geometri efter materiale; der er ingen nye billedfiler eller realtidslys.
+
+Kontrol: hele spilmodulet består JavaScript-syntakskontrol. Interiørets build-funktion er kørt med three.js 0.160.0 og lokal 2D-canvas, med samme afgrænsninger som runde 15 (tomme hestegrupper og ingen browser-UI). Alle geometrikoordinater er endelige. Ti ruter med 251 kontrolpunkter hver består fits- og height-kontrollen: de fem tidligere adgangsruter, op og ned i begge sider af trappen samt på tværs af reposen. Niveauspring er under 18 cm. Den færdige 3D-gengivelse og mobilbetjening er ikke visuelt efterprøvet, da testbrowseren ved den forrige runde rapporterede manglende WebGL.
