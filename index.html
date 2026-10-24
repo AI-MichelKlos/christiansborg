@@ -6201,6 +6201,94 @@ const INTERIOR = (() => {
     shelf(209.5,-3,0.6);window(209.85,-5,-Math.PI/2);lamp(206,-5);lamp(200,-6);lamp(200,-14);lamp(208,-16);lamp(204,6);
     sofa(208.9,6,Math.PI/2,0,2.8);b(2.6,.08,.65,oak,203.8,1.1,2.5);obstacle(203.8,2.5,2.6,.7);
   }
+  // The hearth and seating retain their original footprints and story interactions.
+  // These are original decorative details for the existing, approximate model.
+  function buildHearthDetails(marble) {
+    const y=I.floor,soot=material('#302e29'),iron=material('#3d3b34',{metalness:.4,roughness:.65});
+    // A real recess between separate jambs, rather than a dark patch on a solid block.
+    b(1.85,2.26,.08,soot,0,y+.12,-4.53);
+    for(const side of [-1,1]){
+      b(.16,2.2,.54,soot,side*.89,y+.12,-4.22);
+      b(.45,2.4,.7,marble,side*1.1,y,-4.18);
+      b(.6,.2,.8,stone,side*1.1,y+2.35,-4.15);
+      b(.58,.16,.82,stone,side*1.1,y+.12,-4.12);
+      // Recessed stone face and a slender inner moulding catch the room's light.
+      b(.27,1.91,.025,stone,side*1.1,y+.4,-3.815);
+      b(.065,2.18,.12,stone,side*.835,y+.17,-3.89);
+      b(.09,.08,.7,marble,side*1.36,y+2.2,-4.18);
+    }
+    b(2.9,.22,.65,stone,0,y+2.38,-4.27);
+    for(const [h,w,d] of [[2.55,3.1,.82],[2.75,3.35,.9],[3.0,3.6,1]])b(w,.16,d,stone,0,y+h,-4.2);
+    b(3.28,.045,.92,marble,0,y+2.91,-4.2);
+    b(3.3,.12,1.2,marble,0,y,-4);
+    b(3.26,.028,.09,stone,0,y+.12,-3.46);
+    // Unlit fire basket: no animated fire, new light source or gameplay object.
+    for(const x of [-.53,.53])b(.06,.22,.45,iron,x,y+.14,-4.15);
+    for(const z of [-4.34,-3.97])b(1.2,.06,.05,iron,0,y+.34,z);
+    for(let x=-.5;x<=.51;x+=.2)b(.025,.4,.025,iron,x,y+.2,-3.97);
+    obstacle(0,-4,3.4,1.3);
+    // Domed timber mantel clock with brass bezel and a legible circular dial.
+    b(1.04,.12,.38,trim,0,y+3.16,-4.2);
+    b(.9,.09,.34,oak,0,y+3.28,-4.2);
+    b(.76,.59,.28,oak,0,y+3.37,-4.2);
+    mesh(new THREE.CylinderGeometry(.38,.38,.28,32),oak,0,y+3.96,-4.2,{parent:g,rx:Math.PI/2});
+    for(const x of [-.39,.39])b(.12,.14,.31,brass,x,y+3.19,-4.2);
+    const dial=ctex(256,256,(c,W,H)=>{
+      c.clearRect(0,0,W,H);c.translate(W/2,H/2);
+      c.fillStyle='#eee3c5';c.beginPath();c.arc(0,0,120,0,Math.PI*2);c.fill();
+      c.strokeStyle='#857144';c.lineWidth=3;c.beginPath();c.arc(0,0,112,0,Math.PI*2);c.stroke();
+      c.strokeStyle='#37352c';
+      for(let i=0;i<60;i++){c.save();c.rotate(i*Math.PI/30);c.lineWidth=i%5?1.5:3.5;c.beginPath();c.moveTo(0,-(i%5?104:98));c.lineTo(0,-109);c.stroke();c.restore();}
+      c.fillStyle='#37352c';c.font='20px Georgia';c.textAlign='center';c.textBaseline='middle';
+      for(let i=1;i<=12;i++){const a=i*Math.PI/6;c.fillText(String(i),Math.sin(a)*83,-Math.cos(a)*83);}
+      // Preserve the previous decorative clock's fixed hand positions.
+      for(const [a,l,w] of [[-Math.PI/3,52,6],[Math.PI/3,75,4]]){c.save();c.rotate(a);c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(0,10);c.lineTo(0,-l);c.stroke();c.restore();}
+      c.fillStyle='#9f824b';c.beginPath();c.arc(0,0,6,0,Math.PI*2);c.fill();
+    },{wrap:false});
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(.66,.66),new THREE.MeshBasicMaterial({map:dial,transparent:true}));
+    face.position.set(0,y+3.96,-4.047);g.add(face);
+    mesh(new THREE.TorusGeometry(.338,.018,8,40),brass,0,y+3.96,-4.027,{parent:g});
+  }
+
+  function buildHearthSeating() {
+    const y=I.floor,upholstery=material('#667767'),piping=material('#85917b');
+    // One original woven motif, mapped once across the whole rug.
+    const rugTex=ctex(768,576,(c,W,H)=>{
+      c.fillStyle='#4d5a4d';c.fillRect(0,0,W,H);
+      for(const [p,col,w] of [[12,'#c3b58e',9],[27,'#8c956f',5],[43,'#c3b58e',2]]){c.strokeStyle=col;c.lineWidth=w;c.strokeRect(p,p,W-2*p,H-2*p);}
+      c.strokeStyle='rgba(195,181,142,.28)';c.lineWidth=2;
+      for(let row=0;row<6;row++)for(let col=0;col<8;col++){const x=79+col*87,z=76+row*85;c.beginPath();c.moveTo(x,z-22);c.lineTo(x+22,z);c.lineTo(x,z+22);c.lineTo(x-22,z);c.closePath();c.stroke();}
+      c.fillStyle='rgba(235,227,200,.055)';for(let z=0;z<H;z+=3)c.fillRect(0,z,W,1);
+    },{wrap:false});
+    const rug=new THREE.Mesh(new THREE.PlaneGeometry(5.5,4.1),material('#fff',{map:rugTex}));
+    rug.rotation.x=-Math.PI/2;rug.position.set(0,y+.023,-.55);g.add(rug);
+    // Turned pedestal and three low feet keep the existing table footprint clear.
+    mesh(new THREE.CylinderGeometry(.8,.78,.1,40),oak,0,y+.78,-.8,{parent:g});
+    mesh(new THREE.TorusGeometry(.785,.018,6,40),trim,0,y+.765,-.8,{parent:g,rx:Math.PI/2});
+    const profile=[[.16,.11],[.24,.17],[.18,.26],[.12,.39],[.16,.55],[.28,.7]].map(p=>new THREE.Vector2(...p));
+    mesh(new THREE.LatheGeometry(profile,20),oak,0,y,-.8,{parent:g});
+    for(let i=0;i<3;i++){const a=i*Math.PI*2/3,foot=b(.16,.09,.57,trim,Math.sin(a)*.25,y+.035,-.8+Math.cos(a)*.25);foot.rotation.y=a;}
+    obstacle(0,-.8,1.65,1.65);
+    function armchair(x,z,ry){
+      const r=new THREE.Group();r.position.set(x,y,z);r.rotation.y=ry;g.add(r);
+      const add=(w,h,d,m,x,y,z)=>box(w,h,d,m,x,y,z,{parent:r,cast:false});
+      for(const dx of [-.29,.29])for(const dz of [-.28,.28])add(.065,.4,.065,trim,dx,.03,dz);
+      add(.75,.12,.76,oak,0,.36,0);add(.64,.15,.62,upholstery,0,.48,.035);
+      add(.66,.025,.64,piping,0,.48,.035);
+      add(.73,.6,.1,oak,0,.5,-.33);add(.6,.45,.12,upholstery,0,.58,-.255);
+      add(.75,.055,.14,trim,0,1.06,-.33);
+      for(const side of [-1,1]){
+        add(.06,.28,.06,oak,side*.35,.48,.25);
+        add(.105,.08,.72,oak,side*.35,.75,0);
+        add(.09,.035,.6,upholstery,side*.35,.83,0);
+      }
+      // Same collision rectangles as the four previous single-seat sofas.
+      obstacle(x,z,.8+.15,1.05);
+    }
+    // All four seats now face the table.
+    for(const [x,z,ry] of [[-1.6,-.8,Math.PI/2],[1.6,-.8,-Math.PI/2],[-.8,.9,Math.PI],[.8,.9,Math.PI]])armchair(x,z,ry);
+  }
+
   // First small interior polish: only the ground-floor arrival area, z=18.5..23.
   // Decorative relief stays outside the existing walkable bounds. No new obstacles,
   // story interactions or inferred claims about the real building's floor plan.
@@ -6333,26 +6421,14 @@ const INTERIOR = (() => {
       mesh(new THREE.CylinderGeometry(.32,.42,3.6,20),marble,x,I.floor+2.0,z,{parent:g});
       b(.95,.25,.95,stone,x,I.floor,z);b(1,.3,1,stone,x,I.floor+3.8,z);obstacle(x,z,.95,.95);
     }
-    b(2.9,3.05,.65,stone,0,I.floor,-4.27);b(1.85,2,.1,dark,0,I.floor+.12,-3.88);
-    for(const x of [-1.1,1.1]){b(.45,2.4,.7,marble,x,I.floor,-4.18);b(.6,.2,.8,stone,x,I.floor+2.35,-4.15);}
-    for(const [y,w] of [[2.55,3.1],[2.75,3.35],[3.0,3.6]])b(w,.16,.9,stone,0,I.floor+y,-4.2);
-    b(3.3,.12,1.2,marble,0,I.floor,-4);obstacle(0,-4,3.4,1.3);
+    buildHearthDetails(marble);
     for(const x of [-8,8]) {
       b(2.2,.13,1.05,oak,x,I.floor+.64,-1.5);
       for(const dx of [-.85,.85])for(const dz of [-.33,.33])b(.09,.64,.09,trim,x+dx,I.floor,-1.5+dz);
       obstacle(x,-1.5,2.3,1.15);
       sofa(x,-3.25,0,I.floor,2.7);sofa(x,.35,Math.PI,I.floor,2.7);
     }
-    // The central seating group and mantel clock follow the additional hall photo.
-    b(5.5,.018,4.1,material('#4d514b'),0,I.floor+.004,-.55);
-    for(const z of [-2.5,1.4])b(5.5,.02,.13,plaster,0,I.floor+.02,z);
-    for(const x of [-2.65,2.65])b(.13,.02,4.1,plaster,x,I.floor+.02,-.55);
-    mesh(new THREE.CylinderGeometry(.8,.76,.12,32),oak,0,I.floor+.76,-.8,{parent:g});
-    b(.2,.7,.2,trim,0,I.floor,-.8);obstacle(0,-.8,1.65,1.65);
-    for(const [x,z,ry] of [[-1.6,-.8,-Math.PI/2],[1.6,-.8,Math.PI/2],[-.8,.9,Math.PI],[.8,.9,Math.PI]])sofa(x,z,ry,I.floor,.8);
-    b(1.05,1.25,.3,trim,0,I.floor+3.2,-4.4);b(1.2,.12,.4,stone,0,I.floor+4.45,-4.4);
-    const dial=ctex(256,256,(c,W,H)=>{c.fillStyle='#ddd4b9';c.fillRect(0,0,W,H);c.translate(W/2,H/2);c.strokeStyle='#3b3528';c.lineWidth=5;for(let i=0;i<12;i++){c.save();c.rotate(i*Math.PI/6);c.beginPath();c.moveTo(0,-84);c.lineTo(0,-99);c.stroke();c.restore();}for(const [a,l] of [[-Math.PI/3,56],[Math.PI/3,78]]){c.save();c.rotate(a);c.beginPath();c.moveTo(0,0);c.lineTo(0,-l);c.stroke();c.restore();}},{wrap:false});
-    const face=new THREE.Mesh(new THREE.PlaneGeometry(.8,.8),new THREE.MeshBasicMaterial({map:dial}));face.position.set(0,I.floor+3.85,-4.22);g.add(face);
+    buildHearthSeating();
     // Constitution display cases with books, not invented politician likenesses.
     for(const x of [-27,-21]) {
       b(3.5,.8,.8,oak,x,I.floor,3.9);b(3.5,.5,.8,material('#d5e5df',{transparent:true,opacity:.35}),x,I.floor+.8,3.9);
