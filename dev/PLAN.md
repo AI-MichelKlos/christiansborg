@@ -338,6 +338,11 @@ Michel: efter samtalen med Gry vidste man ikke, hvor man skulle hen, og det var 
 - [x] 4. Ridebanen (24. okt. 2026): Michel valgte at beholde den rigtige vej. Man kommer kun ud ved Marmorbroen og går rundt ad Tøjhusgade til Rigsdagsgården (ca. 390 m fra Gry). Pilen og Gry viser vejen. Jeg har ikke fundet en port mellem Ridebanen og Rigsdagsgården i virkeligheden (Altinget nævner kun Tøjhusgade og Slotspladsen).
 
 ## Til senere
-- [ ] Pænere heste. Michel synes, de er meget grimme (Ridebanen, staldene, Vega, kongens hest i 1942).
+- [x] Pænere heste (24. okt. 2026)
+  - Ny `buildHorse` bygget af glatte rør (`loft(ctrl)`: et rør langs en kurve, hvor hvert punkt har bredde og dybde, og enderne er lukket) og samlet med `figKit`, så hver bevægelig del er én farvet mesh og én kontur. Dyb brystkasse, rund krop og bagpart, buet hals med manke langs kammen, langt hoved med kind, mule, næsebor, øjne med glimt, spidse ører og pandelok, ben med knæ (bag: has), kode og hov, og en hale, der hænger ned til haserne.
+  - Alle heste har grime. Rytterens hest har rødt sadeldækken og sadel. `o.ben` giver farven på underbenene (den brune på Ridebanen har sorte ben), `o.blaze` en hvid blis.
+  - Benene er `legs` (øverst) med `knees` (knæ eller has). Når hestene går på Ridebanen, bøjer et ben i knæet, mens det svinger frem.
+  - Hestene, der kigger ud over staldenes halvdøre, har halsen længere inde og højere oppe, så den kommer ud over den nederste halvdør. De ekstra remme på hestene inde i staldene er fjernet, fordi alle heste nu har grime.
+  - Den samme model bruges på Ridebanen, ved staldenes døre, inde i staldene, til Vega og til kongens hest i 1942.
 - [ ] Bygningerne rundt omkring flottere, én ad gangen. Spørg Michel om den næste, når der ikke er andre opgaver i gang.
 
