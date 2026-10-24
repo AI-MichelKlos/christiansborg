@@ -1570,29 +1570,27 @@ function building(rings, h, wall, roof, o = {}) {
   pcols.push({ rings, ...bboxOf(rings[0]), top: h, bot: y0 });
   if (!o.noMap) mapItems.push({ k: 'p', pts: rings[0], fill: roof, line: true });
 }
-// Two real gates through the long house between Rigsdagsgården and Proviantgården (OpenStreetMap: building passages):
-// Proviantpassagen, a service road (about 5 m), and a narrow gate toward Bibliotekshaven (about 4 m). The house is cut
-// into pieces with a bridge over each gate from 4.6 m up, so she can walk through. The frame is the one of the gates
+// The long house on the south side of Rigsdagsgården (Rigsarkivet, see RIGSARKIVET further down for the facades).
+// Two real gates go through it (OpenStreetMap: building passages): Proviantpassagen, a service road (about 5 m), and a
+// narrow gate toward Bibliotekshaven (about 4 m). Here the house is only what stops Ida and the camera: solid parts,
+// and a bridge over each gate from 4.6 m up, plus a plain core behind the facades. The frame is the one of the gates
 // into Rigsdagsgården: s along the palace facade, d out into the yard.
-function passageHouse(ring, h, wall, roof) {
-  const A = [-23.4, 86.5], U = [0.840, -0.543], N = [0.543, 0.840], sOf = q => (q[0] - A[0]) * U[0] + (q[1] - A[1]) * U[1], dOf = q => (q[0] - A[0]) * N[0] + (q[1] - A[1]) * N[1];
+const ARKIV = {};
+function passageHouse(ring) {
+  const A = [-23.4, 86.5], U = [0.840, -0.543], N = [0.543, 0.840], sOf = q => (q[0] - A[0]) * U[0] + (q[1] - A[1]) * U[1];
   const clip = (r, keep) => { const out = []; for (let i = 0; i < r.length; i++) { const p = r[i], q = r[(i + 1) % r.length], kp = keep(p), kq = keep(q); if (kp >= 0) out.push(p); if ((kp >= 0) !== (kq >= 0)) { const t = kp / (kp - kq); out.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]); } } return out; };
-  const stone = tm('#e3dccf');
+  const GATES = [[44.2, 48.2], [92.8, 97.8]], EAVE = 15, GH = 4.6, core = tm('#9a5240');
+  const ext = (r, y0, y1) => { const e = new THREE.ExtrudeGeometry(shapeOf([insetRing(r, 0.12)]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); e.rotateX(-Math.PI / 2); mesh(e, core, 0, y0, 0); };
   let lo = -1e9;
-  for (const [s0, s1] of [[44.2, 48.2], [92.8, 97.8]]) {
-    building([clip(clip(ring, q => sOf(q) - lo), q => s0 - sOf(q))], h, wall, roof);
-    const mid = clip(clip(ring, q => sOf(q) - s0), q => s1 - sOf(q)); building([mid], h, wall, roof, { y0: 4.6 });
-    let d0 = 1e9, d1 = -1e9; for (const q of mid) { d0 = Math.min(d0, dOf(q)); d1 = Math.max(d1, dOf(q)); }
-    const w = s1 - s0, dep = d1 - d0, sc = (s0 + s1) / 2, dc = (d0 + d1) / 2;
-    const g = new THREE.Group(); g.position.set(A[0] + U[0] * sc + N[0] * dc, 0, A[1] + U[1] * sc + N[1] * dc); g.rotation.y = Math.atan2(N[0], N[1]); world.add(g);   // local z through the house
-    const fl = new THREE.PlaneGeometry(w, dep + 0.8); fl.rotateX(-Math.PI / 2); mesh(fl, SM.setts, 0, 0.02, 0, { parent: g, cast: false });
-    for (const zf of [-dep / 2, dep / 2]) {
-      for (const sx of [-1, 1]) box(0.45, 4.6, 0.36, stone, sx * (w / 2 + 0.2), 0, zf, { parent: g, edges: true });
-      box(w + 0.9, 0.55, 0.36, stone, 0, 4.35, zf, { parent: g, edges: true });
-    }
+  for (const [s0, s1] of GATES) {
+    const a = clip(clip(ring, q => sOf(q) - lo), q => s0 - sOf(q)), mid = clip(clip(ring, q => sOf(q) - s0), q => s1 - sOf(q));
+    ext(a, 0, EAVE); pcols.push({ rings: [a], ...bboxOf(a), top: EAVE + 4, bot: 0 });
+    ext(mid, GH, EAVE); pcols.push({ rings: [mid], ...bboxOf(mid), top: EAVE + 4, bot: GH });
     lo = s1;
   }
-  building([clip(ring, q => sOf(q) - lo)], h, wall, roof);
+  const z = clip(ring, q => sOf(q) - lo); ext(z, 0, EAVE); pcols.push({ rings: [z], ...bboxOf(z), top: EAVE + 4, bot: 0 });
+  mapItems.push({ k: 'p', pts: ring, fill: ROOF_COPPER, line: true });
+  Object.assign(ARKIV, { ring, clip, sOf, GATES, EAVE, GH, A, U, N });
 }
 for (const b of DATA.B) {
   const nm = NAMED[b.n];
@@ -1607,7 +1605,7 @@ for (const b of DATA.B) {
     pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: own[0], bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: own[1], line: true }); continue;
   }
   if (b.n === 'Kancellibygningen') { pcols.push({rings:b.rings,...bboxOf(b.rings[0]),top:20,bot:0});mapItems.push({k:'p',pts:b.rings[0],fill:ROOF_SLATE,line:true});continue; }
-  if (b.n === 'Slotsholmen' && b.rings[0][0][0] === 107 && b.rings[0][0][1] === 66) { passageHouse(b.rings[0], h, wall, roof); continue; }   // the long house with Proviantpassagen
+  if (b.n === 'Slotsholmen' && b.rings[0][0][0] === 107 && b.rings[0][0][1] === 66) { passageHouse(b.rings[0]); continue; }   // Rigsarkivet, the long house with Proviantpassagen
   building(b.rings, h, wall, roof);
 }
 
@@ -2768,6 +2766,128 @@ TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 
     mesh(new THREE.TorusGeometry(0.22, 0.05, 6, 12), tm('#2f3338'), 0, 1.27, 1.6, { parent: c, rx: -0.18 });
     colCirc(x, z, 1.1, 1.3);
     const [mx, mz] = wp(side, -(W / 2 + 6.2)); CANNONS.push({ x, z, mx, mz });
+  }
+}
+
+// ======================================================================== RIGSARKIVET
+// The long house on the south side of Rigsdagsgården, opposite the Folketing. From the west: the Zuber building
+// (C. J. Zuber, 1781-85: plastered, small-paned windows, a tile roof), Kunstkammerbygningen (Albert Mathisen, 1665-73:
+// red and yellow brick without plaster on a granite base, round-arched windows in the low ground floor, tall windows in
+// the beletage, by turns timber windows with a pediment and iron windows under a brick arch, a copper roof with blind
+// dormers and small copper crowns on the downpipes, a crown over the entrance) and Gehejmearkivet (J. C. Ernst, 1715-22:
+// red brick, small-paned windows, a tile roof, a fourth floor from 1909). The two arched gates through Kunstkammeret lead to
+// Proviantgården and to Bibliotekshaven. Source: Kunstakademiet, "Analyse og værdisætning: Rigsarkivet". The number of
+// bays, the colour of the Zuber building and where the entrance with the crown sits are guesses.
+{
+  const { ring, clip, sOf, GATES, EAVE, GH, A, U, N } = ARKIV;
+  if (ring) {
+    const dOf = q => (q[0] - A[0]) * N[0] + (q[1] - A[1]) * N[1];
+    // the two long walls as straight lines d(s) (the outline is a little skew)
+    const lange = ring.map((p, i) => [p, ring[(i + 1) % ring.length]]).filter(([p, q]) => Math.abs(sOf(p) - sOf(q)) > 50)
+      .map(([p, q]) => ({ s0: sOf(p), d0: dOf(p), s1: sOf(q), d1: dOf(q) })).sort((a, b) => (a.d0 + a.d1) - (b.d0 + b.d1));
+    const dAt = (e, s) => e.d0 + (s - e.s0) * (e.d1 - e.d0) / (e.s1 - e.s0);
+    const S0 = Math.max(Math.min(lange[0].s0, lange[0].s1), Math.min(lange[1].s0, lange[1].s1)), S1 = Math.min(Math.max(lange[0].s0, lange[0].s1), Math.max(lange[1].s0, lange[1].s1));
+    const FACES = [{ e: lange[0], out: -1, ry: Math.atan2(-N[0], -N[1]) }, { e: lange[1], out: 1, ry: Math.atan2(N[0], N[1]) }];   // toward the yard, toward the garden
+    for (const F of FACES) { F.phi = -Math.atan((F.e.d1 - F.e.d0) / (F.e.s1 - F.e.s0)); F.sA = Math.min(F.e.s0, F.e.s1); F.sB = Math.max(F.e.s0, F.e.s1); }   // each wall's own ends
+    const g = new THREE.Group(); g.position.set(A[0], 0, A[1]); g.rotation.y = Math.atan2(-U[1], U[0]); world.add(g);   // local x = s, local z = d
+    const W = (s, d) => [A[0] + U[0] * s + N[0] * d, A[1] + U[1] * s + N[1] * d];
+    const dF = (F, s, o = 0) => dAt(F.e, s) + F.out * o;   // a point on a facade, o metres out from the wall
+    const lry = F => (F.out > 0 ? 0 : Math.PI) + F.phi;   // local rotation of something that faces out from F
+    const S_KK = 1, S_GA = 104;   // where Kunstkammeret begins and ends
+    const brickKK = toon('#ffffff', { map: brickTex('#a8513b', '#d3c4a6') }), brickGA = toon('#ffffff', { map: brickTex('#9b4834', '#c9b99c') });
+    const yellow = tm('#d8b56c'), sand = tm('#e8dfca'), plaster = tm(lit('#e3d6b9', 0.02)), white = tm('#f2ede2'), cu = tm(ROOF_COPPER), cuDark = tm('#4a8a77'), tile = tm(ROOF_TILE);
+    const granite = toon('#ffffff', { map: TX.granBase });
+    const skin = (F, s0, s1, y0, y1, mat, th = 0.14, o = 0) => { const sm = (s0 + s1) / 2; box(s1 - s0, y1 - y0, th, mat, sm, y0, dF(F, sm, o + th / 2 - 0.12), { parent: g, ry: F.phi }); };
+    const ved = (F, s, y, o, geo, mat, extra = {}) => mesh(geo, mat, s, y, dF(F, s, o), { parent: g, ry: lry(F), ...extra });
+    const win = (F, kind, s, y, w, h, lp = 0.5) => { const [x, z] = W(s, dF(F, s, 0.02 + WOFF)); addWin(kind, x, y, z, F.ry, w, h, lp); };
+    const gateAt = s => GATES.find(([a, b]) => s > a - 1.7 && s < b + 1.7);
+    // ---- walls: plaster on the Zuber building, brick on the other two; the ground floor stops at the gates
+    for (const F of FACES) {
+      skin(F, F.sA, S_KK, 0.7, EAVE, plaster); box(S_KK - F.sA, 0.7, 0.3, tm('#bdb3a2'), (F.sA + S_KK) / 2, 0, dF(F, (F.sA + S_KK) / 2, 0.03), { parent: g, ry: F.phi, cast: false });
+      let a = S_KK;
+      for (const [g0, g1] of [...GATES, [S_GA, S_GA]]) { skin(F, a, g0, 0.9, GH, brickKK); a = g1; }
+      skin(F, S_KK, S_GA, GH, EAVE, brickKK);
+      skin(F, S_GA, F.sB, 0.9, EAVE, brickGA);
+      a = S_KK;
+      for (const [g0, g1] of [...GATES, [F.sB, F.sB]]) { const sm = (a + g0) / 2; box(g0 - a, 0.9, 0.3, granite, sm, 0, dF(F, sm, 0.06), { parent: g, ry: F.phi, cast: false }); a = g1; }   // the granite base
+      for (const [y, h, mat, s0, s1] of [[GH - 0.25, 0.32, yellow, S_KK, S_GA], [10.25, 0.28, yellow, S_KK, S_GA], [4.3, 0.22, white, F.sA, S_KK], [EAVE - 0.55, 0.6, sand, F.sA, F.sB]]) {
+        const big = mat === sand, sm = (s0 + s1) / 2; box(s1 - s0 + (big ? 0.5 : 0), h, big ? 0.75 : 0.24, mat, sm, y, dF(F, sm, big ? 0.25 : 0.06), { parent: g, ry: F.phi, edges: big });   // bands and the cornice
+      }
+    }
+    // the gable ends follow the short edges of the outline (the west end is a little skew); windows only in the west end
+    for (const [p, q] of ring.map((p, i) => [p, ring[(i + 1) % ring.length]]).filter(([p, q]) => Math.abs(sOf(p) - sOf(q)) < 10)) {
+      const sa = sOf(p), da = dOf(p), sb = sOf(q), db = dOf(q), vest = sa + sb < 100, len = Math.hypot(sb - sa, db - da);
+      let ns = -(db - da) / len, nd = (sb - sa) / len; if ((vest && ns > 0) || (!vest && ns < 0)) { ns = -ns; nd = -nd; }   // outward
+      const sm = (sa + sb) / 2 - ns * 0.05, dm = (da + db) / 2 - nd * 0.05, ry = Math.atan2(sb - sa, db - da);
+      box(0.14, EAVE - (vest ? 0.7 : 0.9), len, vest ? plaster : brickGA, sm, vest ? 0.7 : 0.9, dm, { parent: g, ry });
+      if (!vest) continue;
+      box(0.3, 0.7, len, tm('#bdb3a2'), sm + ns * 0.08, 0, dm + nd * 0.08, { parent: g, ry, cast: false });
+      box(0.75, 0.6, len + 0.5, sand, sm + ns * 0.3, EAVE - 0.55, dm + nd * 0.3, { parent: g, ry, edges: true });
+      const wry = Math.atan2(U[0] * ns + N[0] * nd, U[1] * ns + N[1] * nd);
+      for (const y of [2.7, 7.2, 12.4]) for (const f of [0.28, 0.72]) {
+        const ss = sa + (sb - sa) * f + ns * (0.02 + WOFF), dd = da + (db - da) * f + nd * (0.02 + WOFF), [x, z] = W(ss, dd);
+        addWin('pane', x, y, z, wry, 1.3, y > 5 && y < 10 ? 2.6 : 1.8, 0.5);
+      }
+    }
+    // ---- windows. Kunstkammeret: round-arched windows in the low ground floor, tall windows in the beletage (timber with a
+    // pediment, iron under a brick arch, by turns), smaller windows at the top.
+    const NB = 22, BW = (S_GA - S_KK) / NB, DOOR = 5;
+    const pediment = prismGeo([[-1.0, 0], [1.0, 0], [0, 0.55]], 0.28), segArch = new THREE.TorusGeometry(1.25, 0.13, 6, 12, 1.4), halfArch = new THREE.TorusGeometry(0.72, 0.12, 6, 14, Math.PI);
+    for (const F of FACES) for (let k = 0; k < NB; k++) {
+      const s = S_KK + (k + 0.5) * BW, door = F.out < 0 && k === DOOR;
+      if (!gateAt(s) && !door) { win(F, 'arch', s, 2.75, 1.24, 2.1); ved(F, s, 3.8 - 0.62, 0.05, halfArch, yellow); box(1.5, 0.12, 0.22, sand, s, 1.62, dF(F, s, 0.08), { parent: g, ry: F.phi, cast: false }); }
+      const timber = k % 2 === 0;
+      win(F, timber ? 'rect' : 'modern', s, 7.25, 1.55, 3.3);
+      box(1.85, 0.14, 0.26, sand, s, 5.5, dF(F, s, 0.1), { parent: g, ry: F.phi, cast: false });   // the sill
+      if (timber) ved(F, s, 9.05, 0.12, pediment, sand, { edges: 30 });
+      else ved(F, s, 8.9 - 1.25 * Math.cos(0.7) + 0.06, 0.05, segArch, yellow, { rz: Math.PI / 2 - 0.7 });
+      win(F, 'rect', s, 12.45, 1.25, 1.7);
+    }
+    // the entrance with the crown, toward the yard
+    { const F = FACES[0], s = S_KK + (DOOR + 0.5) * BW, [x, z] = W(s, dF(F, s, 0.02 + WOFF));
+      addWin('doorArch', x, 2.55, z, F.ry, 1.8, 3.3, 0.7); const [sx, sz] = W(s, dF(F, s, 0)); palaceWindowSurround('arch', sx, 2.55, sz, F.ry, 1.8, 3.3, sand);
+      box(2.6, 0.18, 0.9, granite, s, 0, dF(F, s, 0.45), { parent: g, ry: F.phi, cast: false }); colBox(...(() => { const [x0, z0] = W(s, dF(F, s, 0.45)); return [x0 - 1.2, x0 + 1.2, z0 - 0.6, z0 + 0.6]; })(), 0.18);
+      const c = new THREE.Group(); c.position.set(s, 0, dF(F, s, 0.3)); c.rotation.y = lry(F); g.add(c); crownAt(c, 0, 4.75, 0, 0.32); }
+    // the Zuber building and Gehejmearkivet: small-paned windows, three bays
+    for (const F of FACES) {
+      for (let k = 0; k < 3; k++) { const s = S0 + (k + 0.5) * (S_KK - S0) / 3; win(F, 'pane', s, 2.7, 1.35, 1.9); win(F, 'pane', s, 7.2, 1.45, 2.8); win(F, 'pane', s, 12.4, 1.35, 1.8); }
+      for (let k = 0; k < 3; k++) { const s = S_GA + (k + 0.5) * (S1 - S_GA) / 3; for (const [y, h] of [[2.4, 2.0], [5.9, 2.2], [9.3, 2.1], [12.6, 1.7]]) win(F, 'pane', s, y, 1.3, h); }
+    }
+    // ---- the gates: a round arch of brick with a sandstone keystone on both sides, and a vault through the house
+    for (const [g0, g1] of GATES) {
+      const R = (g1 - g0) / 2, sc = (g0 + g1) / 2, dN = dF(FACES[0], sc), dS = dF(FACES[1], sc);
+      const vault = new THREE.Shape(); vault.moveTo(-R, GH - R); vault.lineTo(-R, GH); vault.lineTo(R, GH); vault.lineTo(R, GH - R); vault.absarc(0, GH - R, R, 0, Math.PI, false);
+      const vg = new THREE.ExtrudeGeometry(vault, { depth: dS - dN - 0.1, bevelEnabled: false, curveSegments: 16 }); vg.translate(0, 0, 0.05);
+      mesh(vg, brickKK, sc, 0, dN, { parent: g, cast: false });
+      const fl = new THREE.PlaneGeometry(g1 - g0, dS - dN + 0.8); fl.rotateX(-Math.PI / 2); mesh(fl, SM.setts, sc, 0.02, (dN + dS) / 2, { parent: g, cast: false });
+      for (const sd of [-1, 1]) box(0.1, GH - R + 0.05, dS - dN - 0.2, brickKK, sc + sd * (R - 0.05), 0, (dN + dS) / 2, { parent: g, cast: false });   // brick walls in the passage
+      for (const F of FACES) {
+        ved(F, sc, GH - R, 0.08, new THREE.TorusGeometry(R + 0.18, 0.24, 6, 20, Math.PI), yellow, { edges: 40 });
+        box(0.55, 0.7, 0.4, sand, sc, GH - 0.42, dF(F, sc, 0.15), { parent: g, ry: F.phi, edges: true });
+        for (const sd of [-1, 1]) box(0.36, GH - R - 0.9, 0.3, sand, sc + sd * (R + 0.18), 0.9, dF(F, sc, 0.1), { parent: g, ry: F.phi, cast: false });
+      }
+    }
+    // ---- roofs: copper on Kunstkammeret with blind dormers, tile on the two others
+    const part = (a, b) => clip(clip(ring, q => sOf(q) - a), q => b - sOf(q));
+    bevelRoof(part(S_KK, S_GA), EAVE, 4.4, 6.2, cu);
+    bevelRoof(part(S0 - 1, S_KK), EAVE, 4.0, 5.6, tile);
+    bevelRoof(part(S_GA, S1 + 1), EAVE, 4.4, 6.0, tile);
+    const gavl = prismGeo([[-0.78, 0], [0.78, 0], [0, 0.6]], 1.8);
+    for (const F of FACES) for (let k = 1; k < NB; k += 2) {
+      const s = S_KK + (k + 0.5) * BW, dd = dF(F, s, -1.3), y = EAVE + 0.92;
+      box(1.3, 1.25, 1.8, cu, s, y - 0.2, dd + F.out * -0.6, { parent: g, ry: F.phi, edges: true });
+      box(0.9, 0.85, 0.06, cuDark, s, y, dd + F.out * 0.33, { parent: g, ry: F.phi, cast: false });   // blind: a panel, no glass
+      mesh(gavl, cu, s, y + 1.05, dd + F.out * -0.55, { parent: g, ry: lry(F), edges: 30 });
+    }
+    // downpipes with small copper crowns on the brackets
+    const pipe = new THREE.CylinderGeometry(0.06, 0.06, EAVE - 1.6, 8);
+    for (const F of FACES) for (let j = 1; j < NB / 4; j++) {
+      const s = S_KK + j * 4 * BW; if (gateAt(s)) continue;
+      ved(F, s, (EAVE - 1.6) / 2 + 0.95, 0.12, pipe, cuDark);
+      const c = new THREE.Group(); c.position.set(s, EAVE - 1.05, dF(F, s, 0.16)); g.add(c);
+      mesh(new THREE.CylinderGeometry(0.11, 0.09, 0.09, 8, 1, true), cuDark, 0, 0, 0, { parent: c });
+      for (let q = 0; q < 5; q++) { const a = q / 5 * Math.PI * 2; mesh(new THREE.ConeGeometry(0.025, 0.08, 4), cuDark, Math.cos(a) * 0.1, 0.07, Math.sin(a) * 0.1, { parent: c, cast: false }); }
+    }
   }
 }
 
