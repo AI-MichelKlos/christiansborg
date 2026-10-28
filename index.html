@@ -477,6 +477,7 @@ function menneske(o = {}) {
     part(rundKasse(0.2, 0.16, 0.07, 0.025), m(o.taske), g, -0.17, 0.97, foran(0.97) + 0.03).rotation.y = -0.45;
   }
   // ---- the head: round with a softer jaw, eyes with a light spot, brows, nose, mouth and ears
+  const eyes = [], lively = !!o.levende && !o.lukket && !o.statisk && !o.enkel;
   const head = new THREE.Group(); head.position.set(0, 1.79, 0); g.add(head);
   part(K(0.14, 22, 16), m(skin), head).scale.set(0.95, 1.06, 1);
   part(K(0.112, 16, 12), m(skin), head, 0, -0.058, 0.018).scale.set(kv ? 0.86 : 0.93, 0.86, 0.95);
@@ -484,8 +485,16 @@ function menneske(o = {}) {
     if (!lav) part(K(0.03, 8, 6), m(skin), head, s * 0.138, -0.012, -0.008).scale.set(0.5, 1, 0.8);
     if (o.lukket) { const l = part(new THREE.TorusGeometry(0.016, 0.004, 4, 8, Math.PI), m('#231a22'), head, s * 0.047, 0.006, 0.131, 0); l.rotation.z = Math.PI; }   // closed eyes
     else {
-      part(K(0.0185, 10, 8), m('#231a22'), head, s * 0.047, 0.012, 0.126, 0).scale.set(0.95, 1.25, 0.6);
-      if (!lav) part(K(0.006, 6, 4), m('#ffffff'), head, s * 0.047 + 0.006, 0.021, 0.137, 0);
+      if (lively && !o.solbriller) {
+        const eye = new THREE.Group(); eye.position.set(s * .047, .012, .128); head.add(eye); eyes.push(eye);
+        part(K(.019, 10, 8), m('#eee8da'), eye, 0, 0, 0, 0).scale.set(1, .82, .43);
+        part(K(.011, 10, 8), m(o.iris || '#586454'), eye, 0, 0, .008, 0).scale.set(.85, 1, .4);
+        part(K(.006, 8, 6), m('#231a22'), eye, 0, 0, .012, 0).scale.set(.8, 1, .4);
+        part(K(.0035, 6, 4), m('#ffffff'), eye, -.003, .004, .015, 0);
+      } else {
+        part(K(0.0185, 10, 8), m('#231a22'), head, s * 0.047, 0.012, 0.126, 0).scale.set(0.95, 1.25, 0.6);
+        if (!lav) part(K(0.006, 6, 4), m('#ffffff'), head, s * 0.047 + 0.006, 0.021, 0.137, 0);
+      }
       if (kv && !lav) part(kasse(0.017, 0.004, 0.004), m('#231a22'), head, s * 0.063, 0.029, 0.12, 0).rotation.set(0, s * 0.35, -s * 0.55);   // a lash at the outer corner
     }
     part(KP(0.0052, 0.028, 6), m(bryn), head, s * 0.047, 0.05, 0.124, 0).rotation.set(0, s * 0.3, Math.PI / 2 + s * (o.alvor ? -0.12 : 0.15));
@@ -536,16 +545,52 @@ function menneske(o = {}) {
     if (!lav) { const sa = part(KP(kv ? 0.058 : 0.064, 0.15, 10), m(nuance(shoes, 0.07)), knee, 0, -0.452, 0.045, 0); sa.rotation.x = Math.PI / 2; sa.scale.set(1.08, 1, 0.22); }   // sole
     hips.push(hip); legs.push({ hip, knee });
   }
+  if (lively && !lav) {
+    for (const side of [-1, 1]) {
+      const y = o.long ? .97 : 1.04;
+      const pocket=[[.1,y+.035],[.14,y],[.17,y-.01]].map(([x,h])=>[side*x,h,Math.sqrt(Math.max(0,(foran(h)/zf)**2-x*x))*zf+.006]);
+      part(slange(pocket,.004,6,4),m(nuance(coat,-.12)),g,0,0,0,0);
+      const seam=part(KP(.004,.12,6),m(nuance(coat,.07)),arms[side>0?1:0],0,-.15,kv?.061:.065,0);
+      seam.rotation.z=side*.06;
+    }
+  }
   if (o.extra) o.extra(g, head, part, m, foran);
   if (o.sidder) for (const l of legs) { l.hip.rotation.x = -Math.PI / 2; l.knee.rotation.x = Math.PI / 2; }
   if (o.barn) head.scale.setScalar(1.2);
   g.scale.setScalar((o.scale || 1) * (o.barn ? 0.64 : 1));
   const root = new THREE.Group(); root.add(g);
-  const f = { root, g, head, legs, hips, arms, elbows };
+  const f = { root, g, head, legs, hips, arms, elbows, eyes };
   if (o.foer) o.foer(f);
   f.grupper = o.statisk ? [g] : o.enkel ? [g, ...arms, ...hips] : [g, head, ...arms, ...hips, ...legs.map(l => l.knee)];
+  if (lively) f.grupper.push(...eyes);
   if (o.bag !== false) bagFigur(f.grupper, { skygge: o.skygge });
+  if (lively) f.presence = {
+    phase: 0, time: 0, scaleY: g.scale.y,
+    headX: head.rotation.x, headZ: head.rotation.z,
+    arms: arms.map((a,i)=>({x:a.rotation.x,z:a.rotation.z,free:!o.arm?.[i]}))
+  };
   return f;
+}
+
+// Small, deterministic movements on top of the authored pose. Props keep their arm pose.
+function animatePresence(f, dt, nearby = false) {
+  const a=f.presence;if(!a)return;
+  a.time+=Math.max(0,Math.min(dt,.05));const t=a.time,p=a.phase;
+  const breath=Math.sin(t*1.65+p);
+  f.g.scale.y=a.scaleY*(1+breath*.0018);
+  f.head.rotation.x=a.headX+Math.sin(t*.75+p)*.018+(nearby?Math.sin(t*1.5+p)*.012:0);
+  f.head.rotation.z=a.headZ+Math.sin(t*.43+p)*.018;
+  // Each person blinks at a different interval, with a short closing/opening cycle.
+  const cycle=3.7+(p%1.8),blink=(t+p*1.7)%cycle;
+  const open=blink<.16?Math.max(.06,1-Math.sin(blink/.16*Math.PI)):1;
+  for(const eye of f.eyes)eye.scale.y=open;
+  a.arms.forEach((pose,i)=>{
+    if(!pose.free)return;
+    const wave=Math.sin(t*.9+p+i*1.4),gesture=nearby?Math.pow(Math.max(0,Math.sin(t*.65+p+i)),6):0;
+    f.arms[i].rotation.x=pose.x+wave*.025-gesture*.16;
+    f.arms[i].rotation.z=pose.z+Math.sin(t*.6+p+i)*.012;
+
+  });
 }
 
 // ---------------------------------------------------------------- canvas textures
@@ -4766,7 +4811,9 @@ HOOKS.frame.push((dt, time) => {
       const a = time * 0.48 + t.phase, u = (1 - Math.cos(a)) * 0.5;
       const x = t.a[0] + (t.b[0] - t.a[0]) * u, z = t.a[1] + (t.b[1] - t.a[1]) * u;
       t.root.position.set(x, groundAt(x, z, 2), z);
-      t.root.rotation.y = Math.atan2(t.b[0] - t.a[0], t.b[1] - t.a[1]) + (Math.sin(a) < 0 ? Math.PI : 0);
+      const facing=Math.atan2(t.b[0]-t.a[0],t.b[1]-t.a[1])+(Math.sin(a)<0?Math.PI:0);
+      if(!t.facingReady){t.root.rotation.y=facing;t.facingReady=true;}
+      else t.root.rotation.y+=angDiff(facing,t.root.rotation.y)*(1-Math.exp(-dt*5));
       animateWalkingCompany(t, time, Math.abs(Math.sin(a)));
     }
   }
@@ -7932,7 +7979,7 @@ const PERSONER = (() => {
   GAADE.sted = id => { for (let s = stedNu(), n = 0; s && n < 6; s = M.steder[s]?.inde_i, n++) if (s === id) return true; return false; };
 
   // ---- figures: grown-ups in the same style as Ida (see menneske)
-  const figur = o => menneske(o);
+  const figur = o => menneske({ ...o, levende: !o.lukket });
   // things they hold: the arm is bent at the elbow, and the thing sits in a holder that keeps it upright
   const holder = (el, x = 0, z = 0.004) => { const h = new THREE.Group(); h.position.set(x, -0.3, z); let r = 0; for (let p = el; p && p.isGroup && p.parent && !p.userData.krop; p = p.parent) r += p.rotation.x; h.rotation.x = -r; el.add(h); return h; };
   const boej = (sh, el, a, b) => { sh.rotation.x = a; el.rotation.x = b; };
@@ -8072,7 +8119,7 @@ const PERSONER = (() => {
   const ude = new THREE.Group(); dyn.add(ude);
   const FIG = {};
   for (const id of Object.keys(SPOT)) {
-    const f = figur(LOOK[id]); f.spot = null; f.yaw = 0; FIG[id] = f; f.root.visible = false;
+    const f = figur(LOOK[id]); if(f.presence)f.presence.phase=Object.keys(FIG).length*.83; f.spot = null; f.yaw = 0; FIG[id] = f; f.root.visible = false;
     const sp = Object.values(SPOT[id]).find(s => s.foelge);
     f.vagter = []; if (sp) for (const [dx, dz] of sp.foelge) { const v = figur(LOOK.vagt); v.root.position.set(dx, 0, dz); f.root.add(v.root); f.vagter.push(v.root); }
   }
@@ -8116,8 +8163,13 @@ const PERSONER = (() => {
       // turn towards Ida when she is close, otherwise back to the usual direction. Someone sitting only turns the head.
       const wx = sp.ude ? sp.ude[0] : I.x + sp.at[0], wz = sp.ude ? sp.ude[1] : sp.at[1];
       const want = d < 6 ? Math.atan2(P.pos.x - wx, P.pos.z - wz) : sp.face;
-      if (f.sid) { const h = Math.max(-0.9, Math.min(0.9, angDiff(want, sp.face))); f.head.rotation.y += (h - f.head.rotation.y) * Math.min(1, dt * 4); }
-      else { f.yaw += angDiff(want, f.yaw) * Math.min(1, dt * 4); f.root.rotation.y = f.yaw; }
+      if (!paused) {
+        animatePresence(f,dt,d<sp.r+1);
+        if (!f.sid) { f.yaw += angDiff(want, f.yaw) * (1-Math.exp(-dt*1.8)); f.root.rotation.y = f.yaw; }
+        const glance=d<6?0:Math.sin((f.presence?.time||0)*.37+(f.presence?.phase||0))*.18;
+        const h=Math.max(-.7,Math.min(.7,angDiff(want,f.sid?sp.face:f.yaw)+glance));
+        f.head.rotation.y+=(h-f.head.rotation.y)*(1-Math.exp(-dt*4));
+      }
       if (sp.r && d < sp.r && d / sp.r < nd) { nd = d / sp.r; naer = id; }   // when two people are close, the nearest one answers
     }
     if (naer && !paused) {
