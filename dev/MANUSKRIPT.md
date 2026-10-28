@@ -8,11 +8,11 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 
 ## Tjek af logikken
 
-- Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 63 skridt.
-- Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 76 skridt.
+- Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 61 skridt.
+- Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 72 skridt.
 - Fejl: ingen. Advarsler: ingen.
 - Steder, der skal bygges: .
-- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 301.
+- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 305.
 
 ## Start
 
@@ -46,68 +46,66 @@ Uret kan ikke løbe ud. Det står stille 5 minutter før aktens slut, til de vig
 Den korteste af de tilfældige gennemspilninger uden 1942-laget. Den kan bruges, når spillet skal testes.
 
 1. Begivenhed: moede_bente
-2. Bibliotekshaven: Se på gruset
-3. Vandrehallen og Rigets midte: Se på Mørkeberg
-4. Begivenhed: kommissaeren
-5. Begivenhed: statsministeren
-6. Kompaspartiets mødelokale: Se på bordet i mødelokalet
-7. Gry Strigle: Så du nogen i nat?
-8. Vandrehallen og Rigets midte: Se grundlovene
-9. Gry Strigle: Fortæl om hestene
-10. Bibliotekshaven: Se på bænken ved Kierkegaard
-11. Bente Holmsgaard: Fortæl om huset
-12. Bente Holmsgaard: Giv Bente brillerne
-13. Kajen ved Reformministeriet: Se på båden
-14. Bente Holmsgaard: Hvad skete der omkring kl. 2?
-15. De Kongelige Stalde: Gå hen til sadelkammeret
-16. Vandrehallen og Rigets midte: Lys under sofaen
-17. Proviantpassagen: Se i vandpytten ved døren
-18. Bente Holmsgaard: Hvordan gik din runde i nat?
-19. Samtaleværelset: Undersøg rummet
-20. Vandrehallen og Rigets midte: Se på bordet ved sofaen
-21. Kompaspartiets sekretariat: Se på kopimaskinens låg
-22. Vandrehallen og Rigets midte: Gnid blyanten over notesbogen
+2. Kompaspartiets mødelokale: Se på bordet i mødelokalet
+3. Kajen ved Reformministeriet: Se på båden
+4. Bibliotekshaven: Se på bænken ved Kierkegaard
+5. Bente Holmsgaard: Fortæl om huset
+6. Gry Strigle: Så du nogen i nat?
+7. Gry Strigle: Fortæl om hestene
+8. Vandrehallen og Rigets midte: Se på bordet ved sofaen
+9. Bibliotekshaven: Se på gruset
+10. Bente Holmsgaard: Giv Bente brillerne
+11. Vandrehallen og Rigets midte: Se grundlovene
+12. Bente Holmsgaard: Hvordan gik din runde i nat?
+13. Bente Holmsgaard: Hvad skete der omkring kl. 2?
+14. Vandrehallen og Rigets midte: Se på Mørkeberg
+15. Begivenhed: kommissaeren
+16. Begivenhed: statsministeren
+17. Vandrehallen og Rigets midte: Lys under sofaen
+18. Proviantpassagen: Se i vandpytten ved døren
+19. Kompaspartiets sekretariat: Se på kopimaskinens skærm
+20. De Kongelige Stalde: Gå hen til sadelkammeret
+21. Vandrehallen og Rigets midte: Gnid blyanten over notesbogen
+22. Samtaleværelset: Undersøg rummet
 23. Akt 2 begynder: De mistænkte
-24. Udsigten: Kig gennem kikkerten
-25. Ditte Rosenvinge: Giv hende 50.000-rapporten
-26. Kasper Lindved: Vis ham kortet fra vandpytten
-27. Ditte Rosenvinge: Hvad lavede Deres departementschef i nat?
-28. Svend Lysholt: Hvad fotograferer De?
-29. Bodil Kryddal: Fyldte du Mørkebergs termokande i går?
-30. Begivenhed: valdorf_kommer
-31. Bodil Kryddal: Har du gulerødder til staldene?
-32. Jonas Fenger: Giv ham telefonen fra mødelokalet
-33. Mogens Brask: Holder tallene?
-34. Finansministeriets garderobe: Se på knagerne
-35. Pernille Strandvig: Er pressekort 17 dit?
+24. Begivenhed: valdorf_kommer
+25. Pernille Strandvig: Er pressekort 17 dit?
+26. Svend Lysholt: Hvad fotograferer De?
+27. Bodil Kryddal: Fyldte du Mørkebergs termokande i går?
+28. Bodil Kryddal: Har du gulerødder til staldene?
+29. Kompaspartiets sekretariat: Se på kopimaskinens låg
+30. Henrik Valdorf: De ser ud til at være meget ude i vejret
+31. Mogens Brask: Holder tallene?
+32. Udsigten: Kig gennem kikkerten
+33. Kasper Lindved: Vis ham kopimaskinens log
+34. Ditte Rosenvinge: Vis hende koppen med læbestift
+35. Ditte Rosenvinge: Giv hende 50.000-rapporten
 36. De Kongelige Stalde: Giv Vega en gulerod
-37. Finansministeriets forhandlingsrum: Læs referatet
-38. Sadelkammeret: Åbn det gamle sadelskab
-39. Ditte Rosenvinge: Vis hende koppen med læbestift
-40. Henrik Valdorf: De ser ud til at være meget ude i vejret
-41. Henrik Valdorf: Hvad tænkte De om Mørkeberg?
-42. Kompaspartiets sekretariat: Se på kopimaskinens skærm
-43. Akt 3 begynder: Ud på Slotsholmen
-44. Begivenhed: retsmed
+37. Henrik Valdorf: Hvad tænkte De om Mørkeberg?
+38. Jonas Fenger: Giv ham telefonen fra mødelokalet
+39. Akt 3 begynder: Ud på Slotsholmen
+40. Begivenhed: retsmed
+41. Finansministeriets forhandlingsrum: Læs referatet
+42. Jonas Fenger: Hvad skændtes du og Mørkeberg om kl. 23.50?
+43. Mogens Brask: Var De på arbejde i nat?
+44. Reformministeriets sidedør: Se på sidedøren
 45. Begivenhed: springvandet
-46. Kasper Lindved: Vis ham kopimaskinens log
-47. Viggo Aagaard: Hvad ligger der i etuiet?
-48. Riddersalen: Se på gobelinerne
-49. Reformministeriets sidedør: Se på sidedøren
-50. Viggo Aagaard: Lån Elefantordenen
-51. Jonas Fenger: Hvad skændtes du og Mørkeberg om kl. 23.50?
-52. Mogens Brask: Vis ham Elefantordenen
-53. Bibliotekshaven: Saml papirerne op ved kanten
+46. Finansministeriets garderobe: Se på knagerne
+47. Bibliotekshaven: Saml papirerne op ved kanten
+48. Sadelkammeret: Åbn det gamle sadelskab
+49. Reformministeriets printerområde: Se på printerens log
+50. Viggo Aagaard: Hvad ligger der i etuiet?
+51. Riddersalen: Se på gobelinerne
+52. Viggo Aagaard: Lån Elefantordenen
+53. Mogens Brask: Vis ham Elefantordenen
 54. Departementschefens kontor: Se dig om på kontoret
-55. Reformministeriets printerområde: Se på printerens log
-56. Departementschefens kontor: Se i jakkens lommer
-57. Viggo Aagaard: Læg Elefantordenen tilbage
-58. Kajen ved Reformministeriet: Sejl med båden
-59. Kanalen ved den gamle fortøjningspæl: Kig ned i vandet ved fortøjningspælen
-60. Akt 4 begynder: Afsløringen
-61. Begivenhed: valdorf_venter
-62. Henrik Valdorf: Hvorfor ville De tale med mig?
-63. Begivenhed: pressemoedet
+55. Departementschefens kontor: Se i jakkens lommer
+56. Kajen ved Reformministeriet: Sejl med båden
+57. Kanalen ved den gamle fortøjningspæl: Kig ned i vandet ved fortøjningspælen
+58. Akt 4 begynder: Afsløringen
+59. Begivenhed: valdorf_venter
+60. Henrik Valdorf: Hvorfor ville De tale med mig?
+61. Begivenhed: pressemoedet
 
 ## Personerne
 
@@ -549,14 +547,17 @@ I notesbogen: Kontorchef i Reformministeriet og medlem af DJØF i 31 år. Sætte
 
 #### Vis ham Elefantordenen
 
-<small>Kræver: har Elefantordenen. Giver: »mogens talt«, »kode hint«, »valdorf våd«.</small>
+<small>Kræver: har Elefantordenen. Giver: »mogens talt«, »kode hint«, »valdorf våd«, Ida afleverer Elefantordenen, slutter »orden ude«, »orden tilbage«, »mogens bærer«.</small>
 
 **Mogens:** Må jeg? Bare et øjeblik.  
 *Mogens holder ordenen i flade hænder, som var den en fugleunge.*  
 **Mogens:** Kun fire borgerlige danskere siden 1900. Og nu står en kontorchef her og holder den.  
 **Mogens:** Ved De hvad? Jeg har aldrig fortalt det til nogen. Det var mig, der gav Aksel tallene fra maj. 4.000 flere i job, ikke 11.000. Han havde ret til at vide det.  
 **Mogens:** Henrik har låst de rigtige tal inde på sit kontor. Koden er den samme på alle hans låse: året, hvor Danmark fik sin første grundlov.  
-**Mogens:** Og en ting mere. Da jeg så ham ved printeren i nat, var han våd i håret. Det regner ikke indenfor.
+**Mogens:** Og en ting mere. Da jeg så ham ved printeren i nat, var han våd i håret. Det regner ikke indenfor.  
+**Ida:** Tak. Nu skal ordenen tilbage til hoffoureren. Jeg har lovet ti minutter.  
+**Mogens:** Må jeg bære den derhen? Bare én gang i mit liv. Det er nok det nærmeste, jeg kommer.  
+*Ida nikker. Mogens lægger ordenen på sin mappe som på en sølvbakke og retter ryggen.*
 
 #### Hvad med 50.000-rapporten?
 
@@ -564,12 +565,6 @@ I notesbogen: Kontorchef i Reformministeriet og medlem af DJØF i 31 år. Sætte
 
 **Mogens:** Den fra Prognosehuset Optima? Jeg så den på ministerens bord i morges.  
 **Mogens:** Der er en kommafejl på forsiden. Der skulle have stået 5.000,0.
-
-#### Hvad skal jeg gøre med ordenen nu?
-
-<small>Kræver: har Elefantordenen, »mogens talt«.</small>
-
-**Mogens:** Læg den tilbage i Riddersalen. Hoffet tæller elefanter.
 
 ### Viggo Aagaard (63)
 
@@ -590,7 +585,7 @@ I notesbogen: Hoffourer. Passer på Elefantordenen til aftenens gallamiddag.
 
 #### Lån Elefantordenen
 
-<small>Kræver: »hoffourer spurgt«, »gobelin kendt«, har ikke Elefantordenen. Giver: Ida får Elefantordenen, »orden ude«, slutter »orden tilbage«.</small>
+<small>Kræver: »hoffourer spurgt«, »gobelin kendt«, har ikke Elefantordenen, endnu ikke »mogens bærer«. Giver: Ida får Elefantordenen, »orden ude«, slutter »orden tilbage«.</small>
 
 **Ida:** Bjørn Nørgaard. 17 gobeliner med Danmarks og verdens historie. De blev hængt op i 2000.  
 **Hoffoureren:** Korrekt. Skriv Deres navn i protokollen. Ti minutter.  
@@ -600,6 +595,13 @@ I notesbogen: Hoffourer. Passer på Elefantordenen til aftenens gallamiddag.
 
 <small>Kræver: har Elefantordenen. Giver: Ida afleverer Elefantordenen, slutter »orden ude«, »orden tilbage«.</small>
 
+**Hoffoureren:** Ni minutter og fyrre sekunder. Hoffet takker.
+
+#### Fik De ordenen tilbage?
+
+<small>Kræver: »mogens bærer«.</small>
+
+**Hoffoureren:** En kontorchef kom med den på en mappe. Han gik meget langsomt gennem Vandrehallen, så alle kunne se ham.  
 **Hoffoureren:** Ni minutter og fyrre sekunder. Hoffet takker.
 
 ### Svend Lysholt (67)
@@ -1214,12 +1216,6 @@ I spillet: ude: Ridebanen (bygget).
 
 *Idas mobil summer. En sms fra Bente: »Pressemødet begynder om fem minutter i Landstingssalen. Kommissæren har sit papir klar.«*
 
-### orden paamindelse
-
-<small>Sker, når: akt 4 eller senere, har Elefantordenen.</small>
-
-*Elefantordenen ligger stadig i Idas rygsæk. Hoffoureren tæller elefanter, og Riddersalen er stadig åben.*
-
 ### kongen rider
 
 <small>Sker, når: 1942-laget er slået til, »i 1942«, Ida er ved Ridebanen, juni 1942. Giver: »handske tabt«.</small>
@@ -1275,10 +1271,9 @@ Spillet viser det første hint på listen, hvis betingelse passer. Målet i fed 
 37. **Find kongens nøgle ved staldporten** (Ridebanen). Kongen sagde: bag den tredje hestesko over staldporten. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle, »kongen takket«)</small>
 38. **Find en nøgle til det gamle sadelskab**. Er skabet låst? Min farfar sagde altid, at kongen gemte nøgler bag hestesko. Og hans gamle radio har altid været lidt mærkelig. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle)</small>
 39. **Undersøg det gamle sadelskab i sadelkammeret** (Sadelkammeret). Se i det gamle sadelskab inderst i sadelkammeret. <small>(mangler spor 21 (Den gemte tabel))</small>
-40. **Læg Elefantordenen tilbage i Riddersalen** (Riddersalen). Har du stadig Elefantordenen? Hoffoureren tæller elefanter. Riddersalen er åben. <small>(akt 4 eller senere, »orden ude«)</small>
-41. **Mød departementschefen på Udsigten i tårnet** (Udsigten). Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
-42. **Gå til pressemødet i Landstingssalen** (Landstingssalen). Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
-43. **Tal med Svend på Højbro** (Højbro). Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
+40. **Mød departementschefen på Udsigten i tårnet** (Udsigten). Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
+41. **Gå til pressemødet i Landstingssalen** (Landstingssalen). Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
+42. **Tal med Svend på Højbro** (Højbro). Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
 
 ## Afsløringen
 
@@ -1356,6 +1351,7 @@ Efter tre forkerte svar:
 *Pressemødet bliver aflyst. Samme eftermiddag lægger Reformministeriet det rigtige regnestykke frem: 4.000 flere i job.*  
 *Tre uger senere bliver Fremtidsreformen alligevel vedtaget med et nyt sidebrev og 4.100 flere i job.*  
 *Jonas Fenger bliver formand for Kompaspartiet. Pernille Strandvig får sin forside. Kaspers gamle adgangskort bliver endelig spærret.*  
+*Mogens Brask får aldrig Elefantordenen. Men han har båret den gennem Vandrehallen, og det fortæller han om resten af livet.*  
 *Ida får et nyt kapitel til sit speciale. Hun kalder det »Rigets midte, kl. 02.00«.*
 
 Hvis Elefantordenen ikke er lagt tilbage:

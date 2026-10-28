@@ -142,13 +142,13 @@ Ida samler ti ting i sin rygsæk, og hver af dem åbner en dør eller får en pe
 | 50.000-rapporten | Glemt på kopimaskinen i sekretariatet | Ditte | Hun indrømmer sidebrevet og giver Ida et gæstekort til Finansministeriet (spor 9) |
 | Jonas' telefon | Glemt på bordet i Kompaspartiets mødelokale | Jonas | Beskeden fra Pernille (spor 8). Når Ida giver ham telefonen, indrømmer han lækket og bliver renset |
 | Gulerødder | Bodil i Snapstinget | Vega, hesten foran sadelkammeret | Mørkebergs gemte tabel (spor 21) |
-| Elefantordenen | Et etui i Riddersalen, lagt frem til en gallamiddag | Mogens Brask i Landstingssalen | Han får lov at holde den og bliver snakkesalig. Det var ham, der sendte Mørkeberg de rigtige tal, og koden til Valdorfs kontor er "året, hvor Danmark fik sin første grundlov" |
+| Elefantordenen | Et etui i Riddersalen, lagt frem til en gallamiddag | Mogens Brask i Landstingssalen | Han får lov at holde den og bliver snakkesalig. Det var ham, der sendte Mørkeberg de rigtige tal, og koden til Valdorfs kontor er "året, hvor Danmark fik sin første grundlov". Bagefter bærer han selv ordenen tilbage til Riddersalen |
 | Koden 1849 | Grundlovsmontrerne i Vandrehallen, eller Ida ved det | Kodelåsen på Valdorfs kontor | Spor 15 og sejlerjakken |
 | Bådnøglen | Lommen i Valdorfs sejlerjakke | Den røde båd | Spor 22, termokanden på bunden (spor 14) og tidsprøven over kanalen |
 
 **50.000-rapporten** hedder *Arbejdsudbud uden besvær* og er lavet af det opdigtede konsulenthus Prognosehuset Optima. Den lover 50.000 i øget arbejdsudbud, og Ditte vil gøre næsten alt for at få den. Senere kaster Mogens et blik på den og finder en kommafejl: Der skulle have stået 5.000,0.
 
-**Elefantordenen** gives fortrinsvis til kongelige og statsoverhoveder. Siden 1900 har kun fire borgerlige danskere fået den, og det ved Mogens godt, men han drømmer alligevel. Ida må låne ordenen i ti minutter, hvis hun skriver sig ind i hoffourerens bog, og hun skal lægge den tilbage før kl. 10.
+**Elefantordenen** gives fortrinsvis til kongelige og statsoverhoveder. Siden 1900 har kun fire borgerlige danskere fået den, og det ved Mogens godt, men han drømmer alligevel. Ida må låne ordenen i ti minutter, hvis hun skriver sig ind i hoffourerens bog. Når Mogens har talt, beder han om at bære den tilbage selv. Det er nok det nærmeste, han kommer.
 
 **Idas viden om historie** er også et redskab. Mange steder kan hun fortælle om det, hun ser, fx Bjørn Nørgaards gobeliner i Riddersalen eller statuen af Kierkegaard, der efter sigende kigger mod Regine Olsens hus. En gang er historien selve nøglen: koden 1849.
 
@@ -200,7 +200,7 @@ Vælger spilleren forkert, protesterer den, det går ud over, med sit alibi ("Je
 
 Når beviserne er lagt frem, tilstår Valdorf roligt. Han har brugt hele sit arbejdsliv på regnestykker, der holder, og Mørkeberg ville ødelægge det hele med én sætning på et pressemøde.
 
-Efterskrift med et glimt i øjet: Pressemødet bliver aflyst, og det rigtige regnestykke bliver offentliggjort. Tre uger senere bliver reformen alligevel vedtaget med 4.100 flere i job og et nyt sidebrev. Jonas bliver formand for Kompaspartiet, Pernille får sin forside, og Kaspers gamle adgangskort bliver endelig spærret. Ida får et nyt kapitel til sit speciale. Har hun glemt at lægge Elefantordenen tilbage, savner Ordenskapitlet en elefant.
+Efterskrift med et glimt i øjet: Pressemødet bliver aflyst, og det rigtige regnestykke bliver offentliggjort. Tre uger senere bliver reformen alligevel vedtaget med 4.100 flere i job og et nyt sidebrev. Jonas bliver formand for Kompaspartiet, Pernille får sin forside, og Kaspers gamle adgangskort bliver endelig spærret. Mogens får aldrig Elefantordenen, men han har båret den gennem Vandrehallen. Ida får et nyt kapitel til sit speciale.
 
 ## Ekstra lag: tilbage til 1942
 

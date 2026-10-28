@@ -601,20 +601,20 @@ const PERSONER = {
         ["mogens", "Det er ikke mit bord. Henrik har tallene."],
         ["mogens", "Har De i øvrigt set, hvor få der har fået Elefantordenen? Kun fire borgerlige danskere siden 1900. Det er et bedre emne."],
       ] },
-      { id: "orden", spoerg: "Vis ham Elefantordenen", kraever: ["ting:elefantorden"], giver: ["flag:mogens_talt", "flag:kode_hint", "flag:valdorf_vaad"], replikker: [
+      { id: "orden", spoerg: "Vis ham Elefantordenen", kraever: ["ting:elefantorden"], giver: ["flag:mogens_talt", "flag:kode_hint", "flag:valdorf_vaad", "-ting:elefantorden", "-flag:orden_ude", "flag:orden_tilbage", "flag:mogens_baerer"], replikker: [
         ["mogens", "Må jeg? Bare et øjeblik."],
         ["fortaeller", "Mogens holder ordenen i flade hænder, som var den en fugleunge."],
         ["mogens", "Kun fire borgerlige danskere siden 1900. Og nu står en kontorchef her og holder den."],
         ["mogens", "Ved De hvad? Jeg har aldrig fortalt det til nogen. Det var mig, der gav Aksel tallene fra maj. 4.000 flere i job, ikke 11.000. Han havde ret til at vide det."],
         ["mogens", "Henrik har låst de rigtige tal inde på sit kontor. Koden er den samme på alle hans låse: året, hvor Danmark fik sin første grundlov."],
         ["mogens", "Og en ting mere. Da jeg så ham ved printeren i nat, var han våd i håret. Det regner ikke indenfor."],
+        ["ida", "Tak. Nu skal ordenen tilbage til hoffoureren. Jeg har lovet ti minutter."],
+        ["mogens", "Må jeg bære den derhen? Bare én gang i mit liv. Det er nok det nærmeste, jeg kommer."],
+        ["fortaeller", "Ida nikker. Mogens lægger ordenen på sin mappe som på en sølvbakke og retter ryggen."],
       ] },
       { id: "rapporten", spoerg: "Hvad med 50.000-rapporten?", kraever: ["flag:ditte_renset"], giver: [], replikker: [
         ["mogens", "Den fra Prognosehuset Optima? Jeg så den på ministerens bord i morges."],
         ["mogens", "Der er en kommafejl på forsiden. Der skulle have stået 5.000,0."],
-      ] },
-      { id: "husk", spoerg: "Hvad skal jeg gøre med ordenen nu?", kraever: ["ting:elefantorden", "flag:mogens_talt"], giver: [], replikker: [
-        ["mogens", "Læg den tilbage i Riddersalen. Hoffet tæller elefanter."],
       ] },
     ],
   },
@@ -634,12 +634,16 @@ const PERSONER = {
         ["hoffourer", "Ingen låner Elefantordenen."],
         ["hoffourer", "Medmindre det er en historiker, der kan fortælle mig, hvem der har lavet gobelinerne på væggene. Det ved ingen af dem, der kommer her."],
       ] },
-      { id: "laan", spoerg: "Lån Elefantordenen", kraever: ["flag:hoffourer_spurgt", "flag:gobelin_kendt", "!ting:elefantorden"], giver: ["+ting:elefantorden", "flag:orden_ude", "-flag:orden_tilbage"], replikker: [
+      { id: "laan", spoerg: "Lån Elefantordenen", kraever: ["flag:hoffourer_spurgt", "flag:gobelin_kendt", "!ting:elefantorden", "!flag:mogens_baerer"], giver: ["+ting:elefantorden", "flag:orden_ude", "-flag:orden_tilbage"], replikker: [
         ["ida", "Bjørn Nørgaard. 17 gobeliner med Danmarks og verdens historie. De blev hængt op i 2000."],
         ["hoffourer", "Korrekt. Skriv Deres navn i protokollen. Ti minutter."],
         ["hoffourer", "Og er den ikke tilbage før kl. 10, finder jeg Dem. Hoffet tæller elefanter."],
       ] },
       { id: "aflever", spoerg: "Læg Elefantordenen tilbage", kraever: ["ting:elefantorden"], giver: ["-ting:elefantorden", "-flag:orden_ude", "flag:orden_tilbage"], replikker: [
+        ["hoffourer", "Ni minutter og fyrre sekunder. Hoffet takker."],
+      ] },
+      { id: "mogens", spoerg: "Fik De ordenen tilbage?", kraever: ["flag:mogens_baerer"], giver: [], replikker: [
+        ["hoffourer", "En kontorchef kom med den på en mappe. Han gik meget langsomt gennem Vandrehallen, så alle kunne se ham."],
         ["hoffourer", "Ni minutter og fyrre sekunder. Hoffet takker."],
       ] },
     ],
@@ -954,9 +958,6 @@ const BEGIVENHEDER = [
   { id: "pressemoedet", titel: "Pressemødet", kl: "09.55", naar: ["spor:16"], giver: ["flag:pressemoede"], replikker: [
     ["fortaeller", "Idas mobil summer. En sms fra Bente: »Pressemødet begynder om fem minutter i Landstingssalen. Kommissæren har sit papir klar.«"],
   ] },
-  { id: "orden_paamindelse", titel: "Hoffet tæller elefanter", kl: null, naar: ["akt>=4", "ting:elefantorden"], giver: [], replikker: [
-    ["fortaeller", "Elefantordenen ligger stadig i Idas rygsæk. Hoffoureren tæller elefanter, og Riddersalen er stadig åben."],
-  ] },
   { id: "kongen_rider", titel: "Kongen rider forbi", kl: null, lag1942: true, naar: ["lag1942", "flag:i_1942", "sted:ridebanen_1942"], giver: ["flag:handske_tabt"], replikker: [
     ["fortaeller", "En høj, ældre rytter kommer ridende uden følge. Folk på fortovet løfter hatten, og han hilser igen."],
     ["fortaeller", "Ved Ridebanen glider en handske ned fra hans hånd og lander i gruset."],
@@ -1057,8 +1058,6 @@ const HINT = [
     maal: "Find en nøgle til det gamle sadelskab", hen: null },
   { naar: ["!spor:21"], tekst: "Se i det gamle sadelskab inderst i sadelkammeret.",
     maal: "Undersøg det gamle sadelskab i sadelkammeret", hen: "sadelkammeret" },
-  { naar: ["akt>=4", "flag:orden_ude"], tekst: "Har du stadig Elefantordenen? Hoffoureren tæller elefanter. Riddersalen er åben.",
-    maal: "Læg Elefantordenen tilbage i Riddersalen", hen: "riddersalen" },
   { naar: ["akt>=4", "!spor:16"], tekst: "Departementschefen venter på dig på Udsigten i tårnet.",
     maal: "Mød departementschefen på Udsigten i tårnet", hen: "udsigten" },
   { naar: ["spor:16"], tekst: "Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op.",
@@ -1133,8 +1132,10 @@ const EFTERSKRIFT = {
     ["fortaeller", "Pressemødet bliver aflyst. Samme eftermiddag lægger Reformministeriet det rigtige regnestykke frem: 4.000 flere i job."],
     ["fortaeller", "Tre uger senere bliver Fremtidsreformen alligevel vedtaget med et nyt sidebrev og 4.100 flere i job."],
     ["fortaeller", "Jonas Fenger bliver formand for Kompaspartiet. Pernille Strandvig får sin forside. Kaspers gamle adgangskort bliver endelig spærret."],
+    ["fortaeller", "Mogens Brask får aldrig Elefantordenen. Men han har båret den gennem Vandrehallen, og det fortæller han om resten af livet."],
     ["fortaeller", "Ida får et nyt kapitel til sit speciale. Hun kalder det »Rigets midte, kl. 02.00«."],
   ],
+  // Kan ikke længere ske, fordi Mogens bærer ordenen tilbage (28. okt. 2026). Bliver stående, fordi spillet og tjekket læser den.
   ordenUde: {
     kraever: ["flag:orden_ude"],
     replikker: [
