@@ -562,6 +562,7 @@ function menneske(o = {}) {
   const f = { root, g, head, legs, hips, arms, elbows, eyes };
   if (o.foer) o.foer(f);
   f.grupper = o.statisk ? [g] : o.enkel ? [g, ...arms, ...hips] : [g, head, ...arms, ...hips, ...legs.map(l => l.knee)];
+  if (o.gang && o.enkel && !o.statisk) f.grupper.push(...legs.map(l=>l.knee));
   if (lively) f.grupper.push(...eyes);
   if (o.bag !== false) bagFigur(f.grupper, { skygge: o.skygge });
   if (lively) f.presence = {
@@ -4308,20 +4309,66 @@ function updPlayer(dt) {
 
 
 // ======================================================================== SOUND
-let actx = null;
-function audio() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; } } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
+let actx = null, soundBus = null, musicBus = null, lastSoundMix = null, lastMusicMix = null;
+function syncSoundMix() {
+  if(!actx)return;
+  const audible=soundOn&&!document.hidden;
+  const master=audible?1:0,music=audible&&musicOn&&started&&!paused?musicVolume:0;
+  if(master!==lastSoundMix){soundBus.gain.setTargetAtTime(master,actx.currentTime,.025);lastSoundMix=master;}
+  if(music!==lastMusicMix){musicBus.gain.setTargetAtTime(music,actx.currentTime,.4);lastMusicMix=music;}
+}
+function audio() {
+  if(!actx)try {
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    soundBus=actx.createGain();soundBus.connect(actx.destination);
+    musicBus=actx.createGain();musicBus.gain.value=0;musicBus.connect(soundBus);
+    syncSoundMix();
+  } catch(e){actx=null;}
+  if(actx?.state==='suspended')actx.resume().catch(()=>{});
+  return actx;
+}
+// An original, sparse minor-key motif, synthesised locally. No audio downloads.
+const MUSIC_MELODY=[62,69,65,64,62,57,60,65,64,69,67,65,62,60,57,60];
+let musicBeat=0,musicNext=0;
+function musicNote(midi,when,duration,volume,type='sine') {
+  const a=actx,o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.value=440*Math.pow(2,(midi-69)/12);
+  g.gain.setValueAtTime(.0001,when);
+  g.gain.exponentialRampToValueAtTime(volume,when+.06);
+  g.gain.exponentialRampToValueAtTime(.0001,when+duration);
+  o.connect(g);g.connect(musicBus);o.start(when);o.stop(when+duration+.03);
+  o.onended=()=>{o.disconnect();g.disconnect();};
+}
+function updateMusic() {
+  if(!actx)return;
+  syncSoundMix();
+  if(!soundOn||!musicOn||!started||paused||document.hidden||actx.state!=='running') {musicNext=0;return;}
+  if(actx.currentTime<musicNext)return;
+  const when=actx.currentTime+.025,i=musicBeat%MUSIC_MELODY.length;
+  musicNote(MUSIC_MELODY[i],when,2.8,.075);
+  if(i%4===0)musicNote([38,41,36,45][Math.floor(i/4)],when,4.2,.045,'triangle');
+  musicBeat++;musicNext=when+1.8;
+}
+HOOKS.frame.push(updateMusic);
+document.addEventListener('visibilitychange',()=>{syncSoundMix();musicNext=0;});
 function tone(f0, f1, start, dur, vol = 0.16, type = 'sine') {
   const a = audio(); if (!a || !soundOn) return; const t = a.currentTime + start;
   const o = a.createOscillator(), g = a.createGain(); o.type = type;
   o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + dur + 0.05);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(.03,dur*.3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(soundBus); o.start(t); o.stop(t + dur + 0.05);
+  o.onended=()=>{o.disconnect();g.disconnect();};
 }
 function sparkleSound() { [1320, 1760, 2093].forEach((f, i) => tone(f, f * 1.01, 0.08 + i * 0.07, 0.3, 0.045)); }
 function hop() { tone(300, 520, 0, 0.12, 0.05, 'triangle'); }
 function footstep() {   // a soft step outside, a clear tap on the marble and parquet indoors
   if (!soundOn) return;
-  if (FX.interior?.on) { tone(950, 620, 0, 0.035, 0.016, 'triangle'); tone(150, 95, 0, 0.05, 0.012); } else tone(110, 65, 0, 0.07, 0.018, 'triangle');
+  const inside=FX.interior;
+  if(inside?.on) {
+    const wood=inside.place==='folketing'&&inside.height(P.pos.x-inside.x,P.pos.z)>=inside.floor;
+    if(wood){tone(185,95,0,.075,.018,'triangle');tone(740,420,0,.025,.005);}
+    else {tone(950,620,0,.035,.012,'triangle');tone(150,95,.012,.075,.01);}
+  } else tone(110,65,0,.07,.018,'triangle');
 }
 function chime(notes, vol = 0.05) { notes.forEach((f, i) => tone(f, f * 1.002, i * 0.11, 0.5, vol)); }   // a new clue or thing
 function klokke(n) {   // Holmens Kirke strikes the hour: a bell with its overtones, n times
@@ -4335,7 +4382,7 @@ function regnLyd(styrke) {   // the last drops of the night's rain: soft noise t
     for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (Math.random() < 0.02 ? 1 : 0.35);
     const src = a.createBufferSource(); src.buffer = buf; src.loop = true;
     const f = a.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2600; f.Q.value = 0.7;
-    const g = a.createGain(); g.gain.value = 0; src.connect(f); f.connect(g); g.connect(a.destination); src.start();
+    const g = a.createGain(); g.gain.value = 0; src.connect(f); f.connect(g); g.connect(soundBus); src.start();
     regn = { src, g };
   }
   if (!regn) return;
@@ -4439,7 +4486,7 @@ function setEvening(v) {
   $('iNight').innerHTML = v ? '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke-linecap="round"/>' : '<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>';
   save();
 }
-function setSound(v) { soundOn = v; $('bSound').setAttribute('aria-pressed', String(v)); $('iWave').style.display = v ? '' : 'none'; save(); }
+function setSound(v) { soundOn = v; syncSoundMix(); $('bSound').setAttribute('aria-pressed', String(v)); $('iWave').style.display = v ? '' : 'none'; save(); }
 function setTekst(v) { tekstStor = v; document.body.classList.toggle('storTekst', v); save(); }
 let toastTimer = 0;
 function toast(msg) { const t = $('toast'); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false; toastTimer = 3.4; }
@@ -4644,9 +4691,9 @@ function updActions() {
 }
 
 // ======================================================================== STATE / STORAGE
-let tipsSet = [], soundOn = true, tekstStor = false, naesteSpor = false, visMaal = true, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
+let tipsSet = [], soundOn = true, musicOn = true, musicVolume = .18, tekstStor = false, naesteSpor = false, visMaal = true, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
 const SKEY = 'mordIRigetsMidte';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, map: showMap, tekst: tekstStor, spor: naesteSpor, maal: visMaal, tips: tipsSet, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, music: musicOn, musicVolume, map: showMap, tekst: tekstStor, spor: naesteSpor, maal: visMaal, tips: tipsSet, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 
 // ======================================================================== MAIN LOOP
@@ -4716,13 +4763,13 @@ function makePlazaTourist(coat, hair, photo, phase, style = {}) {
   const f = menneske({ coat, trousers: ['#344052', '#3b3f45', '#5a4a3c', '#2f3e5c'][n % 4], shoes: ['#303038', '#f1ede4', '#5a3a2a'][n % 3], skin: style.skin || HUD[(n * 2 + 1) % HUD.length], hair,
     kvinde: woman, barn: !!style.child, hairStyle: woman ? ({ bob: 'bob', bun: 'knold', ponytail: 'hestehale' }[style.hairdo] || 'lang') : (n % 4 === 3 && !style.child ? 'skaldet' : 'kort'),
     taske: style.child ? null : ['#7a614b', '#2f3138', '#b5523b', '#c9b48a'][n % 4], scale: woman ? 0.95 : 1, detalje: 'lav', skygge: !isTouch,
-    statisk: photo, enkel: !photo, arm: photo ? [foto(-1), foto(1)] : null,
+    statisk: photo, enkel: !photo, gang: !photo, arm: photo ? [foto(-1), foto(1)] : null,
     extra: photo ? (g, head, part, m) => {   // a phone; the screen lights briefly for each picture
       part(rundKasse(0.085, 0.165, 0.016, 0.01), m('#232831'), g, 0, 1.73, 0.44, 0);
       flash = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.14), new THREE.MeshBasicMaterial({ color: '#eaf5ff' })); flash.position.set(0, 1.73, 0.45); flash.visible = false; g.add(flash);
     } : null });
   dyn.add(f.root);
-  return { root: f.root, legs: f.hips, arms: f.arms, flash, photo, phase, style };
+  return { root: f.root, body: f.g, legs: f.hips, knees: f.legs.map(l=>l.knee), arms: f.arms, flash, photo, phase, style };
 }
 // A group shares its route and turning direction. Companions cannot drift apart.
 function addWalkingCompany(lead, kind, phase) {
@@ -4764,17 +4811,46 @@ function addWalkingCompany(lead, kind, phase) {
   }
   return lead;
 }
-function animateWalkingCompany(lead, time, moving) {
+// Measure actual world-space travel, including the companions' wider arc in a turn.
+function walkingMotion(p,dt,cycleLength) {
+  if(!p.gait)p.gait={previous:p.root.getWorldPosition(new THREE.Vector3()),sample:new THREE.Vector3(),phase:p.phase||0,weight:0};
+  const g=p.gait,at=p.root.getWorldPosition(g.sample),d=Math.hypot(at.x-g.previous.x,at.z-g.previous.z);
+  g.previous.copy(at);
+  const valid=dt>0&&d<Math.max(.5,dt*8),speed=valid?d/dt:0;
+  if(valid)g.phase=(g.phase+d*Math.PI*2/cycleLength)%(Math.PI*2);
+  g.weight+=(Math.min(1,speed/.75)-g.weight)*(1-Math.exp(-Math.max(0,dt)*10));
+  return g;
+}
+function animateWalkingCompany(lead, time, dt) {
   for (const p of lead.members || [lead]) {
-    const step = Math.sin(time * (p.style.child ? 7.8 : 6) + p.phase) * 0.46 * moving;
-    p.legs[0].rotation.x = step; p.legs[1].rotation.x = -step;
-    p.arms[0].rotation.x = -step * 0.8; p.arms[1].rotation.x = step * 0.8;
-    if (lead.dogs && lead.dogs.length && p === lead) p.arms[1].rotation.x = -0.1;
+    const gait=walkingMotion(p,dt,p.style.child ? .85 : 1.35),ph=gait.phase,k=gait.weight;
+    const step=Math.sin(ph)*.48*k;
+    p.legs[0].rotation.x=step;p.legs[1].rotation.x=-step;
+    p.knees[0].rotation.x=Math.max(0,Math.sin(ph-Math.PI/2))*.78*k;
+    p.knees[1].rotation.x=Math.max(0,Math.sin(ph+Math.PI/2))*.78*k;
+    p.arms[0].rotation.x=-step*.7;p.arms[1].rotation.x=step*.7;
+    p.body.position.y=Math.abs(Math.sin(ph))*.018*k;
+    p.body.rotation.z=Math.sin(ph)*.012*k;
+    if (lead.dogs?.length && p===lead) p.arms[1].rotation.x=-.1;
   }
   for (const d of lead.dogs || []) {
-    d.paws.forEach((p, i) => { p.rotation.x = Math.sin(time * 9 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.5 * moving; });
-    d.tail.rotation.z = Math.sin(time * 7) * 0.35;
+    const gait=walkingMotion(d,dt,.72);
+    d.paws.forEach((p,i)=>{p.rotation.x=Math.sin(gait.phase+(i===0||i===3?0:Math.PI))*.5*gait.weight;});
+    d.tail.rotation.z=Math.sin(time*7)*.35;
   }
+}
+function advanceWalkingRoute(w,dt,sine=false) {
+  const length=Math.hypot(w.b[0]-w.a[0],w.b[1]-w.a[1]);
+  w.walkTime=(w.walkTime||0)+dt;
+  // Same route endpoints, with a calm maximum walking speed of 1.35 m/s.
+  const a=w.walkTime*2.7/Math.max(1,length)+w.phase;
+  const u=(1+(sine?Math.sin(a):-Math.cos(a)))*.5;
+  const direction=sine?Math.cos(a):Math.sin(a);
+  const x=w.a[0]+(w.b[0]-w.a[0])*u,z=w.a[1]+(w.b[1]-w.a[1])*u;
+  w.root.position.set(x,groundAt(x,z,2),z);
+  const facing=Math.atan2(w.b[0]-w.a[0],w.b[1]-w.a[1])+(direction<0?Math.PI:0);
+  if(!w.facingReady){w.root.rotation.y=facing;w.facingReady=true;}
+  else w.root.rotation.y+=angDiff(facing,w.root.rotation.y)*(1-Math.exp(-dt*5));
 }
 const touristOk = ([x, z]) => ptIn(SLOTSPLADS_RING, x, z) && !rawWater(x, z) && !inBuilding(x, z)
   && groundAt(x, z, 2) < 0.5 && !nearRoute(x, z, 4) && Math.hypot(x - 81, z + 51) > 7;
@@ -4808,13 +4884,8 @@ HOOKS.frame.push((dt, time) => {
       t.flash.visible = ((time + t.phase) % 7.5) < 0.13;
       t.root.rotation.z = Math.sin(time * 0.8 + t.phase) * 0.014;
     } else {
-      const a = time * 0.48 + t.phase, u = (1 - Math.cos(a)) * 0.5;
-      const x = t.a[0] + (t.b[0] - t.a[0]) * u, z = t.a[1] + (t.b[1] - t.a[1]) * u;
-      t.root.position.set(x, groundAt(x, z, 2), z);
-      const facing=Math.atan2(t.b[0]-t.a[0],t.b[1]-t.a[1])+(Math.sin(a)<0?Math.PI:0);
-      if(!t.facingReady){t.root.rotation.y=facing;t.facingReady=true;}
-      else t.root.rotation.y+=angDiff(facing,t.root.rotation.y)*(1-Math.exp(-dt*5));
-      animateWalkingCompany(t, time, Math.abs(Math.sin(a)));
+      advanceWalkingRoute(t,dt);
+      animateWalkingCompany(t,time,dt);
     }
   }
 });
@@ -4917,12 +4988,8 @@ hideWhenFar(START_WALKERS.map(w => w.root), 0, -225, 130);
 HOOKS.frame.push((dt, t) => {
   if (!started || paused) return;
   for (const w of START_WALKERS) {
-    const a = t * 0.34 + w.phase, u = (Math.sin(a) + 1) / 2, moving = Math.abs(Math.cos(a));
-    const x = w.a[0] + (w.b[0] - w.a[0]) * u, z = w.a[1] + (w.b[1] - w.a[1]) * u;
-    w.root.position.set(x, groundAt(x, z, 2), z);
-    w.root.rotation.y = Math.atan2(w.b[0] - w.a[0], w.b[1] - w.a[1]) + (Math.cos(a) < 0 ? Math.PI : 0);
-    animateWalkingCompany(w, t, moving);
-    const d = Math.hypot(P.pos.x - x, P.pos.z - z);
+    advanceWalkingRoute(w,dt,true);
+    animateWalkingCompany(w,t,dt);
   }
 });
 
@@ -7239,7 +7306,7 @@ const GAADE = (() => {
 
   // Settings: sound, text size and the small map. Also reachable from the start card and the help card.
   const sets = dialog('setDialog', 'Indstillinger', true);
-  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Lyd</label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setMaal"> Vis, hvad Ida skal nu (øverst til venstre)</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><label class="gdCheck"><input type="checkbox" id="set1942"> Rejsen til 1942 (et ekstra lag, gælder nye spil)</label><button class="go" id="setDone" type="button">Færdig</button>';
+  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Al lyd</label><label class="gdCheck"><input type="checkbox" id="setMusic"> Baggrundsmusik</label><label class="gdCheck" for="setMusicVolume">Musikstyrke <input type="range" id="setMusicVolume" min="0" max="100" step="1" style="width:140px;max-width:40vw"><output id="musicVolumeText" for="setMusicVolume"></output></label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setMaal"> Vis, hvad Ida skal nu (øverst til venstre)</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><label class="gdCheck"><input type="checkbox" id="set1942"> Rejsen til 1942 (et ekstra lag, gælder nye spil)</label><button class="go" id="setDone" type="button">Færdig</button>';
   sets.addEventListener('keydown', e => e.stopPropagation());
   sets.addEventListener('close', () => { if (!intro.hidden) $('setBtn').focus(); else canvas.focus(); });
   $('setDone').addEventListener('click', () => sets.close());
@@ -7247,9 +7314,12 @@ const GAADE = (() => {
   $('setMini').addEventListener('change', e => setMapVisible(e.target.checked));
   $('setSpor').addEventListener('change', e => { naesteSpor = e.target.checked; save(); });
   $('setMaal').addEventListener('change', e => { visMaal = e.target.checked; if (FX.maal) { FX.maal.vis = visMaal; FX.maal.opdater(); } save(); });
+  $('setMusic').addEventListener('change',e=>{musicOn=e.target.checked;audio();syncSoundMix();save();});
+  $('setMusicVolume').addEventListener('input',e=>{musicVolume=Number(e.target.value)/100;$('musicVolumeText').textContent=e.target.value+' %';syncSoundMix();save();});
   $('set1942').addEventListener('change', e => { med1942 = e.target.checked; save(); });
   for (const r of sets.querySelectorAll('[name=setTs]')) r.addEventListener('change', e => setTekst(e.target.value === 'stor'));
   $('setBtn').addEventListener('click', () => {
+    $('setMusic').checked=musicOn; $('setMusicVolume').value=Math.round(musicVolume*100); $('musicVolumeText').textContent=Math.round(musicVolume*100)+' %';
     $('setSound').checked = soundOn; $('setMini').checked = showMap; $('setSpor').checked = naesteSpor; $('setMaal').checked = visMaal; $('set1942').checked = med1942;
     for (const r of sets.querySelectorAll('[name=setTs]')) r.checked = (r.value === 'stor') === tekstStor;
     sets.showModal(); $('setSound').focus();
@@ -8426,6 +8496,7 @@ const AAR1942 = (() => {
 function boot(data) {
   data = data || {};
   const st = load();
+  musicOn=st.music!==false; musicVolume=typeof st.musicVolume==='number'&&Number.isFinite(st.musicVolume)?Math.max(0,Math.min(1,st.musicVolume)):.18;
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
   setTekst(!!st.tekst); naesteSpor = !!st.spor; visMaal = st.maal !== false; if (FX.maal) FX.maal.vis = visMaal; tipsSet = Array.isArray(st.tips) ? st.tips : []; med1942 = st.lag1942 !== false;
