@@ -315,7 +315,7 @@ I notesbogen: Køkkenchef i Snapstinget. Fylder Mørkebergs termokande hver afte
 
 #### Har du gulerødder til staldene?
 
-<small>Kræver: »vega hint« eller »hest i vejen«, endnu ikke »fik gulerødder«. Giver: Ida får Gulerødder, »fik gulerødder«.</small>
+<small>Kræver: »vega hint« eller »hest i vejen« eller akt 3 eller senere, endnu ikke »fik gulerødder«. Giver: Ida får Gulerødder, »fik gulerødder«.</small>
 
 **Bodil:** Selvfølgelig. Vi sender skrællerne over hver morgen, men hestene foretrækker de hele. Tag tre.  
 **Bodil:** Og sig til Vega, at hun skylder mig en tur i karet.
@@ -1258,26 +1258,27 @@ Spillet viser det første hint på listen, hvis betingelse passer. Målet i fed 
 20. **Vis ministeren rapporten i restauranten i tårnet** (Restauranten i tårnet). Ministeren er i restauranten i tårnet. Hun vil gøre meget for en god rapport. <small>(akt 2 eller senere, endnu ikke »ditte renset«, har 50.000-rapporten)</small>
 21. **Find noget, ministeren gerne vil have** (Kompaspartiets sekretariat). Der lå vist en rapport på kopimaskinen i Kompaspartiets sekretariat. <small>(akt 2 eller senere, endnu ikke »ditte renset«, endnu ikke »rapport taget«)</small>
 22. **Tal med ministeren i restauranten i tårnet** (Restauranten i tårnet). Ministeren drak kaffe med Aksel i nat. Hun er i restauranten i tårnet. <small>(akt 2 eller senere, endnu ikke »ditte renset«)</small>
-23. **Vis Kasper kopimaskinens log i Snapstinget** (Snapstinget). Vis Kasper kopimaskinens log. Så tør han måske fortælle, hvad han så. <small>(spor 10 (Kopimaskinens log), mangler spor 11 (Manden på trappen))</small>
-24. **Find referatet i Finansministeriet** (Finansministeriets forhandlingsrum). Med ministerens gæstekort kommer du ind i Finansministeriet. Referatet ligger i forhandlingsrummet. <small>(akt 3 eller senere, mangler spor 9 (Referatet))</small>
-25. **Gå til springvandet i Bibliotekshaven** (Bibliotekshaven). Springvandet i Bibliotekshaven springer om lidt. Gå derud, og se efter i bassinet. <small>(akt 3 eller senere, mangler spor 20 (Papirerne i springvandet))</small>
-26. **Undersøg den røde båd ved Reformministeriet** (Kajen ved Reformministeriet). Se på båden ved kajen over for Reformministeriet. Hvem har bundet den? <small>(akt 3 eller senere, mangler spor 12 (Den røde båd))</small>
-27. **Vis Mogens Brask Elefantordenen i Landstingssalen** (Landstingssalen). Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har Elefantordenen)</small>
-28. **Tal med hoffoureren i Riddersalen** (Riddersalen). Hoffet dækker op i Riddersalen. Hoffoureren holder af folk, der kender hans gobeliner. <small>(akt 3 eller senere, endnu ikke »mogens talt«, endnu ikke »gobelin kendt«)</small>
-29. **Få Mogens Brask til at tale** (Riddersalen). Lån Elefantordenen hos hoffoureren i Riddersalen, og vis den til Mogens i Landstingssalen. <small>(akt 3 eller senere, endnu ikke »mogens talt«)</small>
-30. **Kom ind på departementschefens kontor i Reformministeriet** (Departementschefens kontor). Året for den første grundlov. Det står i montrerne i Vandrehallen. Departementschefens kontor ligger i Reformministeriet. <small>(akt 3 eller senere, mangler spor 15 (Valdorfs kontor))</small>
-31. **Undersøg jakken på departementschefens kontor** (Departementschefens kontor). Se i lommerne på den jakke. <small>(spor 15 (Valdorfs kontor), mangler spor 22 (Bådnøglen))</small>
-32. **Sejl ud med den røde båd ved Reformministeriet** (Kajen ved Reformministeriet). En bådnøgle? Den røde båd ligger ved kajen over for Reformministeriet. <small>(har Bådnøglen, endnu ikke »sejlet«)</small>
-33. **Sejl ud til den gamle fortøjningspæl midt i kanalen** (Kanalen ved den gamle fortøjningspæl). Sejl ud til den gamle fortøjningspæl midt i kanalen, og kig ned. Vandet er klart i dag. <small>(»sejlet«, mangler spor 14 (Termokanden))</small>
-34. **Få Vega til at flytte sig fra sadelkammeret** (De Kongelige Stalde). Giv Vega en gulerod. Hun står foran sadelkammeret i staldene. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«, har Gulerødder)</small>
-35. **Kom ind i sadelkammeret i De Kongelige Stalde** (De Kongelige Stalde). Gry siger, at Aksel var i sadelkammeret i nat. Men Vega står i vejen, og hun flytter sig kun for en gulerod fra Snapstinget. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«)</small>
-36. **Find kongens nøgle ved staldporten** (Ridebanen). Kongen sagde: bag den tredje hestesko over staldporten. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle, »kongen takket«)</small>
-37. **Find en nøgle til det gamle sadelskab**. Er skabet låst? Min farfar sagde altid, at kongen gemte nøgler bag hestesko. Og hans gamle radio har altid været lidt mærkelig. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle)</small>
-38. **Undersøg det gamle sadelskab i sadelkammeret** (Sadelkammeret). Se i det gamle sadelskab inderst i sadelkammeret. <small>(mangler spor 21 (Den gemte tabel))</small>
-39. **Læg Elefantordenen tilbage i Riddersalen** (Riddersalen). Har du stadig Elefantordenen? Hoffoureren tæller elefanter. Riddersalen er åben. <small>(akt 4 eller senere, »orden ude«)</small>
-40. **Mød departementschefen på Udsigten i tårnet** (Udsigten). Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
-41. **Gå til pressemødet i Landstingssalen** (Landstingssalen). Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
-42. **Tal med Svend på Højbro** (Højbro). Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
+23. **Tal med hoffoureren i Riddersalen om Elefantordenen** (Riddersalen). Aksel skrev, at departementet har vidst det siden maj. Mogens Brask er kontorchef i Reformministeriet, og han har drømt om Elefantordenen hele livet. Den ligger fremme i Riddersalen. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har ikke Elefantordenen, endnu ikke »hoffourer spurgt«)</small>
+24. **Find ud af, hvem der har lavet gobelinerne i Riddersalen** (Riddersalen). Hoffoureren låner kun ordenen ud til en, der ved, hvem der har lavet gobelinerne. Se godt på dem. Du er jo historiker. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har ikke Elefantordenen, endnu ikke »gobelin kendt«)</small>
+25. **Lån Elefantordenen hos hoffoureren** (Riddersalen). Nu ved du, hvem der har lavet gobelinerne. Sig det til hoffoureren, og lån ordenen. Mogens taler, når han får den at se. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har ikke Elefantordenen)</small>
+26. **Vis Kasper kopimaskinens log i Snapstinget** (Snapstinget). Vis Kasper kopimaskinens log. Så tør han måske fortælle, hvad han så. <small>(spor 10 (Kopimaskinens log), mangler spor 11 (Manden på trappen))</small>
+27. **Hent gulerødder hos Bodil til hesten foran sadelkammeret** (Snapstinget). Gry i staldene siger, at Aksel var inde i sadelkammeret i nat. Men hesten Vega står foran døren og flytter sig kun for en gulerod. Bodil i Snapstinget har altid nogle. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«, endnu ikke »fik gulerødder«)</small>
+28. **Vis Mogens Brask Elefantordenen i Landstingssalen** (Landstingssalen). Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har Elefantordenen)</small>
+29. **Gå til springvandet i Bibliotekshaven** (Bibliotekshaven). Springvandet i Bibliotekshaven springer om lidt. Gå derud, og se efter i bassinet. <small>(akt 3 eller senere, mangler spor 20 (Papirerne i springvandet))</small>
+30. **Find referatet i Finansministeriet** (Finansministeriets forhandlingsrum). Med ministerens gæstekort kommer du ind i Finansministeriet. Referatet ligger i forhandlingsrummet. <small>(akt 3 eller senere, mangler spor 9 (Referatet))</small>
+31. **Kom ind på departementschefens kontor i Reformministeriet** (Departementschefens kontor). Året for den første grundlov. Det står i montrerne i Vandrehallen. Departementschefens kontor ligger i Reformministeriet. <small>(akt 3 eller senere, mangler spor 15 (Valdorfs kontor))</small>
+32. **Undersøg jakken på departementschefens kontor** (Departementschefens kontor). Se i lommerne på den jakke. <small>(spor 15 (Valdorfs kontor), mangler spor 22 (Bådnøglen))</small>
+33. **Undersøg den røde båd ved kajen over for Reformministeriet** (Kajen ved Reformministeriet). En nøgle fra bådlauget ved Gammel Strand? Se på den røde båd ved kajen over for Reformministeriet. Hvem har bundet den? <small>(akt 3 eller senere, mangler spor 12 (Den røde båd))</small>
+34. **Sejl ud med den røde båd ved Reformministeriet** (Kajen ved Reformministeriet). En bådnøgle? Den røde båd ligger ved kajen over for Reformministeriet. <small>(har Bådnøglen, endnu ikke »sejlet«)</small>
+35. **Sejl ud til den gamle fortøjningspæl midt i kanalen** (Kanalen ved den gamle fortøjningspæl). Sejl ud til den gamle fortøjningspæl midt i kanalen, og kig ned. Vandet er klart i dag. <small>(»sejlet«, mangler spor 14 (Termokanden))</small>
+36. **Få Vega til at flytte sig fra sadelkammeret** (De Kongelige Stalde). Giv Vega en gulerod. Hun står foran sadelkammeret i staldene. <small>(akt 3 eller senere, endnu ikke »hesten flyttet«, har Gulerødder)</small>
+37. **Find kongens nøgle ved staldporten** (Ridebanen). Kongen sagde: bag den tredje hestesko over staldporten. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle, »kongen takket«)</small>
+38. **Find en nøgle til det gamle sadelskab**. Er skabet låst? Min farfar sagde altid, at kongen gemte nøgler bag hestesko. Og hans gamle radio har altid været lidt mærkelig. <small>(1942-laget er slået til, mangler spor 21 (Den gemte tabel), har ikke Kongens nøgle)</small>
+39. **Undersøg det gamle sadelskab i sadelkammeret** (Sadelkammeret). Se i det gamle sadelskab inderst i sadelkammeret. <small>(mangler spor 21 (Den gemte tabel))</small>
+40. **Læg Elefantordenen tilbage i Riddersalen** (Riddersalen). Har du stadig Elefantordenen? Hoffoureren tæller elefanter. Riddersalen er åben. <small>(akt 4 eller senere, »orden ude«)</small>
+41. **Mød departementschefen på Udsigten i tårnet** (Udsigten). Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
+42. **Gå til pressemødet i Landstingssalen** (Landstingssalen). Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
+43. **Tal med Svend på Højbro** (Højbro). Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
 
 ## Afsløringen
 

@@ -347,6 +347,21 @@ Michel: efter samtalen med Gry vidste man ikke, hvor man skulle hen, og det var 
   - Bente sagde "Kom ned til mig" i scenen med statsministeren, mens målet stadig var i Vandrehallen. Nu siger hun "Se dig godt omkring heroppe først. Så kom ned til mig ...".
   - Kontrolleret i Chromium: målet for hvert trin i akt 1 både i Vandrehallen og i betjentstuen, frem til akt 2.
 
+## Hurtigere og bedre flow i gåden (fra 28. okt. 2026)
+Michel: kan historien glide bedre, og kan man komme hurtigere igennem? Gennemgang af manuskriptet og måling af gåturene i spillet (den korteste vej, som pilen viser, med `FX.maal.vej`): en gennemspilning er ca. 4,2 km udendørs, ca. 13 minutters gang. To tredjedele ligger i akt 3, hvor målet sendte Ida i zigzag (båden ved Reformministeriet, Riddersalen, Folketinget, over kanalen igen, staldene og tilbage til Riddersalen). Akt 4 åbner først, når alle 8 spor i akt 3 er fundet, selv om afsløringen kun bruger 2 beviser pr. spørgsmål. Valdorfs fortalelse er svag, fordi tallet 4.000 kommer fra hans eget ministerium, og Mogens kender det også. Tages i bidder, én ad gangen.
+- [x] 1. Ny rækkefølge for målene i akt 3 (28. okt. 2026). Samme indhold i en fornuftig rute. Båden undersøges, når Ida kommer med bådnøglen.
+  - Rækkefølgen i `HINT`: Riddersalen (akt 2 slutter normalt i tårnet, 143 m derfra), Folketinget (Kasper, gulerødder hos Bodil og Mogens), Bibliotekshaven, Finansministeriet, Reformministeriet med kontoret, jakken og båden, og til sidst staldene. Sporene peger nu mere og mere på Valdorf, og akten slutter med båden og termokanden lige før Udsigten.
+  - Elefantordenen har tre mål i stedet for to: tal med hoffoureren, find ud af, hvem der har lavet gobelinerne, og lån ordenen. Før stod der "Tal med hoffoureren", også efter at man havde talt med ham. Bentes første hint siger nu, hvorfor Mogens skal tale: Aksel skrev, at departementet har vidst det siden maj.
+  - Gulerødderne hentes hos Bodil, mens Ida alligevel er i Snapstinget hos Kasper. Bodils emne kræver nu `vega_hint`, `hest_i_vejen` eller akt 3. Før kunne man komme til Vega uden gulerødder og måtte gå tilbage til Snapstinget og ud igen (ca. 800 m). Det gamle hint "Kom ind i sadelkammeret" uden gulerødder kunne ikke længere nås og er fjernet.
+  - Målt med en spiller, der følger målet øverst (Bentes hint i rækkefølge, afstand med `FX.maal.vej`): akt 3 fra tårnet til det sidste mål før akt 4 er 2,0 km mod 2,6 km før (og før yderligere ca. 0,8 km uden gulerødder). Hele spillet frem til afsløringen: 3,0 km mod 3,7 km.
+  - Kontrolleret: `node dev/tjek-mordgaade.js` uden fejl (2000/2000 med og uden 1942). I Chromium på computer (1280 x 800) og telefon (390 x 844 med touch) uden JavaScript-fejl: målet og afstanden for hvert trin i akt 3, og at Bodils emne om gulerødder vises i akt 3.
+- [ ] 2. Mogens lægger selv Elefantordenen tilbage. Det sparer den sidste tur til Riddersalen og giver ham en scene.
+- [ ] 3. En skarpere fortalelse på Udsigten: Valdorf siger noget om, at termokanden ligger i kanalen. Det ved kun morderen og Ida, der har set den fra båden.
+- [ ] 4. Sadelkammeret bliver et ekstra bevis, ikke et krav for akt 4. "Hvorfor?" er allerede bevist af notesbogen og papirerne i springvandet, og staldene er den længste tur. 1942-laget bliver en rigtig sidehistorie. Evt. en stjerne for det.
+- [ ] 5. Hoffoureren spørger direkte: Ida vælger mellem tre kunstnere i samtalen i stedet for først at se på gobelinerne og så tale med ham igen.
+- [ ] 6. Kortere start: et kort billede over Marmorbroen, og så starter Ida ved porten i Tøjhusgade. Gry møder hun senere i staldene (replikken "Så du nogen i nat?" findes). Sparer ca. 450 m. Den rigtige vej (valgt 24. okt.) beholdes.
+- [ ] 7. Senere, hvis Michel vil: akt 4 åbner, når Ida har beviser nok til alle fire spørgsmål. Spor ud over det giver stjerner.
+
 ## Til senere
 - [x] Pænere heste (24. okt. 2026)
   - Ny `buildHorse` bygget af glatte rør (`loft(ctrl)`: et rør langs en kurve, hvor hvert punkt har bredde og dybde, og enderne er lukket) og samlet med `figKit`, så hver bevægelig del er én farvet mesh og én kontur. Dyb brystkasse, rund krop og bagpart, buet hals med manke langs kammen, langt hoved med kind, mule, næsebor, øjne med glimt, spidse ører og pandelok, ben med knæ (bag: has), kode og hov, og en hale, der hænger ned til haserne.
