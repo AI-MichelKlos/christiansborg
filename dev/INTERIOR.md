@@ -403,3 +403,13 @@ Gallerivæggene langs trappen har fået egetræspaneler med mørke fyldninger, s
 Detaljerne er en æstetisk fortolkning af spilmodellen, ikke en dokumentation af den virkelige bygnings indretning. Ganggrænser, gulvhøjder, kollisionslister og historie er bevaret.
 
 Kontrol: JavaScript-syntaks og git diff --check består. Historiens eksisterende test består 2.000 simulerede gennemspilninger med 1942-laget og 2.000 uden. Den nye dekorationsfunktion er kørt isoleret med three.js 0.160.0: 204 meshes har endelige geometrikoordinater, og deres verdensafgrænsninger friholder galleriets gangbredde i spillerhøjde. fits- og height-funktionerne er kontrolleret identiske med før ændringen. Visuel 3D-kontrol kunne ikke gennemføres: den lokale browser manglede, og browserinstallationen returnerede en ugyldig download. Lysvirkning og mobilgengivelse er derfor ikke visuelt verificeret.
+
+## Runde 20: mere levende personer (28. oktober 2026)
+
+Historiens levende personer har fået lys øjenflade, iris, pupil og en lille lysrefleks. Øjnene blinker med forskudte intervaller. Der er tilføjet diskret vejrtrækning, hovedbevægelser, blikke til siderne og små bevægelser med frie arme tæt på Ida. Hovedet drejer hurtigere end kroppen, og siddende personer beholder deres siddestilling. Animationen følger pausen. Armene med kopper, telefoner og andre rekvisitter bevarer deres oprindelige stilling. Mørkebergs lukkede øjne og stillestående figur er undtaget.
+
+Tøjet har fået diskrete lommesømme og ærmedetaljer på de levende historiefigurer. Det eksisterende system samler stadig geometrien; øjnene kræver to ekstra meshes pr. figur. De gående turister vender gradvist, når deres eksisterende rute vender, i stedet for straks at dreje 180 grader. Steder, ruter, samtaleafstande, spor og manuskript er bevaret.
+
+Kontrol: JavaScript-syntaks og git diff --check består. Det faktiske figursystem og alle 17 LOOK-opsætninger er bygget isoleret med three.js 0.160.0; navneskiltets canvas-tekstur og kongens hest er erstattet af testobjekter. Der er kontrolleret endelige geometri- og transformationsværdier gennem 600 animationstrin pr. figur, fungerende blink, faste rodpositioner og uændrede armstillinger for alle rekvisitter. De forenklede figuropsætninger bygger også. 4.000 simulerede gennemspilninger af historien består. Browserkontrollen af den eksisterende spilside melder manglende WebGL; den nye gengivelse og mobilens billedhastighed er derfor ikke visuelt efterprøvet.
+
+Næste foreslåede opgave: ganganimation hos turister med knæbøjning og skridtlængde, der følger deres faktiske hastighed.
