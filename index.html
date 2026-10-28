@@ -4634,6 +4634,12 @@ function rayHit(a, b) {
 }
 let startBlend = -1;
 const orbitC = new THREE.Vector3(20, 0, 40);
+// The opening shot of a new game: Marmorbroen and Ridebanen at dawn, seen while the first cards are open. When the last
+// card closes (INTRO.slip), the camera glides over the roofs to Ida at the gate in Tøjhusgade, where she starts.
+// The glide is a curve through bue: high over the stables and then down along Tøjhusgade, so it does not cut through houses.
+const INTRO = { on: false, t: 0, pos: new THREE.Vector3(-215, 26, 190), look: new THREE.Vector3(-140, 0, 85), bue: new THREE.Vector3(-80, 62, 155), fraPos: null, fraLook: null,
+  start() { this.on = true; this.t = 0; },
+  slip() { if (!this.on) return; this.on = false; this.fraPos = camera.position.clone(); this.fraLook = this.look.clone(); startBlend = 0; } };
 let camIn = 0;
 function camFollow(dt, out, look) {
   if (drag.size === 0 && clockT - lastDragEnd > 0.8 && (!isTouch || MYBOAT.on)) {
@@ -4660,9 +4666,18 @@ function updCamera(dt, t) {
   camFollow(dt, followPos, followLook);
   if (!camInit) { camPos.copy(followPos); camLook.copy(followLook); camInit = true; }
   camPos.lerp(followPos, 1 - Math.exp(-dt * 12)); camLook.lerp(followLook, 1 - Math.exp(-dt * 14));
+  if (INTRO.on) {   // the opening shot drifts slowly toward Ridebanen
+    INTRO.t += dt; camera.position.lerpVectors(INTRO.pos, INTRO.look, Math.min(0.12, INTRO.t * 0.006)); camera.lookAt(INTRO.look);
+    return;
+  }
   if (startBlend >= 0 && startBlend < 1) {
-    startBlend = Math.min(1, startBlend + dt / 2.2); const e = startBlend * startBlend * (3 - 2 * startBlend);
-    camera.position.lerpVectors(orbitPos, camPos, e); tmpA.lerpVectors(orbitC, camLook, e); camera.lookAt(tmpA);
+    const fra = INTRO.fraPos;   // from the opening shot over the roofs, or from the circling view on the start screen
+    startBlend = Math.min(1, startBlend + dt / (fra ? 3.4 : 2.2)); const e = startBlend * startBlend * (3 - 2 * startBlend);
+    if (fra) { const k = INTRO.bue, u = 1 - e; camera.position.set(u * u * fra.x + 2 * u * e * k.x + e * e * camPos.x, u * u * fra.y + 2 * u * e * k.y + e * e * camPos.y, u * u * fra.z + 2 * u * e * k.z + e * e * camPos.z); }
+    else camera.position.lerpVectors(orbitPos, camPos, e);
+    tmpA.lerpVectors(INTRO.fraLook || orbitC, camLook, fra ? Math.min(1, e * 2) : e);   // in the glide she looks ahead toward Ida early
+    camera.lookAt(tmpA);
+    if (startBlend >= 1) INTRO.fraPos = INTRO.fraLook = null;
   } else { camera.position.copy(camPos); camera.lookAt(camLook); }
   kid.root.visible = camera.position.distanceTo(camLook) > 1.05;
 }
@@ -7035,7 +7050,7 @@ FX.mapView=MAPVIEW;
 // Conditions and effects use the same small language as mordgaade.js (see the top of that file).
 const GAADE = (() => {
   const M = MANUS, GKEY = 'mordIRigetsMidte.spil';
-  const START_POS = [-212, 0, 139], START_FACE = Math.atan2(24, -15);   // west end of Marmorbroen, facing Ridebanen
+  const START_POS = [-17.3, 0, 119.1], START_FACE = Math.atan2(21.3, -13);   // Tøjhusgade, facing the gate into Rigsdagsgården (85 m to Bente)
   const toMin = s => { const [h, m] = String(s).split(/[.:]/).map(Number); return h * 60 + (m || 0); };
   const kl = n => String(Math.floor(n / 60)).padStart(2, '0') + '.' + String(n % 60).padStart(2, '0');
   // Night times sort after the evening before: 21.30 < 23.50 < 00.15 < 05.50. "02-03" means some time between 2 and 3.
@@ -7145,8 +7160,8 @@ const GAADE = (() => {
   }
   function efterStart(nyt) {
     gem();
-    if (nyt && !TESTMODE) scene({ eyebrow: `Akt 1 · ${akt().navn} · kl. ${kl(G.min)}`, title: 'Torsdag morgen', lines: M.start.replikker.map(r => r[1]), btn: 'Videre', efter: () =>
-      scene({ eyebrow: 'Før du går i gang', title: 'Sådan opklarer du mordet', lines: opklarTrin(), btn: 'Gå over broen', efter: () => FX.tip?.vis('maal') }) });
+    if (nyt && !TESTMODE) { INTRO.start(); scene({ eyebrow: `Akt 1 · ${akt().navn} · kl. ${kl(G.min)}`, title: 'Torsdag morgen', lines: M.start.replikker.map(r => r[1]), btn: 'Videre', efter: () =>
+      scene({ eyebrow: 'Før du går i gang', title: 'Sådan opklarer du mordet', lines: opklarTrin(), btn: 'Gå ind ad porten', efter: () => { INTRO.slip(); FX.tip?.vis('maal'); } }) }); }
     else if (!nyt) setTimeout(() => toast(`Velkommen tilbage. Klokken er ${kl(G.min)}.`), 900);
   }
   function startKnapper() {
@@ -8513,7 +8528,7 @@ function boot(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, started, evening }));
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
-window.__cb = { MAAL, TIPS, lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
+window.__cb = { INTRO, MAAL, TIPS, lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
 </script>

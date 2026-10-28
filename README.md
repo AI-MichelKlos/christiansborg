@@ -1,6 +1,6 @@
 # Christiansborg: Mord i Rigets midte
 
-En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Hele gåden kan spilles fra Marmorbroen kl. 06.00 til afsløringen ved pressemødet kl. 10. Et spil tager 60-90 minutter og kan stoppes og fortsættes på computer og telefon.
+En mordgåde for voksne i 3D på Christiansborg og Slotsholmen i København. Hele gåden kan spilles fra porten i Tøjhusgade kl. 06.00 til afsløringen ved pressemødet kl. 10. Et spil tager 60-90 minutter og kan stoppes og fortsættes på computer og telefon.
 
 Med et ekstra lag kan Ida dreje på en gammel radio i betjentstuen og stå på Slotsholmen en sommermorgen i juni 1942, hvor kongen rider forbi Ridebanen, og tyske soldater går patrulje. Laget kan slås fra under Indstillinger før et nyt spil.
 

@@ -16,10 +16,10 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 
 ## Start
 
-Ida starter ved Marmorbroen kl. 06.00 med blyant, notesbog, mobil, studiekort i rygsækken.
+Ida starter ved porten i Tøjhusgade kl. 06.00 med blyant, notesbog, mobil, studiekort i rygsækken.
 
 *Torsdag morgen kl. 06.00. Det regnede det meste af natten, og brostenene er stadig våde. Hestene damper på Ridebanen.*  
-*Ida har aftalt at møde nattevagten Bente ved Folketingets indgang i Rigsdagsgården. Ingen kender huset bedre, og Ida skriver speciale om Christiansborg.*  
+*Ida er gået over Marmorbroen og langs kanalen ad Tøjhusgade. Hun skal møde nattevagten Bente ved Folketingets indgang i Rigsdagsgården, lige inden for porten. Ingen kender huset bedre, og Ida skriver speciale om Christiansborg.*  
 *Hun ved endnu ikke, at nogen er død i nat.*
 
 Uret kan ikke løbe ud. Det står stille 5 minutter før aktens slut, til de vigtigste spor er fundet. Når en begivenhed har et klokkeslæt, springer uret frem til det, hvis det er bagud.

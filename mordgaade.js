@@ -22,12 +22,12 @@
 // Tekster må ikke indeholde tankestreg. Brug bindestreg.
 
 const START = {
-  sted: "marmorbroen",
+  sted: "porten i Tøjhusgade",   // efter et kort billede over Marmorbroen og Ridebanen (28. okt. 2026)
   kl: "06.00",
   ting: ["blyant", "notesbog", "mobil", "studiekort"],
   replikker: [
     ["fortaeller", "Torsdag morgen kl. 06.00. Det regnede det meste af natten, og brostenene er stadig våde. Hestene damper på Ridebanen."],
-    ["fortaeller", "Ida har aftalt at møde nattevagten Bente ved Folketingets indgang i Rigsdagsgården. Ingen kender huset bedre, og Ida skriver speciale om Christiansborg."],
+    ["fortaeller", "Ida er gået over Marmorbroen og langs kanalen ad Tøjhusgade. Hun skal møde nattevagten Bente ved Folketingets indgang i Rigsdagsgården, lige inden for porten. Ingen kender huset bedre, og Ida skriver speciale om Christiansborg."],
     ["fortaeller", "Hun ved endnu ikke, at nogen er død i nat."],
   ],
 };

@@ -378,7 +378,11 @@ Michel: kan historien glide bedre, og kan man komme hurtigere igennem? Gennemgan
   - "Se på gobelinerne" (Idas viden) står der stadig og giver svaret, hvis man er i tvivl. Bentes hint siger det også.
   - Fjernet: emnerne "Lån Elefantordenen" og "Læg Elefantordenen tilbage" (Mogens bærer den tilbage) og målet "Lån Elefantordenen hos hoffoureren". Riddersalen har nu to mål: tal med hoffoureren, og fortæl ham, hvem der har lavet gobelinerne.
   - Kontrolleret: `node dev/tjek-mordgaade.js` uden fejl. I Chromium på computer og telefon uden JavaScript-fejl: samtalen med et forkert og så det rigtige svar, ordenen i rygsækken og målet bagefter (Kasper i Snapstinget).
-- [ ] 6. Kortere start: et kort billede over Marmorbroen, og så starter Ida ved porten i Tøjhusgade. Gry møder hun senere i staldene (replikken "Så du nogen i nat?" findes). Sparer ca. 450 m. Den rigtige vej (valgt 24. okt.) beholdes.
+- [x] 6. Kortere start (29. okt. 2026): et kort billede over Marmorbroen, og så starter Ida ved porten i Tøjhusgade. Gry møder hun senere i staldene (replikken "Så du nogen i nat?" findes). Den rigtige vej (valgt 24. okt.) beholdes.
+  - Nyt spil: mens kortene "Torsdag morgen" og "Sådan opklarer du mordet" er åbne, viser kameraet Marmorbroen, pavillonerne, Ridebanen med hestene og slottet og glider langsomt frem (`INTRO` ved `startBlend`). Knappen på det sidste kort hedder "Gå ind ad porten". Så glider kameraet på 3,4 sekunder i en bue over staldene og ned langs Tøjhusgade til Ida (`INTRO.bue`, en kurve, så det ikke skærer gennem husene), og hun kigger frem mod porten fra begyndelsen af turen.
+  - Ida starter i Tøjhusgade og kigger ind gennem porten til Rigsdagsgården (`START_POS` -17,3; 119,1), 85 m fra Bente. Før startede hun på Marmorbroen 326 m væk, eller ca. 500 m, hvis hun først gik ind til Gry på Ridebanen.
+  - Starttekst: "Ida er gået over Marmorbroen og langs kanalen ad Tøjhusgade ...". `START.sted` er nu en tekst ("porten i Tøjhusgade"), som kun bruges i manuskriptet. Fortsæt og `?test` har ingen indledning. README og `dev/MORDGAADE.md` er rettet.
+  - Kontrolleret: `node dev/tjek-mordgaade.js` uden fejl. I Chromium på computer og telefon uden JavaScript-fejl: billedet bag de to kort, seks billeder af glidet, Ida ved porten med målet "Rigsdagsgården · 85 m", og at Bente møder hende i Rigsdagsgården.
 - [ ] 7. Senere, hvis Michel vil: akt 4 åbner, når Ida har beviser nok til alle fire spørgsmål. Spor ud over det giver stjerner.
 
 ## Til senere
