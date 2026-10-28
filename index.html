@@ -5672,6 +5672,48 @@ const INTERIOR = (() => {
       b(.014,.48,w*.55,trim,x+side*(w/2+.008),y+.38,z);
     }
   }
+  // Decorative joinery and lamps follow the existing walls; no new walkable surfaces.
+  function buildStairAndHallFinish() {
+    const ivory=material('#f0e5cf'),recess=material('#61432e');
+    const glow=new THREE.MeshBasicMaterial({color:'#ffe2a6'});
+    function sconce(x,y,z,ry) {
+      const r=new THREE.Group();r.position.set(x,y,z);r.rotation.y=ry;g.add(r);
+      const add=(w,h,d,m,x,y,z)=>box(w,h,d,m,x,y,z,{parent:r,cast:false});
+      add(.22,.55,.055,brass,0,0,0);
+      add(.045,.12,.24,brass,0,.12,.12);
+      add(.34,.045,.32,brass,0,.23,.22);
+      add(.25,.38,.24,glow,0,.28,.22);
+      for(const side of [-1,1])add(.025,.42,.27,brass,side*.145,.26,.22);
+      add(.36,.055,.34,brass,0,.67,.22);
+      mesh(new THREE.SphereGeometry(.055,8,6),brass,0,.78,.22,{parent:r});
+    }
+    // Panelled gallery walls above the stair: relief stays behind the walkway edge.
+    for(const side of [-1,1]) {
+      b(.08,1.55,11.5,oak,side*4.14,I.floor,12.2);
+      b(.12,.16,11.5,trim,side*4.1,I.floor,12.2);
+      b(.14,.08,11.5,oak,side*4.1,I.floor+1.55,12.2);
+      for(let z=7.4;z<18;z+=1.5) {
+        b(.025,1.08,1.17,recess,side*4.085,I.floor+.27,z);
+        for(const dz of [-.6,.6])b(.06,1.18,.045,trim,side*4.055,I.floor+.22,z+dz);
+        for(const y of [.22,1.36])b(.06,.045,1.24,trim,side*4.055,I.floor+y,z);
+      }
+      for(const z of [9.1,15.3])sconce(side*4.12,I.floor+2.25,z,-side*Math.PI/2);
+      b(.16,.15,17.5,ivory,side*4.12,10.95,14);
+      b(.24,.08,17.5,plaster,side*4.08,11.1,14);
+    }
+    // Layered skirting and frieze edging stop at every existing doorway.
+    for(const side of [-1,1]) {
+      const spans=side===1?[[-40,-4.2],[4.2,22.5],[25.5,40]]:[[-40,-4.5],[-1.5,1.5],[4.5,40]];
+      for(const [a,c] of spans) {
+        b(c-a,.15,.07,trim,(a+c)/2,I.floor,side*4.45);
+        b(c-a,.035,.06,brass,(a+c)/2,I.floor+2.17,side*4.48);
+        b(c-a,.065,.1,ivory,(a+c)/2,I.floor+3.12,side*4.48);
+      }
+      // Above the panelling, clear of the seating niches and the central doors.
+      for(const x of [-30,-18,18,30])sconce(x,I.floor+3.28,side*4.48,side===1?Math.PI:0);
+    }
+  }
+
   function buildHallVaults() {
     // Barrel vault with a low elliptical rise, plus transverse white arches.
     const pos=[],nor=[],segments=24;
@@ -6624,6 +6666,7 @@ const INTERIOR = (() => {
     for(const z of [8.2,15.2])archFrame(0,z,0,0,8.4,7.7,.65);
     b(2.8,3.4,.18,oak,0,0,22.75);sign('Ud til Rigsdagsgården',3.7,.65,0,3.9,22.6,Math.PI);
     buildEntryDetails();
+    buildStairAndHallFinish();
     sign('Vandrehallen',3.6,.5,0,7.3,6.9,Math.PI);
     sign('Landstingssalen  ←',3,.4,-2.1,6.7,4.8,Math.PI);
     sign('→  Folketingssalen',3,.4,2.1,6.7,4.8,Math.PI);
