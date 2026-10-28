@@ -636,15 +636,19 @@ const PERSONER = {
         ["hoffourer", "Elefantordenen. Den skal ligge fremme til aftenens gallamiddag for en udenlandsk gæst."],
         ["ida", "Må jeg låne den? Ti minutter. Det er til et speciale."],
         ["hoffourer", "Ingen låner Elefantordenen."],
-        ["hoffourer", "Medmindre det er en historiker, der kan fortælle mig, hvem der har lavet gobelinerne på væggene. Det ved ingen af dem, der kommer her."],
+        ["hoffourer", "Medmindre De er historiker. Så kan De sikkert fortælle mig, hvem der har lavet gobelinerne her på væggene. Det ved ingen af dem, der kommer her."],
       ] },
-      { id: "laan", spoerg: "Lån Elefantordenen", kraever: ["flag:hoffourer_spurgt", "flag:gobelin_kendt", "!ting:elefantorden", "!flag:mogens_baerer"], giver: ["+ting:elefantorden", "flag:orden_ude", "-flag:orden_tilbage"], replikker: [
-        ["ida", "Bjørn Nørgaard. 17 gobeliner med Danmarks og verdens historie. De blev hængt op i 2000."],
+      // Ida svarer hoffoureren i samtalen. Det rigtige svar giver ordenen. Mogens bærer den selv tilbage, så Ida afleverer den ikke.
+      { id: "svar_kirkeby", spoerg: "Det er Per Kirkeby.", kraever: ["flag:hoffourer_spurgt", "!flag:gobelin_svaret"], giver: [], replikker: [
+        ["hoffourer", "Kirkeby? En fin maler. Men det er ikke ham. Kig en gang til."],
+      ] },
+      { id: "svar_noergaard", spoerg: "Det er Bjørn Nørgaard.", kraever: ["flag:hoffourer_spurgt", "!flag:gobelin_svaret"], giver: ["+ting:elefantorden", "flag:orden_ude", "-flag:orden_tilbage", "flag:gobelin_kendt", "flag:gobelin_svaret"], replikker: [
+        ["ida", "17 gobeliner med Danmarks og verdens historie. De blev hængt op i 2000."],
         ["hoffourer", "Korrekt. Skriv Deres navn i protokollen. Ti minutter."],
         ["hoffourer", "Og er den ikke tilbage før kl. 10, finder jeg Dem. Hoffet tæller elefanter."],
       ] },
-      { id: "aflever", spoerg: "Læg Elefantordenen tilbage", kraever: ["ting:elefantorden"], giver: ["-ting:elefantorden", "-flag:orden_ude", "flag:orden_tilbage"], replikker: [
-        ["hoffourer", "Ni minutter og fyrre sekunder. Hoffet takker."],
+      { id: "svar_jorn", spoerg: "Det er Asger Jorn.", kraever: ["flag:hoffourer_spurgt", "!flag:gobelin_svaret"], giver: [], replikker: [
+        ["hoffourer", "Jorn? Nej. Et godt gæt, men ikke rigtigt. Kig en gang til."],
       ] },
       { id: "mogens", spoerg: "Fik De ordenen tilbage?", kraever: ["flag:mogens_baerer"], giver: [], replikker: [
         ["hoffourer", "En kontorchef kom med den på en mappe. Han gik meget langsomt gennem Vandrehallen, så alle kunne se ham."],
@@ -1044,10 +1048,8 @@ const HINT = [
   // Bibliotekshaven, Finansministeriet og til sidst Reformministeriet og båden. Målt 28. okt. 2026.
   { naar: ["akt>=3", "!flag:mogens_talt", "!ting:elefantorden", "!flag:hoffourer_spurgt"], tekst: "Aksel skrev, at departementet har vidst det siden maj. Mogens Brask er kontorchef i Reformministeriet, og han har drømt om Elefantordenen hele livet. Den ligger fremme i Riddersalen.",
     maal: "Tal med hoffoureren i Riddersalen om Elefantordenen", hen: "riddersalen" },
-  { naar: ["akt>=3", "!flag:mogens_talt", "!ting:elefantorden", "!flag:gobelin_kendt"], tekst: "Hoffoureren låner kun ordenen ud til en, der ved, hvem der har lavet gobelinerne. Se godt på dem. Du er jo historiker.",
-    maal: "Find ud af, hvem der har lavet gobelinerne i Riddersalen", hen: "riddersalen" },
-  { naar: ["akt>=3", "!flag:mogens_talt", "!ting:elefantorden"], tekst: "Nu ved du, hvem der har lavet gobelinerne. Sig det til hoffoureren, og lån ordenen. Mogens taler, når han får den at se.",
-    maal: "Lån Elefantordenen hos hoffoureren", hen: "riddersalen" },
+  { naar: ["akt>=3", "!flag:mogens_talt", "!ting:elefantorden"], tekst: "Hoffoureren låner kun ordenen ud til en, der ved, hvem der har lavet gobelinerne. Er du i tvivl, så se godt på dem. Du er jo historiker.",
+    maal: "Fortæl hoffoureren, hvem der har lavet gobelinerne", hen: "riddersalen" },
   { naar: ["spor:10", "!spor:11"], tekst: "Vis Kasper kopimaskinens log. Så tør han måske fortælle, hvad han så.",
     maal: "Vis Kasper kopimaskinens log i Snapstinget", hen: "snapstinget" },
   { naar: ["akt>=3", "!flag:mogens_talt", "ting:elefantorden"], tekst: "Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den.",

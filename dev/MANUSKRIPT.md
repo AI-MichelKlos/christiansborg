@@ -8,11 +8,11 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 
 ## Tjek af logikken
 
-- Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 60 skridt.
-- Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 66 skridt.
+- Uden 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 59 skridt.
+- Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 65 skridt.
 - Fejl: ingen. Advarsler: ingen.
 - Steder, der skal bygges: .
-- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 308.
+- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 309.
 
 ## Start
 
@@ -45,66 +45,65 @@ Uret kan ikke løbe ud. Det står stille 5 minutter før aktens slut, til de vig
 
 Den korteste af de tilfældige gennemspilninger uden 1942-laget. Den kan bruges, når spillet skal testes.
 
-1. Gry Strigle: Fortæl om hestene
-2. De Kongelige Stalde: Gå hen til sadelkammeret
-3. Bibliotekshaven: Se på bænken ved Kierkegaard
-4. Gry Strigle: Godmorgen
+1. Bibliotekshaven: Se på bænken ved Kierkegaard
+2. Gry Strigle: Godmorgen
+3. Gry Strigle: Fortæl om hestene
+4. De Kongelige Stalde: Gå hen til sadelkammeret
 5. Begivenhed: moede_bente
-6. Bibliotekshaven: Se på gruset
-7. Vandrehallen og Rigets midte: Se på Mørkeberg
-8. Begivenhed: kommissaeren
-9. Begivenhed: statsministeren
-10. Vandrehallen og Rigets midte: Lys under sofaen
-11. Vandrehallen og Rigets midte: Gnid blyanten over notesbogen
-12. Bente Holmsgaard: Fortæl om huset
-13. Vandrehallen og Rigets midte: Se grundlovene
-14. Vandrehallen og Rigets midte: Se på bordet ved sofaen
-15. Kajen ved Reformministeriet: Se på båden
-16. Proviantpassagen: Se i vandpytten ved døren
-17. Kompaspartiets sekretariat: Se på kopimaskinens låg
-18. Bente Holmsgaard: Kan vi se adgangsloggen?
-19. Bente Holmsgaard: Giv Bente brillerne
-20. Kompaspartiets mødelokale: Se på bordet i mødelokalet
-21. Kompaspartiets sekretariat: Se på kopimaskinens skærm
-22. Bente Holmsgaard: Hvordan gik din runde i nat?
-23. Bente Holmsgaard: Hvad skete der omkring kl. 2?
-24. Samtaleværelset: Undersøg rummet
-25. Akt 2 begynder: De mistænkte
-26. Begivenhed: valdorf_kommer
+6. Bente Holmsgaard: Giv Bente brillerne
+7. Bente Holmsgaard: Fortæl om huset
+8. Vandrehallen og Rigets midte: Se på bordet ved sofaen
+9. Kompaspartiets mødelokale: Se på bordet i mødelokalet
+10. Vandrehallen og Rigets midte: Se grundlovene
+11. Bente Holmsgaard: Hvad skete der omkring kl. 2?
+12. Samtaleværelset: Undersøg rummet
+13. Kajen ved Reformministeriet: Se på båden
+14. Bente Holmsgaard: Hvordan gik din runde i nat?
+15. Bibliotekshaven: Se på gruset
+16. Vandrehallen og Rigets midte: Se på Mørkeberg
+17. Begivenhed: kommissaeren
+18. Begivenhed: statsministeren
+19. Proviantpassagen: Se i vandpytten ved døren
+20. Kompaspartiets sekretariat: Se på kopimaskinens skærm
+21. Kompaspartiets sekretariat: Se på kopimaskinens låg
+22. Vandrehallen og Rigets midte: Lys under sofaen
+23. Vandrehallen og Rigets midte: Gnid blyanten over notesbogen
+24. Akt 2 begynder: De mistænkte
+25. Begivenhed: valdorf_kommer
+26. Bodil Kryddal: Har du gulerødder til staldene?
 27. Ditte Rosenvinge: Giv hende 50.000-rapporten
-28. Udsigten: Kig gennem kikkerten
+28. Jonas Fenger: Giv ham telefonen fra mødelokalet
 29. Henrik Valdorf: Hvor var De i nat?
 30. Ditte Rosenvinge: Vis hende koppen med læbestift
-31. Bodil Kryddal: Fyldte du Mørkebergs termokande i går?
-32. Finansministeriets forhandlingsrum: Læs referatet
-33. Henrik Valdorf: De ser ud til at være meget ude i vejret
-34. Kasper Lindved: Vis ham kopimaskinens log
+31. Henrik Valdorf: Hvad tænkte De om Mørkeberg?
+32. Finansministeriets garderobe: Se på knagerne
+33. Udsigten: Kig gennem kikkerten
+34. Henrik Valdorf: De ser ud til at være meget ude i vejret
 35. Pernille Strandvig: Er pressekort 17 dit?
-36. Jonas Fenger: Giv ham telefonen fra mødelokalet
-37. Akt 3 begynder: Ud på Slotsholmen
-38. Begivenhed: retsmed
-39. Finansministeriets garderobe: Se på knagerne
-40. Mogens Brask: Holder tallene?
-41. Viggo Aagaard: Hvad ligger der i etuiet?
-42. Riddersalen: Se på gobelinerne
-43. Viggo Aagaard: Lån Elefantordenen
-44. Mogens Brask: Vis ham Elefantordenen
-45. Departementschefens kontor: Se dig om på kontoret
-46. Svend Lysholt: Hvad fotograferer De?
-47. Reformministeriets sidedør: Se på sidedøren
-48. Begivenhed: springvandet
-49. Reformministeriets printerområde: Se på printerens log
-50. Departementschefens kontor: Se i jakkens lommer
-51. Kajen ved Reformministeriet: Sejl med båden
-52. Bibliotekshaven: Saml papirerne op ved kanten
-53. Pernille Strandvig: Hvor var du i nat?
-54. Kajen ved Reformministeriet: Tag tid på turen til Folketinget
-55. Jonas Fenger: Hvad skændtes du og Mørkeberg om kl. 23.50?
-56. Kanalen ved den gamle fortøjningspæl: Kig ned i vandet ved fortøjningspælen
-57. Akt 4 begynder: Afsløringen
-58. Begivenhed: valdorf_venter
-59. Henrik Valdorf: Hvorfor ville De tale med mig?
-60. Begivenhed: pressemoedet
+36. Mogens Brask: Holder tallene?
+37. Kasper Lindved: Vis ham kopimaskinens log
+38. Svend Lysholt: Hvad fotograferer De?
+39. Jonas Fenger: Hvad skændtes du og Mørkeberg om kl. 23.50?
+40. Bodil Kryddal: Fyldte du Mørkebergs termokande i går?
+41. Akt 3 begynder: Ud på Slotsholmen
+42. Begivenhed: retsmed
+43. Begivenhed: springvandet
+44. Reformministeriets printerområde: Se på printerens log
+45. Viggo Aagaard: Hvad ligger der i etuiet?
+46. Viggo Aagaard: Det er Bjørn Nørgaard.
+47. Mogens Brask: Vis ham Elefantordenen
+48. De Kongelige Stalde: Giv Vega en gulerod
+49. Bibliotekshaven: Saml papirerne op ved kanten
+50. Departementschefens kontor: Se dig om på kontoret
+51. Finansministeriets forhandlingsrum: Læs referatet
+52. Reformministeriets sidedør: Se på sidedøren
+53. Departementschefens kontor: Se i jakkens lommer
+54. Kajen ved Reformministeriet: Sejl med båden
+55. Kanalen ved den gamle fortøjningspæl: Kig ned i vandet ved fortøjningspælen
+56. Akt 4 begynder: Afsløringen
+57. Begivenhed: valdorf_venter
+58. Henrik Valdorf: Hvorfor ville De tale med mig?
+59. Begivenhed: pressemoedet
 
 ## Personerne
 
@@ -583,21 +582,27 @@ I notesbogen: Hoffourer. Passer på Elefantordenen til aftenens gallamiddag.
 **Hoffoureren:** Elefantordenen. Den skal ligge fremme til aftenens gallamiddag for en udenlandsk gæst.  
 **Ida:** Må jeg låne den? Ti minutter. Det er til et speciale.  
 **Hoffoureren:** Ingen låner Elefantordenen.  
-**Hoffoureren:** Medmindre det er en historiker, der kan fortælle mig, hvem der har lavet gobelinerne på væggene. Det ved ingen af dem, der kommer her.
+**Hoffoureren:** Medmindre De er historiker. Så kan De sikkert fortælle mig, hvem der har lavet gobelinerne her på væggene. Det ved ingen af dem, der kommer her.
 
-#### Lån Elefantordenen
+#### Det er Per Kirkeby.
 
-<small>Kræver: »hoffourer spurgt«, »gobelin kendt«, har ikke Elefantordenen, endnu ikke »mogens bærer«. Giver: Ida får Elefantordenen, »orden ude«, slutter »orden tilbage«.</small>
+<small>Kræver: »hoffourer spurgt«, endnu ikke »gobelin svaret«.</small>
 
-**Ida:** Bjørn Nørgaard. 17 gobeliner med Danmarks og verdens historie. De blev hængt op i 2000.  
+**Hoffoureren:** Kirkeby? En fin maler. Men det er ikke ham. Kig en gang til.
+
+#### Det er Bjørn Nørgaard.
+
+<small>Kræver: »hoffourer spurgt«, endnu ikke »gobelin svaret«. Giver: Ida får Elefantordenen, »orden ude«, slutter »orden tilbage«, »gobelin kendt«, »gobelin svaret«.</small>
+
+**Ida:** 17 gobeliner med Danmarks og verdens historie. De blev hængt op i 2000.  
 **Hoffoureren:** Korrekt. Skriv Deres navn i protokollen. Ti minutter.  
 **Hoffoureren:** Og er den ikke tilbage før kl. 10, finder jeg Dem. Hoffet tæller elefanter.
 
-#### Læg Elefantordenen tilbage
+#### Det er Asger Jorn.
 
-<small>Kræver: har Elefantordenen. Giver: Ida afleverer Elefantordenen, slutter »orden ude«, »orden tilbage«.</small>
+<small>Kræver: »hoffourer spurgt«, endnu ikke »gobelin svaret«.</small>
 
-**Hoffoureren:** Ni minutter og fyrre sekunder. Hoffet takker.
+**Hoffoureren:** Jorn? Nej. Et godt gæt, men ikke rigtigt. Kig en gang til.
 
 #### Fik De ordenen tilbage?
 
@@ -1263,20 +1268,19 @@ Spillet viser det første hint på listen, hvis betingelse passer. Målet i fed 
 27. **Find noget, ministeren gerne vil have** (Kompaspartiets sekretariat). Der lå vist en rapport på kopimaskinen i Kompaspartiets sekretariat. <small>(akt 2 eller senere, endnu ikke »ditte renset«, endnu ikke »rapport taget«)</small>
 28. **Tal med ministeren i restauranten i tårnet** (Restauranten i tårnet). Ministeren drak kaffe med Aksel i nat. Hun er i restauranten i tårnet. <small>(akt 2 eller senere, endnu ikke »ditte renset«)</small>
 29. **Tal med hoffoureren i Riddersalen om Elefantordenen** (Riddersalen). Aksel skrev, at departementet har vidst det siden maj. Mogens Brask er kontorchef i Reformministeriet, og han har drømt om Elefantordenen hele livet. Den ligger fremme i Riddersalen. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har ikke Elefantordenen, endnu ikke »hoffourer spurgt«)</small>
-30. **Find ud af, hvem der har lavet gobelinerne i Riddersalen** (Riddersalen). Hoffoureren låner kun ordenen ud til en, der ved, hvem der har lavet gobelinerne. Se godt på dem. Du er jo historiker. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har ikke Elefantordenen, endnu ikke »gobelin kendt«)</small>
-31. **Lån Elefantordenen hos hoffoureren** (Riddersalen). Nu ved du, hvem der har lavet gobelinerne. Sig det til hoffoureren, og lån ordenen. Mogens taler, når han får den at se. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har ikke Elefantordenen)</small>
-32. **Vis Kasper kopimaskinens log i Snapstinget** (Snapstinget). Vis Kasper kopimaskinens log. Så tør han måske fortælle, hvad han så. <small>(spor 10 (Kopimaskinens log), mangler spor 11 (Manden på trappen))</small>
-33. **Vis Mogens Brask Elefantordenen i Landstingssalen** (Landstingssalen). Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har Elefantordenen)</small>
-34. **Gå til springvandet i Bibliotekshaven** (Bibliotekshaven). Springvandet i Bibliotekshaven springer om lidt. Gå derud, og se efter i bassinet. <small>(akt 3 eller senere, mangler spor 20 (Papirerne i springvandet))</small>
-35. **Find referatet i Finansministeriet** (Finansministeriets forhandlingsrum). Med ministerens gæstekort kommer du ind i Finansministeriet. Referatet ligger i forhandlingsrummet. <small>(akt 3 eller senere, mangler spor 9 (Referatet))</small>
-36. **Kom ind på departementschefens kontor i Reformministeriet** (Departementschefens kontor). Året for den første grundlov. Det står i montrerne i Vandrehallen. Departementschefens kontor ligger i Reformministeriet. <small>(akt 3 eller senere, mangler spor 15 (Valdorfs kontor))</small>
-37. **Undersøg jakken på departementschefens kontor** (Departementschefens kontor). Se i lommerne på den jakke. <small>(spor 15 (Valdorfs kontor), mangler spor 22 (Bådnøglen))</small>
-38. **Undersøg den røde båd ved kajen over for Reformministeriet** (Kajen ved Reformministeriet). En nøgle fra bådlauget ved Gammel Strand? Se på den røde båd ved kajen over for Reformministeriet. Hvem har bundet den? <small>(akt 3 eller senere, mangler spor 12 (Den røde båd))</small>
-39. **Sejl ud med den røde båd ved Reformministeriet** (Kajen ved Reformministeriet). En bådnøgle? Den røde båd ligger ved kajen over for Reformministeriet. <small>(har Bådnøglen, endnu ikke »sejlet«)</small>
-40. **Sejl ud til den gamle fortøjningspæl midt i kanalen** (Kanalen ved den gamle fortøjningspæl). Sejl ud til den gamle fortøjningspæl midt i kanalen, og kig ned. Vandet er klart i dag. <small>(»sejlet«, mangler spor 14 (Termokanden))</small>
-41. **Mød departementschefen på Udsigten i tårnet** (Udsigten). Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
-42. **Gå til pressemødet i Landstingssalen** (Landstingssalen). Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
-43. **Tal med Svend på Højbro** (Højbro). Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
+30. **Fortæl hoffoureren, hvem der har lavet gobelinerne** (Riddersalen). Hoffoureren låner kun ordenen ud til en, der ved, hvem der har lavet gobelinerne. Er du i tvivl, så se godt på dem. Du er jo historiker. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har ikke Elefantordenen)</small>
+31. **Vis Kasper kopimaskinens log i Snapstinget** (Snapstinget). Vis Kasper kopimaskinens log. Så tør han måske fortælle, hvad han så. <small>(spor 10 (Kopimaskinens log), mangler spor 11 (Manden på trappen))</small>
+32. **Vis Mogens Brask Elefantordenen i Landstingssalen** (Landstingssalen). Mogens Brask i Landstingssalen har drømt om den orden hele livet. Vis ham den. <small>(akt 3 eller senere, endnu ikke »mogens talt«, har Elefantordenen)</small>
+33. **Gå til springvandet i Bibliotekshaven** (Bibliotekshaven). Springvandet i Bibliotekshaven springer om lidt. Gå derud, og se efter i bassinet. <small>(akt 3 eller senere, mangler spor 20 (Papirerne i springvandet))</small>
+34. **Find referatet i Finansministeriet** (Finansministeriets forhandlingsrum). Med ministerens gæstekort kommer du ind i Finansministeriet. Referatet ligger i forhandlingsrummet. <small>(akt 3 eller senere, mangler spor 9 (Referatet))</small>
+35. **Kom ind på departementschefens kontor i Reformministeriet** (Departementschefens kontor). Året for den første grundlov. Det står i montrerne i Vandrehallen. Departementschefens kontor ligger i Reformministeriet. <small>(akt 3 eller senere, mangler spor 15 (Valdorfs kontor))</small>
+36. **Undersøg jakken på departementschefens kontor** (Departementschefens kontor). Se i lommerne på den jakke. <small>(spor 15 (Valdorfs kontor), mangler spor 22 (Bådnøglen))</small>
+37. **Undersøg den røde båd ved kajen over for Reformministeriet** (Kajen ved Reformministeriet). En nøgle fra bådlauget ved Gammel Strand? Se på den røde båd ved kajen over for Reformministeriet. Hvem har bundet den? <small>(akt 3 eller senere, mangler spor 12 (Den røde båd))</small>
+38. **Sejl ud med den røde båd ved Reformministeriet** (Kajen ved Reformministeriet). En bådnøgle? Den røde båd ligger ved kajen over for Reformministeriet. <small>(har Bådnøglen, endnu ikke »sejlet«)</small>
+39. **Sejl ud til den gamle fortøjningspæl midt i kanalen** (Kanalen ved den gamle fortøjningspæl). Sejl ud til den gamle fortøjningspæl midt i kanalen, og kig ned. Vandet er klart i dag. <small>(»sejlet«, mangler spor 14 (Termokanden))</small>
+40. **Mød departementschefen på Udsigten i tårnet** (Udsigten). Departementschefen venter på dig på Udsigten i tårnet. <small>(akt 4 eller senere, mangler spor 16 (Fortalelsen))</small>
+41. **Gå til pressemødet i Landstingssalen** (Landstingssalen). Pressemødet begynder i Landstingssalen. Gå derind, og ræk hånden op. <small>(spor 16 (Fortalelsen))</small>
+42. **Tal med Svend på Højbro** (Højbro). Svend står på Højbro hver nat med sit kamera. Måske så han noget. <small>(akt 3 eller før, mangler spor 13 (Svends billeder))</small>
 
 ## Afsløringen
 

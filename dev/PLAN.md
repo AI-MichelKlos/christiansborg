@@ -373,7 +373,11 @@ Michel: kan historien glide bedre, og kan man komme hurtigere igennem? Gennemgan
   - Slutskærmen siger nu, hvor mange spor Ida fandt ("Ida fandt 20 af 22 spor. Nogle spor er ekstra beviser ..."). Stjernerne er de samme som før.
   - Målt med en spiller, der følger målet øverst: fra start til Udsigten 2,2 km mod 3,2 km før dette trin og ca. 3,9 km før trin 1. Akt 3 fra tårnet til termokanden er 0,9 km.
   - Kontrolleret: `node dev/tjek-mordgaade.js` uden fejl (2000/2000 med og uden 1942). I Chromium på computer og telefon uden JavaScript-fejl: målene inde i staldene og ude igen, 1942-målene efter kongen, og at akt 4 begynder, når termokanden er fundet uden sadelkammeret.
-- [ ] 5. Hoffoureren spørger direkte: Ida vælger mellem tre kunstnere i samtalen i stedet for først at se på gobelinerne og så tale med ham igen.
+- [x] 5. Hoffoureren spørger direkte (28. okt. 2026): Ida vælger mellem tre kunstnere i samtalen i stedet for først at se på gobelinerne og så tale med ham igen.
+  - Efter "Hvad ligger der i etuiet?" spørger hoffoureren, hvem der har lavet gobelinerne. Tre nye emner er svarene: "Det er Per Kirkeby.", "Det er Bjørn Nørgaard." og "Det er Asger Jorn." Et forkert svar giver "Kig en gang til", og man kan prøve igen. Det rigtige giver Elefantordenen (`flag:gobelin_svaret`), og så forsvinder svarene.
+  - "Se på gobelinerne" (Idas viden) står der stadig og giver svaret, hvis man er i tvivl. Bentes hint siger det også.
+  - Fjernet: emnerne "Lån Elefantordenen" og "Læg Elefantordenen tilbage" (Mogens bærer den tilbage) og målet "Lån Elefantordenen hos hoffoureren". Riddersalen har nu to mål: tal med hoffoureren, og fortæl ham, hvem der har lavet gobelinerne.
+  - Kontrolleret: `node dev/tjek-mordgaade.js` uden fejl. I Chromium på computer og telefon uden JavaScript-fejl: samtalen med et forkert og så det rigtige svar, ordenen i rygsækken og målet bagefter (Kasper i Snapstinget).
 - [ ] 6. Kortere start: et kort billede over Marmorbroen, og så starter Ida ved porten i Tøjhusgade. Gry møder hun senere i staldene (replikken "Så du nogen i nat?" findes). Sparer ca. 450 m. Den rigtige vej (valgt 24. okt.) beholdes.
 - [ ] 7. Senere, hvis Michel vil: akt 4 åbner, når Ida har beviser nok til alle fire spørgsmål. Spor ud over det giver stjerner.
 
