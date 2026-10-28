@@ -12,7 +12,7 @@ Denne fil laves automatisk af `dev/tjek-mordgaade.js` ud fra `mordgaade.js`. Ret
 - Med 1942-laget: 2000 af 2000 tilfældige gennemspilninger nåede frem til afsløringen, 0 gik i stå. Den korteste brugte 72 skridt.
 - Fejl: ingen. Advarsler: ingen.
 - Steder, der skal bygges: .
-- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 305.
+- Personer: 15. Spor: 22. Ting: 15. Ting at undersøge: 46. Replikker: 308.
 
 ## Start
 
@@ -476,7 +476,7 @@ Departementschef i Reformministeriet. Gråt jakkesæt, gult slips og en mappe un
 
 Hvor: akt 2: Vandrehallen og Rigets midte, akt 3: Restauranten i tårnet, akt 4: Udsigten. Med i spillet, når: »valdorf her«.
 
-I notesbogen: Departementschef i Reformministeriet. Har regnet reformen ud til 11.000 job. Meget hjælpsom. Siger, at han regnede i sit ministerium kl. 01.35-02.50. Mailen gik kl. 02.05, og Mogens så ham ved printeren. Var våd i håret ved printeren kl. 02.36. Det regner ikke indenfor.
+I notesbogen: Departementschef i Reformministeriet. Har regnet reformen ud til 11.000 job. Meget hjælpsom. Siger, at han regnede i sit ministerium kl. 01.35-02.50. Mailen gik kl. 02.05, og Mogens så ham ved printeren. Var våd i håret ved printeren kl. 02.36. Det regner ikke indenfor. Vidste, at termokanden ligger i kanalen, før nogen havde sagt det.
 
 #### Hvor var De i nat?
 
@@ -516,8 +516,11 @@ I notesbogen: Departementschef i Reformministeriet. Har regnet reformen ud til 1
 
 **Valdorf:** Bente siger, De har gået rundt hele morgenen. Jeg tænkte, De måske trængte til et overblik.  
 **Valdorf:** Se, derovre ligger mit ministerium. Og dernede Folketinget. Et kvarters gang over broen.  
-**Valdorf:** Forfærdeligt med Aksel. Han tog de tal så tungt. Det er stadig en god reform, om den så giver 11.000 eller 4.000 job.  
-*Ida skriver i sin notesbog. Ingen har sagt tallet 4.000 til Valdorf. Det står kun i Mørkebergs notesbog og i papirerne fra springvandet.*
+**Valdorf:** Forfærdeligt med Aksel. Han tog de tal alt for tungt.  
+*Valdorf ser ned på kanalen lidt for længe.*  
+**Valdorf:** Og nu skal politiet vel rode hele kanalen igennem efter hans gamle termokande.  
+*Ida skriver i sin notesbog. Ingen har sagt, at termokanden ligger i kanalen. Det ved kun Ida, som har set den fra båden. Og den, der smed den.*  
+**Valdorf:** Nå. Pressemødet venter. Vi ses i Landstingssalen.
 
 ### Mogens Brask (56)
 
@@ -1137,7 +1140,7 @@ I spillet: ude: Ridebanen (bygget).
 | 13 | Svends billeder | Højbro | Svend Lysholts nattebilleder fra Højbro viser lyset fra en lille båd over kanalen fra Ved Stranden mod Slotspladsen kl. 01.44 og tilbage kl. 02.31. |
 | 14 | Termokanden | Kanalen ved den gamle fortøjningspæl | Den røde termokande med Kompaspartiets kompasrose ligger på bunden ved den gamle fortøjningspæl midt i kanalen. Den kan kun ses fra båden. Nogen har smidt den. |
 | 15 | Valdorfs kontor | Departementschefens kontor | Knobtavle på væggen, en fugtig sejlerjakke og sejlersko med bølgemønster. Mailen med de nye tal blev skrevet kl. 23.12 og sat til at sende sig selv kl. 02.05. |
-| 16 | Fortalelsen | Udsigten | På Udsigten sagde Valdorf, at reformen er god, »om den så giver 11.000 eller 4.000 job«. Ingen har sagt tallet 4.000 til ham. Det står kun i Mørkebergs notesbog og i papirerne fra springvandet. |
+| 16 | Fortalelsen | Udsigten | På Udsigten sagde Valdorf, at politiet vel skal »rode hele kanalen igennem« efter Mørkebergs termokande. Ingen har sagt, at den ligger i kanalen. Det ved kun Ida, som har set den fra båden, og den, der smed den. |
 | 17 | Gry og den faste runde | Ridebanen | Mørkeberg gik sin faste runde på Ridebanen ved midnat og sagde: »I morgen kl. 10 falder der en bombe.« Han var inde i sadelkammeret et øjeblik. Det plejer han ikke. |
 | 18 | Bodil og termokanden | Snapstinget | Bodil fyldte termokanden kl. 21.30 med sort kaffe og to stykker sukker. Kun Mørkeberg drak af den. Hvis der kom noget i kaffen, kom det senere. |
 | 19 | Bentes runde | Betjentstuen | Kl. 02.25 hørte Bente gruset knase i gangen mod Bibliotekshaven. Hun gik derind, satte sig på bænken ved Kierkegaard for at læse en sms og glemte sine briller. Hun troede, det var en ræv. |

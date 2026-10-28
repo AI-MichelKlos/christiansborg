@@ -108,7 +108,7 @@ Gåden har 22 spor. De første spor åbner sagen og peger i mange retninger, de 
 | 13 | Svends fotos | Svend på Højbro | Lange eksponeringer viser lys fra en lille båd over kanalen kl. 01.44 og kl. 02.31 |
 | 14 | Termokanden | På bunden ved den gamle fortøjningspæl midt i kanalen. Kan kun ses fra båden | Den røde termokande med Kompaspartiets logo. Morderen smed den |
 | 15 | Valdorfs kontor | Reformministeriet på Ved Stranden, bag en kodelås | Knobtavle på væggen, fugtig sejlerjakke, sejlersko. Mailen fra kl. 02.05 er "oprettet 23.12" |
-| 16 | Valdorfs fortalelse | Samtalen med Valdorf på Udsigten i tårnet | Han nævner tallet 4.000, før nogen har sagt det til ham. At termokanden er væk, ved alle |
+| 16 | Valdorfs fortalelse | Samtalen med Valdorf på Udsigten i tårnet | Han siger, at politiet vel skal rode kanalen igennem efter termokanden. At termokanden er væk, ved alle, men ingen har sagt, at den ligger i kanalen. Det ved kun Ida, som har set den fra båden, og morderen |
 | 17 | Staldvagtens forklaring | Gry i De Kongelige Stalde ved Ridebanen | Mørkeberg gik sin faste runde ved midnat og sagde, at der falder en bombe kl. 10. Han havde noget, han ville afsløre |
 | 18 | Køkkenchefens forklaring | Bodil i Snapstinget | Termokanden blev fyldt kl. 21.30 med sort kaffe og to sukker, og kun Mørkeberg drak af den. Det, der kom i kaffen, kom senere |
 | 19 | Bentes runde | Bente, når hun får sine briller tilbage | Kl. 02.25 hørte hun gruset knase i gangen mod Bibliotekshaven og gik derind. Hun troede, det var en ræv |

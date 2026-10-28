@@ -187,7 +187,7 @@ const SPOR = {
   15: { titel: "Valdorfs kontor", sted: "valdorfs_kontor",
         tekst: "Knobtavle på væggen, en fugtig sejlerjakke og sejlersko med bølgemønster. Mailen med de nye tal blev skrevet kl. 23.12 og sat til at sende sig selv kl. 02.05." },
   16: { titel: "Fortalelsen", sted: "udsigten",
-        tekst: "På Udsigten sagde Valdorf, at reformen er god, »om den så giver 11.000 eller 4.000 job«. Ingen har sagt tallet 4.000 til ham. Det står kun i Mørkebergs notesbog og i papirerne fra springvandet." },
+        tekst: "På Udsigten sagde Valdorf, at politiet vel skal »rode hele kanalen igennem« efter Mørkebergs termokande. Ingen har sagt, at den ligger i kanalen. Det ved kun Ida, som har set den fra båden, og den, der smed den." },
   17: { titel: "Gry og den faste runde", sted: "ridebanen",
         tekst: "Mørkeberg gik sin faste runde på Ridebanen ved midnat og sagde: »I morgen kl. 10 falder der en bombe.« Han var inde i sadelkammeret et øjeblik. Det plejer han ikke." },
   18: { titel: "Bodil og termokanden", sted: "snapstinget",
@@ -550,6 +550,7 @@ const PERSONER = {
       { kraever: [], tekst: "Departementschef i Reformministeriet. Har regnet reformen ud til 11.000 job. Meget hjælpsom." },
       { kraever: ["flag:valdorf_alibi_hoert"], tekst: "Siger, at han regnede i sit ministerium kl. 01.35-02.50. Mailen gik kl. 02.05, og Mogens så ham ved printeren." },
       { kraever: ["flag:valdorf_vaad"], tekst: "Var våd i håret ved printeren kl. 02.36. Det regner ikke indenfor." },
+      { kraever: ["spor:16"], tekst: "Vidste, at termokanden ligger i kanalen, før nogen havde sagt det." },
     ],
     emner: [
       { id: "natten", spoerg: "Hvor var De i nat?", kraever: [], giver: ["flag:valdorf_alibi_hoert"], replikker: [
@@ -574,8 +575,11 @@ const PERSONER = {
       { id: "udsigten", spoerg: "Hvorfor ville De tale med mig?", kraever: ["akt>=4"], giver: ["spor:16"], replikker: [
         ["valdorf", "Bente siger, De har gået rundt hele morgenen. Jeg tænkte, De måske trængte til et overblik."],
         ["valdorf", "Se, derovre ligger mit ministerium. Og dernede Folketinget. Et kvarters gang over broen."],
-        ["valdorf", "Forfærdeligt med Aksel. Han tog de tal så tungt. Det er stadig en god reform, om den så giver 11.000 eller 4.000 job."],
-        ["fortaeller", "Ida skriver i sin notesbog. Ingen har sagt tallet 4.000 til Valdorf. Det står kun i Mørkebergs notesbog og i papirerne fra springvandet."],
+        ["valdorf", "Forfærdeligt med Aksel. Han tog de tal alt for tungt."],
+        ["fortaeller", "Valdorf ser ned på kanalen lidt for længe."],
+        ["valdorf", "Og nu skal politiet vel rode hele kanalen igennem efter hans gamle termokande."],
+        ["fortaeller", "Ida skriver i sin notesbog. Ingen har sagt, at termokanden ligger i kanalen. Det ved kun Ida, som har set den fra båden. Og den, der smed den."],
+        ["valdorf", "Nå. Pressemødet venter. Vi ses i Landstingssalen."],
       ] },
     ],
   },
