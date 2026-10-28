@@ -7466,6 +7466,7 @@ const GAADE = (() => {
     scene({ eyebrow: 'Landstingssalen', title: 'Tilståelsen', lines: A.tilstaaelse, efter: () => {
       scene({ eyebrow: 'Gåden er løst', title: '★'.repeat(n) + '☆'.repeat(3 - n), lines: [
         ['fortaeller', `${['Én stjerne', 'To stjerner', 'Tre stjerner'][n - 1]}. Forkerte svar og spor: ${G.forkert}. Hint: ${G.hint}.`],
+        ['fortaeller', `Ida fandt ${G.spor.length} af ${Object.keys(M.spor).length} spor. Nogle spor er ekstra beviser, som man ikke behøver for at løse gåden.`],
         ['fortaeller', `Tre stjerner: ${st.tre.tekst}. To stjerner: ${st.to.tekst}.`]], btn: 'Efterskrift', efter: () =>
         scene({ eyebrow: 'Efterskrift', title: M.titel, lines: slut, btn: 'Spil igen', efter: nytSpil }) });
       $('sceneTitle').innerHTML = [0, 1, 2].map(i => `<span class="stj${i < n ? '' : ' tom'}">★</span>`).join('');   // gold stars
