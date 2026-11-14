@@ -53,4 +53,25 @@ export const TEGNINGER = {
     <rect x="16" y="36" width="88" height="18" rx="3" fill="#3f8a52" ${S}/>
     <rect x="52" y="36" width="16" height="66" fill="#b3262a" ${S}/>
     <path d="M60 36c-18-22-34-8-18 0zM60 36c18-22 34-8 18 0z" fill="#b3262a" ${S}/>`),
+  hestesko: svg(`
+    <path d="M28 104V58a32 32 0 0 1 64 0v46H74V58a14 14 0 0 0-28 0v46z" fill="#9aa3ad" ${S}/>
+    <path d="M36 98V60a24 24 0 0 1 12-21" fill="none" stroke="#c9d0d8" stroke-width="4" stroke-linecap="round"/>
+    <g fill="#2a2118"><circle cx="37" cy="88" r="2.6"/><circle cx="37" cy="68" r="2.6"/><circle cx="46" cy="42" r="2.6"/><circle cx="74" cy="42" r="2.6"/><circle cx="83" cy="68" r="2.6"/><circle cx="83" cy="88" r="2.6"/></g>`),
+  groed: svg(`
+    <path d="M46 34c-6-8 6-10 0-18M62 34c-6-8 6-10 0-18M78 34c-6-8 6-10 0-18" fill="none" stroke="#d8d2c4" stroke-width="3" stroke-linecap="round"/>
+    <path d="M16 58h88c0 30-18 44-44 44S16 88 16 58z" fill="#b3262a" ${S}/>
+    <ellipse cx="60" cy="58" rx="44" ry="12" fill="#fbf5e2" ${S}/>
+    <rect x="52" y="50" width="16" height="11" rx="2" fill="#f2c94c" ${S}/>
+    <g fill="#9a6a3a"><circle cx="38" cy="58" r="1.6"/><circle cx="46" cy="63" r="1.6"/><circle cx="76" cy="62" r="1.6"/><circle cx="84" cy="56" r="1.6"/><circle cx="72" cy="52" r="1.6"/></g>
+    <path d="M30 76c4 10 12 16 22 18" fill="none" stroke="#d4605f" stroke-width="3" stroke-linecap="round"/>`),
+  klokke: svg(`
+    <path d="M60 14v10" fill="none" ${S}/>
+    <circle cx="60" cy="14" r="5" fill="#d9b25a" ${S}/>
+    <path d="M30 86c8-8 6-24 8-36a22 22 0 0 1 44 0c2 12 0 28 8 36z" fill="#d9b25a" ${S}/>
+    <path d="M42 54c2-10 6-16 14-18" fill="none" stroke="#f3dea0" stroke-width="4" stroke-linecap="round"/>
+    <rect x="24" y="84" width="72" height="9" rx="4.5" fill="#c9a35a" ${S}/>
+    <circle cx="60" cy="100" r="7" fill="#b3262a" ${S}/>`),
+  stjerne: svg(`
+    <path d="M60 10l14 32 34 4-26 22 8 34-30-18-30 18 8-34L12 46l34-4z" fill="#f2c94c" ${S}/>
+    <path d="M60 28l7 18" fill="none" stroke="#fff3c4" stroke-width="4" stroke-linecap="round"/>`),
 };

@@ -31,12 +31,14 @@ Spillets udseende ligger i et tema, som kan skiftes. Mordgåden bruger temaet `k
 Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er to spor: `mord` (mordgåden) og `jul` (julekalenderen).
 
 ## Julekalenderen
-En julekalender for voksne med 24 låger på Slotsholmen. Den er under opbygning: rammen er færdig, og der er skrevet tre prøvelåger. Prøv den her: https://ai-michelklos.github.io/christiansborg/?spor=jul
+En julekalender for voksne med 24 låger på Slotsholmen. Den er under opbygning: rammen er færdig, og de seks låger til første søndag i advent er skrevet. Prøv den her: https://ai-michelklos.github.io/christiansborg/?spor=jul
 
 - Lågerne er døre med tal på rundt på Slotsholmen. De åbnes i rækkefølge, og den næste låge lyser svagt. Øverst til venstre står et praj om, hvor den er.
 - Der er tre slags: store låger (et rum med en nisse og en gåde), små låger (en dør, man åbner udefra) og mini-låger (en luge med en overraskelse).
 - Bag hver låge ligger en tegnet genstand, som også står i døråbningen og på kalenderkortet. Tegningerne ligger i `tegninger.js` og er fælles for alle udgaver.
 - Hver låge giver et felt på kalenderkortet (knappen Kalender eller N) og et stykke af nissernes protokol. De 24 låger er delt i fire adventssøndage.
+- Når en låge åbnes, ringer bjælderne, der står gnister ud af døråbningen, og genstanden flyver op i kalenderen.
+- For hver låge tændes et lys på juletræet i Rigsdagsgården, og for hver sjette låge tændes et lys på adventskransen ved trappen.
 - Spillet gemmer selv på den telefon eller computer, man spiller på, hver gang en låge åbnes. Julekalenderen og mordgåden har hver sin gemmeplads.
 - Går man i stå, kan man slå Vis vej til på kalenderkortet, så en pil peger mod den næste låge.
 

@@ -425,6 +425,19 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .kalDetalje::after{content:"";display:block;clear:both}
 #kalSpm .kalTing{margin:10px 0}
 #kalSpm .kalTing svg{width:104px;height:104px}
+@keyframes kalPop{0%{transform:scale(.1) rotate(-25deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes kalStraaler{to{transform:rotate(360deg)}}
+@keyframes kalPuls{0%{transform:scale(1)}35%{transform:scale(1.28);box-shadow:0 0 0 6px var(--leaf),0 0 26px var(--leaf)}100%{transform:scale(1)}}
+.kalTing.ny{position:relative}
+.kalTing.ny::before{content:"";position:absolute;left:50%;top:74px;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:repeating-conic-gradient(rgba(243,217,138,.55) 0 8deg,transparent 8deg 24deg);-webkit-mask:radial-gradient(circle,#000 28%,transparent 68%);mask:radial-gradient(circle,#000 28%,transparent 68%);animation:kalStraaler 16s linear infinite;pointer-events:none}
+.kalTing.ny svg{position:relative;animation:kalPop .8s cubic-bezier(.2,1.7,.4,1) .12s both}
+.kalTing.ny figcaption{position:relative}
+#kalSpm .kalTing.ny::before{top:60px;width:200px;height:200px;margin:-100px 0 0 -100px}
+.kalFlyv{position:fixed;left:50%;top:42%;z-index:80;width:132px;height:132px;transform:translate(-50%,-50%);pointer-events:none;filter:drop-shadow(0 0 14px #f3d98a)}
+.kalFlyv svg{width:100%;height:100%}
+.kalPuls{animation:kalPuls .65s ease-out}
+.kalFelt.ny{animation:kalPop .7s cubic-bezier(.2,1.7,.4,1) .15s both}
+@media (prefers-reduced-motion:reduce){.kalTing.ny svg,.kalTing.ny::before,.kalFelt.ny,.kalPuls{animation:none}}
 .kalFelt[aria-pressed=true]{box-shadow:0 0 0 3px var(--leaf)}
 .kalFelt:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .kalDetalje{position:relative;margin:14px 2px 6px;padding:14px 16px 10px;background:var(--flade,#fff);box-shadow:0 1px 4px rgba(0,0,0,.28);rotate:-.3deg}
@@ -8816,7 +8829,17 @@ const KALENDER = (() => {
         break;
       }
     }
-    return bedst || { x, z, nx: 0, nz: 1, d: 0, loes: true };   // no wall found: the door stands on the spot itself
+    if (!bedst) return { x, z, nx: 0, nz: 1, d: 0, loes: true, sokkel: 0, frem: 0 };   // no wall found: the door stands on the spot itself
+    // a plinth that juts out at the foot of the wall would hide the lower half of the door: find its top, so the door can sit above it
+    let sokkel = 0, naer = bedst.d;
+    ned.set(-bedst.nx, 0, -bedst.nz);
+    for (let hoejde = 0.3; hoejde < 1.25; hoejde += 0.15) {
+      ray.set(new THREE.Vector3(bedst.x + bedst.nx * bedst.d, y - 1.3 + hoejde, bedst.z + bedst.nz * bedst.d), ned);
+      const h = ray.intersectObject(world, true).find(h => h.face && h.object.isMesh && !h.object.userData.fig && h.distance > 0.3);
+      if (h && h.distance < bedst.d - 0.12) { sokkel = hoejde; naer = Math.min(naer, h.distance); }
+    }
+    bedst.sokkel = sokkel ? sokkel + 0.15 : 0; bedst.frem = bedst.d - naer;
+    return bedst;
   }
   const talTex = nr => ctex(128, 128, g => {
     g.clearRect(0, 0, 128, 128); g.fillStyle = '#f3d98a'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -8837,14 +8860,18 @@ const KALENDER = (() => {
     const f = el('figure', 'kalTing' + (cls ? ' ' + cls : '')), t = tegn(l); if (!t) return null;
     f.innerHTML = t; f.querySelector('svg').setAttribute('aria-hidden', 'true'); f.append(el('figcaption', '', l.ting.navn)); return f;
   }
+  function tingTex(l, mat) {   // paint the drawing on a material when the picture has loaded
+    const t = tegn(l); if (!t) return;
+    const img = new Image(); img.onload = () => { mat.map = ctex(256, 256, g => { g.clearRect(0, 0, 256, 256); g.drawImage(img, 0, 0, 256, 256); }, { wrap: false }); mat.opacity = 1; mat.needsUpdate = true; };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t);
+  }
   function tingPlade(l, st) {   // a flat cut-out of the drawing for the doorway
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(st, st), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0 })), t = tegn(l);
-    if (t) { const img = new Image(); img.onload = () => { m.material.map = ctex(256, 256, g => { g.clearRect(0, 0, 256, 256); g.drawImage(img, 0, 0, 256, 256); }, { wrap: false }); m.material.opacity = 1; m.material.needsUpdate = true; }; img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t); }
-    return m;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(st, st), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0 }));
+    tingTex(l, m.material); return m;
   }
   const DOERE = [];
   for (const l of K.laager) {
-    const d = { l, g: new THREE.Group(), aaben: 0, pynt: [] };
+    const d = { l, g: new THREE.Group(), aaben: 0, pynt: [], pop: 0, blink: 0 };
     if (l.type === 'stor') {   // a sign beside the building's own door
       const e = MINISTRY_DOORS[l.indgang]; if (!e) { console.warn('Julekalender: låge ' + l.nr + ' har ingen indgang ' + l.indgang); continue; }
       const sx = -e.nz, sz = e.nx;   // along the wall
@@ -8857,8 +8884,9 @@ const KALENDER = (() => {
       d.pynt = krans(d.g, 2.42, 0.2); d.glimt = glimt(d.g, 1.9);
     } else {   // a door (lille) or a hatch (mini) on the wall
       const v = vaeg(l), mini = l.type === 'mini', w = mini ? 0.62 : 0.95, h = mini ? 0.62 : 2.0, y0 = mini ? 1.05 : 0;
-      d.vaeg = v; d.staa = [v.x + v.nx * 1.3, v.z + v.nz * 1.3]; d.r = 2.6;
-      d.g.position.set(v.x + v.nx * 0.04, groundAt(d.staa[0], d.staa[1], 2), v.z + v.nz * 0.04); d.g.rotation.y = Math.atan2(v.nx, v.nz);
+      const loeft = Math.max(0, v.sokkel + 0.08 - y0);   // up over a plinth, if the wall has one
+      d.vaeg = v; d.staa = [v.x + v.nx * (1.3 + v.frem), v.z + v.nz * (1.3 + v.frem)]; d.r = 2.6;
+      d.g.position.set(v.x + v.nx * 0.04, groundAt(d.staa[0], d.staa[1], 2) + loeft, v.z + v.nz * 0.04); d.g.rotation.y = Math.atan2(v.nx, v.nz);
       box(w + 0.3, h + 0.2, 0.1, tm('#cdbfa8'), 0, y0 - (mini ? 0.1 : 0), 0, { parent: d.g, cast: false });   // the frame
       box(w + 0.4, 0.07, 0.2, lys('#f4f6f8', 0.5), 0, y0 + h + (mini ? 0.1 : 0.2), 0.04, { parent: d.g, cast: false });   // snow on top
       const hul = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: '#ffcf7a' })); hul.position.set(0, y0 + h / 2, 0.056); d.g.add(hul); d.hul = hul;
@@ -8870,14 +8898,14 @@ const KALENDER = (() => {
       if (!mini) d.pynt = krans(blad, h * 0.42, 0.2);
       const st = mini ? 0.58 : 0.88, hy = mini ? y0 + 0.02 : 0.62;   // the thing stands on a little shelf in the doorway
       if (!mini) box(w, 0.05, 0.1, tm('#6b4a2e'), 0, hy - 0.05, 0.06, { parent: d.g, cast: false });
-      d.ting = tingPlade(l, st); d.ting.position.set(0, hy + st / 2, 0.075); d.ting.visible = false; d.g.add(d.ting);
+      d.ting = tingPlade(l, st); d.tingY = hy + st / 2; d.ting.position.set(0, d.tingY, 0.075); d.ting.visible = false; d.g.add(d.ting);
       d.glimt = glimt(d.g, y0 + h / 2);
     }
     gruppe.add(d.g); DOERE.push(d);
   }
   function saet(d) {   // show the door as it is in the saved game
     const op = S.aabnet.includes(d.l.nr);
-    d.aaben = op ? 1 : 0; if (d.led) d.led.rotation.y = -d.aaben * 1.9;
+    d.aaben = op ? 1 : 0; d.aabner = false; d.pop = op ? 1 : 0; if (d.led) d.led.rotation.y = -d.aaben * 1.9;
     if (d.hul) d.hul.visible = op; if (d.ting) d.ting.visible = op;
     for (const p of d.pynt) p.visible = !op || d.l.type === 'stor';
   }
@@ -8896,7 +8924,90 @@ const KALENDER = (() => {
   for (const l of K.laager) {
     if (l.type !== 'stor' || !l.inde || !K.nisser[l.nisse]) continue;
     const f = nisseFigur(K.nisser[l.nisse]), face = (l.inde.face || 0) * Math.PI / 180;
-    f.root.visible = false; inde.add(f.root); NISSER.push({ l, f, face, yaw: face });
+    f.root.visible = false; inde.add(f.root);
+    const ting = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, opacity: 0, depthWrite: false })); tingTex(l, ting.material);   // what he has for Ida lies beside him
+    ting.scale.setScalar(0.5); ting.visible = false; inde.add(ting);
+    NISSER.push({ l, f, face, yaw: face, ting });
+  }
+
+  // ---- what makes a door worth opening: bells, a burst of sparks, the thing popping out and flying up to the calendar
+  function bjaelder(n = 7, v = 0.016) { for (let i = 0; i < n; i++) { tone(3300 + (i % 3) * 380, 3200, i * 0.085, 0.11, v, 'triangle'); tone(5400, 5300, i * 0.085 + 0.012, 0.07, v * 0.6); } }
+  const GN = 110, gnPos = new Float32Array(GN * 3).fill(-999), gnVel = new Float32Array(GN * 3), gnLiv = new Float32Array(GN);
+  const gnGeo = new THREE.BufferGeometry(); gnGeo.setAttribute('position', new THREE.BufferAttribute(gnPos, 3));
+  const gnister = new THREE.Points(gnGeo, new THREE.PointsMaterial({ color: '#ffd27a', size: 0.36, map: TX.glow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+  gnister.frustumCulled = false; gnister.visible = false; scene.add(gnister);
+  function gnist(x, y, z, nx, nz, antal = 70) {
+    if (reduceMotion) return;
+    for (let i = 0, k = 0; i < GN && k < antal; i++) {
+      if (gnLiv[i] > 0) continue; k++; gnLiv[i] = 0.7 + Math.random() * 1.0;
+      gnPos.set([x + (Math.random() - 0.5) * 0.5, y + (Math.random() - 0.5) * 0.9, z + (Math.random() - 0.5) * 0.5], i * 3);
+      const fart = 0.8 + Math.random() * 2.8; gnVel.set([nx * fart + (Math.random() - 0.5) * 2.4, 1.0 + Math.random() * 2.8, nz * fart + (Math.random() - 0.5) * 2.4], i * 3);
+    }
+    gnister.visible = true;
+  }
+  function gnistFrame(dt) {
+    let liv = false;
+    for (let i = 0; i < GN; i++) {
+      if (gnLiv[i] <= 0) continue;
+      gnLiv[i] -= dt; const j = i * 3;
+      if (gnLiv[i] <= 0) { gnPos[j + 1] = -999; continue; }
+      liv = true; gnVel[j + 1] -= 4.2 * dt; gnPos[j] += gnVel[j] * dt; gnPos[j + 1] += gnVel[j + 1] * dt; gnPos[j + 2] += gnVel[j + 2] * dt;
+    }
+    gnGeo.attributes.position.needsUpdate = true; gnister.visible = liv;
+  }
+  function flyv(l, efter) {   // the thing flies from the middle of the screen up to the calendar button
+    const t = tegn(l), m = $('bNotes'), r = m.getBoundingClientRect();
+    if (!t || reduceMotion || !r.width) { efter(); return; }
+    const f = el('div', 'kalFlyv'); f.innerHTML = t; document.body.append(f);
+    const x = r.left + r.width / 2 - innerWidth / 2, y = r.top + r.height / 2 - innerHeight * 0.42;
+    let faerdig = false; const slut = () => { if (faerdig) return; faerdig = true; f.remove(); m.classList.remove('kalPuls'); void m.offsetWidth; m.classList.add('kalPuls'); efter(); };
+    f.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${x * 0.45}px), calc(-50% + ${y * 0.45 - 70}px)) scale(.85) rotate(-14deg)`, opacity: 1, offset: 0.45 }, { transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(.16) rotate(12deg)`, opacity: 0.9 }], { duration: 780, easing: 'cubic-bezier(.45,0,.6,1)' }).onfinish = slut;
+    setTimeout(slut, 1300);
+  }
+  const popKurve = x => 1 + 2.7 * (x - 1) ** 3 + 1.7 * (x - 1) ** 2;   // grows a little too big and settles
+
+  // ---- the Christmas tree: one light for every opened door. The edition's file says where it stands
+  let trae = null;
+  if (K.juletrae) {
+    const [x, z] = K.juletrae.ved, g = new THREE.Group(); g.position.set(x, groundAt(x, z, 2), z); gruppe.add(g);
+    const stamme = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.3, 1.2, 10), tm('#4a3323')); stamme.position.y = 0.6; g.add(stamme);
+    const groen = lys('#1f5a37', 0.22), hvid = lys('#eef2f4', 0.35);
+    for (let i = 0; i < 5; i++) {
+      const r = 2.7 - i * 0.48, h = 2.3 - i * 0.16, y = 0.9 + i * 1.25;
+      const lag = new THREE.Mesh(new THREE.ConeGeometry(r, h, 14), groen); lag.position.y = y + h / 2; g.add(lag);
+      const sne_ = new THREE.Mesh(new THREE.ConeGeometry(r * 0.58, h * 0.56, 14), hvid); sne_.position.y = y + h * 0.73; g.add(sne_);   // snow on the top of every layer
+    }
+    const top = 0.9 + 4 * 1.25 + 1.66;
+    const stjerne = new THREE.Mesh(new THREE.OctahedronGeometry(0.34), new THREE.MeshBasicMaterial({ color: '#6b5a2e' })); stjerne.position.y = top + 0.25; stjerne.scale.set(1, 1.5, 0.45); g.add(stjerne);
+    const stjerneGlod = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffe08a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); stjerneGlod.position.y = top + 0.25; stjerneGlod.scale.setScalar(3.4); g.add(stjerneGlod);
+    const farver = ['#ffd27a', '#ff6b5e', '#8fd8ff', '#a6e88f'], kugler = [];
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1), y = 1.25 + t * 5.3, r = 2.45 * (1 - t * 0.86) + 0.12, a = i * 2.4;
+      const k = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 8), new THREE.MeshBasicMaterial({ color: '#39423a' })); k.position.set(Math.sin(a) * r, y, Math.cos(a) * r); g.add(k);
+      const glod = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: farver[i % 4], transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); glod.position.copy(k.position).multiplyScalar(1.04); glod.position.y = y; glod.scale.setScalar(1.9); g.add(glod);
+      kugler.push({ k, glod, farve: farver[i % 4], taendt: null });
+    }
+    colCirc(x, z, 1.1, 7);
+    trae = { g, kugler, stjerne, stjerneGlod, x, z };
+  }
+  // ---- the advent wreath: one candle is lit for every six doors
+  let krans_ = null;
+  if (K.adventskrans) {
+    const [x, z] = K.adventskrans.ved, g = new THREE.Group(); g.position.set(x, groundAt(x, z, 2), z); gruppe.add(g);
+    const fod = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.34, 1.05, 12), tm('#3a3430')); fod.position.y = 0.52; g.add(fod);
+    const plade = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.08, 24), tm('#5b3d2a')); plade.position.y = 1.08; g.add(plade);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.2, 10, 28), lys('#2f6b3f', 0.25)); ring.rotation.x = Math.PI / 2; ring.position.y = 1.26; g.add(ring);
+    const flammer = [];
+    for (let i = 0; i < 4; i++) {
+      const a = i * Math.PI / 2 + Math.PI / 4, cx = Math.sin(a) * 0.72, cz = Math.cos(a) * 0.72;
+      const stage = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.62, 10), lys('#b3262a', 0.35)); stage.position.set(cx, 1.62, cz); g.add(stage);
+      const sloejfe = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), lys('#b3262a', 0.4)); sloejfe.position.set(Math.sin(a + Math.PI / 4) * 0.72, 1.36, Math.cos(a + Math.PI / 4) * 0.72); sloejfe.scale.set(1.5, 0.8, 1); g.add(sloejfe);
+      const flamme = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshBasicMaterial({ color: '#ffe9a8' })); flamme.position.set(cx, 2.0, cz); flamme.scale.set(1, 1.7, 1); g.add(flamme);
+      const glod = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffc45e', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8 })); glod.position.set(cx, 2.02, cz); glod.scale.setScalar(1.5); g.add(glod);
+      flammer.push({ flamme, glod });
+    }
+    colCirc(x, z, 0.85, 2);
+    krans_ = { g, flammer };
   }
 
   // ---- opening a door
@@ -8905,21 +9016,26 @@ const KALENDER = (() => {
     if (S.aabnet.includes(l.nr)) return;
     S.aabnet.push(l.nr); S.klem = S.klem.filter(n => n !== l.nr); gem();
     const d = DOERE.find(d => d.l === l); if (d) saet(d);
-    chime([784, 988, 1319]); toast(`Låge ${l.nr} er stemplet. Du har fået stykke ${l.nr} af protokollen.`);
-    const antal = S.aabnet.length;
+    tone(170, 60, 0, 0.16, 0.2); chime([784, 988, 1319]); nyFelt = l.nr;   // the thump of the stamp
+    toast(`Låge ${l.nr} er åbnet. Du har fået stykke ${l.nr} af protokollen` + (trae ? ', og et lys er tændt på juletræet.' : '.'));
+    const antal = S.aabnet.length, ikkeMere = () => { if (!naeste() && antal < N) GAADE.scene({ eyebrow: `${antal} af ${N} låger`, title: K.proeve.titel, lines: K.proeve.tekst }); };
     setTimeout(() => {
       if (antal === N) GAADE.scene({ eyebrow: K.soendage[3].navn, title: K.slut.titel, lines: [K.soendage[3].tekst, ...K.slut.tekst] });
-      else if (antal % 6 === 0) GAADE.scene({ eyebrow: 'Et lys er tændt', title: K.soendage[antal / 6 - 1].navn, lines: [K.soendage[antal / 6 - 1].tekst] });
-      else if (!naeste()) GAADE.scene({ eyebrow: `${antal} af ${N} låger`, title: K.proeve.titel, lines: K.proeve.tekst });
+      else if (antal % 6 === 0) { bjaelder(10); GAADE.scene({ eyebrow: 'Et lys er tændt', title: K.soendage[antal / 6 - 1].navn, lines: [K.soendage[antal / 6 - 1].tekst], efter: ikkeMere }); }
+      else ikkeMere();
     }, 1400);
   }
   function aabn(d) {
-    const l = d.l; d.aabner = true; chime([523, 659], 0.04);
+    const l = d.l, stor = l.type === 'stor'; d.aabner = true; bjaelder();
+    if (d.g) setTimeout(() => {   // the light bursts out of the doorway
+      const ry = d.g.rotation.y, nx = Math.sin(ry), nz = Math.cos(ry), y = d.g.position.y + (stor ? 1.8 : l.type === 'mini' ? 1.4 : 1.1);
+      gnist(d.g.position.x + nx * 0.3, y, d.g.position.z + nz * 0.3, nx, nz); d.blink = 1; chime([523, 659, 784, 1047], 0.045);
+    }, stor ? 0 : 420);
     setTimeout(() => {
-      d.aabner = false;
+      if (stor) d.aabner = false;
       if (l.type === 'stor') { if (!S.klem.includes(l.nr)) { S.klem.push(l.nr); gem(); } GAADE.scene({ eyebrow: navn(l), title: l.navn, lines: l.bag, btn: I.on ? 'Videre' : 'Gå ind', efter: () => { if (!I.on) FX.interior.enter(l.inde.place); } }); }
-      else GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...l.bag, { b: 'Stykke ' + l.nr + ':', t: l.stykke }], efter: () => stempl(l) });
-    }, l.type === 'stor' ? 150 : 900);
+      else GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l, 'ny'), lines: [...l.bag, { b: 'Stykke ' + l.nr + ':', t: l.stykke }], efter: () => flyv(l, () => stempl(l)) });
+    }, stor ? 700 : 1500);
   }
   const igen = l => GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...(l.type === 'stor' ? l.gaade.efter : l.bag), { b: 'Stykke ' + l.nr + ':', t: l.stykke }] });
 
@@ -8948,9 +9064,9 @@ const KALENDER = (() => {
       const b = el('button', 'sEmne'); b.type = 'button'; b.append(el('span', '', s.t));
       b.addEventListener('click', () => {
         if (!s.rigtig) { log.append(replik(['ida', s.t + '.']), replik(s.replik)); b.disabled = true; b.classList.add('spurgt'); log.scrollTop = log.scrollHeight; chime([330, 294], 0.03); return; }
-        log.append(replik(['ida', s.t + '.']), ...g.efter.map(replik)); const b = billede(l); if (b) log.append(b); log.append(replik(['fortaeller', 'Stykke ' + l.nr + ': ' + l.stykke])); log.scrollTop = log.scrollHeight;
+        log.append(replik(['ida', s.t + '.']), ...g.efter.map(replik)); const bil = billede(l, 'ny'); if (bil) log.append(bil); bjaelder(); chime([523, 659, 784, 1047], 0.045); log.append(replik(['fortaeller', 'Stykke ' + l.nr + ': ' + l.stykke])); log.scrollTop = log.scrollHeight;
         const ok = el('button', 'go', 'Tak'); ok.type = 'button'; ok.addEventListener('click', () => spm.close());
-        q.remove(); valgene.replaceChildren(ok); ok.focus(); spm.addEventListener('close', () => stempl(l), { once: true });
+        q.remove(); valgene.replaceChildren(ok); ok.focus(); spm.addEventListener('close', () => flyv(l, () => stempl(l)), { once: true });
       });
       valgene.append(b);
     }
@@ -8958,7 +9074,7 @@ const KALENDER = (() => {
   }
 
   const kort = vindue('kalDialog', 'Kalenderen');
-  let valgt = 0;
+  let valgt = 0, nyFelt = 0;
   function visKort() {
     const body = kort.querySelector('.gdBody'), nx = naeste(), a = S.aabnet.length;
     body.replaceChildren();
@@ -8975,6 +9091,7 @@ const KALENDER = (() => {
         const op = S.aabnet.includes(nr), b = el('button', 'kalFelt' + (op ? ' aaben' : nx && nx.nr === nr ? ' naeste' : !L[nr] ? ' kommer' : ''), String(nr)); b.type = 'button';
         b.setAttribute('aria-label', `Låge ${nr}: ` + (op ? 'åbnet' : nx && nx.nr === nr ? 'den næste' : L[nr] ? 'lukket' : 'ikke skrevet endnu'));
         if (op && tegn(L[nr])) { b.classList.add('medTing'); const i = el('span', 'kalBillede'); i.innerHTML = tegn(L[nr]); i.querySelector('svg').setAttribute('aria-hidden', 'true'); b.replaceChildren(i, el('span', 'kalNr', String(nr))); }
+        if (op && nr === nyFelt) b.classList.add('ny');
         if (op) { b.setAttribute('aria-pressed', String(valgt === nr)); b.addEventListener('click', () => { valgt = valgt === nr ? 0 : nr; visKort(); }); } else b.disabled = true;
         grid.append(b);
       }
@@ -8986,10 +9103,12 @@ const KALENDER = (() => {
         body.append(det);
       }
     }
+    if (trae) body.append(el('p', 'gdIntro', `Juletræet i Rigsdagsgården har ${a} af ${N} lys tændt.`));
     if (sidste < N) body.append(el('p', 'gdIntro', `Der er skrevet ${K.laager.length} låger i denne udgave indtil videre.`));
   }
   function aabnKort() { if (!started || !$('scene').hidden || spm.open) return; if (kort.open) { kort.close(); return; } visKort(); kort.vis(); }
   kort.addEventListener('keydown', e => { if (e.code === 'KeyN' && !e.repeat) kort.close(); });
+  kort.addEventListener('close', () => { nyFelt = 0; });
 
   // ---- what to find now (the card in the top left corner; MAAL calls this)
   $('maal').querySelector('small').textContent = 'Julekalenderen';
@@ -9041,14 +9160,24 @@ const KALENDER = (() => {
     const nx = naeste();
     for (const d of DOERE) {
       if (d.led) { const maal_ = d.aabner || S.aabnet.includes(d.l.nr) ? 1 : 0; d.aaben += (maal_ - d.aaben) * Math.min(1, dt * 3.5); d.led.rotation.y = -d.aaben * 1.9; if (d.hul) d.hul.visible = d.aaben > 0.03; if (d.ting) d.ting.visible = d.aaben > 0.03; }
-      d.glimt.material.opacity = d.l === nx ? 0.3 + 0.18 * Math.sin(tid * 2.2) : 0;
+      if (d.ting) { if (d.aaben > 0.45) d.pop = Math.min(1, d.pop + dt * 1.9); const sk = d.pop <= 0 ? 0.001 : popKurve(d.pop); d.ting.scale.setScalar(sk); d.ting.position.y = d.tingY + Math.sin(tid * 1.8 + d.l.nr) * 0.018; }
+      d.blink = Math.max(0, d.blink - dt * 1.1);
+      d.glimt.material.opacity = Math.max(d.l === nx ? 0.3 + 0.18 * Math.sin(tid * 2.2) : 0, d.blink); d.glimt.scale.setScalar(3.2 + d.blink * 5);
     }
+    gnistFrame(dt);
+    if (trae) {
+      const a = S.aabnet.length;
+      trae.kugler.forEach((k, i) => { const on = i < a; if (k.taendt !== on) { k.taendt = on; k.k.material.color.set(on ? k.farve : '#39423a'); } k.glod.material.opacity = on ? 0.55 + 0.3 * Math.sin(tid * 2.6 + i * 1.7) : 0; });
+      const alle = a >= N; trae.stjerne.material.color.set(alle ? '#ffe08a' : '#8a7436'); trae.stjerneGlod.material.opacity = alle ? 0.8 + 0.2 * Math.sin(tid * 3) : 0; trae.stjerne.rotation.y = tid * 0.6;
+    }
+    if (krans_) { const lys_ = Math.floor(S.aabnet.length / 6); krans_.flammer.forEach((f, i) => { const on = i < lys_; f.flamme.visible = on; f.glod.material.opacity = on ? 0.7 + 0.25 * Math.sin(tid * 9 + i * 2) : 0; }); }
     for (const n of NISSER) {
       const her = I.on && I.place === n.l.inde.place, klar = S.klem.includes(n.l.nr) || S.aabnet.includes(n.l.nr);
       if (her && !klar && nx === n.l && $('scene').hidden && !paused) aabn(DOERE.find(d => d.l === n.l) || { l: n.l });   // she walked in by the building's own door
-      n.f.root.visible = klar;
+      n.f.root.visible = klar; n.ting.visible = klar && !S.aabnet.includes(n.l.nr);   // when she has got it, it is no longer beside him
       if (!klar) continue;
-      const [ax, az] = n.l.inde.at; n.f.root.position.set(ax, I.height(ax, az) + (n.l.inde.dy || 0), az);
+      const [ax, az] = n.l.inde.at, gy = I.height(ax, az) + (n.l.inde.dy || 0), [tx, tz] = n.l.inde.ting || [ax + 0.6, az];
+      n.f.root.position.set(ax, gy, az); n.ting.position.set(tx, gy + 0.27 + Math.sin(tid * 2) * 0.02, tz);
       if (!her) continue;
       const dist = Math.hypot(P.pos.x - I.x - ax, P.pos.z - az), want = dist < 6 ? Math.atan2(P.pos.x - I.x - ax, P.pos.z - az) : n.face;
       if (!paused) { n.yaw += angDiff(want, n.yaw) * (1 - Math.exp(-dt * 2)); n.f.root.rotation.y = n.yaw; if (typeof animatePresence === 'function') animatePresence(n.f, dt, dist < 3.5); }
