@@ -8,6 +8,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const filArg = process.argv.find(a => a.startsWith('--fil='));
 const kilde = filArg ? resolve(filArg.slice(6)) : join(root, 'julekalender.js');
 const { KALENDER: K } = await import(pathToFileURL(kilde).href);
+const { TEGNINGER } = await import(pathToFileURL(join(root, 'tegninger.js')).href);
 const fejl = [], bem = [];
 const tekst = readFileSync(kilde, 'utf8');
 if (/[–—]/.test(tekst)) fejl.push('Filen indeholder tankestreg. Brug bindestreg.');
@@ -22,6 +23,8 @@ for (const l of K.laager || []) {
   if (!['stor', 'lille', 'mini'].includes(l.type)) fejl.push(h + ': type skal være stor, lille eller mini.');
   for (const k of ['navn', 'praj', 'stykke']) if (!l[k]) fejl.push(h + ': mangler ' + k + '.');
   replikker(l.bag, h + ' (bag)');
+  if (!l.ting || !l.ting.navn || !l.ting.billede) fejl.push(h + ': mangler ting { navn, billede }. Der skal ligge en genstand bag hver låge.');
+  else if (!l.ting.billede.startsWith('<svg') && !TEGNINGER[l.ting.billede]) fejl.push(h + ': tegningen ' + l.ting.billede + ' findes ikke i tegninger.js. Vælg en af ' + Object.keys(TEGNINGER).join(', ') + '.');
   if (l.type === 'stor') {
     if (!INDGANGE.includes(l.indgang)) fejl.push(h + ': indgang skal være en af ' + INDGANGE.join(', ') + '.');
     if (!K.nisser || !K.nisser[l.nisse]) fejl.push(h + ': nissen ' + l.nisse + ' findes ikke i nisser.');

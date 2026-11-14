@@ -35,7 +35,8 @@ En julekalender for voksne med 24 låger på Slotsholmen. Den er under opbygning
 
 - Lågerne er døre med tal på rundt på Slotsholmen. De åbnes i rækkefølge, og den næste låge lyser svagt. Øverst til venstre står et praj om, hvor den er.
 - Der er tre slags: store låger (et rum med en nisse og en gåde), små låger (en dør, man åbner udefra) og mini-låger (en luge med en overraskelse).
-- Hver låge giver et stempel på kalenderkortet (knappen Kalender eller N) og et stykke af nissernes protokol. De 24 låger er delt i fire adventssøndage.
+- Bag hver låge ligger en tegnet genstand, som også står i døråbningen og på kalenderkortet. Tegningerne ligger i `tegninger.js` og er fælles for alle udgaver.
+- Hver låge giver et felt på kalenderkortet (knappen Kalender eller N) og et stykke af nissernes protokol. De 24 låger er delt i fire adventssøndage.
 - Spillet gemmer selv på den telefon eller computer, man spiller på, hver gang en låge åbnes. Julekalenderen og mordgåden har hver sin gemmeplads.
 - Går man i stå, kan man slå Vis vej til på kalenderkortet, så en pil peger mod den næste låge.
 

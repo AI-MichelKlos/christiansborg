@@ -410,6 +410,21 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .kalFelt.naeste{opacity:1;border:2.5px solid var(--ryg,#2b3a34);background:var(--mark,#fff1b8)}
 .kalFelt.aaben{cursor:pointer;border-style:solid;opacity:1}
 .kalFelt.aaben::after{content:"ÅBNET";position:absolute;inset:9%;border:2.5px solid #b3262a;border-radius:50%;color:#b3262a;font:700 9px/1 var(--body);letter-spacing:.12em;display:grid;place-items:end center;padding-bottom:13%;box-sizing:border-box;rotate:-14deg;opacity:.8;pointer-events:none}
+.kalFelt.medTing{background:#fff8e6;overflow:hidden}
+.kalFelt.medTing::after{content:none}
+.kalBillede{position:absolute;inset:8% 8% 4%;display:grid;place-items:center}
+.kalBillede svg{width:100%;height:100%}
+.kalNr{position:absolute;left:4px;top:3px;min-width:20px;height:20px;padding:0 4px;border-radius:10px;background:#b3262a;color:#fff;font:700 12px/20px var(--body);text-align:center}
+.kalTing{margin:0 0 10px;text-align:center}
+.kalTing svg{width:132px;height:132px;padding:8px;border-radius:50%;background:radial-gradient(circle,#fff6d6 0 55%,#f3d98a 100%);box-shadow:0 0 0 3px var(--leaf),0 6px 18px rgba(0,0,0,.35)}
+.kalTing figcaption{margin-top:8px;font:600 calc(14px * var(--ts)) var(--body);color:var(--leaf-deep)}
+#sceneBillede{margin:12px 0 2px}
+.kalDetalje .kalTing{float:right;margin:0 0 6px 14px}
+.kalDetalje .kalTing svg{width:92px;height:92px;box-shadow:0 0 0 2px #c9a35a}
+.kalDetalje .kalTing figcaption{display:none}
+.kalDetalje::after{content:"";display:block;clear:both}
+#kalSpm .kalTing{margin:10px 0}
+#kalSpm .kalTing svg{width:104px;height:104px}
 .kalFelt[aria-pressed=true]{box-shadow:0 0 0 3px var(--leaf)}
 .kalFelt:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .kalDetalje{position:relative;margin:14px 2px 6px;padding:14px 16px 10px;background:var(--flade,#fff);box-shadow:0 1px 4px rgba(0,0,0,.28);rotate:-.3deg}
@@ -483,6 +498,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 <div id="scene" class="overlay" hidden>
   <div class="card sticker" role="dialog" aria-modal="true" aria-labelledby="sceneTitle">
     <div class="eyebrow" id="sceneEyebrow"></div>
+    <div id="sceneBillede" hidden></div>
     <h2 id="sceneTitle"></h2>
     <div id="sceneText"></div>
     <button class="go" id="sceneBtn" type="button">Videre</button>
@@ -507,6 +523,7 @@ const SP = SPOR[SPOR_ID];
 document.documentElement.dataset.tema = new URLSearchParams(location.search).get('tema') || SP.tema;   // ?tema=jul previews another look
 const KAL = SP.type === 'kalender';   // a calendar edition: the murder mystery is switched off and the doors are switched on
 const KALDATA = KAL ? (await import(SP.fil)).KALENDER : null;
+const TEGNINGER = KAL ? (await import('./tegninger.js')).TEGNINGER : {};   // the drawings of what lies behind the doors
 const { MANUS } = await import(KAL ? './mordgaade.js' : SP.fil);   // the whole story: people, places, things, clues and the reveal
 
 const $ = id => document.getElementById(id);
@@ -7320,6 +7337,7 @@ const GAADE = (() => {
   const hvem = id => id === 'ida' ? 'Ida' : id === 'fortaeller' ? '' : M.personer[id] ? (M.personer[id].kort || M.personer[id].navn.split(' ')[0]) : id;
   function scene(o) {
     $('sceneEyebrow').textContent = o.eyebrow; $('sceneTitle').textContent = o.title;
+    $('sceneBillede').hidden = !o.billede; $('sceneBillede').replaceChildren(...(o.billede ? [o.billede] : []));   // a picture above the title (the thing behind a calendar door)
     $('sceneText').replaceChildren(...o.lines.map(line => {
       const p = document.createElement('p'); p.className = 'lead';
       if (line && line.b) { const b = document.createElement('b'); b.textContent = line.b + ' '; p.append(b, line.t); p.classList.add('trinLinje'); return p; }
@@ -8813,6 +8831,17 @@ const KALENDER = (() => {
   }
   function tal(parent, nr, y, st, z) { const m = new THREE.Mesh(new THREE.PlaneGeometry(st, st), new THREE.MeshBasicMaterial({ map: talTex(nr), transparent: true, depthWrite: false })); m.position.set(0, y, z); parent.add(m); return m; }
   function glimt(parent, y) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffd98a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); s.position.set(0, y, 0.5); s.scale.setScalar(3.2); parent.add(s); return s; }
+  // the thing behind a door: a drawing, shown on the card, on the calendar and standing in the open doorway
+  const tegn = l => { const b = l.ting && l.ting.billede; return !b ? '' : b.startsWith('<svg') ? b : TEGNINGER[b] || ''; };
+  function billede(l, cls) {
+    const f = el('figure', 'kalTing' + (cls ? ' ' + cls : '')), t = tegn(l); if (!t) return null;
+    f.innerHTML = t; f.querySelector('svg').setAttribute('aria-hidden', 'true'); f.append(el('figcaption', '', l.ting.navn)); return f;
+  }
+  function tingPlade(l, st) {   // a flat cut-out of the drawing for the doorway
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(st, st), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0 })), t = tegn(l);
+    if (t) { const img = new Image(); img.onload = () => { m.material.map = ctex(256, 256, g => { g.clearRect(0, 0, 256, 256); g.drawImage(img, 0, 0, 256, 256); }, { wrap: false }); m.material.opacity = 1; m.material.needsUpdate = true; }; img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t); }
+    return m;
+  }
   const DOERE = [];
   for (const l of K.laager) {
     const d = { l, g: new THREE.Group(), aaben: 0, pynt: [] };
@@ -8839,6 +8868,9 @@ const KALENDER = (() => {
       box(0.05, 0.05, 0.08, tm('#c9a35a'), w / 2 - 0.1, h * 0.48, 0.03, { parent: blad, cast: false });   // the handle
       tal(blad, l.nr, mini ? h * 0.5 : h * 0.72, mini ? 0.5 : 0.62, 0.04);
       if (!mini) d.pynt = krans(blad, h * 0.42, 0.2);
+      const st = mini ? 0.58 : 0.88, hy = mini ? y0 + 0.02 : 0.62;   // the thing stands on a little shelf in the doorway
+      if (!mini) box(w, 0.05, 0.1, tm('#6b4a2e'), 0, hy - 0.05, 0.06, { parent: d.g, cast: false });
+      d.ting = tingPlade(l, st); d.ting.position.set(0, hy + st / 2, 0.075); d.ting.visible = false; d.g.add(d.ting);
       d.glimt = glimt(d.g, y0 + h / 2);
     }
     gruppe.add(d.g); DOERE.push(d);
@@ -8846,7 +8878,7 @@ const KALENDER = (() => {
   function saet(d) {   // show the door as it is in the saved game
     const op = S.aabnet.includes(d.l.nr);
     d.aaben = op ? 1 : 0; if (d.led) d.led.rotation.y = -d.aaben * 1.9;
-    if (d.hul) d.hul.visible = op;
+    if (d.hul) d.hul.visible = op; if (d.ting) d.ting.visible = op;
     for (const p of d.pynt) p.visible = !op || d.l.type === 'stor';
   }
 
@@ -8886,10 +8918,10 @@ const KALENDER = (() => {
     setTimeout(() => {
       d.aabner = false;
       if (l.type === 'stor') { if (!S.klem.includes(l.nr)) { S.klem.push(l.nr); gem(); } GAADE.scene({ eyebrow: navn(l), title: l.navn, lines: l.bag, btn: I.on ? 'Videre' : 'Gå ind', efter: () => { if (!I.on) FX.interior.enter(l.inde.place); } }); }
-      else GAADE.scene({ eyebrow: navn(l), title: l.navn, lines: [...l.bag, { b: 'Stykke ' + l.nr + ':', t: l.stykke }], efter: () => stempl(l) });
+      else GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...l.bag, { b: 'Stykke ' + l.nr + ':', t: l.stykke }], efter: () => stempl(l) });
     }, l.type === 'stor' ? 150 : 900);
   }
-  const igen = l => GAADE.scene({ eyebrow: navn(l), title: l.navn, lines: [...(l.type === 'stor' ? l.gaade.efter : l.bag), { b: 'Stykke ' + l.nr + ':', t: l.stykke }] });
+  const igen = l => GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...(l.type === 'stor' ? l.gaade.efter : l.bag), { b: 'Stykke ' + l.nr + ':', t: l.stykke }] });
 
   // ---- small windows of my own: the riddle and the calendar card
   function vindue(id, titel, small) {
@@ -8916,7 +8948,7 @@ const KALENDER = (() => {
       const b = el('button', 'sEmne'); b.type = 'button'; b.append(el('span', '', s.t));
       b.addEventListener('click', () => {
         if (!s.rigtig) { log.append(replik(['ida', s.t + '.']), replik(s.replik)); b.disabled = true; b.classList.add('spurgt'); log.scrollTop = log.scrollHeight; chime([330, 294], 0.03); return; }
-        log.append(replik(['ida', s.t + '.']), ...g.efter.map(replik), replik(['fortaeller', 'Stykke ' + l.nr + ': ' + l.stykke]));
+        log.append(replik(['ida', s.t + '.']), ...g.efter.map(replik)); const b = billede(l); if (b) log.append(b); log.append(replik(['fortaeller', 'Stykke ' + l.nr + ': ' + l.stykke])); log.scrollTop = log.scrollHeight;
         const ok = el('button', 'go', 'Tak'); ok.type = 'button'; ok.addEventListener('click', () => spm.close());
         q.remove(); valgene.replaceChildren(ok); ok.focus(); spm.addEventListener('close', () => stempl(l), { once: true });
       });
@@ -8942,12 +8974,14 @@ const KALENDER = (() => {
       for (let nr = s * 6 + 1; nr <= s * 6 + 6; nr++) {
         const op = S.aabnet.includes(nr), b = el('button', 'kalFelt' + (op ? ' aaben' : nx && nx.nr === nr ? ' naeste' : !L[nr] ? ' kommer' : ''), String(nr)); b.type = 'button';
         b.setAttribute('aria-label', `Låge ${nr}: ` + (op ? 'åbnet' : nx && nx.nr === nr ? 'den næste' : L[nr] ? 'lukket' : 'ikke skrevet endnu'));
+        if (op && tegn(L[nr])) { b.classList.add('medTing'); const i = el('span', 'kalBillede'); i.innerHTML = tegn(L[nr]); i.querySelector('svg').setAttribute('aria-hidden', 'true'); b.replaceChildren(i, el('span', 'kalNr', String(nr))); }
         if (op) { b.setAttribute('aria-pressed', String(valgt === nr)); b.addEventListener('click', () => { valgt = valgt === nr ? 0 : nr; visKort(); }); } else b.disabled = true;
         grid.append(b);
       }
       body.append(grid);
       if (valgt && soendag(valgt) === s + 1 && L[valgt]) {
         const l = L[valgt], det = el('article', 'kalDetalje');
+        const bi = billede(l); if (bi) det.append(bi);
         det.append(el('h3', '', `${l.nr}. ${l.navn}`), el('p', 'kalStykke', l.stykke), ...(l.type === 'stor' ? l.gaade.efter : l.bag).map(replik));
         body.append(det);
       }
@@ -9006,7 +9040,7 @@ const KALENDER = (() => {
     if (!started) return;
     const nx = naeste();
     for (const d of DOERE) {
-      if (d.led) { const maal_ = d.aabner || S.aabnet.includes(d.l.nr) ? 1 : 0; d.aaben += (maal_ - d.aaben) * Math.min(1, dt * 3.5); d.led.rotation.y = -d.aaben * 1.9; if (d.hul) d.hul.visible = d.aaben > 0.03; }
+      if (d.led) { const maal_ = d.aabner || S.aabnet.includes(d.l.nr) ? 1 : 0; d.aaben += (maal_ - d.aaben) * Math.min(1, dt * 3.5); d.led.rotation.y = -d.aaben * 1.9; if (d.hul) d.hul.visible = d.aaben > 0.03; if (d.ting) d.ting.visible = d.aaben > 0.03; }
       d.glimt.material.opacity = d.l === nx ? 0.3 + 0.18 * Math.sin(tid * 2.2) : 0;
     }
     for (const n of NISSER) {

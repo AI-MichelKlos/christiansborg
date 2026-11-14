@@ -19,6 +19,8 @@
 //   farve     (kan udelades) dørens farve.
 //   praj      hvor lågen er. Vises øverst til venstre, når det er den næste låge.
 //   bag       det, der er bag lågen: replikker som [hvem, tekst]. Hvem er "fortaeller", "ida" eller et navn.
+//   ting      { navn, billede }: genstanden bag lågen. billede er navnet på en tegning i tegninger.js
+//             (kaffekop, mandarin, briller, papir, nissehue, lys, noegle, gave) eller en hel tegning, der begynder med <svg.
 //   stykke    det stykke af protokollen, lågen giver.
 // En stor låge har også:
 //   nisse     en af nisserne i listen nisser.
@@ -85,6 +87,7 @@ export const KALENDER = {
         ["fortaeller", "På den øverste står: »Stykkerne er gemt, hvor ingen embedsmand kigger: bag døre med tal på. Gå videre til dem, der tæller pengene. Pind.«"],
         ["ida", "Dem, der tæller pengene. Det må være Den Røde Bygning."],
       ],
+      ting: { navn: "En kop kaffe, der stadig er varm", billede: "kaffekop" },
       stykke: "§ 1. Der skal være jul. Også i år.",
     },
     {
@@ -109,9 +112,10 @@ export const KALENDER = {
         ],
         efter: [
           ["Pind", "Tre. Første, anden og tredje. Og natten mellem anden og tredje kommer vi."],
-          ["Pind", "Her er mit stykke. Det næste ligger på den anden side af kanalen, ved Gammel Strand. Ministeriet bor i det gamle pantelånerhus. Kig efter en luge i muren."],
+          ["Pind", "Her er mit stykke, og tag en mandarin med. Du får brug for den. Det næste ligger på den anden side af kanalen, ved Gammel Strand. Ministeriet bor i det gamle pantelånerhus. Kig efter en luge i muren."],
         ],
       },
+      ting: { navn: "En mandarin fra Pinds skuffe", billede: "mandarin" },
       stykke: "§ 2. Regnestykket skal gå op inden tredjebehandlingen. Går det ikke op, lægges en mandarin imellem.",
     },
     {
@@ -121,8 +125,9 @@ export const KALENDER = {
       bag: [
         ["fortaeller", "Lugen går op på klem. En nisse med læsebriller ser på Ida uden at sige noget i lang tid."],
         ["Nissen", "Vi har lukket for i år. Ansøgningsfristen var i september."],
-        ["fortaeller", "Lugen smækker. Et stykke papir sidder i klemme i sprækken."],
+        ["fortaeller", "Lugen smækker så hårdt, at hans læsebriller falder af. De ligger tilbage i sprækken sammen med et stykke papir."],
       ],
+      ting: { navn: "Et par læsebriller", billede: "briller" },
       stykke: "§ 3. Kulturen holder åbent, når nogen banker pænt på.",
     },
   ],
