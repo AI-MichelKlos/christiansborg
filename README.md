@@ -39,6 +39,7 @@ En julekalender for voksne med 24 låger på Slotsholmen. Den er under opbygning
 - Hver låge giver et felt på kalenderkortet (knappen Kalender eller N) og et stykke af nissernes protokol. De 24 låger er delt i fire adventssøndage.
 - Når en låge åbnes, ringer bjælderne, der står gnister ud af døråbningen, og genstanden flyver op i kalenderen.
 - For hver låge tændes et lys på juletræet i Rigsdagsgården, og for hver sjette låge tændes et lys på adventskransen ved trappen.
+- Vejret følger kalenderen. Sneen bliver liggende, lidt mere for hver låge. Efter låge 12 sner det mindre og mindre, efter låge 18 er det holdt op, og den sidste søndag er en klar nat med stjerner.
 - Spillet gemmer selv på den telefon eller computer, man spiller på, hver gang en låge åbnes. Julekalenderen og mordgåden har hver sin gemmeplads.
 - Går man i stå, kan man slå Vis vej til på kalenderkortet, så en pil peger mod den næste låge.
 

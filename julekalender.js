@@ -31,6 +31,8 @@
 // Udgaven har også:
 //   juletrae      { ved: [x, z] }: her står juletræet. Der tændes et lys på det for hver låge, der åbnes.
 //   adventskrans  { ved: [x, z] }: her står adventskransen. Der tændes et lys på den for hver sjette låge.
+// Vejret følger kalenderen: sneen bliver liggende, lidt mere for hver låge. Efter låge 12 sner det mindre og mindre,
+// og efter låge 18 er det holdt op. Den sidste søndag er en klar nat med stjerner.
 // Tekster må ikke indeholde tankestreg. Brug bindestreg.
 
 export const KALENDER = {
@@ -65,8 +67,8 @@ export const KALENDER = {
   soendage: [
     { navn: "1. søndag i advent", tekst: "Det første lys er tændt på adventskransen i Rigsdagsgården. Ingen ved, hvem der tændte det." },
     { navn: "2. søndag i advent", tekst: "To lys brænder nu på adventskransen. Betjentene er holdt op med at spørge, hvem der tænder dem." },
-    { navn: "3. søndag i advent", tekst: "Det tredje lys er tændt. Protokollen er snart til at læse." },
-    { navn: "4. søndag i advent", tekst: "Alle fire lys brænder. Nu mangler kun underskriften." },
+    { navn: "3. søndag i advent", tekst: "Det tredje lys er tændt. Det er holdt op med at sne, og der er helt stille på Slotsholmen." },
+    { navn: "4. søndag i advent", tekst: "Alle fire lys brænder under en klar stjernehimmel. Nu mangler kun underskriften." },
   ],
 
   // vises, når alle lågerne i filen er åbnet, men der endnu ikke er skrevet 24
