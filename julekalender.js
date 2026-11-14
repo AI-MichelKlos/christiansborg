@@ -14,13 +14,14 @@
 //   ved       [x, z]: der, hvor Ida står foran væggen. Spillet sætter selv døren på den nærmeste væg.
 //             x peger mod øst og z mod syd, målt i meter fra midten af Christiansborg.
 //   retning   (kan udelades) den vej, væggen ligger fra "ved", i grader: 0 er nord, 90 øst, 180 syd, 270 vest.
-//   indgang   kun store låger: den bygning, lågen fører ind i (finance, reform, riddersal, stables,
+//   indgang   kun store låger: den bygning, lågen fører ind i (folketing, finance, reform, riddersal, stables,
 //             courtEntry, pmEntry). Skiltet med tallet sættes ved bygningens egen dør.
 //   farve     (kan udelades) dørens farve.
 //   praj      hvor lågen er. Vises øverst til venstre, når det er den næste låge.
 //   bag       det, der er bag lågen: replikker som [hvem, tekst]. Hvem er "fortaeller", "ida" eller et navn.
 //   ting      { navn, billede }: genstanden bag lågen. billede er navnet på en tegning i tegninger.js
-//             (kaffekop, mandarin, briller, papir, nissehue, lys, noegle, gave, hestesko, groed, klokke, stjerne) eller en hel tegning, der begynder med <svg.
+//             (kaffekop, mandarin, briller, papir, nissehue, lys, noegle, gave, hestesko, groed, klokke, stjerne,
+//             kuglepen, mus, kanon, bog) eller en hel tegning, der begynder med <svg.
 //   stykke    det stykke af protokollen, lågen giver.
 // En stor låge har også:
 //   nisse     en af nisserne i listen nisser.
@@ -63,7 +64,7 @@ export const KALENDER = {
 
   soendage: [
     { navn: "1. søndag i advent", tekst: "Det første lys er tændt på adventskransen i Rigsdagsgården. Ingen ved, hvem der tændte det." },
-    { navn: "2. søndag i advent", tekst: "To lys brænder nu. Betjentene er holdt op med at spørge." },
+    { navn: "2. søndag i advent", tekst: "To lys brænder nu på adventskransen. Betjentene er holdt op med at spørge, hvem der tænder dem." },
     { navn: "3. søndag i advent", tekst: "Det tredje lys er tændt. Protokollen er snart til at læse." },
     { navn: "4. søndag i advent", tekst: "Alle fire lys brænder. Nu mangler kun underskriften." },
   ],
@@ -82,6 +83,7 @@ export const KALENDER = {
   adventskrans: { ved: [36.6, 50.4] },   // ved trappen, til højre
 
   nisser: {
+    slev: { navn: "Køkkenmester Slev", kort: "Slev", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
     hov: { navn: "Staldmester Hov", kort: "Hov", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
     pind: { navn: "Kontorchef Pind", kort: "Pind", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
   },
@@ -185,11 +187,101 @@ export const KALENDER = {
         ],
         efter: [
           ["Hov", "179. To fra Færøerne, to fra Grønland og resten herfra. Så ved jeg, hvor meget grød der skal koges."],
-          ["Hov", "Her er mit stykke og en hestesko. Den bringer held, og det får du brug for. Ham med mappen gik mod tårnet."],
+          ["Hov", "Her er mit stykke og en hestesko. Den bringer held, og det får du brug for. Ham med mappen gik tværs over Ridebanen, mens hestene sov. Kig på fløjen ud mod kanalen."],
         ],
       },
       ting: { navn: "En hestesko fra stalden", billede: "hestesko" },
       stykke: "§ 6. Hestene skal have grød før ministrene.",
+    },
+    // ---------------------------------------------------------------- 2. søndag i advent
+    {
+      nr: 7, type: "lille", navn: "Spor i gruset",
+      ved: [-184, 80], farve: "#7a1f24",
+      praj: "Ridebanen uden for staldene. Kig på den lange fløj ud mod kanalen.",
+      bag: [
+        ["fortaeller", "Bag døren ligger en meget lille kuglepen. På siden står med guldtryk: »Effektiviseringsenheden. Vi gør det enklere.«"],
+        ["ida", "Det har aldrig betydet noget godt."],
+        ["fortaeller", "I gruset uden for døren går små fodspor ud mod Marmorbroen. De går i en helt lige linje."],
+      ],
+      ting: { navn: "En kuglepen fra Effektiviseringsenheden", billede: "kuglepen" },
+      stykke: "§ 7. Gruset på Ridebanen rives hver morgen. Også efter nisser.",
+    },
+    {
+      nr: 8, type: "mini", navn: "Et vidne",
+      ved: [-184.5, 121.9], farve: "#2f5a43",
+      praj: "Marmorbroen for enden af Ridebanen. Kig på de to små pavilloner ved broen.",
+      bag: [
+        ["fortaeller", "Lugen går op. Derinde sidder en mus med en halv mandarin og ser skyldig ud."],
+        ["fortaeller", "Den skubber et stykke papir ud med snuden. Med meget små bogstaver står der: »Han gik ind i Tøjhuset uden billet. Han målte kanonerne.«"],
+        ["fortaeller", "Musen lukker selv lugen."],
+      ],
+      ting: { navn: "En mus med en halv mandarin", billede: "mus" },
+      stykke: "§ 8. Mus tæller ikke som embedsmænd, men de må gerne spise med.",
+    },
+    {
+      nr: 9, type: "lille", navn: "Udkast 14",
+      ved: [38, 205], retning: 236, farve: "#7a1f24",
+      praj: "Tøjhusmuseet, det lange hus syd for slottet. Kig på muren ud mod Bibliotekshaven.",
+      bag: [
+        ["fortaeller", "Bag døren står en meget lille kanon. I løbet sidder en sammenrullet seddel."],
+        ["fortaeller", "»Julestrategi 2030, udkast 14. Protokollen udgår og erstattes af et regneark. Høringsfrist: ingen. Bilag.«"],
+        ["ida", "Så har han et navn. Bilag."],
+        ["fortaeller", "Nederst står med blyant: »Husk at aflevere bogen.«"],
+      ],
+      ting: { navn: "En kanon ladt med et udkast", billede: "kanon" },
+      stykke: "§ 9. I december skydes der kun med konfetti.",
+    },
+    {
+      nr: 10, type: "lille", navn: "Lånt og ikke afleveret",
+      ved: [98, 208], retning: 146, farve: "#2f5a43",
+      praj: "Det Kongelige Bibliotek, det gamle hus af røde mursten. Kig på muren ud mod Bibliotekshaven.",
+      bag: [
+        ["fortaeller", "Bag døren står en bog: »Sådan afskaffer man en tradition på tolv trin«. På lånerkortet står: Bilag. Afleveres: for længst."],
+        ["fortaeller", "Som bogmærke ligger en kvittering fra Snapstinget. Én portion risengrød, hver aften i tre uger."],
+        ["ida", "Han spiser grød alene hver aften. Det er næsten synd for ham. Den korteste vej til Snapstinget går gennem Proviantpassagen."],
+      ],
+      ting: { navn: "En bog, der skulle have været afleveret", billede: "bog" },
+      stykke: "§ 10. Bøger om at afskaffe julen udlånes kun til dem, der lover at fortryde.",
+    },
+    {
+      nr: 11, type: "mini", navn: "Til tredjebehandlingen",
+      ved: [82, 74], farve: "#7a1f24",
+      praj: "Proviantpassagen, porten mellem Proviantgården og Rigsdagsgården. Kig efter en luge i muren.",
+      bag: [
+        ["fortaeller", "Lugen går op. Derinde sover en nisse oven på en stak finanslovsforslag. Ved siden af ham står et lys, der er brændt næsten ned."],
+        ["Nissen", "Til tredjebehandlingen."],
+        ["fortaeller", "Han vender sig om på den anden side og sover videre. Under hans hue stikker et stykke papir ud."],
+      ],
+      ting: { navn: "Et lys, der er brændt næsten ned", billede: "lys" },
+      stykke: "§ 11. Den, der falder i søvn på arbejdet i december, vækkes først, når grøden er klar.",
+    },
+    {
+      nr: 12, type: "stor", navn: "Grød for én",
+      indgang: "folketing", nisse: "slev",
+      inde: { place: "folketing", at: [-17.6, 25.5], face: 90, dy: 0.83, ting: [-17.0, 24.7] },   // han står på bordet lige inden for døren
+      praj: "Folketinget i Rigsdagsgården. Gå op ad den store trappe, og find Snapstinget til venstre for indgangen.",
+      bag: [
+        ["fortaeller", "Der er mørkt i huset, men fra Snapstinget kommer der lys og en lugt af kanel."],
+      ],
+      gaade: {
+        foer: [
+          ["Slev", "Du kommer på grund af ham med mappen. Bilag. Han sidder derovre hver aften og spiser grød alene."],
+          ["ida", "Ved du, hvorfor han rev protokollen over?"],
+          ["Slev", "Han siger, at den ikke kan stå i et regneark. Men jeg siger ikke mere til en, der ikke kender huset. Svar mig på én ting."],
+        ],
+        spoergsmaal: "Hvor længe kan der højst gå mellem to folketingsvalg?",
+        svar: [
+          { t: "Tre år", replik: ["Slev", "Så travlt har selv de ikke. Prøv igen."] },
+          { t: "Fire år", rigtig: true },
+          { t: "Fem år", replik: ["Slev", "Det er i andre lande. Prøv igen."] },
+        ],
+        efter: [
+          ["Slev", "Fire år. Og grøden skal koges hver jul, uanset hvem der vinder."],
+          ["Slev", "Bilag ville gøre julen enklere. Nu kan han ikke samle protokollen igen, og han tør ikke sige det til nogen. Tag en skål grød med. Du finder ham ikke i dag."],
+        ],
+      },
+      ting: { navn: "En skål risengrød med smørklat", billede: "groed" },
+      stykke: "§ 12. Ingen spiser grød alene på Borgen.",
     },
   ],
 };

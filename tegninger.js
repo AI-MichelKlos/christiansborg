@@ -74,4 +74,43 @@ export const TEGNINGER = {
   stjerne: svg(`
     <path d="M60 10l14 32 34 4-26 22 8 34-30-18-30 18 8-34L12 46l34-4z" fill="#f2c94c" ${S}/>
     <path d="M60 28l7 18" fill="none" stroke="#fff3c4" stroke-width="4" stroke-linecap="round"/>`),
+  kuglepen: svg(`
+    <g transform="rotate(-42 60 60)">
+      <rect x="20" y="51" width="66" height="18" rx="5" fill="#2f5a8a" ${S}/>
+      <rect x="20" y="51" width="14" height="18" rx="5" fill="#c9a35a" ${S}/>
+      <path d="M86 51l20 9-20 9z" fill="#e6dfcc" ${S}/>
+      <path d="M100 57.5l6 2.5-6 2.5z" fill="#2a2118"/>
+      <path d="M34 47h34" fill="none" stroke="#2a2118" stroke-width="5" stroke-linecap="round"/>
+      <path d="M40 57h36" fill="none" stroke="#7fa3cc" stroke-width="3" stroke-linecap="round"/>
+    </g>`),
+  mus: svg(`
+    <path d="M90 84c18 2 22-12 12-20" fill="none" ${S}/>
+    <ellipse cx="60" cy="76" rx="34" ry="24" fill="#b9b3ab" ${S}/>
+    <circle cx="34" cy="50" r="12" fill="#b9b3ab" ${S}/>
+    <circle cx="34" cy="50" r="6" fill="#e9b7b2"/>
+    <circle cx="56" cy="44" r="11" fill="#b9b3ab" ${S}/>
+    <circle cx="56" cy="44" r="5" fill="#e9b7b2"/>
+    <path d="M30 60c-10 2-16 10-18 16 8 4 20 4 28-2z" fill="#b9b3ab" ${S}/>
+    <circle cx="11" cy="76" r="3.5" fill="#2a2118"/>
+    <circle cx="28" cy="66" r="2.6" fill="#2a2118"/>
+    <path d="M38 98a16 16 0 0 1 32 0z" fill="#f08a24" ${S}/>
+    <path d="M54 98v-14M46 98l-4-10M62 98l4-10" fill="none" stroke="#f9b866" stroke-width="3" stroke-linecap="round"/>`),
+  kanon: svg(`
+    <g transform="rotate(-18 60 60)">
+      <rect x="26" y="44" width="78" height="24" rx="6" fill="#59636d" ${S}/>
+      <rect x="96" y="40" width="12" height="32" rx="3" fill="#6f7a85" ${S}/>
+      <rect x="20" y="40" width="12" height="32" rx="6" fill="#6f7a85" ${S}/>
+      <path d="M40 50h44" fill="none" stroke="#8a95a0" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <path d="M22 96h62l10-22H38z" fill="#7a5a3a" ${S}/>
+    <circle cx="46" cy="92" r="17" fill="#5b3d2a" ${S}/>
+    <circle cx="46" cy="92" r="5" fill="#c9a35a" ${S}/>
+    <path d="M46 75v34M29 92h34" fill="none" stroke="#2a2118" stroke-width="2"/>`),
+  bog: svg(`
+    <path d="M24 26h60a10 10 0 0 1 10 10v64H34a10 10 0 0 1-10-10z" fill="#7a1f24" ${S}/>
+    <path d="M24 90a10 10 0 0 1 10-10h60v20H34a10 10 0 0 1-10-10z" fill="#fbf5e2" ${S}/>
+    <path d="M38 87h52M38 94h52" fill="none" stroke="#b8ae96" stroke-width="2" stroke-linecap="round"/>
+    <rect x="38" y="40" width="42" height="22" rx="2" fill="#f3d98a" ${S}/>
+    <path d="M45 48h28M45 55h20" fill="none" stroke="#2a2118" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M70 80v30l6-6 6 6V80z" fill="#2f6b3f" ${S}/>`),
 };

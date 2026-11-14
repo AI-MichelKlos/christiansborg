@@ -14,7 +14,7 @@ const tekst = readFileSync(kilde, 'utf8');
 if (/[–—]/.test(tekst)) fejl.push('Filen indeholder tankestreg. Brug bindestreg.');
 for (const k of ['id', 'titel', 'overskrift', 'forside', 'gemTekst', 'start', 'hjaelp', 'soendage', 'proeve', 'slut', 'laager']) if (!K[k]) fejl.push('Mangler: ' + k);
 if ((K.soendage || []).length !== 4) fejl.push('Der skal være fire søndage.');
-const set = new Set(), INDGANGE = ['finance', 'reform', 'reformSide', 'riddersal', 'stables', 'courtEntry', 'pmEntry'];
+const set = new Set(), INDGANGE = ['folketing', 'finance', 'reform', 'reformSide', 'riddersal', 'stables', 'courtEntry', 'pmEntry'];
 const replikker = (r, hvor) => { if (!Array.isArray(r) || !r.length || r.some(x => !Array.isArray(x) || x.length !== 2)) fejl.push(hvor + ': replikker skal være en liste af [hvem, tekst].'); };
 for (const l of K.laager || []) {
   const h = 'Låge ' + l.nr;
