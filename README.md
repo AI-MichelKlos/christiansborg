@@ -25,6 +25,11 @@ Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsni
 - Telefon: venstre tommel styrer (hold den helt ude et øjeblik for at løbe), højre tommel kigger, og der er en hop-knap og en handlingsknap. Uret, notesbogen, rygsækken og kortet ligger som knapper øverst.
 - Tårnet: gå hen til Kongeporten, og vælg Gå ind i tårnet. Vælg derefter etage til restauranten eller Udsigten. Deroppe drejer pilene eller tommelen dig rundt, og mellemrum eller knappen Kikkert zoomer ind.
 
+## Udseende og spor
+Spillets udseende ligger i et tema, som kan skiftes. Mordgåden bruger temaet `krimi`: mørke flader, messingfarve, avisskrift i overskrifterne og en notesbog med linjeret papir og håndskrift. Temaet `jul` (mørkegrøn, rød og guld) ligger klar til en juleudgave og kan ses ved at skrive `?tema=jul` efter adressen.
+
+Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Indtil videre findes kun sporet `mord`.
+
 ## Om spillet
 - Spillet er `index.html` med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
 - Hele historien står i `mordgaade.js` ved siden af spillet. Ret teksterne der, og kør `node dev/tjek-mordgaade.js` bagefter. Spillet skal hentes fra en webserver (fx GitHub Pages), ikke åbnes direkte som fil, fordi det henter `mordgaade.js`.
