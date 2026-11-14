@@ -4932,10 +4932,10 @@ function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') ||
 // ======================================================================== MAIN LOOP
 let last = performance.now(), clockT = 0, poiT = 0, mapT = 0, lysInde = false;
 // the light follows the story's clock outdoors; indoors the lamps are on
-const lysMaal = () => FX.interior?.on ? 0 : Math.max(0, Math.min(1, (495 - GAADE.G.min) / 135));
+const lysMaal = () => FX.interior?.on ? 0 : FX.kal ? FX.kal.lys() : Math.max(0, Math.min(1, (495 - GAADE.G.min) / 135));   // a calendar edition has its own light
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; clockT += dt;
-  { const inde = !!FX.interior?.on, maal = lysMaal(); if (inde !== lysInde) { lysInde = inde; ev = maal; } else ev += (maal - ev) * Math.min(1, dt * 1.6); } applyEvening();
+  { const inde = !!FX.interior?.on, maal = lysMaal(); if (inde !== lysInde) { lysInde = inde; ev = maal; } else ev += (maal - ev) * Math.min(1, dt * (KAL ? 0.22 : 1.6)); } applyEvening();   // in a calendar the light changes slowly, like the weather
   if (started) updPlayer(dt);
   updCamera(dt, clockT);
   if (window.__camFix) { camera.position.fromArray(window.__camFix[0]); camera.lookAt(...window.__camFix[1]); }   // for testing only
@@ -9158,6 +9158,9 @@ const KALENDER = (() => {
     m.needsUpdate = true;
   }
   for (const g of [world, dyn]) g.traverse(o => { if (o.material) for (const m of Array.isArray(o.material) ? o.material : [o.material]) sneMat(m); });
+  // The light follows the four Sundays: dusk at the first door, dark evening by the second Sunday, night from the third,
+  // and when the last door is open the morning comes. 0 is daylight and 1 is dark.
+  const lysNu = () => { const a = (started ? S : gemt || S).aabnet.length; return a >= N ? 0.04 : a >= 12 ? 1 : 0.55 + 0.45 * a / 12; };
   const sneMaal = a => 0.1 + 0.82 * Math.min(1, a / 18), faldMaal = a => a <= 12 ? 1 : Math.max(0, 1 - (a - 12) / 6);
   let sneNu = null, faldNu = 1, stjerner = null;
   {
@@ -9237,8 +9240,8 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, vejr: () => { vejr(0, true); return [sneNu, faldNu]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
-  const kal = { begynd, efterStart, startKnapper, aabnKort, maal, hjaelp: K.hjaelp, titel: K.titel, test };
+  const test = { get S() { return S; }, DOERE, NISSER, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
 })();

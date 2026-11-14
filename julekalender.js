@@ -31,6 +31,8 @@
 // Udgaven har også:
 //   juletrae      { ved: [x, z] }: her står juletræet. Der tændes et lys på det for hver låge, der åbnes.
 //   adventskrans  { ved: [x, z] }: her står adventskransen. Der tændes et lys på den for hver sjette låge.
+// Lyset følger også kalenderen: skumring ved den første låge, mørk aften ved anden søndag, nat fra tredje søndag,
+// og når låge 24 er åbnet, bliver det morgen.
 // Vejret følger kalenderen: sneen bliver liggende, lidt mere for hver låge. Efter låge 12 sner det mindre og mindre,
 // og efter låge 18 er det holdt op. Den sidste søndag er en klar nat med stjerner.
 // Tekster må ikke indeholde tankestreg. Brug bindestreg.
@@ -78,7 +80,7 @@ export const KALENDER = {
   },
   slut: {
     titel: "Protokollen er samlet",
-    tekst: ["Alle 24 stykker ligger i rækkefølge. Nisserne kan gå i gang, og der bliver jul på Borgen i år."],
+    tekst: ["Alle 24 stykker ligger i rækkefølge. Nisserne kan gå i gang, og der bliver jul på Borgen i år.", "Det bliver lyst over en hvid Slotsholm. Det er den 24. december."],
   },
 
   juletrae: { ved: [17.1, 74.6] },       // i Rigsdagsgården, til venstre for trappen
