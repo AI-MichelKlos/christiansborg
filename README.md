@@ -28,7 +28,20 @@ Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsni
 ## Udseende og spor
 Spillets udseende ligger i et tema, som kan skiftes. Mordgåden bruger temaet `krimi`: mørke flader, messingfarve, avisskrift i overskrifterne og en notesbog med linjeret papir og håndskrift. Temaet `jul` (mørkegrøn, rød og guld) ligger klar til en juleudgave og kan ses ved at skrive `?tema=jul` efter adressen.
 
-Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Indtil videre findes kun sporet `mord`.
+Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er to spor: `mord` (mordgåden) og `jul` (julekalenderen).
+
+## Julekalenderen
+En julekalender for voksne med 24 låger på Slotsholmen. Den er under opbygning: rammen er færdig, og der er skrevet tre prøvelåger. Prøv den her: https://ai-michelklos.github.io/christiansborg/?spor=jul
+
+- Lågerne er døre med tal på rundt på Slotsholmen. De åbnes i rækkefølge, og den næste låge lyser svagt. Øverst til venstre står et praj om, hvor den er.
+- Der er tre slags: store låger (et rum med en nisse og en gåde), små låger (en dør, man åbner udefra) og mini-låger (en luge med en overraskelse).
+- Hver låge giver et stempel på kalenderkortet (knappen Kalender eller N) og et stykke af nissernes protokol. De 24 låger er delt i fire adventssøndage.
+- Spillet gemmer selv på den telefon eller computer, man spiller på, hver gang en låge åbnes. Julekalenderen og mordgåden har hver sin gemmeplads.
+- Går man i stå, kan man slå Vis vej til på kalenderkortet, så en pil peger mod den næste låge.
+
+Rammen ligger i `index.html` (afsnittet JULEKALENDER). Alt indhold står i `julekalender.js`: hvor hver låge sidder, hvad der er bag den, nisserne og gåderne. Formatet er forklaret øverst i filen. Kør `node dev/tjek-kalender.js` efter en rettelse.
+
+En ny udgave, fx om dagpenge, er en kopi af `julekalender.js` med andre tekster og en linje mere i listen `SPOR`. Alle udgaver går rundt i den samme by, så en bygning, der bliver bygget flottere, bliver det i dem alle.
 
 ## Om spillet
 - Spillet er `index.html` med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
