@@ -438,6 +438,13 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .kalPuls{animation:kalPuls .65s ease-out}
 .kalFelt.ny{animation:kalPop .7s cubic-bezier(.2,1.7,.4,1) .15s both}
 @media (prefers-reduced-motion:reduce){.kalTing.ny svg,.kalTing.ny::before,.kalFelt.ny,.kalPuls{animation:none}}
+.kalProtokol{margin:18px 0 6px;padding:10px 14px;background:var(--flade,#fff);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.kalProtokol summary{cursor:pointer;min-height:28px;font:700 calc(24px * var(--ts))/1.3 var(--haand,var(--display));color:var(--ryg,#7a1f24)}
+.kalProtokol summary:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+.kalProtokol ol{list-style:none;margin:8px 0 0;padding:0}
+.kalProtokol li{padding:5px 0;border-bottom:1px dashed var(--kant)}
+.kalProtokol li.mangler{color:var(--daempet)}
+.kalUnder{margin:12px 0 2px;font:700 calc(24px * var(--ts))/1.2 var(--haand,var(--display));text-align:right}
 .kalFelt[aria-pressed=true]{box-shadow:0 0 0 3px var(--leaf)}
 .kalFelt:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
 .kalDetalje{position:relative;margin:14px 2px 6px;padding:14px 16px 10px;background:var(--flade,#fff);box-shadow:0 1px 4px rgba(0,0,0,.28);rotate:-.3deg}
@@ -8766,7 +8773,7 @@ const KALENDER = (() => {
   const L = Object.fromEntries(K.laager.map(l => [l.nr, l]));
   const sidste = Math.max(...K.laager.map(l => l.nr));   // the last door that has been written
   const soendag = nr => Math.ceil(nr / 6);
-  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], vej: false, pos: null, face: 0 });
+  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], vej: false, pos: null, face: 0, morgen: false });
   function hent() { try { const g = JSON.parse(localStorage.getItem(GEM) || 'null'); if (g && g.v === 1 && g.id === K.id && Array.isArray(g.aabnet)) return Object.assign(ny(), g); } catch (e) {} return null; }
   let S = ny(), gemt = hent(), valg = gemt ? 'fortsaet' : 'nyt';
   function gem() { if (!started) return; try { localStorage.setItem(GEM, JSON.stringify(S)); gemt = S; } catch (e) {} }
@@ -8874,7 +8881,8 @@ const KALENDER = (() => {
     const d = { l, g: new THREE.Group(), aaben: 0, pynt: [], pop: 0, blink: 0 };
     if (l.type === 'stor') {   // a sign beside the building's own door
       const ftN = (() => { const a = FT.at(0, 0), b = FT.at(0, 1); return { x: a[0], z: a[1], nx: b[0] - a[0], nz: b[1] - a[1], side: 4.6 }; })();   // Folketinget's own door at the top of the stairs
-      const e0 = MINISTRY_DOORS[l.indgang], e = l.indgang === 'folketing' ? ftN : l.indgang === 'courtEntry' && e0 ? { ...e0, side: 4.6, frem: 8.4 } : e0;   // Højesteret's door is behind four columns, so its sign stands at the foot of the stairs
+      const T_ = FX.tower, taarn = { x: T_.door[0], z: T_.door[1], nx: T_.OUT[0], nz: T_.OUT[1], side: 3.4 };   // Kongeporten under the tower
+      const e0 = MINISTRY_DOORS[l.indgang], e = l.indgang === 'folketing' ? ftN : l.indgang === 'tower' ? taarn : l.indgang === 'courtEntry' && e0 ? { ...e0, side: 4.6, frem: 8.4 } : e0;   // Højesteret's door is behind four columns, so its sign stands at the foot of the stairs
       if (!e) { console.warn('Julekalender: låge ' + l.nr + ' har ingen indgang ' + l.indgang); continue; }
       const sx = -e.nz, sz = e.nx;   // along the wall
       const ud = e.frem ? 6 : 3.2; d.staa = [e.x + e.nx * ud, e.z + e.nz * ud]; d.r = 3.6;   // a few steps out, clear of the doorway that leads inside
@@ -8925,6 +8933,7 @@ const KALENDER = (() => {
         part(new THREE.SphereGeometry(0.13, 12, 10), m('#f1eee6'), head, 0, -0.12, 0.07).scale.set(1, 1.15, 0.7);   // the beard
       } });
   }
+  const indPlace = l => l.inde.ind || l.inde.place;   // where the door leads in, if the nisse stands further inside
   const NISSER = [];
   for (const l of K.laager) {
     if (l.type !== 'stor' || !l.inde || !K.nisser[l.nisse]) continue;
@@ -9025,7 +9034,7 @@ const KALENDER = (() => {
     toast(`Låge ${l.nr} er åbnet. Du har fået stykke ${l.nr} af protokollen` + (trae ? ', og et lys er tændt på juletræet.' : '.'));
     const antal = S.aabnet.length, ikkeMere = () => { if (!naeste() && antal < N) GAADE.scene({ eyebrow: `${antal} af ${N} låger`, title: K.proeve.titel, lines: K.proeve.tekst }); };
     setTimeout(() => {
-      if (antal === N) GAADE.scene({ eyebrow: K.soendage[3].navn, title: K.slut.titel, lines: [K.soendage[3].tekst, ...K.slut.tekst] });
+      if (antal === N) { klokker(); GAADE.scene({ eyebrow: K.soendage[3].navn, title: K.slut.titel, billede: billede({ ting: { navn: K.slut.ting || '', billede: K.slut.billede || 'stjerne' } }, 'ny'), lines: [K.soendage[3].tekst, ...K.slut.tekst], btn: I.on && I.place.startsWith('tower') ? 'Op på Udsigten' : 'Videre', efter: () => { if (I.on && I.place.startsWith('tower') && I.liftTo) I.liftTo('view'); } }); }
       else if (antal % 6 === 0) { bjaelder(10); GAADE.scene({ eyebrow: 'Et lys er tændt', title: K.soendage[antal / 6 - 1].navn, lines: [K.soendage[antal / 6 - 1].tekst], efter: ikkeMere }); }
       else ikkeMere();
     }, 1400);
@@ -9038,7 +9047,7 @@ const KALENDER = (() => {
     }, stor ? 0 : 420);
     setTimeout(() => {
       if (stor) d.aabner = false;
-      if (l.type === 'stor') { if (!S.klem.includes(l.nr)) { S.klem.push(l.nr); gem(); } GAADE.scene({ eyebrow: navn(l), title: l.navn, lines: l.bag, btn: I.on ? 'Videre' : 'Gå ind', efter: () => { if (!I.on) FX.interior.enter(l.inde.place); } }); }
+      if (l.type === 'stor') { if (!S.klem.includes(l.nr)) { S.klem.push(l.nr); gem(); } GAADE.scene({ eyebrow: navn(l), title: l.navn, lines: l.bag, btn: I.on ? 'Videre' : 'Gå ind', efter: () => { if (!I.on) FX.interior.enter(indPlace(l)); } }); }
       else GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l, 'ny'), lines: [...l.bag, { b: 'Stykke ' + l.nr + ':', t: l.stykke }], efter: () => flyv(l, () => stempl(l)) });
     }, stor ? 700 : 1500);
   }
@@ -9109,6 +9118,11 @@ const KALENDER = (() => {
       }
     }
     if (trae) body.append(el('p', 'gdIntro', `Juletræet i Rigsdagsgården har ${a} af ${N} lys tændt.`));
+    if (a) {   // the protocol so far, in the order of the paragraphs
+      const pro = el('details', 'kalProtokol'), sum = el('summary', '', a >= N ? 'Læs hele protokollen' : `Læs protokollen (${a} af ${N} stykker)`), ol = el('ol');
+      for (let nr = 1; nr <= N; nr++) { const li = el('li', S.aabnet.includes(nr) ? '' : 'mangler', S.aabnet.includes(nr) && L[nr] ? L[nr].stykke : '...'); ol.append(li); }
+      pro.append(sum, ol); if (a >= N) pro.append(el('p', 'kalUnder', K.slut.underskrift || '')); body.append(pro);
+    }
     if (sidste < N) body.append(el('p', 'gdIntro', `Der er skrevet ${K.laager.length} låger i denne udgave indtil videre.`));
   }
   function aabnKort() { if (!started || !$('scene').hidden || spm.open) return; if (kort.open) { kort.close(); return; } visKort(); kort.vis(); }
@@ -9124,6 +9138,7 @@ const KALENDER = (() => {
     if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
     let pil = null, hvor = nx.praj;
     if (I.on && nx.type === 'stor' && I.place === nx.inde.place) hvor = 'Her er det. Find nissen.';
+    else if (I.on && nx.type === 'stor' && I.place === indPlace(nx) && nx.inde.vej) hvor = nx.inde.vej;   // fx the tower: in at the bottom, the nisse is higher up
     else if (S.vej && d && !I.on && !FX.tower?.on) {
       const v = MYBOAT.on ? null : M_.vej(P.pos.x, P.pos.z, d.staa), aim = v ? v.sigte : d.staa, lige = Math.hypot(d.staa[0] - P.pos.x, d.staa[1] - P.pos.z), len = v ? v.len : lige;
       if (lige > 5) pil = Math.atan2(aim[0] - P.pos.x, aim[1] - P.pos.z) - (cam.yaw + Math.PI);
@@ -9161,7 +9176,7 @@ const KALENDER = (() => {
   for (const g of [world, dyn]) g.traverse(o => { if (o.material) for (const m of Array.isArray(o.material) ? o.material : [o.material]) sneMat(m); });
   // The light follows the four Sundays: dusk at the first door, dark evening by the second Sunday, night from the third,
   // and when the last door is open the morning comes. 0 is daylight and 1 is dark.
-  const lysNu = () => { const a = (started ? S : gemt || S).aabnet.length; return a >= N ? 0.04 : a >= 12 ? 1 : 0.55 + 0.45 * a / 12; };
+  const lysNu = () => { const a = (started ? S : gemt || S).aabnet.length; return a >= N ? ((started ? S : gemt || S).morgen ? 0.04 : 1) : a >= 12 ? 1 : 0.55 + 0.45 * a / 12; };   // after the last door the night lasts until the fireworks are over
   const sneMaal = a => 0.1 + 0.82 * Math.min(1, a / 18), faldMaal = a => a <= 12 ? 1 : Math.max(0, 1 - (a - 12) / 6);
   let sneNu = null, faldNu = 1, stjerner = null;
   {
@@ -9180,10 +9195,85 @@ const KALENDER = (() => {
     if (sne) sne.geometry.setDrawRange(0, Math.round(sne.geometry.attributes.position.count * faldNu));
   }
 
+  // ---- the end. Holmens Kirke rings Christmas in, fireworks go up over Slotsholmen, and all the nisser sit down to grød
+  // in the tower restaurant. The night lasts until the fireworks are over; then it is morning.
+  function klokker() {   // a deep church bell with its overtones, struck eight times
+    for (let i = 0; i < 8; i++) { const t = 0.6 + i * 1.55; tone(196, 195, t, 3.2, 0.06); tone(392.5, 391, t, 2.4, 0.03); tone(589, 587, t, 1.6, 0.018); tone(990, 985, t, 0.9, 0.01); }
+  }
+  const FN = 1400, fPos = new Float32Array(FN * 3).fill(-999), fFarve = new Float32Array(FN * 3), fBase = new Float32Array(FN * 3), fVel = new Float32Array(FN * 3), fLiv = new Float32Array(FN), fMax = new Float32Array(FN);
+  const fGeo = new THREE.BufferGeometry(); fGeo.setAttribute('position', new THREE.BufferAttribute(fPos, 3)); fGeo.setAttribute('color', new THREE.BufferAttribute(fFarve, 3));
+  const fyr = new THREE.Points(fGeo, new THREE.PointsMaterial({ size: 2.4, vertexColors: true, map: TX.glow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+  fyr.frustumCulled = false; fyr.visible = false; scene.add(fyr);
+  const raketter = [], FARVER = ['#ffd27a', '#ff5e5e', '#7fd0ff', '#9dff8a', '#ff8ae0', '#ffffff'].map(c => new THREE.Color(c));
+  let fNaeste = 0, festTid = 0;
+  function partikel(x, y, z, vx, vy, vz, c, liv) {
+    for (let i = 0; i < FN; i++) { if (fLiv[i] > 0) continue; fLiv[i] = fMax[i] = liv; fPos.set([x, y, z], i * 3); fVel.set([vx, vy, vz], i * 3); fBase.set([c.r, c.g, c.b], i * 3); return; }
+  }
+  function affyr() {
+    const a = Math.random() * Math.PI * 2, r = 110 + Math.random() * 150, x = 30 + Math.sin(a) * r, z = 40 + Math.cos(a) * r;
+    raketter.push({ x, y: 2, z, vy: 46 + Math.random() * 12, top: 60 + Math.random() * 45, c: FARVER[Math.floor(Math.random() * FARVER.length)], c2: Math.random() < 0.4 ? FARVER[Math.floor(Math.random() * FARVER.length)] : null });
+    tone(500, 1700, 0, 0.9, 0.012, 'triangle');   // the whistle
+  }
+  function brag(r) {
+    const n = 110 + Math.floor(Math.random() * 60), fart = 15 + Math.random() * 9;
+    for (let i = 0; i < n; i++) {
+      const u = Math.random() * 2 - 1, v = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u), k = fart * (0.85 + Math.random() * 0.25);
+      partikel(r.x, r.y, r.z, Math.cos(v) * s * k, u * k, Math.sin(v) * s * k, r.c2 && i % 2 ? r.c2 : r.c, 1.6 + Math.random() * 1.1);
+    }
+    const afst = Math.hypot(r.x - camera.position.x, r.z - camera.position.z), v = Math.max(0.03, 0.22 - afst / 1400);
+    tone(90, 35, afst / 340, 0.7, v); for (let i = 0; i < 6; i++) tone(2500 + Math.random() * 2500, 2000, afst / 340 + 0.25 + i * 0.07 + Math.random() * 0.05, 0.05, v * 0.12, 'square');
+  }
+  function fyrFrame(dt) {
+    const a = S.aabnet.length, fest = started && a >= N && !S.morgen;
+    if (fest && !paused && (!I.on || FX.tower?.on)) {
+      festTid += dt; fNaeste -= dt;
+      if (fNaeste <= 0) { affyr(); if (Math.random() < 0.35) affyr(); fNaeste = 0.5 + Math.random() * 0.9; }
+      if (festTid > (K.fest?.sekunder || 75)) { S.morgen = true; gem(); toast(K.fest?.morgen || 'Det bliver lyst over Slotsholmen.'); }
+    }
+    for (let i = raketter.length - 1; i >= 0; i--) {
+      const r = raketter[i]; r.y += r.vy * dt; r.vy -= 9 * dt;
+      partikel(r.x + (Math.random() - 0.5) * 0.3, r.y, r.z + (Math.random() - 0.5) * 0.3, 0, -2, 0, FARVER[0], 0.45);   // the trail
+      if (r.y >= r.top || r.vy < 8) { brag(r); raketter.splice(i, 1); }
+    }
+    let liv = raketter.length > 0;
+    for (let i = 0; i < FN; i++) {
+      if (fLiv[i] <= 0) continue;
+      fLiv[i] -= dt; const j = i * 3;
+      if (fLiv[i] <= 0) { fPos[j + 1] = -999; fFarve.fill(0, j, j + 3); continue; }
+      liv = true; const k = Math.exp(-dt * 1.4); fVel[j] *= k; fVel[j + 1] = fVel[j + 1] * k - 5.5 * dt; fVel[j + 2] *= k;
+      fPos[j] += fVel[j] * dt; fPos[j + 1] += fVel[j + 1] * dt; fPos[j + 2] += fVel[j + 2] * dt;
+      const t = fLiv[i] / fMax[i], g = t * t * (0.75 + 0.25 * Math.sin(tid * 30 + i));   // fades out and twinkles
+      fFarve[j] = fBase[j] * g; fFarve[j + 1] = fBase[j + 1] * g; fFarve[j + 2] = fBase[j + 2] * g;
+    }
+    fGeo.attributes.position.needsUpdate = true; fGeo.attributes.color.needsUpdate = true;
+    fyr.visible = liv && (!I.on || !!FX.tower?.on);
+  }
+  // all the nisser at the tables in the tower restaurant once the protocol is whole
+  const FEST = [];
+  if (K.fest) for (const [id, p] of Object.entries(K.fest.nisser || {})) {
+    const ns = K.nisser[id]; if (!ns) continue;
+    const f = nisseFigur(ns); f.root.visible = false; inde.add(f.root);
+    const l = K.laager.find(l => l.nisse === id), ting = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+    if (l) tingTex(l, ting.material); ting.scale.setScalar(0.5); ting.visible = false; inde.add(ting);
+    const face = (p.face || 0) * Math.PI / 180;
+    FEST.push({ id, ns, p, f, ting, face, yaw: face });
+  }
+  function festFrame(dt) {
+    const vis = started && S.aabnet.length >= N && I.on && I.place === K.fest?.place;
+    for (const n of FEST) {
+      n.f.root.visible = n.ting.visible = vis; if (!vis) continue;
+      const [ax, az] = n.p.at, gy = I.height(ax, az) + (n.p.dy || 0);
+      n.f.root.position.set(ax, gy, az); n.ting.position.set(ax + 0.55, gy + 0.27, az + 0.2);
+      const dist = Math.hypot(P.pos.x - I.x - ax, P.pos.z - az), want = dist < 6 ? Math.atan2(P.pos.x - I.x - ax, P.pos.z - az) : n.face;
+      if (!paused) { n.yaw += angDiff(want, n.yaw) * (1 - Math.exp(-dt * 2)); n.f.root.rotation.y = n.yaw; if (typeof animatePresence === 'function') animatePresence(n.f, dt, dist < 3.5); }
+      if (dist < 2.6 && !paused) offerAction({ id: 'kal-fest-' + n.id, label: 'Tal med ' + (n.ns.kort || n.ns.navn), prio: 9, run: () => GAADE.scene({ eyebrow: K.fest.overskrift || 'Juleaften i Tårnet', title: n.ns.navn, lines: [[n.ns.kort || n.ns.navn, n.p.replik]] }) });
+    }
+  }
+
   // ---- every frame: the doors swing, the next one glows, and the button offers what Ida can do
   let posT = 0, gemT = 20, tid = 0;
   HOOKS.frame.push(dt => {
-    tid += dt; vejr(dt);
+    tid += dt; vejr(dt); fyrFrame(dt); festFrame(dt);
     if (sne) {
       sne.visible = faldNu > 0.01 && !I.on && !document.body.classList.contains('inTowerRooms');
       if (sne.visible && !paused) {
@@ -9233,7 +9323,7 @@ const KALENDER = (() => {
         if (Math.hypot(P.pos.x - d.staa[0], P.pos.z - d.staa[1]) > d.r || d.aabner) continue;
         const l = d.l, nr = l.nr;
         if (S.aabnet.includes(nr)) offerAction({ id: 'kal-' + nr, label: `Se låge ${nr} igen`, prio: 5, run: () => igen(l) });
-        else if (S.klem.includes(nr)) offerAction({ id: 'kal-' + nr, label: `Gå ind ad låge ${nr}`, prio: 13, run: () => FX.interior.enter(l.inde.place) });
+        else if (S.klem.includes(nr)) offerAction({ id: 'kal-' + nr, label: `Gå ind ad låge ${nr}`, prio: 13, run: () => FX.interior.enter(indPlace(l)) });
         else if (nx && nx.nr === nr) offerAction({ id: 'kal-' + nr, label: `Åbn låge ${nr}`, prio: 13, run: () => aabn(d) });
         else offerAction({ id: 'kal-' + nr, label: `Låge ${nr} er lukket`, prio: l.type === 'stor' ? 4 : 13, run: () => toast(`Låge ${nr} kan ikke åbnes endnu. Find låge ${nx ? nx.nr : nr} først.`) });
       }
@@ -9241,8 +9331,8 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
-  const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, hjaelp: K.hjaelp, titel: K.titel, test };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && S.aabnet.length >= N, hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
 })();

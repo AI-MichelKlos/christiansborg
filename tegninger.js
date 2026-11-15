@@ -153,4 +153,47 @@ export const TEGNINGER = {
     <rect x="30" y="64" width="60" height="20" rx="4" fill="#3a3430" ${S}/>
     <rect x="34" y="84" width="52" height="8" rx="2" fill="#b3262a" ${S}/>
     <ellipse cx="60" cy="106" rx="34" ry="5" fill="#b3262a" opacity=".3"/>`),
+  kuvert: svg(`
+    <rect x="12" y="30" width="96" height="64" rx="4" fill="#fbf5e2" ${S}/>
+    <path d="M12 34l48 36 48-36" fill="none" ${S}/>
+    <path d="M12 94l34-30M108 94L74 64" fill="none" stroke="#b8ae96" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="60" cy="68" r="12" fill="#b3262a" ${S}/>
+    <path d="M55 64l5 8 5-8" fill="none" stroke="#f3d98a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`),
+  pebernoedder: svg(`
+    <path d="M30 34h50l8 66H22z" fill="#d9c4a0" ${S}/>
+    <path d="M30 34l-4-10h58l-4 10" fill="#c9b08a" ${S}/>
+    <rect x="34" y="56" width="42" height="20" rx="3" fill="#fbf5e2" ${S}/>
+    <path d="M40 66h30" fill="none" stroke="#b3262a" stroke-width="3" stroke-linecap="round"/>
+    <g fill="#a8693a" stroke="#2a2118" stroke-width="2.5"><circle cx="86" cy="100" r="8"/><circle cx="100" cy="94" r="7"/><circle cx="96" cy="108" r="6"/><circle cx="16" cy="104" r="6"/></g>
+    <g fill="#d39a62"><circle cx="84" cy="97" r="2"/><circle cx="98" cy="91" r="2"/></g>`),
+  fjerpen: svg(`
+    <path d="M98 10C70 18 48 44 40 80l10 2C64 56 84 34 98 10z" fill="#fbf5e2" ${S}/>
+    <path d="M98 10C80 34 62 56 46 80" fill="none" stroke="#b8ae96" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M40 80l-6 14 10-8" fill="#2a2118" ${S}/>
+    <path d="M20 88h40l-4 24H24z" fill="#2f3a52" ${S}/>
+    <rect x="26" y="80" width="28" height="9" rx="2" fill="#59636d" ${S}/>
+    <path d="M28 96h22" fill="none" stroke="#7f8fa6" stroke-width="3" stroke-linecap="round"/>`),
+  fotografi: svg(`
+    <g transform="rotate(-6 60 60)">
+      <rect x="18" y="14" width="84" height="94" rx="2" fill="#fbf5e2" ${S}/>
+      <rect x="26" y="22" width="68" height="62" fill="#2b3a34" ${S}/>
+      <path d="M60 30l16 34H44z" fill="#2f6b3f"/>
+      <path d="M60 30l-6 12h12z" fill="#3f8a52"/>
+      <g fill="#f2c94c"><circle cx="54" cy="46" r="2"/><circle cx="64" cy="50" r="2"/><circle cx="52" cy="58" r="2"/><circle cx="68" cy="60" r="2"/><circle cx="58" cy="62" r="2"/><circle cx="62" cy="40" r="2"/></g>
+      <path d="M60 24l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z" fill="#f2c94c"/>
+      <path d="M32 84c0-10 4-16 8-16s8 6 8 16z" fill="#6f7780"/>
+      <path d="M33 70l7-14 7 14z" fill="#b3262a"/>
+      <circle cx="40" cy="70" r="4" fill="#f1eee6"/>
+      <path d="M36 54l4-8 4 8z" fill="#b3262a"/>
+      <path d="M80 84c0-8 3-12 6-12s6 4 6 12z" fill="#7a5a3a"/>
+      <path d="M38 96h44" fill="none" stroke="#8a8271" stroke-width="3" stroke-linecap="round"/>
+    </g>`),
+  protokol: svg(`
+    <path d="M26 14h68v88H26z" fill="#fbf5e2" ${S}/>
+    <path d="M26 36h68M26 58h68M26 80h68" fill="none" stroke="#c9b08a" stroke-width="2" stroke-dasharray="5 4"/>
+    <path d="M34 24h40M34 46h46M34 68h36" fill="none" stroke="#8a8271" stroke-width="3" stroke-linecap="round"/>
+    <g fill="#e9cd78" opacity=".85"><rect x="20" y="31" width="14" height="9" rx="1" transform="rotate(-8 27 35)"/><rect x="86" y="53" width="14" height="9" rx="1" transform="rotate(10 93 57)"/><rect x="20" y="75" width="14" height="9" rx="1" transform="rotate(6 27 79)"/></g>
+    <path d="M36 92c6-8 10 4 16-2s8-6 12 0" fill="none" stroke="#2f3a52" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="84" cy="92" r="13" fill="#b3262a" ${S}/>
+    <circle cx="84" cy="92" r="7" fill="none" stroke="#f3d98a" stroke-width="2.5"/>`),
 };

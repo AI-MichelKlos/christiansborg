@@ -14,7 +14,7 @@ const tekst = readFileSync(kilde, 'utf8');
 if (/[–—]/.test(tekst)) fejl.push('Filen indeholder tankestreg. Brug bindestreg.');
 for (const k of ['id', 'titel', 'overskrift', 'forside', 'gemTekst', 'start', 'hjaelp', 'soendage', 'proeve', 'slut', 'laager']) if (!K[k]) fejl.push('Mangler: ' + k);
 if ((K.soendage || []).length !== 4) fejl.push('Der skal være fire søndage.');
-const set = new Set(), INDGANGE = ['folketing', 'finance', 'reform', 'reformSide', 'riddersal', 'stables', 'courtEntry', 'pmEntry'];
+const set = new Set(), INDGANGE = ['folketing', 'tower', 'finance', 'reform', 'reformSide', 'riddersal', 'stables', 'courtEntry', 'pmEntry'];
 const replikker = (r, hvor) => { if (!Array.isArray(r) || !r.length || r.some(x => !Array.isArray(x) || x.length !== 2)) fejl.push(hvor + ': replikker skal være en liste af [hvem, tekst].'); };
 for (const l of K.laager || []) {
   const h = 'Låge ' + l.nr;
@@ -38,6 +38,7 @@ for (const l of K.laager || []) {
     }
   } else if (!Array.isArray(l.ved) || l.ved.length !== 2) fejl.push(h + ': mangler ved [x, z].');
 }
+for (const id of Object.keys((K.fest && K.fest.nisser) || {})) if (!K.nisser[id]) fejl.push('Festen: nissen ' + id + ' findes ikke i nisser.');
 const max = Math.max(0, ...set);
 for (let n = 1; n <= max; n++) if (!set.has(n)) fejl.push('Låge ' + n + ' mangler. Lågerne åbnes i rækkefølge, så der må ikke være huller.');
 const antal = t => (K.laager || []).filter(l => l.type === t).length;

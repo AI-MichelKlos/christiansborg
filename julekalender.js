@@ -14,22 +14,26 @@
 //   ved       [x, z]: der, hvor Ida står foran væggen. Spillet sætter selv døren på den nærmeste væg.
 //             x peger mod øst og z mod syd, målt i meter fra midten af Christiansborg.
 //   retning   (kan udelades) den vej, væggen ligger fra "ved", i grader: 0 er nord, 90 øst, 180 syd, 270 vest.
-//   indgang   kun store låger: den bygning, lågen fører ind i (folketing, finance, reform, riddersal, stables,
+//   indgang   kun store låger: den bygning, lågen fører ind i (folketing, tower, finance, reform, riddersal, stables,
 //             courtEntry, pmEntry). Skiltet med tallet sættes ved bygningens egen dør.
 //   farve     (kan udelades) dørens farve.
 //   praj      hvor lågen er. Vises øverst til venstre, når det er den næste låge.
 //   bag       det, der er bag lågen: replikker som [hvem, tekst]. Hvem er "fortaeller", "ida" eller et navn.
 //   ting      { navn, billede }: genstanden bag lågen. billede er navnet på en tegning i tegninger.js
 //             (kaffekop, mandarin, briller, papir, nissehue, lys, noegle, gave, hestesko, groed, klokke, stjerne,
-//             kuglepen, mus, kanon, bog, regneark, slips, vaegt, mappe, stempel) eller en hel tegning, der begynder med <svg.
+//             kuglepen, mus, kanon, bog, regneark, slips, vaegt, mappe, stempel, kuvert, pebernoedder, fjerpen,
+//             fotografi, protokol) eller en hel tegning, der begynder med <svg.
 //   stykke    det stykke af protokollen, lågen giver.
 // En stor låge har også:
 //   nisse     en af nisserne i listen nisser.
-//   inde      { place, at: [x, z], face, dy, ting: [x, z] }: hvor nissen står inde i bygningen. dy løfter ham, fx op på et bord.
+//   inde      { place, at: [x, z], face, dy, ting: [x, z], ind, vej }: hvor nissen står inde i bygningen. dy løfter ham, fx op på et bord.
+//             ind er det rum, døren fører ind i, hvis nissen står længere inde (fx tårnet), og vej er prajet derinde.
 //             ting er der, hvor genstanden ligger ved siden af ham (kan udelades).
 //   gaade     { foer: replikker, spoergsmaal, svar: [{ t, rigtig, replik }], efter: replikker }
 // Udgaven har også:
 //   juletrae      { ved: [x, z] }: her står juletræet. Der tændes et lys på det for hver låge, der åbnes.
+//   fest          { place, nisser: { id: { at, face, dy, replik } } }: når låge 24 er åbnet, sidder nisserne her og
+//                 spiser grød, og man kan tale med dem. sekunder er, hvor længe fyrværkeriet varer, før det bliver morgen.
 //   adventskrans  { ved: [x, z] }: her står adventskransen. Der tændes et lys på den for hver sjette låge.
 // Lyset følger også kalenderen: skumring ved den første låge, mørk aften ved anden søndag, nat fra tredje søndag,
 // og når låge 24 er åbnet, bliver det morgen.
@@ -79,14 +83,35 @@ export const KALENDER = {
     tekst: ["De næste låger er ikke skrevet endnu. Du kan gå rundt på Slotsholmen, se lågerne igen og kigge på juletræet i Rigsdagsgården, eller starte forfra fra forsiden."],
   },
   slut: {
-    titel: "Protokollen er samlet",
-    tekst: ["Alle 24 stykker ligger i rækkefølge. Nisserne kan gå i gang, og der bliver jul på Borgen i år.", "Det bliver lyst over en hvid Slotsholm. Det er den 24. december."],
+    titel: "Glædelig jul på Borgen",
+    ting: "Juletræets stjerne", billede: "stjerne",
+    tekst: [
+      "Protokollen er samlet, underskrevet og stemplet. Bilag går ned i Rigsdagsgården og sætter stjernen på toppen af juletræet. Han er den yngste, så det er hans opgave.",
+      "Ovre fra Holmens Kirke ringer klokken julen ind, og over Slotsholmen går fyrværkeriet til vejrs. Gå op på Udsigten og se det, eller gå ud i sneen.",
+      "Nisserne sidder ved bordene i restauranten og spiser grød. Der er plads til dig.",
+    ],
+    underskrift: "Underskrevet: Pind, Hov, Slev, Kendelse, Stempel og Bilag",
   },
 
   juletrae: { ved: [17.1, 74.6] },       // i Rigsdagsgården, til venstre for trappen
   adventskrans: { ved: [36.6, 50.4] },   // ved trappen, til højre
 
+  fest: {
+    place: "towerRestaurant",
+    overskrift: "Juleaften i Tårnet",
+    sekunder: 75,
+    morgen: "Fyrværkeriet er slut, og det bliver lyst over en hvid Slotsholm. Glædelig jul.",
+    nisser: {
+      pind: { at: [433.2, -6.2], face: 0, dy: 0.76, replik: "Næste år hjælper han mig med regnestykket, siger han. Med blyant. Det bliver en lang december." },
+      hov: { at: [433.2, 0.8], face: 0, dy: 0.76, replik: "Hestene fik pebernødderne. De siger tak, og de har ikke spurgt efter mandariner en eneste gang." },
+      slev: { at: [433.2, 7.8], face: 0, dy: 0.76, replik: "Ingen spiser grød alene på Borgen. Sæt dig bare. Der er en mandel i én af skålene." },
+      kendelse: { at: [445.8, 0.8], face: 0, dy: 0.76, replik: "Retten konstaterer, at julen er gyldig. Sagen er afsluttet. Retten går over til grøden." },
+      stempel: { at: [445.8, 7.8], face: 0, dy: 0.76, replik: "Stemplet og godkendt. Jeg har også stemplet grøden. Det var nok ikke nødvendigt." },
+    },
+  },
+
   nisser: {
+    bilag: { navn: "Bilag", kort: "Bilag", rolle: "Nisse i Effektiviseringsenheden. Den yngste nisse på Christiansborg", hue: "#59636d", toej: "#2b2f36" },
     kendelse: { navn: "Dommer Kendelse", kort: "Kendelse", rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for han har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
     stempel: { navn: "Sekretær Stempel", kort: "Stempel", rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før han har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
     slev: { navn: "Køkkenmester Slev", kort: "Slev", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
@@ -389,11 +414,101 @@ export const KALENDER = {
         ],
         efter: [
           ["Stempel", "Kongen. Sådan står der, og sådan har jeg stemplet det hver gang."],
-          ["Stempel", "Bilag gik op i tårnet med de sidste stykker. Han tør ikke komme ned. Tag stemplet med. Protokollen gælder først, når den er samlet, underskrevet og stemplet."],
+          ["Stempel", "Bilag gik herfra med de sidste stykker. Han sagde, at han ville op i tårnet. Tag stemplet med. Protokollen gælder først, når den er samlet, underskrevet og stemplet."],
         ],
       },
       ting: { navn: "Statsministeriets stempel", billede: "stempel" },
       stykke: "§ 18. Intet gælder, før det er stemplet. Heller ikke julen.",
+    },
+    // ---------------------------------------------------------------- 4. søndag i advent
+    {
+      nr: 19, type: "lille", navn: "Et brev uden frimærke",
+      ved: [-24.4, -52.1], retning: 147, farve: "#7a1f24",
+      praj: "Prins Jørgens Gård. Kig på muren ved siden af indgangen til Riddersalen.",
+      bag: [
+        ["fortaeller", "Bag døren ligger et brev med rødt lak. Der står Ida på kuverten, med meget små bogstaver."],
+        ["fortaeller", "»Kære Ida. Jeg ved, at du følger efter mig. Jeg har besluttet at lægge stykkerne tilbage, ét ad gangen. Det er lettere at rive noget over end at samle det igen. Bilag.«"],
+        ["ida", "Han er begyndt at samle. Så kan jeg også."],
+      ],
+      ting: { navn: "Et brev fra Bilag", billede: "kuvert" },
+      stykke: "§ 19. Den, der river over, skal også hjælpe med at samle.",
+    },
+    {
+      nr: 20, type: "mini", navn: "Til hestene",
+      ved: [-68, 50], retning: 270, farve: "#2f5a43",
+      praj: "Rytterstatuen af Christian den Niende. Kig efter en luge i soklen.",
+      bag: [
+        ["fortaeller", "Lugen i rytterstatuens sokkel går op. Derinde står en pose pebernødder med en mærkeseddel."],
+        ["fortaeller", "»Til hestene i De Kongelige Stalde. Undskyld for uroen. B.«"],
+        ["ida", "Nu siger han også undskyld. Det er et godt tegn."],
+      ],
+      ting: { navn: "En pose pebernødder til hestene", billede: "pebernoedder" },
+      stykke: "§ 20. Pebernødder tæller ikke som mandariner.",
+    },
+    {
+      nr: 21, type: "lille", navn: "Pennen fra læsesalen",
+      ved: [242, 253], retning: 239, farve: "#7a1f24",
+      praj: "Den Sorte Diamant ved havnen, bag Det Kongelige Bibliotek. Kig på den sorte mur ud mod vandet.",
+      bag: [
+        ["fortaeller", "Bag døren ligger en gammel fjerpen og et lille blækhus."],
+        ["fortaeller", "På en seddel står: »Protokollen er altid blevet underskrevet med denne pen. Uden den gælder ingen underskrift. Jeg lånte den. Den skal tilbage. B.«"],
+        ["ida", "Nu har jeg stemplet og pennen. Så mangler jeg kun ham, der skal skrive under."],
+      ],
+      ting: { navn: "Fjerpennen til underskriften", billede: "fjerpen" },
+      stykke: "§ 21. Protokollen underskrives med blæk. Aldrig i et regneark.",
+    },
+    {
+      nr: 22, type: "lille", navn: "Juleaften 1999",
+      ved: [152, 128], retning: 270, farve: "#2f5a43",
+      praj: "Proviantgården, den store gård bag Proviantpassagen. Kig på den lange mur.",
+      bag: [
+        ["fortaeller", "Bag døren står et gammelt fotografi. Nisserne står om et juletræ med alt for mange lys. Øverst på Pinds skuldre sidder en meget lille nisse med en grå hue."],
+        ["fortaeller", "På bagsiden står: »Juleaften 1999. Pind og lille Bilag.« Og under det, med en nyere håndskrift: »Pind er 177 år. Han nåede næsten ikke at blive færdig sidste jul. Jeg ville bare gøre det lettere for ham.«"],
+        ["ida", "Så det var derfor. Han ville ikke ødelægge julen. Han ville passe på Pind."],
+      ],
+      ting: { navn: "Et fotografi fra 1999", billede: "fotografi" },
+      stykke: "§ 22. Ingen nisse skal ordne julen alene.",
+    },
+    {
+      nr: 23, type: "lille", navn: "Stjernen",
+      ved: [10, 70], retning: 327, farve: "#7a1f24",
+      praj: "Rigsdagsgården. Kig på muren lige ved juletræet.",
+      bag: [
+        ["fortaeller", "Bag døren ligger juletræets stjerne, pakket ind i silkepapir."],
+        ["fortaeller", "»Jeg tog den i 1999, fordi jeg ville have den på mit eget værelse. Den hører til på træet. Jeg venter i tårnet. Bilag.«"],
+        ["ida", "Så skal jeg op i tårnet. Og stjernen skal med."],
+      ],
+      ting: { navn: "Juletræets stjerne", billede: "stjerne" },
+      stykke: "§ 23. Stjernen sættes på træet til sidst, af den yngste nisse.",
+    },
+    {
+      nr: 24, type: "stor", navn: "Bilag",
+      indgang: "tower", nisse: "bilag",
+      inde: { place: "towerRestaurant", ind: "towerLobby", vej: "Tag elevatoren op til restauranten. Bilag venter deroppe.", at: [445.8, -6.2], face: 0, dy: 0.76, ting: [446.4, -5.9] },   // han står på bordet ved vinduet
+      praj: "Tårnet. Gå til Kongeporten på Slotspladsen, gå ind, og tag elevatoren op til restauranten.",
+      bag: [
+        ["fortaeller", "Kongeporten står på klem. Inde i elevatorhallen er lyset tændt, og elevatoren venter med åbne døre."],
+      ],
+      gaade: {
+        foer: [
+          ["Bilag", "Du fandt mig. Jeg vidste godt, du ville."],
+          ["ida", "Jeg har stykkerne. Jeg har stemplet og pennen. Hvorfor rev du den over?"],
+          ["Bilag", "Jeg troede, julen kunne stå i et regneark, så ingen skulle sidde oppe om natten. Men regnearket går ikke op. Der mangler noget, og jeg kan ikke finde ud af hvad."],
+        ],
+        spoergsmaal: "Hvad mangler der i Bilags regneark?",
+        svar: [
+          { t: "En kolonne til gaver", replik: ["Bilag", "Den har jeg. Den står på nul. Det hjalp ikke."] },
+          { t: "Glæden", rigtig: true },
+          { t: "Et bilag mere", replik: ["Bilag", "Jeg har fjorten. Det er ikke det."] },
+        ],
+        efter: [
+          ["Bilag", "Glæden. Det stod på regnearket ved Slotspladsen. Jeg ville bare ikke læse det."],
+          ["fortaeller", "Bilag lægger det sidste stykke på bordet, og Ida lægger de 23 andre ved siden af. Han skriver under med fjerpennen, og Ida stempler. Protokollen gælder igen."],
+          ["Bilag", "Næste år hjælper jeg Pind med regnestykket. Med blyant."],
+        ],
+      },
+      ting: { navn: "Nissernes protokol, hel igen", billede: "protokol" },
+      stykke: "§ 24. Julen gælder fra i dag. Underskrevet af alle nisserne på Christiansborg.",
     },
   ],
 };

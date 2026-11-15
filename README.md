@@ -31,7 +31,7 @@ Spillets udseende ligger i et tema, som kan skiftes. Mordgåden bruger temaet `k
 Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er to spor: `mord` (mordgåden) og `jul` (julekalenderen).
 
 ## Julekalenderen
-En julekalender for voksne med 24 låger på Slotsholmen. Den er under opbygning: rammen er færdig, og de 18 låger til de tre første søndage i advent er skrevet. Prøv den her: https://ai-michelklos.github.io/christiansborg/?spor=jul
+En julekalender for voksne med 24 låger på Slotsholmen. Alle 24 låger er skrevet, og kalenderen kan spilles færdig. Prøv den her: https://ai-michelklos.github.io/christiansborg/?spor=jul
 
 - Lågerne er døre med tal på rundt på Slotsholmen. De åbnes i rækkefølge, og den næste låge lyser svagt. Øverst til venstre står et praj om, hvor den er.
 - Der er tre slags: store låger (et rum med en nisse og en gåde), små låger (en dør, man åbner udefra) og mini-låger (en luge med en overraskelse).
@@ -41,6 +41,7 @@ En julekalender for voksne med 24 låger på Slotsholmen. Den er under opbygning
 - For hver låge tændes et lys på juletræet i Rigsdagsgården, og for hver sjette låge tændes et lys på adventskransen ved trappen.
 - Vejret følger kalenderen. Sneen bliver liggende, lidt mere for hver låge. Efter låge 12 sner det mindre og mindre, efter låge 18 er det holdt op, og den sidste søndag er en klar nat med stjerner.
 - Lyset følger også kalenderen: skumring ved den første låge, mørk aften ved anden søndag og nat fra tredje søndag. Når låge 24 er åbnet, bliver det lys morgen.
+- Slutningen: Låge 24 er i tårnet. Når den er åbnet, ringer Holmens Kirke julen ind, der er fyrværkeri over Slotsholmen (bedst set fra Udsigten), og nisserne sidder og spiser grød i restauranten i tårnet. Efter fyrværkeriet bliver det morgen. Hele protokollen kan læses på kalenderkortet.
 - Spillet gemmer selv på den telefon eller computer, man spiller på, hver gang en låge åbnes. Julekalenderen og mordgåden har hver sin gemmeplads.
 - Går man i stå, kan man slå Vis vej til på kalenderkortet, så en pil peger mod den næste låge.
 
