@@ -21,7 +21,7 @@
 //   bag       det, der er bag lågen: replikker som [hvem, tekst]. Hvem er "fortaeller", "ida" eller et navn.
 //   ting      { navn, billede }: genstanden bag lågen. billede er navnet på en tegning i tegninger.js
 //             (kaffekop, mandarin, briller, papir, nissehue, lys, noegle, gave, hestesko, groed, klokke, stjerne,
-//             kuglepen, mus, kanon, bog) eller en hel tegning, der begynder med <svg.
+//             kuglepen, mus, kanon, bog, regneark, slips, vaegt, mappe, stempel) eller en hel tegning, der begynder med <svg.
 //   stykke    det stykke af protokollen, lågen giver.
 // En stor låge har også:
 //   nisse     en af nisserne i listen nisser.
@@ -87,6 +87,8 @@ export const KALENDER = {
   adventskrans: { ved: [36.6, 50.4] },   // ved trappen, til højre
 
   nisser: {
+    kendelse: { navn: "Dommer Kendelse", kort: "Kendelse", rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for han har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
+    stempel: { navn: "Sekretær Stempel", kort: "Stempel", rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før han har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
     slev: { navn: "Køkkenmester Slev", kort: "Slev", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
     hov: { navn: "Staldmester Hov", kort: "Hov", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
     pind: { navn: "Kontorchef Pind", kort: "Pind", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
@@ -281,11 +283,117 @@ export const KALENDER = {
         ],
         efter: [
           ["Slev", "Fire år. Og grøden skal koges hver jul, uanset hvem der vinder."],
-          ["Slev", "Bilag ville gøre julen enklere. Nu kan han ikke samle protokollen igen, og han tør ikke sige det til nogen. Tag en skål grød med. Du finder ham ikke i dag."],
+          ["Slev", "Bilag ville gøre julen enklere. Nu kan han ikke samle protokollen igen, og han tør ikke sige det til nogen. Tag en skål grød med. Du finder ham ikke i dag, men han går altid hjem over Slotspladsen."],
         ],
       },
       ting: { navn: "En skål risengrød med smørklat", billede: "groed" },
       stykke: "§ 12. Ingen spiser grød alene på Borgen.",
+    },
+    // ---------------------------------------------------------------- 3. søndag i advent
+    {
+      nr: 13, type: "lille", navn: "Julen, version 2",
+      ved: [39.8, -41.2], retning: 225, farve: "#7a1f24",
+      praj: "Slotspladsen foran slottet. Kig på slottets mur lige ved foden af tårnet.",
+      bag: [
+        ["fortaeller", "Bag døren hænger et regneark, sat op med tape. »Julen, version 2. Gaver: 0. Grød: udgår. Stearinlys: erstattes af ét fælles lys. Besparelse: 100 procent.«"],
+        ["fortaeller", "Nederst har nogen skrevet med rød tusch og en anden håndskrift: »Hvor er glæden? Den står ikke i nogen kolonne.«"],
+        ["ida", "Så er der i hvert fald én til, der har læst det. Fodsporene går over Slotspladsen mod Børsen."],
+      ],
+      ting: { navn: "Et regneark med julen i version 2", billede: "regneark" },
+      stykke: "§ 13. Glæde kan ikke stå i en kolonne. Den føres for sig.",
+    },
+    {
+      nr: 14, type: "mini", navn: "Bundet forkert",
+      ved: [250, 48], retning: 180, farve: "#2f5a43",
+      praj: "Børsen med dragespiret, øst for Slotspladsen. Kig efter en luge på den lange mur, der vender mod Holmens Kirke.",
+      bag: [
+        ["fortaeller", "Lugen sidder i den gamle børsmur. Derinde ligger et meget lille slips. Det er bundet forkert, og knuden er våd af sne."],
+        ["fortaeller", "En nisse fra Effektiviseringsenheden tager kun slipset af, når han er begyndt at tvivle."],
+        ["ida", "Sedlen sagde, at jeg ikke skulle sige det til nogen med slips. Nu har han ikke noget."],
+      ],
+      ting: { navn: "Et meget lille slips", billede: "slips" },
+      stykke: "§ 14. Slips er frivilligt fra den 1. december.",
+    },
+    {
+      nr: 15, type: "lille", navn: "Klokken, der ikke ringer",
+      ved: [205.1, -54.9], retning: 135, farve: "#7a1f24",
+      praj: "Holmens Kirke på den anden side af Holmens Bro. Kig på muren, der vender mod broen.",
+      bag: [
+        ["fortaeller", "Bag døren hænger en lille klokke. På en seddel står: »Kirkenissen ringer først julen ind, når protokollen er hel. Sådan står der i § 15.«"],
+        ["fortaeller", "I sneen under klokken er der små fodspor. De har stået her længe, og så er de gået tilbage over broen mod slottet."],
+        ["ida", "Han har stået og kigget på en klokke, han selv har gjort stum. Tilbage over broen, altså."],
+      ],
+      ting: { navn: "Kirkenissens klokke", billede: "klokke" },
+      stykke: "§ 15. Julen ringes ind, når protokollen er hel. Ikke før.",
+    },
+    {
+      nr: 16, type: "stor", navn: "Julen mod Bilag",
+      indgang: "courtEntry", nisse: "kendelse",
+      inde: { place: "courtEntry", at: [544, -1.5], face: 270, dy: 0.6, ting: [544, -0.4] },   // han står på bænken til højre
+      praj: "Højesteret i Prins Jørgens Gård. Gå gennem porten i Kirkeløngangen fra Slotspladsen og op ad trappen mellem de fire søjler.",
+      bag: [
+        ["fortaeller", "Der er lys bag søjlerne. Inde i vindfanget står en lille skikkelse i sort kappe og venter, som om sagen allerede er berammet."],
+      ],
+      gaade: {
+        foer: [
+          ["Kendelse", "Sagen Julen mod Bilag. Retten har ventet på et vidne. Det er dig."],
+          ["ida", "Kan han bare afskaffe protokollen?"],
+          ["Kendelse", "Det afgør retten. Men først skal vidnet vise, at hun kender ordningen. Svar på én ting."],
+        ],
+        spoergsmaal: "Hvem har den dømmende magt efter grundloven?",
+        svar: [
+          { t: "Regeringen", replik: ["Kendelse", "Det ville regeringen gerne. Prøv igen."] },
+          { t: "Folketinget", replik: ["Kendelse", "De laver lovene. De dømmer ikke efter dem. Prøv igen."] },
+          { t: "Domstolene", rigtig: true },
+        ],
+        efter: [
+          ["Kendelse", "Domstolene. Så kan retten sættes."],
+          ["Kendelse", "En protokol kan kun ændres af dem, der har skrevet under på den. Det har Bilag ikke. Altså gælder den stadig, også i 24 stykker."],
+          ["Kendelse", "Tag vægten med som bevis. Og kig på Kirkeløngangens mur, når du går ud. Han har glemt noget."],
+        ],
+      },
+      ting: { navn: "Rettens lille vægt", billede: "vaegt" },
+      stykke: "§ 16. Protokollen kan kun ændres af dem, der har skrevet under.",
+    },
+    {
+      nr: 17, type: "lille", navn: "Nederst i mappen",
+      ved: [-17.5, -86.5], retning: 90, farve: "#2f5a43",
+      praj: "Prins Jørgens Gård. Kig på Kirkeløngangens mur på den anden side af gården fra Højesteret.",
+      bag: [
+        ["fortaeller", "Bag døren står Bilags mappe. Den er ikke låst."],
+        ["fortaeller", "Øverst ligger udkast 1 til 14. Nederst, under dem alle, ligger en barnetegning af et juletræ med alt for mange lys på. I hjørnet står: »Bilag, 6 år.«"],
+        ["ida", "Den har han haft med i mappen hele tiden."],
+      ],
+      ting: { navn: "Bilags mappe", billede: "mappe" },
+      stykke: "§ 17. Et juletræ kan ikke have for mange lys.",
+    },
+    {
+      nr: 18, type: "stor", navn: "Forkontoret",
+      indgang: "pmEntry", nisse: "stempel",
+      inde: { place: "pmEntry", at: [500, -3.25], face: 0, dy: 0.55, ting: [501, -3.2] },   // han står på disken
+      praj: "Statsministeriet i Prins Jørgens Gård, ved siden af Højesteret. Indgangen har nummer 11.",
+      bag: [
+        ["fortaeller", "I forhallen brænder en enkelt lampe. På disken står en nisse med ærmeholdere og stempler i papirer, der ikke er der."],
+      ],
+      gaade: {
+        foer: [
+          ["Stempel", "Du behøver ikke sige noget. Jeg har hørt det hele gennem væggen. Højesteret taler højt."],
+          ["ida", "Hvor er Bilag?"],
+          ["Stempel", "Han var her og ville have protokollen stemplet som ophævet. Det ville jeg ikke. Men du får heller ikke noget, før du har svaret."],
+        ],
+        spoergsmaal: "Hvem udnævner statsministeren?",
+        svar: [
+          { t: "Folketingets formand", replik: ["Stempel", "Formanden leder møderne. Mere bliver det ikke til. Prøv igen."] },
+          { t: "Kongen", rigtig: true },
+          { t: "Højesteret", replik: ["Stempel", "De har travlt nok ovre på den anden side af gården. Prøv igen."] },
+        ],
+        efter: [
+          ["Stempel", "Kongen. Sådan står der, og sådan har jeg stemplet det hver gang."],
+          ["Stempel", "Bilag gik op i tårnet med de sidste stykker. Han tør ikke komme ned. Tag stemplet med. Protokollen gælder først, når den er samlet, underskrevet og stemplet."],
+        ],
+      },
+      ting: { navn: "Statsministeriets stempel", billede: "stempel" },
+      stykke: "§ 18. Intet gælder, før det er stemplet. Heller ikke julen.",
     },
   ],
 };

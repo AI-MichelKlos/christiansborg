@@ -8874,10 +8874,11 @@ const KALENDER = (() => {
     const d = { l, g: new THREE.Group(), aaben: 0, pynt: [], pop: 0, blink: 0 };
     if (l.type === 'stor') {   // a sign beside the building's own door
       const ftN = (() => { const a = FT.at(0, 0), b = FT.at(0, 1); return { x: a[0], z: a[1], nx: b[0] - a[0], nz: b[1] - a[1], side: 4.6 }; })();   // Folketinget's own door at the top of the stairs
-      const e = l.indgang === 'folketing' ? ftN : MINISTRY_DOORS[l.indgang]; if (!e) { console.warn('Julekalender: låge ' + l.nr + ' har ingen indgang ' + l.indgang); continue; }
+      const e0 = MINISTRY_DOORS[l.indgang], e = l.indgang === 'folketing' ? ftN : l.indgang === 'courtEntry' && e0 ? { ...e0, side: 4.6, frem: 8.4 } : e0;   // Højesteret's door is behind four columns, so its sign stands at the foot of the stairs
+      if (!e) { console.warn('Julekalender: låge ' + l.nr + ' har ingen indgang ' + l.indgang); continue; }
       const sx = -e.nz, sz = e.nx;   // along the wall
-      d.staa = [e.x + e.nx * 3.2, e.z + e.nz * 3.2]; d.r = 3.6;   // a few steps out, clear of the doorway that leads inside
-      const side = e.side || 2.3, px = e.x + sx * side + e.nx * 0.7, pz = e.z + sz * side + e.nz * 0.7;
+      const ud = e.frem ? 6 : 3.2; d.staa = [e.x + e.nx * ud, e.z + e.nz * ud]; d.r = 3.6;   // a few steps out, clear of the doorway that leads inside
+      const side = e.side || 2.3, frem = e.frem || 0.7, px = e.x + sx * side + e.nx * frem, pz = e.z + sz * side + e.nz * frem;
       d.g.position.set(px, groundAt(px, pz, 3), pz); d.g.rotation.y = Math.atan2(e.nx, e.nz);
       box(0.09, 1.7, 0.09, tm('#2b2622'), 0, 0, 0, { parent: d.g, cast: false });
       box(0.95, 0.95, 0.08, lys(l.farve || '#7a1f24', 0.35), 0, 1.35, 0.02, { parent: d.g, cast: false });

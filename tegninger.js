@@ -113,4 +113,44 @@ export const TEGNINGER = {
     <rect x="38" y="40" width="42" height="22" rx="2" fill="#f3d98a" ${S}/>
     <path d="M45 48h28M45 55h20" fill="none" stroke="#2a2118" stroke-width="2.5" stroke-linecap="round"/>
     <path d="M70 80v30l6-6 6 6V80z" fill="#2f6b3f" ${S}/>`),
+  regneark: svg(`
+    <rect x="18" y="20" width="84" height="80" rx="3" fill="#fbf5e2" ${S}/>
+    <rect x="18" y="20" width="84" height="16" fill="#2f6b3f" ${S}/>
+    <rect x="18" y="52" width="28" height="16" fill="#f3d98a"/>
+    <rect x="74" y="68" width="28" height="16" fill="#e9a39c"/>
+    <path d="M18 36h84M18 52h84M18 68h84M18 84h84M46 20v80M74 20v80" fill="none" stroke="#2a2118" stroke-width="2"/>
+    <rect x="18" y="20" width="84" height="80" rx="3" fill="none" ${S}/>
+    <path d="M52 62l8 8 14-18" fill="none" stroke="#b3262a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M22 108c10-6 18 4 28-2s16 4 26-2" fill="none" stroke="#b3262a" stroke-width="3" stroke-linecap="round"/>`),
+  slips: svg(`
+    <path d="M46 14h28l-6 18H52z" fill="#24507a" ${S}/>
+    <path d="M52 32h16l12 52-20 24-20-24z" fill="#2f6b9a" ${S}/>
+    <path d="M56 36l-8 46" fill="none" stroke="#7fb0d8" stroke-width="3" stroke-linecap="round"/>
+    <g fill="#f3d98a"><circle cx="62" cy="50" r="2.6"/><circle cx="56" cy="64" r="2.6"/><circle cx="66" cy="72" r="2.6"/><circle cx="58" cy="86" r="2.6"/></g>
+    <path d="M30 20c-6 8 4 14 12 8M90 22c6 6-2 14-12 8" fill="none" stroke="#d8d2c4" stroke-width="3" stroke-linecap="round"/>`),
+  vaegt: svg(`
+    <path d="M60 18v78" fill="none" stroke="#2a2118" stroke-width="9" stroke-linecap="round"/>
+    <path d="M60 18v78" fill="none" stroke="#d9b25a" stroke-width="4" stroke-linecap="round"/>
+    <path d="M22 34h76" fill="none" stroke="#2a2118" stroke-width="9" stroke-linecap="round"/>
+    <path d="M22 34h76" fill="none" stroke="#d9b25a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="60" cy="18" r="6" fill="#d9b25a" ${S}/>
+    <path d="M22 34L10 66M22 34l12 32M98 34L86 60M98 34l12 26" fill="none" stroke="#2a2118" stroke-width="2"/>
+    <path d="M6 66h32a16 12 0 0 1-32 0z" fill="#d9b25a" ${S}/>
+    <path d="M82 60h32a16 12 0 0 1-32 0z" fill="#d9b25a" ${S}/>
+    <rect x="38" y="94" width="44" height="12" rx="4" fill="#7a5a3a" ${S}/>`),
+  mappe: svg(`
+    <path d="M44 38V26a6 6 0 0 1 6-6h20a6 6 0 0 1 6 6v12" fill="none" stroke="#2a2118" stroke-width="9" stroke-linecap="round"/>
+    <path d="M44 38V26a6 6 0 0 1 6-6h20a6 6 0 0 1 6 6v12" fill="none" stroke="#5b3d2a" stroke-width="4" stroke-linecap="round"/>
+    <rect x="12" y="36" width="96" height="64" rx="7" fill="#7a5a3a" ${S}/>
+    <path d="M12 60h96" fill="none" ${S}/>
+    <rect x="50" y="52" width="20" height="18" rx="3" fill="#d9b25a" ${S}/>
+    <path d="M22 46h14M84 46h14" fill="none" stroke="#a07a52" stroke-width="3" stroke-linecap="round"/>
+    <path d="M78 36l6-12 16 6-4 6" fill="#fbf5e2" ${S}/>`),
+  stempel: svg(`
+    <circle cx="60" cy="24" r="14" fill="#7a5a3a" ${S}/>
+    <path d="M52 36h16l4 30H48z" fill="#7a5a3a" ${S}/>
+    <path d="M55 20c2-4 6-6 10-5" fill="none" stroke="#a07a52" stroke-width="3" stroke-linecap="round"/>
+    <rect x="30" y="64" width="60" height="20" rx="4" fill="#3a3430" ${S}/>
+    <rect x="34" y="84" width="52" height="8" rx="2" fill="#b3262a" ${S}/>
+    <ellipse cx="60" cy="106" rx="34" ry="5" fill="#b3262a" opacity=".3"/>`),
 };
