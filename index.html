@@ -7173,30 +7173,8 @@ const WAYFIND=(()=>{
     draw(0,.09);if(!mounted){draw(Math.PI,-.09);const ring=[[-w/2,-.12],[w/2,-.12],[w/2,.12],[-w/2,.12]].map(([a,b])=>[x+Math.cos(ry)*a+Math.sin(ry)*b,z-Math.sin(ry)*a+Math.cos(ry)*b]);pcols.push({rings:[ring],...bboxOf(ring),top:base+h,bot:base});}bakeGroup(r);
     const sign={title,x:inside?x+1000:x,z,y,rows,inside};items.push(sign);return sign;
   }
-  add(world,'Slotspladsen',64,-52,0,.582,[
-    {name:'Tårnet · Kongeporten',next:TOWER.door,text:'Følg slotsfacaden til Kongeporten. Vælg Gå ind i tårnet ved døren.'},
-    {name:'Prins Jørgens Gård',next:[5,-93],text:'Følg pladsen mod Slotskirken og gå gennem porten i Kirkeløngangsbygningen. Statsministeriet og Højesteret ligger i gården.'},
-    {name:'Folketinget',next:[100,10],text:'Følg Slotspladsen mod Finansministeriet og gå gennem passagen ind i Rigsdagsgården. Folketingets trappe ligger inde i gården.'},
-    {name:'Finansministeriet · presse',next:[106,15],text:'Finansministeriets åbne dør ligger i den røde bygning ved Slotsholmsgade. Presseområdet står på pladsen foran bygningen.'}
-  ]);
-  add(world,'Prins Jørgens Gård',-39,-76,0,.582,[
-    {name:'Højesteret',next:COURT_ENTRY.at(0,8),text:'Gå hen til den lyse portal med fire søjler i gårdens vestlige ende. Trappen fører til den åbne dør.'},
-    {name:'Statsministeriet',next:PM_ENTRY.at(0,5),text:'Følg gårdens slotsfacade til den mindre dør med skiltet STATSMINISTERIET og nummer 11, ved siden af Højesteret.'},
-    {name:'Slotspladsen · Tårnet',next:[-17,-79],text:'Gå tilbage gennem porten i Kirkeløngangsbygningen til Slotspladsen. Følg derefter facaden til Kongeporten.'},
-    {name:'Folketinget',next:[-17,-79],text:'Gå gennem porten til Slotspladsen. Fortsæt langs slottet mod Finansministeriet og gennem passagen til Rigsdagsgården.'}
-  ]);
-  const f=FT.at(-8,10);
-  add(world,'Rigsdagsgården',f[0],f[1],0,Math.atan2(FT.n[0],FT.n[1]),[
-    {name:'Folketinget · Vandrehallen',next:FT.at(0,2),text:'Gå op ad den brede hovedtrappe og ind gennem de åbne døre. Fortsæt op ad de to indvendige trappeløb.'},
-    {name:'Snapstinget · betjentstuen',next:FT.at(0,2),text:'Gå ind i Folketinget. Snapstinget ligger til venstre ved indgangen, betjentstuen til højre.'},
-    {name:'Slotspladsen',next:slotsGate,text:'Gå gennem passagen i gårdens østlige ende mod Slotspladsen. Finansministeriet og presseområdet ligger på den anden side.'},
-    {name:'Ridebanen · Bibliotekshaven',next:toejGate,text:'Gå ud gennem passagen mod Tøjhusgade. Til Bibliotekshaven: følg gaden mod Det Kongelige Bibliotek. Til Ridebanen: gå rundt om staldenes sydside og videre mod Marmorbroen. Bliv på slotsiden af kanalen.'}
-  ]);
-  add(world,'Ridebanen',-95,92,0,.582,[
-    {name:'De Kongelige Stalde',next:[STABLE_ENTRY.x,STABLE_ENTRY.z],text:'Følg Ridebanens vestside til den åbne staldport. Vælg Gå ind i De Kongelige Stalde, eller gå over tærsklen.'},
-    {name:'Marmorbroen',next:[-206,140],text:'Følg Ridebanen mod den brede stenbro ved kanalen.'},
-    {name:'Folketinget · Bibliotekshaven',next:[-180,110],text:'Følg Ridebanen mod Marmorbroen. Bliv på slotsiden af kanalen og gå rundt om staldenes sydside til Tøjhusgade. Til Folketinget: gå gennem passagen til Rigsdagsgården. Til haven: følg Tøjhusgade mod Det Kongelige Bibliotek.'}
-  ]);
+  // The four free-standing boards outside (Slotspladsen, Prins Jørgens Gård, Rigsdagsgården, Ridebanen) were taken out on
+  // 15 November 2026: they stood in the way of the view, and the map, the little map and the goal arrow show the way better.
   function indoor(g,I){
     // on the side wall at the foot of the stairs, where it is seen from the door (the walls by the doors are all door)
     add(g,'Folketingets indgang',-3.98,16.8,1.75,Math.PI/2,[

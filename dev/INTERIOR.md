@@ -288,7 +288,7 @@ Visuelt gennemsete fotos, hentet 16. oktober 2026:
 - Wikimedia Commons' oversigtsfoto af gården og fotoet Højesteret.jpg blev fundet i søgningen, men gav HTTP 403 ved lokal hentning. De er ikke angivet som lokalt gennemsete referencer.
 
 ### Vejvisere i spillet
-Fire nye fritstående vejvisere står ved Slotspladsen, Prins Jørgens Gård, Rigsdagsgården og Ridebanen. To vægskilte står indenfor ved Folketingets indgang og i Vandrehallen. Skiltene har korte stednavne og pile på en mørkegrøn bund med lys ramme. Udendørsskiltene kan læses fra begge sider; pilene beregnes særskilt for hver side. Stolperne og skiltets tavle har kollision og står uden for de centrale passager. De indvendige skilte er vægmonterede.
+Fire nye fritstående vejvisere står ved Slotspladsen, Prins Jørgens Gård, Rigsdagsgården og Ridebanen. To vægskilte står indenfor ved Folketingets indgang og i Vandrehallen. De fire fritstående vejvisere blev fjernet igen 15. november 2026, fordi de stod i vejen for udsigten. Vægskiltene indenfor er bevaret. Skiltene har korte stednavne og pile på en mørkegrøn bund med lys ramme. Udendørsskiltene kan læses fra begge sider; pilene beregnes særskilt for hver side. Stolperne og skiltets tavle har kollision og står uden for de centrale passager. De indvendige skilte er vægmonterede.
 
 Når man står tæt på et skilt, kan man vælge Læs vejviser. Et vindue med stor tekst viser korte anvisninger til portene, trapperne og de åbne døre. Spillet holder spilleren stille, mens vinduet er åbent. Tilbage til spillet eller Escape lukker vinduet; berøring og taster nulstilles, så man ikke fortsætter utilsigtet. Vinduet tilpasser sig telefonformat og kan rulles ved lav skærmhøjde.
 
