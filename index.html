@@ -8816,6 +8816,17 @@ const KALENDER = (() => {
   function gem() { if (!started) return; try { localStorage.setItem(GEM, JSON.stringify(S)); gemt = S; } catch (e) {} }
   addEventListener('pagehide', gem);
   document.addEventListener('visibilitychange', () => { if (document.hidden) gem(); });
+  // The date lock: door 5 opens on 5 December, and every door before it can still be opened later. From 24 December all
+  // doors are open. The edition's file says which year (datolaas: { aar }); ?test or ?alle in the address opens them all.
+  const ALLE = TESTMODE || /(^|[?&#])alle\b/.test(location.search + location.hash);
+  function aabneIdag() {
+    if (!K.datolaas || ALLE) return N;
+    const d = new Date(), aar = K.datolaas.aar || d.getFullYear(), y = d.getFullYear(), m = d.getMonth() + 1;
+    if (y > aar || (y === aar && m === 12 && d.getDate() >= N)) return N;
+    return y === aar && m === 12 ? d.getDate() : 0;
+  }
+  const laast = l => l && l.nr > aabneIdag();
+  const aabnerTekst = l => `Låge ${l.nr} åbner ${l.nr}. december`;
   const naeste = () => { for (let n = 1; n <= sidste; n++) if (!S.aabnet.includes(n)) return L[n] || null; return null; };
   const ude = () => !I.on && !FX.tower?.on && !TOWER.busy && !MYBOAT.on;
 
@@ -9129,7 +9140,7 @@ const KALENDER = (() => {
   function visKort() {
     const body = kort.querySelector('.gdBody'), nx = naeste(), a = S.aabnet.length;
     body.replaceChildren();
-    body.append(el('p', 'kalStatus', `Protokollen: ${a} af ${N} stykker.` + (nx ? ` Næste er låge ${nx.nr}.` : '')));
+    body.append(el('p', 'kalStatus', `Protokollen: ${a} af ${N} stykker.` + (nx ? ` Næste er låge ${nx.nr}` + (laast(nx) ? `, som åbner ${nx.nr}. december.` : '.') : '')));
     if (nx) {
       body.append(el('p', 'gdNaeste', nx.praj));
       const lab = el('label', 'gdCheck'), cb = el('input'); cb.type = 'checkbox'; cb.checked = S.vej; lab.append(cb, ' Vis vej til den næste låge (pil og afstand)');
@@ -9171,12 +9182,12 @@ const KALENDER = (() => {
   function maal(M_, card) {
     const nx = started && M_.vis ? naeste() : null;
     if (!nx) { card.hidden = true; M_.punkt = null; return; }
-    const d = DOERE.find(d => d.l === nx), hvad = 'Find låge ' + nx.nr;
+    const d = DOERE.find(d => d.l === nx), vent = laast(nx), hvad = vent ? aabnerTekst(nx) : 'Find låge ' + nx.nr;
     if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
-    let pil = null, hvor = nx.praj;
+    let pil = null, hvor = vent ? (S.aabnet.length ? 'Du har åbnet alle de låger, der er åbne i dag. Kom tilbage i morgen.' : 'Kalenderen åbner 1. december. Indtil da kan du gå rundt på Slotsholmen.') : nx.praj;
     if (I.on && nx.type === 'stor' && I.place === nx.inde.place) hvor = 'Her er det. Find nissen.';
     else if (I.on && nx.type === 'stor' && I.place === indPlace(nx) && nx.inde.vej) hvor = nx.inde.vej;   // fx the tower: in at the bottom, the nisse is higher up
-    else if (S.vej && d && !I.on && !FX.tower?.on) {
+    else if (!vent && S.vej && d && !I.on && !FX.tower?.on) {
       const v = MYBOAT.on ? null : M_.vej(P.pos.x, P.pos.z, d.staa), aim = v ? v.sigte : d.staa, lige = Math.hypot(d.staa[0] - P.pos.x, d.staa[1] - P.pos.z), len = v ? v.len : lige;
       if (lige > 5) pil = Math.atan2(aim[0] - P.pos.x, aim[1] - P.pos.z) - (cam.yaw + Math.PI);
       hvor = lige <= 5 ? 'Lige her' : 'Følg pilen · ' + Math.round(len / 5) * 5 + ' m';
@@ -9340,7 +9351,7 @@ const KALENDER = (() => {
     if (krans_) { const lys_ = Math.floor(S.aabnet.length / 6); krans_.flammer.forEach((f, i) => { const on = i < lys_; f.flamme.visible = on; f.glod.material.opacity = on ? 0.7 + 0.25 * Math.sin(tid * 9 + i * 2) : 0; }); }
     for (const n of NISSER) {
       const her = I.on && I.place === n.l.inde.place, klar = S.klem.includes(n.l.nr) || S.aabnet.includes(n.l.nr);
-      if (her && !klar && nx === n.l && $('scene').hidden && !paused) aabn(DOERE.find(d => d.l === n.l) || { l: n.l });   // she walked in by the building's own door
+      if (her && !klar && nx === n.l && !laast(nx) && $('scene').hidden && !paused) aabn(DOERE.find(d => d.l === n.l) || { l: n.l });   // she walked in by the building's own door
       n.f.root.visible = klar; n.ting.visible = klar && !S.aabnet.includes(n.l.nr);   // when she has got it, it is no longer beside him
       if (!klar) continue;
       const [ax, az] = n.l.inde.at, gy = I.height(ax, az) + (n.l.inde.dy || 0), [tx, tz] = n.l.inde.ting || [ax + 0.6, az];
@@ -9361,6 +9372,7 @@ const KALENDER = (() => {
         const l = d.l, nr = l.nr;
         if (S.aabnet.includes(nr)) offerAction({ id: 'kal-' + nr, label: `Se låge ${nr} igen`, prio: 5, run: () => igen(l) });
         else if (S.klem.includes(nr)) offerAction({ id: 'kal-' + nr, label: `Gå ind ad låge ${nr}`, prio: 13, run: () => FX.interior.enter(indPlace(l)) });
+        else if (nx && nx.nr === nr && laast(l)) offerAction({ id: 'kal-' + nr, label: aabnerTekst(l), prio: 13, run: () => toast(aabnerTekst(l) + '. Kom tilbage den dag.') });
         else if (nx && nx.nr === nr) offerAction({ id: 'kal-' + nr, label: `Åbn låge ${nr}`, prio: 13, run: () => aabn(d) });
         else offerAction({ id: 'kal-' + nr, label: `Låge ${nr} er lukket`, prio: l.type === 'stor' ? 4 : 13, run: () => toast(`Låge ${nr} kan ikke åbnes endnu. Find låge ${nx ? nx.nr : nr} først.`) });
       }

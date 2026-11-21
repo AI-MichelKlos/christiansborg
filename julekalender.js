@@ -47,7 +47,11 @@ export const KALENDER = {
   overskrift: "Christiansborg · en julekalender for voksne",
   titel: "Nissernes protokol",
   forside: "I mange år har nisserne på Christiansborg ordnet det sidste på finansloven om natten. I år er deres protokol revet i 24 stykker og gemt bag 24 låger på Slotsholmen. Uden den bliver der ingen jul på Borgen. Find lågerne i rækkefølge, og saml protokollen.",
-  gemTekst: "Spillet gemmer selv, hver gang du åbner en låge. Du kan fortsætte på denne telefon eller computer.",
+  gemTekst: "Der åbner en ny låge hver dag fra 1. til 24. december. Spillet gemmer selv, så du kan fortsætte på denne telefon eller computer.",
+
+  // Låge 5 kan først åbnes 5. december, men gamle låger kan åbnes senere. Fra 24. december er alle åbne.
+  // Fjern linjen for at slå datolåsen fra. ?alle efter adressen åbner alle låger, fx for at teste.
+  datolaas: { aar: 2026 },
 
   start: {
     ved: [-17.3, 119.1],   // porten i Tøjhusgade
@@ -62,6 +66,7 @@ export const KALENDER = {
   },
 
   hjaelp: [
+    { b: "En låge om dagen.", t: "Låge 1 åbner 1. december, låge 2 den 2. og så videre. Har du misset en dag, kan du bare tage de gamle låger, når du kommer igen." },
     { b: "Find lågen.", t: "Øverst til venstre står, hvilken låge du skal finde, og et praj om, hvor den er. Den næste låge lyser svagt." },
     { b: "Åbn den.", t: "Gå hen til døren med tallet, og tryk på knappen nederst. Lågerne åbnes i rækkefølge." },
     { b: "Tre slags låger.", t: "Bag de store låger er der et rum med en nisse og en gåde. De små er døre og luger, man åbner udefra." },
