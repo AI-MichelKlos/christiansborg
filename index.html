@@ -1933,6 +1933,7 @@ for (const b of DATA.B) {
   if (b.n === 'Kancellibygningen') { pcols.push({rings:b.rings,...bboxOf(b.rings[0]),top:20,bot:0});mapItems.push({k:'p',pts:b.rings[0],fill:ROOF_SLATE,line:true});continue; }
   if (b.n === 'Slotsholmen' && b.rings[0][0][0] === 107 && b.rings[0][0][1] === 66) { passageHouse(b.rings[0]); continue; }   // Rigsarkivet, the long house with Proviantpassagen
   if (b.n === 'Proviantgården') { PROVIANT.ring = b.rings[0]; pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 17, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: ROOF_TILE, line: true }); continue; }   // drawn in PROVIANTGÅRDEN further down
+  if (b.n === 'Assistenshuset') { for (let i = 0; i < 85; i++) husRand(); pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 18.6, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: ROOF_TILE, line: true }); continue; }   // Kulturministeriet, drawn in KULTURMINISTERIET further down. The 85 numbers are the ones byhus drew for it, so the houses after it keep their windows
   byhus(b, h, wall, roof);
 }
 
@@ -3339,6 +3340,134 @@ TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 
   // the porch on the west side
   building([[[195, -59], [191, -54], [198, -48], [203, -53]]], 9, '#ad4f37', '#3a3f48');
   building([[[203, -53], [198, -48], [202, -45], [207, -50]]], 8, '#ad4f37', '#3a3f48');
+}
+
+// ======================================================================== KULTURMINISTERIET (Assistenshuset, Nybrogade 2)
+// The old royal pawnbroker's house at the corner of Gammel Strand, across the canal from Slotsholmen. Built as a
+// three-winged house after the fire of 1728; in 1765 a fourth wing closed the yard toward Nybrogade and the canal, with
+// a tall sandstone gate in the middle and a slab with a gilded inscription over it. Bare yellow brick (the paint was
+// cleaned off in 1951-52), white windows with small panes, barred cellar windows, a red tile roof. The wing toward
+// Gammel Strand is red brick. Kulturministeriet has had the house since 1962.
+// Sources: bygst.dk (Assistenshuset, Nybrogade 2) and kum.dk (Assistenshuset), with the photos on both pages. The
+// eight bays of the gate wing come from kum.dk; heights and the other bays are read off the photos.
+// The outline is the one from OpenStreetMap (four wings round a yard). Own random numbers, so nothing else moves.
+{
+  const B = DATA.B.find(b => b.n === 'Assistenshuset'), OUT = B.rings[0], HUL = B.rings[1];
+  const [O0, O1, O2, O3] = OUT, [H0, H1, H2] = HUL;   // the corners of the yard follow the corners outside
+  const EAVE = 12.6, RISE = 6, kr = mulberry32(1765);
+  const kWin = (kind, x, y, z, ry, w, h, litP) => {   // like addWin, with the house's own random numbers
+    _e.set(0, ry, 0, 'YXZ'); _q.setFromEuler(_e);
+    const m = new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), _q.clone(), new THREE.Vector3(w, h, 1));
+    WIN[kind] = WIN[kind] || { lit: [], dark: [] };
+    (kr() < litP ? WIN[kind].lit : WIN[kind].dark).push(m);
+  };
+  const sten = (brick, mortar, v) => ctex(256, 256, (g, w, h) => {   // bare brick, 24 courses per 2 m
+    g.fillStyle = mortar; g.fillRect(0, 0, w, h);
+    const rows = 24, cols = 8, bh = h / rows, bw = w / cols;
+    for (let r = 0; r < rows; r++) for (let c = -1; c <= cols; c++) { _c.set(brick); _c.offsetHSL(0, 0, (kr() - 0.5) * v); g.fillStyle = '#' + _c.getHexString(); g.fillRect(c * bw + (r % 2) * bw / 2 + 1, r * bh + 1, bw - 2, bh - 2); }
+  }, { rep: 0.5 });
+  const gul = toon('#ffffff', { map: sten('#d5c99f', '#bcb08c', 0.07) }), roed = toon('#ffffff', { map: sten('#a8604a', '#8f725e', 0.08) });
+  const ext = (rings, y0, y1, mat, ed = 25) => { const g = new THREE.ExtrudeGeometry(shapeOf(rings), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2); return mesh(g, mat, 0, y0, 0, ed ? { edges: ed } : { cast: false }); };
+  // the red wing toward Gammel Strand reaches back to the yard; the line of the yard wall cuts it from the rest
+  const cut = (a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], ex = H2[0] - H1[0], ez = H2[1] - H1[1], t = ((H1[0] - a[0]) * ez - (H1[1] - a[1]) * ex) / (dx * ez - dz * ex); return [a[0] + dx * t, a[1] + dz * t]; };
+  const Q1 = cut(O0, O1), Q2 = cut(O2, O3);
+  ext([[O1, O2, Q2, Q1]], 0, EAVE, roed);
+  ext([[O0, Q1, H1, H0, HUL[3], H2, Q2, O3]], 0, EAVE, gul);
+  ext([insetRing(OUT, -0.06), insetRing(HUL, 0.06)], 0, 0.6, tm('#9d9285'), 0);   // a low plinth of grey stone
+  ext([insetRing(OUT, -0.32), insetRing(HUL, 0.32)], EAVE - 0.5, EAVE, tm('#ece6d6'));   // the white cornice
+  // the roof: a ridge all the way round the yard, with hips at the four corners
+  {
+    const ou = insetRing(OUT, -0.45), ind = insetRing(HUL, 0.45), Y0 = EAVE - 0.3, Y1 = EAVE + RISE;
+    const top = OUT.map((p, i) => [(p[0] + HUL[i][0]) / 2, (p[1] + HUL[i][1]) / 2]), pos = [];
+    const tri = (a, b, c) => { const ux = b[0] - a[0], uz = b[2] - a[2], vx = c[0] - a[0], vz = c[2] - a[2]; if (uz * vx - ux * vz < 0) [b, c] = [c, b]; pos.push(...a, ...b, ...c); };
+    for (let i = 0; i < 4; i++) {
+      const j = (i + 1) % 4, R = k => [top[k][0], Y1, top[k][1]];
+      for (const r of [ou, ind]) { const A = [r[i][0], Y0, r[i][1]], C = [r[j][0], Y0, r[j][1]]; tri(A, C, R(j)); tri(A, R(j), R(i)); }
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.computeVertexNormals();
+    mesh(g, tm('#a5563e'), 0, 0, 0, { edges: 20 });
+    for (const [i, f] of [[1, 0.55], [3, 0.4], [0, 0.3]]) {   // three chimneys on the ridge
+      const j = (i + 1) % 4, x = top[i][0] + (top[j][0] - top[i][0]) * f, z = top[i][1] + (top[j][1] - top[i][1]) * f;
+      box(0.8, 2.4, 1.0, tm('#9a5641'), x, Y1 - 1.1, z, { edges: true }); box(1.0, 0.14, 1.2, tm('#ece6d6'), x, Y1 + 1.3, z, { cast: false });
+    }
+  }
+  // windows: three floors over a row of barred cellar windows
+  const FLOORS = [[2.9, 2.2], [6.6, 2.4], [10.0, 2.2]];
+  const at = (e, s, o) => { const t = s / e.len; return [e.a[0] + (e.b[0] - e.a[0]) * t + e.nx * o, e.a[1] + (e.b[1] - e.a[1]) * t + e.nz * o]; };
+  const frames = new THREE.Group(); world.add(frames);
+  const lys = tm('#ddd3ae'), gulKant = tm('#d4c597'), jern = tm('#34383a');
+  const self = HUS_NABO.find(r => r.ring === OUT);
+  function fag(e, s, kant, o = {}) {   // one bay: a window on each floor with a raised brick frame and a sill
+    const [x, z] = at(e, s, 0);
+    if (!o.gaard && husVaeg(x + e.nx * 1.2, z + e.nz * 1.2, self)) return;   // a wall against the neighbour
+    const q = new THREE.Group(); q.position.set(x, 0, z); q.rotation.y = e.ry; frames.add(q);
+    for (const [y, h] of FLOORS) {
+      if (o.uden && o.uden(y)) continue;
+      box(1.64, h + 0.36, 0.07, kant, 0, y - h / 2 - 0.18, 0.035, { parent: q, cast: false });
+      box(1.76, 0.1, 0.17, kant, 0, y - h / 2 - 0.24, 0.085, { parent: q, cast: false });
+      const [wx, wz] = at(e, s, 0.07 + WOFF); kWin('pane', wx, y, wz, e.ry, 1.3, h, o.gaard ? 0.3 : 0.45);
+    }
+    if (!o.gaard && !o.ingenKaelder) {
+      const [cx, cz] = at(e, s, 0.06 + WOFF); kWin('modern', cx, 0.95, cz, e.ry, 1.1, 0.72, 0);
+      for (const b of [-0.32, 0, 0.32]) box(0.05, 0.74, 0.05, jern, b, 0.58, 0.17, { parent: q, cast: false });
+    }
+  }
+  const E = edgesOf(OUT);   // 0: toward Snaregade, 1: toward Gammel Strand, 2: toward Nybrogade and the canal, 3: against no. 4
+  const KANAL = E[2], LN = Math.hypot(Q2[0] - O2[0], Q2[1] - O2[1]), BW = (KANAL.len - LN) / 8, PORT = LN + 4 * BW;
+  fag(KANAL, LN * 0.27, gulKant); fag(KANAL, LN * 0.73, gulKant);   // the end of the red wing
+  for (let k = 0; k < 8; k++) fag(KANAL, LN + (k + 0.5) * BW, lys, k === 3 || k === 4 ? { uden: y => y < 9, ingenKaelder: true } : {});
+  for (let k = 0; k < 6; k++) fag(E[1], (k + 0.5) * E[1].len / 6, gulKant);
+  { const e = E[0], n = Math.round(e.len / 3.1), q1 = Math.hypot(Q1[0] - O0[0], Q1[1] - O0[1]); for (let k = 0; k < n; k++) { const s = (k + 0.5) * e.len / n; fag(e, s, s > q1 ? gulKant : lys); } }
+  { const e = E[3], n = Math.round(e.len / 3.1); for (let k = 0; k < n; k++) fag(e, (k + 0.5) * e.len / n, lys); }
+  for (const h of edgesOf(HUL)) {   // the yard: the normals of the hole point into the house, so turn them round
+    const e = { ...h, nx: -h.nx, nz: -h.nz, ry: Math.atan2(-h.nx, -h.nz) }, n = Math.max(1, Math.floor(e.len / 3.2)), rod = h.a === H1 && h.b === H2;
+    for (let k = 0; k < n; k++) fag(e, (k + 0.5) * e.len / n, rod ? gulKant : lys, { gaard: true });
+  }
+  bakeGroup(frames);
+  // the gate of 1765: a round arch in a sandstone frame, black-green doors with a carved fanlight, and over it the slab
+  // with the gilded inscription between two scrolls under a little copper roof
+  {
+    const e = KANAL, [px, pz] = at(e, PORT, 0), P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = e.ry; world.add(P);
+    const sand = tm('#d9d0b5'), sandR = tm('#b78f79'), sort = tm('#1d2621'), felt = tm('#28352f'), cop = tm('#5c9a85');
+    const add = (w, h, d, m, x, y, z) => box(w, h, d, m, x, y, z, { parent: P, cast: false });
+    add(3.7, 5.3, 0.18, sand, 0, 0, 0.09);   // the stone round the gate
+    add(2.5, 3.4, 0.06, sort, 0, 0, 0.21);   // the doors
+    for (const a of [-1, 1]) for (const y of [0.3, 1.85]) add(0.88, 1.3, 0.05, felt, a * 0.63, y, 0.26);
+    add(0.05, 3.4, 0.05, tm('#0d110f'), 0, 0, 0.25);
+    const fan = ctex(256, 256, (c, W, H) => {   // only the upper half shows: rays and two rings round the middle
+      c.fillStyle = '#1d2621'; c.fillRect(0, 0, W, H); c.strokeStyle = '#66756c'; c.lineWidth = 6;
+      for (let k = 1; k < 8; k++) { const a = Math.PI + k * Math.PI / 8; c.beginPath(); c.moveTo(W / 2 + Math.cos(a) * 40, H / 2 + Math.sin(a) * 40); c.lineTo(W / 2 + Math.cos(a) * 120, H / 2 + Math.sin(a) * 120); c.stroke(); }
+      for (const r of [40, 118]) { c.beginPath(); c.arc(W / 2, H / 2, r, Math.PI, 0); c.stroke(); }
+      c.fillStyle = '#66756c'; c.beginPath(); c.arc(W / 2, H / 2, 16, Math.PI, 0); c.fill();
+    }, { wrap: false });
+    mesh(new THREE.CircleGeometry(1.25, 24, 0, Math.PI), toon('#ffffff', { map: fan }), 0, 3.4, 0.22, { parent: P, cast: false });
+    const arc = new THREE.Shape(); arc.absarc(0, 0, 1.85, 0, Math.PI, false); arc.absarc(0, 0, 1.25, Math.PI, 0, true);
+    mesh(new THREE.ExtrudeGeometry(arc, { depth: 0.36, bevelEnabled: false, curveSegments: 16 }), sand, 0, 3.4, 0.18, { parent: P, cast: false, edges: 30 });
+    for (const a of [-1, 1]) {
+      add(0.6, 3.4, 0.36, sand, a * 1.55, 0, 0.36);   // the jambs, with a rusticated foot of reddish stone
+      add(0.7, 1.15, 0.42, sandR, a * 1.55, 0, 0.36);
+      add(0.78, 0.22, 0.44, sand, a * 1.55, 3.25, 0.36);
+      add(0.36, 1.3, 0.3, sand, a * 1.62, 5.95, 0.15);   // the scrolls beside the slab
+      mesh(new THREE.TorusGeometry(0.36, 0.11, 6, 16, Math.PI * 1.5), sand, a * 1.62, 6.9, 0.2, { parent: P, cast: false, rz: a > 0 ? -Math.PI / 2 : Math.PI });
+    }
+    add(0.5, 0.75, 0.5, sand, 0, 4.5, 0.4);   // the keystone
+    add(4.2, 0.45, 0.6, sand, 0, 5.3, 0.3); add(4.5, 0.16, 0.74, sand, 0, 5.75, 0.37);
+    add(2.9, 1.95, 0.3, sand, 0, 5.91, 0.15);
+    const skrift = ctex(512, 320, (c, W, H) => {
+      c.fillStyle = '#2e2d29'; c.fillRect(0, 0, W, H); c.strokeStyle = '#c9a548'; c.lineWidth = 6; c.strokeRect(16, 16, W - 32, H - 32);
+      c.fillStyle = '#e4c160'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.font = 'bold 42px Georgia'; c.fillText('DET KONGELIGE', W / 2, H * 0.27, W - 70); c.fillText('PRIVILIGEREDE', W / 2, H * 0.5, W - 70);
+      c.font = 'bold 50px Georgia'; c.fillText('ASSISTENCE HUS', W / 2, H * 0.74, W - 70);
+    }, { wrap: false });
+    mesh(new THREE.PlaneGeometry(2.5, 1.56), toon('#ffffff', { map: skrift }), 0, 6.885, 0.31, { parent: P, cast: false });
+    add(3.4, 0.2, 0.62, cop, 0, 7.86, 0.31);
+    mesh(prismGeo([[-1.8, 0], [1.8, 0], [0, 0.55]], 0.62), cop, 0, 8.06, 0.31, { parent: P, edges: 30 });
+    // a brass plate on the other side of the gate from the calendar hatch
+    const sgn = Math.sign((e.b[0] - e.a[0]) * Math.cos(e.ry) - (e.b[1] - e.a[1]) * Math.sin(e.ry));
+    const plade = ctex(512, 112, (c, W, H) => { c.fillStyle = '#b99b55'; c.fillRect(0, 0, W, H); c.strokeStyle = '#7d6633'; c.lineWidth = 6; c.strokeRect(6, 6, W - 12, H - 12); c.fillStyle = '#2a2417'; c.font = 'bold 50px Georgia'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('KULTURMINISTERIET', W / 2, H / 2 + 2, W - 40); }, { wrap: false });
+    mesh(new THREE.PlaneGeometry(1.5, 0.33), toon('#ffffff', { map: plade }), sgn * 2.8, 2.0, 0.03, { parent: P, cast: false });
+    FX.kultur = { port: [px, pz], luge: at(e, PORT - 2.8, 0), nx: e.nx, nz: e.nz };   // the calendar hatch sits on the north side of the gate
+  }
 }
 
 // ======================================================================== BOATS

@@ -167,7 +167,7 @@ export const KALENDER = {
     },
     {
       nr: 3, type: "mini", navn: "Lukket for i år",
-      ved: [-214, -55.4], retning: 310, farve: "#2f5a43",
+      ved: [-175.2, -103.2], retning: 316, farve: "#2f5a43",
       praj: "Over kanalen ved Gammel Strand. Kulturministeriet i det gamle pantelånerhus i Nybrogade. Kig efter en luge i muren.",
       bag: [
         ["fortaeller", "Lugen går op på klem. En nisse med læsebriller ser på Ida uden at sige noget i lang tid."],
