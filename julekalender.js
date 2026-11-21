@@ -464,8 +464,8 @@ export const KALENDER = {
     },
     {
       nr: 22, type: "lille", navn: "Juleaften 1999",
-      ved: [152, 128], retning: 270, farve: "#2f5a43",
-      praj: "Proviantgården, den store gård bag Proviantpassagen. Kig på den lange mur.",
+      ved: [121, 127.5], retning: 90, farve: "#2f5a43",
+      praj: "Proviantgården, de lange røde murstenshuse bag Proviantpassagen. Kig på muren ud mod gaden.",
       bag: [
         ["fortaeller", "Bag døren står et gammelt fotografi. Nisserne står om et juletræ med alt for mange lys. Øverst på Pinds skuldre sidder en meget lille nisse med en grå hue."],
         ["fortaeller", "På bagsiden står: »Juleaften 1999. Pind og lille Bilag.« Og under det, med en nyere håndskrift: »Pind er 177 år. Han nåede næsten ikke at blive færdig sidste jul. Jeg ville bare gøre det lettere for ham.«"],
