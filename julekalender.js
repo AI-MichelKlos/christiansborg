@@ -128,7 +128,7 @@ export const KALENDER = {
     {
       nr: 1, type: "lille", navn: "Ved den store trappe",
       ved: [22.4, 58.8], retning: 327, farve: "#7a1f24",
-      praj: "Rigsdagsgården. Kig ved den store trappe op til Folketinget.",
+      praj: "Rigsdagsgården. Kig ved hjørnet af den store trappe op til Folketinget.",
       bag: [
         ["fortaeller", "Bag døren står en kaffekop, der stadig er varm, og en stak gule sedler med et stempel på."],
         ["fortaeller", "På den øverste står: »Stykkerne er gemt, hvor ingen embedsmand kigger: bag døre med tal på. Gå videre til dem, der tæller pengene. Pind.«"],
@@ -167,8 +167,8 @@ export const KALENDER = {
     },
     {
       nr: 3, type: "mini", navn: "Lukket for i år",
-      ved: [-214, -55.4], retning: 310, farve: "#2f5a43",
-      praj: "Over kanalen ved Gammel Strand. Kulturministeriet i det gamle pantelånerhus i Nybrogade. Kig efter en luge i muren.",
+      ved: [-214, -55.4], retning: 310, farve: "#7a1f24",
+      praj: "Over kanalen ved Gammel Strand. Kulturministeriet i det gamle pantelånerhus i Nybrogade. Kig efter en lille rød luge med et tal ved siden af en grøn dør.",
       bag: [
         ["fortaeller", "Lugen går op på klem. En nisse med læsebriller ser på Ida uden at sige noget i lang tid."],
         ["Nissen", "Vi har lukket for i år. Ansøgningsfristen var i september."],
@@ -192,7 +192,7 @@ export const KALENDER = {
     {
       nr: 5, type: "mini", navn: "Nøglen i kirken",
       ved: [-30, -92.5], retning: 0, farve: "#2f5a43",
-      praj: "Slotskirken ved siden af slottet. Kig efter en luge på muren ind mod Prins Jørgens Gård.",
+      praj: "Slotskirken ved siden af slottet. Kig lavt på muren ind mod Prins Jørgens Gård, ikke langt fra porten i Kirkeløngangen.",
       bag: [
         ["fortaeller", "Bag lugen hænger en stor nøgle på et søm. Den er varm, som om nogen lige har holdt den."],
         ["fortaeller", "På mærkesedlen står: »Staldene. Afleveres til staldmester Hov. Hestene må ikke få mandariner.«"],
@@ -233,7 +233,7 @@ export const KALENDER = {
     {
       nr: 7, type: "lille", navn: "Spor i gruset",
       ved: [-184, 80], farve: "#7a1f24",
-      praj: "Ridebanen uden for staldene. Kig på den lange fløj ud mod kanalen.",
+      praj: "Ridebanen uden for staldene. Kig på den lange fløj i den vestlige side af banen, inde i hjørnet.",
       bag: [
         ["fortaeller", "Bag døren ligger en meget lille kuglepen. På siden står med guldtryk: »Effektiviseringsenheden. Vi gør det enklere.«"],
         ["ida", "Det har aldrig betydet noget godt."],
@@ -245,7 +245,7 @@ export const KALENDER = {
     {
       nr: 8, type: "mini", navn: "Et vidne",
       ved: [-184.5, 121.9], farve: "#2f5a43",
-      praj: "Marmorbroen for enden af Ridebanen. Kig på de to små pavilloner ved broen.",
+      praj: "Marmorbroen for enden af Ridebanen. Kig efter en luge på pavillonerne ved broen, på siden mod Ridebanen.",
       bag: [
         ["fortaeller", "Lugen går op. Derinde sidder en mus med en halv mandarin og ser skyldig ud."],
         ["fortaeller", "Den skubber et stykke papir ud med snuden. Med meget små bogstaver står der: »Han gik ind i Tøjhuset uden billet. Han målte kanonerne.«"],
@@ -281,8 +281,8 @@ export const KALENDER = {
     },
     {
       nr: 11, type: "mini", navn: "Til tredjebehandlingen",
-      ved: [82, 74], farve: "#7a1f24",
-      praj: "Proviantpassagen, porten mellem Proviantgården og Rigsdagsgården. Kig efter en luge i muren.",
+      ved: [82, 74], farve: "#2f5a43",
+      praj: "Proviantpassagen, porten mellem Proviantgården og Rigsdagsgården. Gå ind i porten, og kig efter en luge i murvæggen.",
       bag: [
         ["fortaeller", "Lugen går op. Derinde sover en nisse oven på en stak finanslovsforslag. Ved siden af ham står et lys, der er brændt næsten ned."],
         ["Nissen", "Til tredjebehandlingen."],
@@ -323,7 +323,7 @@ export const KALENDER = {
     {
       nr: 13, type: "lille", navn: "Julen, version 2",
       ved: [39.8, -41.2], retning: 225, farve: "#7a1f24",
-      praj: "Slotspladsen foran slottet. Kig på slottets mur lige ved foden af tårnet.",
+      praj: "Slotspladsen foran slottet. Kig på slottets mur til højre for Kongeporten under tårnet.",
       bag: [
         ["fortaeller", "Bag døren hænger et regneark, sat op med tape. »Julen, version 2. Gaver: 0. Grød: udgår. Stearinlys: erstattes af ét fælles lys. Besparelse: 100 procent.«"],
         ["fortaeller", "Nederst har nogen skrevet med rød tusch og en anden håndskrift: »Hvor er glæden? Den står ikke i nogen kolonne.«"],
@@ -335,7 +335,7 @@ export const KALENDER = {
     {
       nr: 14, type: "mini", navn: "Bundet forkert",
       ved: [250, 48], retning: 180, farve: "#2f5a43",
-      praj: "Børsen med dragespiret, øst for Slotspladsen. Kig efter en luge på den lange mur, der vender mod Holmens Kirke.",
+      praj: "Børsen med dragespiret, øst for Slotspladsen. Kig efter en lille luge lavt på den lange røde mur, der vender mod Holmens Kirke.",
       bag: [
         ["fortaeller", "Lugen sidder i den gamle børsmur. Derinde ligger et meget lille slips. Det er bundet forkert, og knuden er våd af sne."],
         ["fortaeller", "En nisse fra Effektiviseringsenheden tager kun slipset af, når han er begyndt at tvivle."],
@@ -347,7 +347,7 @@ export const KALENDER = {
     {
       nr: 15, type: "lille", navn: "Klokken, der ikke ringer",
       ved: [205.1, -54.9], retning: 135, farve: "#7a1f24",
-      praj: "Holmens Kirke på den anden side af Holmens Bro. Kig på muren, der vender mod broen.",
+      praj: "Holmens Kirke på den anden side af Holmens Bro. Kig i hjørnet på muren, der vender mod broen.",
       bag: [
         ["fortaeller", "Bag døren hænger en lille klokke. På en seddel står: »Kirkenissen ringer først julen ind, når protokollen er hel. Sådan står der i § 15.«"],
         ["fortaeller", "I sneen under klokken er der små fodspor. De har stået her længe, og så er de gået tilbage over broen mod slottet."],
@@ -453,7 +453,7 @@ export const KALENDER = {
     {
       nr: 21, type: "lille", navn: "Pennen fra læsesalen",
       ved: [242, 253], retning: 239, farve: "#7a1f24",
-      praj: "Den Sorte Diamant ved havnen, bag Det Kongelige Bibliotek. Kig på den sorte mur ud mod vandet.",
+      praj: "Den Sorte Diamant ved havnen, bag Det Kongelige Bibliotek. Gå ud på kajen ved vandet, og kig på den sorte mur.",
       bag: [
         ["fortaeller", "Bag døren ligger en gammel fjerpen og et lille blækhus."],
         ["fortaeller", "På en seddel står: »Protokollen er altid blevet underskrevet med denne pen. Uden den gælder ingen underskrift. Jeg lånte den. Den skal tilbage. B.«"],
@@ -477,7 +477,7 @@ export const KALENDER = {
     {
       nr: 23, type: "lille", navn: "Stjernen",
       ved: [10, 70], retning: 327, farve: "#7a1f24",
-      praj: "Rigsdagsgården. Kig på muren lige ved juletræet.",
+      praj: "Rigsdagsgården. Kig på muren til venstre for juletræet, set fra gårdens midte.",
       bag: [
         ["fortaeller", "Bag døren ligger juletræets stjerne, pakket ind i silkepapir."],
         ["fortaeller", "»Jeg tog den i 1999, fordi jeg ville have den på mit eget værelse. Den hører til på træet. Jeg venter i tårnet. Bilag.«"],
