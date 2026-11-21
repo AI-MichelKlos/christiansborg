@@ -9636,7 +9636,7 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, FEST, md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
   const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && S.aabnet.length >= N, hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
