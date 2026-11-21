@@ -567,7 +567,16 @@ try {
   $('loadErr').hidden = false; $('goBtn').textContent = '3D er ikke tilgængelig';
   throw e;
 }
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isTouch ? 1.5 : 2));
+// Graphics quality: 'hoej' is the full picture, 'lav' draws fewer pixels and fewer small things far away, so weak
+// phones keep up. Phones and tablets start on 'lav'. Saved with the other settings (SKEY); ?grafik=lav|hoej for testing.
+const SKEY = 'mordIRigetsMidte';
+const GFX = { lav: (() => {
+  const q = /[?&]grafik=(lav|hoej)\b/.exec(location.search); if (q) return q[1] === 'lav';
+  try { const s = JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; if (s.grafik === 'lav' || s.grafik === 'hoej') return s.grafik === 'lav'; } catch (e) {}
+  return isTouch;
+})() };
+const pixelRatio = () => Math.min(window.devicePixelRatio || 1, GFX.lav ? 1.25 : isTouch ? 1.5 : 2);
+renderer.setPixelRatio(pixelRatio());
 renderer.setSize(window.innerWidth, window.innerHeight, false);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
@@ -4391,7 +4400,8 @@ sky.renderOrder = -1; sky.frustumCulled = false; scene.add(sky);
 scene.fog = new THREE.Fog('#f6e2c6', 220, 680);
 const hemi = new THREE.HemisphereLight('#dbe9ff', '#b39b7c', 1.05); scene.add(hemi);
 const sun = new THREE.DirectionalLight('#fff0d4', 1.7); sun.castShadow = true;
-sun.shadow.mapSize.set(isTouch ? 1024 : 2048, isTouch ? 1024 : 2048);
+const shadowSize = () => GFX.lav || isTouch ? 1024 : 2048;
+sun.shadow.mapSize.set(shadowSize(), shadowSize());
 sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.14;   // big walls at a low sun angle need more bias
 const sc = sun.shadow.camera; sc.near = 1; sc.far = 320;
 function shadowExtent(e) { sc.left = -e; sc.right = e; sc.top = e; sc.bottom = -e; sc.updateProjectionMatrix(); }
@@ -4407,6 +4417,15 @@ for (let i = 0; i < 12; i++) {
   c.position.set(Math.cos(a) * r, rr(85, 130), Math.sin(a) * r);
   for (let k = 0; k < 6; k++) { const m = new THREE.Mesh(icoGeo, cloudMat); m.position.set(rr(-14, 14), rr(-2, 4), rr(-6, 6)); m.scale.set(rr(7, 12), rr(5, 8), rr(6, 9)); c.add(m); }
   c.lookAt(0, c.position.y, 0); clouds.add(c);
+}
+{   // the 72 puffs are one thing to draw (they only turn slowly together)
+  clouds.updateMatrixWorld(true); const gs = [];
+  clouds.traverse(o => { if (o.isMesh) gs.push((o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrixWorld)); });
+  let n = 0; for (const g of gs) n += g.attributes.position.count;
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3); let v = 0;
+  for (const g of gs) { pos.set(g.attributes.position.array, v * 3); nor.set(g.attributes.normal.array, v * 3); v += g.attributes.position.count; g.dispose(); }
+  const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); bg.computeBoundingSphere();
+  clouds.clear(); clouds.add(new THREE.Mesh(bg, cloudMat));
 }
 const DAY = { top: new THREE.Color('#6aa6dc'), mid: new THREE.Color('#fbe5c6'), bot: new THREE.Color('#ead9bd'), hs: new THREE.Color('#dbe9ff'), hg: new THREE.Color('#b39b7c'), hi: 1.05, sc: new THREE.Color('#fff0d4'), si: 1.7, pos: new THREE.Vector3(-55, 90, 42), cloud: new THREE.Color('#ffffff'), sunC: new THREE.Color('#fff3cf') };
 // The murder mystery begins at 06.00 in blue dawn light with the street lamps and windows lit (ev = 1) and reaches full
@@ -4576,40 +4595,57 @@ world.updateMatrixWorld(true);
 // The scene looks the same, but the computer draws a few hundred pieces instead of thousands.
 {
   const keep = o => { for (let p = o; p; p = p.parent) if (p.userData.noMerge) return true; return false; };
-  const groups = new Map(), lines = [], linesIn = [], singles = [];
+  const groups = new Map(), lines = [];
   world.updateMatrixWorld(true);
-  const inside = () => false;
+  // Plain coloured materials (no texture, no glow, nothing that changes later) become one material with the colour in
+  // the vertices, so a wall, a cornice and a chimney in different colours are drawn together. These are merged per
+  // square of the map (CELL metres; things bigger than BIG stay whole), so the squares behind the camera and outside
+  // the sun's shadow box are skipped. Textured things and the outlines are few pieces already and stay whole.
+  const CELL = 100, BIG = 36;
+  const noop = THREE.Material.prototype.onBeforeCompile, vcMats = new Map(), bs = new THREE.Sphere();
+  const plainSig = m => (m.isMeshToonMaterial && !m.map && !m.vertexColors && !m.transparent && m.opacity === 1 && m.alphaTest === 0 && !m.alphaMap && !m.emissiveMap && m.emissive.getHex() === 0
+    && !m.lightMap && !m.aoMap && !m.bumpMap && !m.normalMap && !m.displacementMap && m.gradientMap === grad && !m.wireframe && m.fog && m.depthTest && m.depthWrite && m.colorWrite
+    && m.blending === THREE.NormalBlending && m.visible && !m.clippingPlanes && m.onBeforeCompile === noop && !nightMats.includes(m))
+    ? m.side + '|' + (m.polygonOffset ? m.polygonOffsetFactor + ',' + m.polygonOffsetUnits : '-') : null;
+  const vcMat = (sig, m) => { if (!vcMats.has(sig)) vcMats.set(sig, toon('#ffffff', { vertexColors: true, side: m.side, polygonOffset: m.polygonOffset, polygonOffsetFactor: m.polygonOffsetFactor, polygonOffsetUnits: m.polygonOffsetUnits })); return vcMats.get(sig); };
+  const where = o => {
+    if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+    bs.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
+    return bs.radius >= BIG ? 'all' : Math.floor(bs.center.x / CELL) + ',' + Math.floor(bs.center.z / CELL);
+  };
   world.traverse(o => {
     if (keep(o)) return;
-    if (o.isLineSegments && o.material === edgeMat) (inside(o) ? linesIn : lines).push(o);
+    if (o.isLineSegments && o.material === edgeMat) lines.push(o);
     else if (o.isMesh && !o.isInstancedMesh && !Array.isArray(o.material) && o.matrixWorld.determinant() > 0) {
-      const ins = inside(o), key = o.material.uuid + (o.castShadow ? 's' : '-') + (o.receiveShadow ? 'r' : '-') + (ins ? 'i' : 'o');
-      if (!groups.has(key)) groups.set(key, { mat: o.material, cast: o.castShadow, recv: o.receiveShadow, ins, list: [] });
+      const sig = plainSig(o.material), cell = sig ? where(o) : 'all', key = (sig ? 'vc' + sig : o.material.uuid) + (o.castShadow ? 's' : '-') + (o.receiveShadow ? 'r' : '-') + cell;
+      if (!groups.has(key)) groups.set(key, { mat: sig ? vcMat(sig, o.material) : o.material, vc: !!sig, cast: o.castShadow, recv: o.receiveShadow, list: [] });
       groups.get(key).list.push(o);
     }
   });
   const flat = o => { const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(o.matrixWorld); return g; };
-  for (const [ls0, dest] of [[lines, world]]) if (ls0.length > 1) {
-    const gs = ls0.map(flat); let n = 0; for (const g of gs) n += g.attributes.position.array.length;
+  if (lines.length > 1) {
+    const gs = lines.map(flat); let n = 0; for (const g of gs) n += g.attributes.position.array.length;
     const pos = new Float32Array(n); let off = 0; for (const g of gs) { pos.set(g.attributes.position.array, off); off += g.attributes.position.array.length; g.dispose(); }
     const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.computeBoundingSphere();
-    const ls = new THREE.LineSegments(bg, edgeMat); ls.matrixAutoUpdate = false; dest.add(ls);
-    for (const l of ls0) l.parent.remove(l);
+    const ls = new THREE.LineSegments(bg, edgeMat); ls.matrixAutoUpdate = false; world.add(ls);
+    for (const l of lines) l.parent.remove(l);
   }
-  for (const { mat, cast, recv, ins, list } of groups.values()) {
+  for (const { mat, vc, cast, recv, list } of groups.values()) {
     const ok = list.filter(o => o.children.length === 0);
-    if (ok.length < 2) { if (ins) singles.push(...ok); continue; }
+    if (ok.length < 2) continue;
     const gs = ok.map(o => { const g = flat(o); if (!g.attributes.normal) g.computeVertexNormals(); return g; });
     let n = 0; for (const g of gs) n += g.attributes.position.count;
-    const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2); let v = 0;
-    for (const g of gs) {
+    const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = vc ? null : new Float32Array(n * 2), col = vc ? new Float32Array(n * 3) : null; let v = 0;
+    gs.forEach((g, i) => {
       const c = g.attributes.position.count;
       pos.set(g.attributes.position.array, v * 3); nor.set(g.attributes.normal.array, v * 3);
-      if (g.attributes.uv && g.attributes.uv.itemSize === 2) uv.set(g.attributes.uv.array, v * 2);
+      if (uv && g.attributes.uv && g.attributes.uv.itemSize === 2) uv.set(g.attributes.uv.array, v * 2);
+      if (col) { const k = ok[i].material.color; for (let j = v * 3, e = (v + c) * 3; j < e; j += 3) { col[j] = k.r; col[j + 1] = k.g; col[j + 2] = k.b; } }
       v += c; g.dispose();
-    }
+    });
     const bg = new THREE.BufferGeometry();
-    bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); bg.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+    if (uv) bg.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); if (col) bg.setAttribute('color', new THREE.BufferAttribute(col, 3));
     bg.computeBoundingSphere();
     const m = new THREE.Mesh(bg, mat); m.castShadow = cast; m.receiveShadow = recv; m.matrixAutoUpdate = false; world.add(m);
     for (const o of ok) o.parent.remove(o);
@@ -5149,6 +5185,27 @@ function onResize() { const w = window.innerWidth, h = window.innerHeight; rende
 window.addEventListener('resize', onResize);
 camera.fov = window.innerWidth / window.innerHeight < 0.8 ? 70 : 55; camera.updateProjectionMatrix();
 
+// ======================================================================== GRAPHICS QUALITY
+// setGrafik(true) is the low setting: fewer pixels (still sharp on a phone), a smaller shadow map on a computer, a
+// little less snow, and the dark outline round people dropped a bit sooner. The outline is only a centimetre thick, so
+// far away it is thinner than a pixel on both settings and is not drawn. Nothing moves and nothing in the story changes.
+function setGrafik(lav) {
+  GFX.lav = !!lav;
+  renderer.setPixelRatio(pixelRatio()); onResize();
+  const n = shadowSize();
+  if (sun.shadow.mapSize.x !== n) { sun.shadow.mapSize.set(n, n); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
+  lodT = 0;
+}
+let lodT = 0, olScanT = 0, OUTLINES = [];
+HOOKS.frame.push(dt => {
+  lodT -= dt; olScanT -= dt; if (lodT > 0) return; lodT = 0.2;
+  if (olScanT <= 0) { olScanT = 4; OUTLINES = []; scene.traverse(o => { if (o.isMesh && o.material === FIG_OL) OUTLINES.push(o); }); }
+  const cx = camera.position.x, cy = camera.position.y, cz = camera.position.z, tanF = Math.tan(camera.fov * Math.PI / 360);
+  // the outline is at most 0.012 m: hide it where it would be thinner than a small part of a pixel
+  const olMax = 0.012 * renderer.domElement.height / (2 * tanF * (GFX.lav ? 0.18 : 0.1)), ol2 = olMax * olMax;
+  for (const o of OUTLINES) { const e = o.matrixWorld.elements, dx = e[12] - cx, dy = e[13] - cy, dz = e[14] - cz; o.visible = dx * dx + dy * dy + dz * dz < ol2; }
+});
+
 
 // ======================================================================== ACTION BUTTON
 // A feature calls offerAction({ id, label, run, prio }) every frame while the player can do something there.
@@ -5169,8 +5226,8 @@ function updActions() {
 
 // ======================================================================== STATE / STORAGE
 let tipsSet = [], soundOn = true, musicOn = true, musicVolume = .18, tekstStor = false, naesteSpor = false, visMaal = true, med1942 = true, started = false, paused = true, showMap = !isTouch || window.innerWidth > 700;
-const SKEY = 'mordIRigetsMidte';
-function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, music: musicOn, musicVolume, map: showMap, tekst: tekstStor, spor: naesteSpor, maal: visMaal, tips: tipsSet, lag1942: med1942 })); } catch (e) {} }   // settings; the game itself is saved by GAADE
+let grafikValgt = null;   // 'lav' or 'hoej' once the player has chosen in the settings; until then it follows the device
+function save() { try { localStorage.setItem(SKEY, JSON.stringify({ sound: soundOn, music: musicOn, musicVolume, map: showMap, tekst: tekstStor, spor: naesteSpor, maal: visMaal, tips: tipsSet, lag1942: med1942, ...(grafikValgt ? { grafik: grafikValgt } : {}) })); } catch (e) {} }   // settings; the game itself is saved by GAADE
 function load() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}') || {}; } catch (e) { return {}; } }
 
 // ======================================================================== MAIN LOOP
@@ -7765,7 +7822,7 @@ const GAADE = (() => {
 
   // Settings: sound, text size and the small map. Also reachable from the start card and the help card.
   const sets = dialog('setDialog', 'Indstillinger', true);
-  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Al lyd</label><label class="gdCheck"><input type="checkbox" id="setMusic"> Baggrundsmusik</label><label class="gdCheck" for="setMusicVolume">Musikstyrke <input type="range" id="setMusicVolume" min="0" max="100" step="1" style="width:140px;max-width:40vw"><output id="musicVolumeText" for="setMusicVolume"></output></label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setMaal"> Vis, hvad Ida skal nu (øverst til venstre)</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><label class="gdCheck"><input type="checkbox" id="set1942"> Rejsen til 1942 (et ekstra lag, gælder nye spil)</label><button class="go" id="setDone" type="button">Færdig</button>';
+  sets.querySelector('.gdBody').innerHTML = '<label class="gdCheck"><input type="checkbox" id="setSound"> Al lyd</label><label class="gdCheck"><input type="checkbox" id="setMusic"> Baggrundsmusik</label><label class="gdCheck" for="setMusicVolume">Musikstyrke <input type="range" id="setMusicVolume" min="0" max="100" step="1" style="width:140px;max-width:40vw"><output id="musicVolumeText" for="setMusicVolume"></output></label><fieldset class="gdFs"><legend>Tekststørrelse</legend><label class="gdCheck"><input type="radio" name="setTs" value="normal"> Normal</label><label class="gdCheck"><input type="radio" name="setTs" value="stor"> Stor</label></fieldset><fieldset class="gdFs"><legend>Grafik</legend><label class="gdCheck"><input type="radio" name="setGfx" value="hoej"> Høj</label><label class="gdCheck"><input type="radio" name="setGfx" value="lav"> Lav (kører bedre på telefoner)</label></fieldset><label class="gdCheck"><input type="checkbox" id="setMini"> Vis minikort, mens du går</label><label class="gdCheck"><input type="checkbox" id="setMaal"> Vis, hvad Ida skal nu (øverst til venstre)</label><label class="gdCheck"><input type="checkbox" id="setSpor"> Vis næste spor (tæller som hint)</label><label class="gdCheck"><input type="checkbox" id="set1942"> Rejsen til 1942 (et ekstra lag, gælder nye spil)</label><button class="go" id="setDone" type="button">Færdig</button>';
   sets.addEventListener('keydown', e => e.stopPropagation());
   sets.addEventListener('close', () => { if (!intro.hidden) $('setBtn').focus(); else canvas.focus(); });
   $('setDone').addEventListener('click', () => sets.close());
@@ -7777,10 +7834,12 @@ const GAADE = (() => {
   $('setMusicVolume').addEventListener('input',e=>{musicVolume=Number(e.target.value)/100;$('musicVolumeText').textContent=e.target.value+' %';syncSoundMix();save();});
   $('set1942').addEventListener('change', e => { med1942 = e.target.checked; save(); });
   for (const r of sets.querySelectorAll('[name=setTs]')) r.addEventListener('change', e => setTekst(e.target.value === 'stor'));
+  for (const r of sets.querySelectorAll('[name=setGfx]')) r.addEventListener('change', e => { grafikValgt = e.target.value; setGrafik(grafikValgt === 'lav'); save(); });
   $('setBtn').addEventListener('click', () => {
     $('setMusic').checked=musicOn; $('setMusicVolume').value=Math.round(musicVolume*100); $('musicVolumeText').textContent=Math.round(musicVolume*100)+' %';
     $('setSound').checked = soundOn; $('setMini').checked = showMap; $('setSpor').checked = naesteSpor; $('setMaal').checked = visMaal; $('set1942').checked = med1942;
     for (const r of sets.querySelectorAll('[name=setTs]')) r.checked = (r.value === 'stor') === tekstStor;
+    for (const r of sets.querySelectorAll('[name=setGfx]')) r.checked = (r.value === 'lav') === GFX.lav;
     sets.showModal(); $('setSound').focus();
   });
 
@@ -8981,6 +9040,7 @@ function boot(data) {
   musicOn=st.music!==false; musicVolume=typeof st.musicVolume==='number'&&Number.isFinite(st.musicVolume)?Math.max(0,Math.min(1,st.musicVolume)):.18;
   if (typeof st.sound === 'boolean') setSound(st.sound); else setSound(true);
   if (typeof st.map === 'boolean') showMap = st.map;
+  grafikValgt = st.grafik === 'lav' || st.grafik === 'hoej' ? st.grafik : null;
   setTekst(!!st.tekst); naesteSpor = !!st.spor; visMaal = st.maal !== false; if (FX.maal) FX.maal.vis = visMaal; tipsSet = Array.isArray(st.tips) ? st.tips : []; med1942 = st.lag1942 !== false;
   setEvening(false); ev = lysMaal();   // the light follows the story's clock from the start
   setMapVisible(showMap); sizeMap();
@@ -9211,7 +9271,7 @@ const KALENDER = (() => {
       if (gnLiv[i] <= 0) { gnPos[j + 1] = -999; continue; }
       liv = true; gnVel[j + 1] -= 4.2 * dt; gnPos[j] += gnVel[j] * dt; gnPos[j + 1] += gnVel[j + 1] * dt; gnPos[j + 2] += gnVel[j + 2] * dt;
     }
-    gnGeo.attributes.position.needsUpdate = true; gnister.visible = liv;
+    if (liv || gnister.visible) gnGeo.attributes.position.needsUpdate = true; gnister.visible = liv;   // nothing to send to the graphics card when there are no sparks
   }
   function flyv(l, efter) {   // the thing flies from the middle of the screen up to the calendar button
     const t = tegn(l), m = $('bNotes'), r = m.getBoundingClientRect();
@@ -9436,7 +9496,7 @@ const KALENDER = (() => {
     sneNu += (sneMaal(a) - sneNu) * k; faldNu += (faldMaal(a) - faldNu) * k;
     SNE_U.value = I.on ? 0 : sneNu;   // not on the floors indoors
     stjerner.material.opacity = (1 - faldNu) * ev * 0.9; stjerner.visible = stjerner.material.opacity > 0.01;
-    if (sne) sne.geometry.setDrawRange(0, Math.round(sne.geometry.attributes.position.count * faldNu));
+    if (sne) sne.geometry.setDrawRange(0, Math.round(sne.geometry.attributes.position.count * faldNu * (GFX.lav ? 0.6 : 1)));   // a little less snow on the low graphics setting
   }
 
   // ---- the end. Holmens Kirke rings Christmas in, fireworks go up over Slotsholmen, and all the nisser sit down to grød
@@ -9489,7 +9549,7 @@ const KALENDER = (() => {
       const t = fLiv[i] / fMax[i], g = t * t * (0.75 + 0.25 * Math.sin(tid * 30 + i));   // fades out and twinkles
       fFarve[j] = fBase[j] * g; fFarve[j + 1] = fBase[j + 1] * g; fFarve[j + 2] = fBase[j + 2] * g;
     }
-    fGeo.attributes.position.needsUpdate = true; fGeo.attributes.color.needsUpdate = true;
+    if (liv || fyr.visible) { fGeo.attributes.position.needsUpdate = true; fGeo.attributes.color.needsUpdate = true; }
     fyr.visible = liv && (!I.on || !!FX.tower?.on);
   }
   // all the nisser at the tables in the tower restaurant once the protocol is whole
@@ -9522,7 +9582,7 @@ const KALENDER = (() => {
       sne.visible = faldNu > 0.01 && !I.on && !document.body.classList.contains('inTowerRooms');
       if (sne.visible && !paused) {
         const a = sne.geometry.attributes.position, p = a.array, cx = camera.position.x, cz = camera.position.z, cy = camera.position.y;
-        for (let i = 0; i < p.length; i += 3) {
+        for (let i = 0, e = Math.min(p.length, sne.geometry.drawRange.count * 3); i < e; i += 3) {   // only the flakes that are drawn
           p[i + 1] -= dt * (1.1 + (i % 7) * 0.09); p[i] += Math.sin(tid * 0.7 + i) * dt * 0.25;
           if (p[i + 1] < cy - 6) p[i + 1] += 18; else if (p[i + 1] > cy + 12) p[i + 1] -= 18;
           p[i] = cx + ((((p[i] - cx + 22) % 44) + 44) % 44) - 22; p[i + 2] = cz + ((((p[i + 2] - cz + 22) % 44) + 44) % 44) - 22;
