@@ -9138,7 +9138,7 @@ const KALENDER = (() => {
       tal(d.g, l.nr, 1.83, 0.8, 0.07);
       d.pynt = krans(d.g, 2.42, 0.2); d.glimt = glimt(d.g, 1.9);
     } else {   // a door (lille) or a hatch (mini) on the wall
-      const v = vaeg(l), mini = l.type === 'mini', w = mini ? 0.62 : 0.95, h = mini ? 0.62 : 2.0, y0 = mini ? 1.05 : 0;
+      const v = vaeg(l), mini = l.type === 'mini', w = mini ? 0.84 : 0.95, h = mini ? 0.84 : 2.0, y0 = mini ? 1.05 : 0;
       // a wall with a plinth: a hatch sits above it, and a door stands out on the face of the plinth with a deep frame behind it
       const loeft = mini ? Math.max(0, v.sokkel + 0.08 - y0) : 0, ud = !mini && v.sokkel ? v.frem : 0;
       d.vaeg = v; d.staa = [v.x + v.nx * (1.3 + v.frem), v.z + v.nz * (1.3 + v.frem)]; d.r = 2.6;
@@ -9151,9 +9151,9 @@ const KALENDER = (() => {
       const blad = new THREE.Group(); blad.position.set(w / 2, y0, 0); d.led.add(blad);
       box(w, h, 0.06, lys(l.farve || '#7a1f24', 0.3), 0, 0, 0, { parent: blad, cast: false });
       box(0.05, 0.05, 0.08, tm('#c9a35a'), w / 2 - 0.1, h * 0.48, 0.03, { parent: blad, cast: false });   // the handle
-      tal(blad, l.nr, mini ? h * 0.5 : h * 0.72, mini ? 0.5 : 0.62, 0.04);
+      tal(blad, l.nr, mini ? h * 0.5 : h * 0.72, mini ? 0.7 : 0.62, 0.04);
       if (!mini) d.pynt = krans(blad, h * 0.42, 0.2);
-      const st = mini ? 0.58 : 0.88, hy = mini ? y0 + 0.02 : 0.62;   // the thing stands on a little shelf in the doorway
+      const st = mini ? 0.76 : 0.88, hy = mini ? y0 + 0.03 : 0.62;   // the thing stands on a little shelf in the doorway
       if (!mini) box(w, 0.05, 0.1, tm('#6b4a2e'), 0, hy - 0.05, 0.06, { parent: d.g, cast: false });
       d.ting = tingPlade(l, st); d.tingY = hy + st / 2; d.ting.position.set(0, d.tingY, 0.075); d.ting.visible = false; d.g.add(d.ting);
       d.glimt = glimt(d.g, y0 + h / 2);
