@@ -1926,7 +1926,7 @@ for (const b of DATA.B) {
   if (!b.n && b.rings[0][0][0] === 154 && b.rings[0][0][1] === 264) continue;
   if (!b.n && b.rings[0][0][0] === -22 && b.rings[0][0][1] === -100) { mapItems.push({ k: 'p', pts: b.rings[0], fill: '#d9c7a6', line: true }); continue; }   // Kirkeløngangsbygningen, drawn further down
   if (!b.n && b.rings[0][0][0] === 113 && b.rings[0][0][1] === -122) { pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 22, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: '#5aa58e', line: true }); continue; }   // Beskæftigelsesministeriet, drawn further down
-  if (!b.n && b.rings[0][0][0] === 213 && b.rings[0][0][1] === -35) { building(b.rings, 9, '#ad4f37', ROOF_COPPER); continue; }   // the chapel of Holmens Kirke   // the old library, drawn further down
+  if (!b.n && b.rings[0][0][0] === 213 && b.rings[0][0][1] === -35) { pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 9, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: ROOF_COPPER, line: true }); continue; }   // the burial chapel of Holmens Kirke, drawn in HOLMENS KIRKE further down
   if (own) {   // drawn by hand further down; the outline only stops her and the camera
     pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: own[0], bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: own[1], line: true }); continue;
   }
@@ -3339,6 +3339,49 @@ TX.glassGrid = ctex(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 
   // the porch on the west side
   building([[[195, -59], [191, -54], [198, -48], [203, -53]]], 9, '#ad4f37', '#3a3f48');
   building([[[203, -53], [198, -48], [202, -45], [207, -50]]], 8, '#ad4f37', '#3a3f48');
+
+  // The burial chapel (Gravkapellet) along the canal, built 1705-08 by J.C. Ernst in Dutch baroque (lex.dk/Holmens_Kirke):
+  // one long brick front, 21 bays split 8 + 5 + 8 by pilasters, the middle five with segmental-arched windows. Here: the
+  // same brick as the church, a granite plinth, sandstone pilasters, sills and a sandstone cornice, tall windows in every
+  // bay. It has its own random numbers, so nothing else in the world moves.
+  const CH = [[213, -35], [263, -2], [267, -12], [219, -41]], CH_H = 9, chRand = mulberry32(1708);
+  const chRing = (r, y0, y1, mat, edg) => { const eg = new THREE.ExtrudeGeometry(shapeOf([r]), { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); eg.rotateX(-Math.PI / 2); return mesh(eg, mat, 0, y0, 0, edg ? { edges: 25 } : { cast: false }); };
+  const chG = new THREE.ExtrudeGeometry(shapeOf([CH]), { depth: CH_H, bevelEnabled: false, curveSegments: 1 }); chG.rotateX(-Math.PI / 2);
+  mesh(chG, brick, 0, 0, 0, { edges: 25 });
+  const chRoof = new THREE.ShapeGeometry(shapeOf([CH])); chRoof.rotateX(-Math.PI / 2); mesh(chRoof, tm(ROOF_COPPER, true), 0, CH_H + 0.05, 0, { cast: false });
+  chRing(insetRing(CH, -0.28), 0, 0.9, tm('#7d7468'), true);   // the granite plinth
+  chRing(insetRing(CH, -0.4), CH_H - 0.65, CH_H, sand, true);   // the sandstone cornice
+  chRing(insetRing(CH, -0.12), CH_H - 1.0, CH_H - 0.65, sand);   // a thin band under it
+  const chStone = [];   // pilasters and sills, drawn as one instanced mesh
+  const chBlock = (x, y, z, ry, w, h, d) => { _e.set(0, ry, 0, 'YXZ'); _q.setFromEuler(_e); chStone.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y + h / 2, z), _q.clone(), new THREE.Vector3(w, h, d))); };
+  const chFree = (x, z) => !ptIn(body, x, z);   // not against the church itself
+  for (const e of edgesOf(CH)) {
+    const ry = Math.atan2(e.nx, e.nz), at = (t, off) => [e.a[0] + (e.b[0] - e.a[0]) * t + e.nx * off, e.a[1] + (e.b[1] - e.a[1]) * t + e.nz * off];
+    if (e.len > 30) {   // a long front: 21 bays, 8 + 5 + 8
+      const nb = 21;
+      for (let i = 0; i <= nb; i++) {
+        const t = i / nb, wide = i === 8 || i === 13, [x, z] = at(t, 0.1);
+        if (chFree(x + e.nx * 1.2, z + e.nz * 1.2)) chBlock(x, 0.9, z, ry, wide ? 1.0 : 0.55, CH_H - 1.0 - 0.9, 0.36);
+      }
+      for (let i = 0; i < nb; i++) {
+        const t = (i + 0.5) / nb, [x, z] = at(t, WOFF);
+        if (!chFree(x + e.nx * 1.2, z + e.nz * 1.2)) continue;
+        const mid = i >= 8 && i < 13;
+        husChapelWin(mid ? 'arch' : 'rect', x, 4.55, z, ry);
+        const [sx, sz] = at(t, 0.1); chBlock(sx, 2.3, sz, ry, 1.75, 0.16, 0.36);
+      }
+    } else if (e.len > 8 && chFree(e.mx + e.nx * 1.2, e.mz + e.nz * 1.2)) {   // the east gable: one window in the middle
+      const [x, z] = at(0.5, WOFF); husChapelWin('arch', x, 4.55, z, ry); const [sx, sz] = at(0.5, 0.1); chBlock(sx, 2.3, sz, ry, 1.75, 0.16, 0.36);
+    }
+  }
+  function husChapelWin(kind, x, y, z, ry) {
+    _e.set(0, ry, 0, 'YXZ'); _q.setFromEuler(_e);
+    const m = new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), _q.clone(), new THREE.Vector3(1.4, 4.6, 1));
+    WIN[kind] = WIN[kind] || { lit: [], dark: [] };
+    (chRand() < 0.3 ? WIN[kind].lit : WIN[kind].dark).push(m);
+  }
+  const stoneIM = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), sand, chStone.length);
+  chStone.forEach((m, i) => stoneIM.setMatrixAt(i, m)); stoneIM.castShadow = true; stoneIM.receiveShadow = true; stoneIM.frustumCulled = false; world.add(stoneIM);
 }
 
 // ======================================================================== BOATS
