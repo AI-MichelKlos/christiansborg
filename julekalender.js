@@ -223,7 +223,7 @@ export const KALENDER = {
         ],
         efter: [
           ["Hov", "179. To fra Færøerne, to fra Grønland og resten herfra. Så ved jeg, hvor meget grød der skal koges."],
-          ["Hov", "Her er mit stykke og en hestesko. Den bringer held, og det får du brug for. Ham med mappen gik tværs over Ridebanen, mens hestene sov. Kig på fløjen ud mod kanalen."],
+          ["Hov", "Her er mit stykke og en hestesko. Den bringer held, og det får du brug for. Ham med mappen gik tværs over Ridebanen, mens hestene sov. Kig på den lange fløj i den vestlige side af banen."],
         ],
       },
       ting: { navn: "En hestesko fra stalden", billede: "hestesko" },
