@@ -107,7 +107,7 @@ export const KALENDER = {
     sekunder: 75,
     morgen: "Fyrværkeriet er slut, og det bliver lyst over en hvid Slotsholm. Glædelig jul.",
     nisser: {
-      pind: { at: [433.2, -6.2], face: 0, dy: 0.76, replik: "Næste år hjælper han mig med regnestykket, siger han. Med blyant. Det bliver en lang december." },
+      pind: { at: [433.2, -6.2], face: 0, dy: 0.76, replik: "Det var mig, der lagde sedlen i din rygsæk. Nogen skulle finde ham, og mine knæ klarer ikke trapperne længere. Næste år hjælper han mig med regnestykket. Med blyant." },
       hov: { at: [433.2, 0.8], face: 0, dy: 0.76, replik: "Hestene fik pebernødderne. De siger tak, og de har ikke spurgt efter mandariner en eneste gang." },
       slev: { at: [433.2, 7.8], face: 0, dy: 0.76, replik: "Ingen spiser grød alene på Borgen. Sæt dig bare. Der er en mandel i én af skålene." },
       kendelse: { at: [445.8, 0.8], face: 0, dy: 0.76, replik: "Retten konstaterer, at julen er gyldig. Sagen er afsluttet. Retten går over til grøden." },
@@ -130,7 +130,7 @@ export const KALENDER = {
       ved: [22.4, 58.8], retning: 327, farve: "#7a1f24",
       praj: "Rigsdagsgården. Kig ved hjørnet af den store trappe op til Folketinget.",
       bag: [
-        ["fortaeller", "Bag døren står en kaffekop, der stadig er varm, og en stak gule sedler med et stempel på."],
+        ["fortaeller", "Bag døren står en kaffekop, der stadig er varm, og en stak gule sedler med stemplet »Til orientering«."],
         ["fortaeller", "På den øverste står: »Stykkerne er gemt, hvor ingen embedsmand kigger: bag døre med tal på. Gå videre til dem, der tæller pengene. Pind.«"],
         ["ida", "Dem, der tæller pengene. Det må være Den Røde Bygning."],
       ],
@@ -147,7 +147,7 @@ export const KALENDER = {
       ],
       gaade: {
         foer: [
-          ["Pind", "Du er hende fra arkivet. Godt. Jeg har talt finansloven efter hver jul siden 1849, og den har aldrig stemt, før vi rettede den."],
+          ["Pind", "Du er hende fra arkivet. Godt. Jeg har talt finansloven efter hver jul siden 1849, og den har aldrig stemt, før vi rettede den. I år er julen også ramt af omprioriteringsbidraget, så vi har ét stearinlys mindre."],
           ["ida", "Hvem har revet protokollen over?"],
           ["Pind", "Det ved jeg ikke endnu. Men jeg giver ikke mit stykke til en, der ikke kan huset. Svar mig på én ting."],
         ],
@@ -171,7 +171,7 @@ export const KALENDER = {
       praj: "Over kanalen ved Gammel Strand. Kulturministeriet i det gamle pantelånerhus i Nybrogade, det gule hus med porten. Kig efter en lille rød luge med et tal lige ved siden af porten.",
       bag: [
         ["fortaeller", "Lugen går op på klem. En nisse med læsebriller ser på Ida uden at sige noget i lang tid."],
-        ["Nissen", "Vi har lukket for i år. Ansøgningsfristen var i september."],
+        ["Nissen", "Vi har lukket for i år. Ansøgningsfristen var i september, og resten af puljen er brugt på en evaluering af puljen."],
         ["fortaeller", "Lugen smækker så hårdt, at hans læsebriller falder af. De ligger tilbage i sprækken sammen med et stykke papir."],
       ],
       ting: { navn: "Et par læsebriller", billede: "briller" },
@@ -260,7 +260,7 @@ export const KALENDER = {
       praj: "Tøjhusmuseet, det lange hus syd for slottet. Kig på muren ud mod Bibliotekshaven.",
       bag: [
         ["fortaeller", "Bag døren står en meget lille kanon. I løbet sidder en sammenrullet seddel."],
-        ["fortaeller", "»Julestrategi 2030, udkast 14. Protokollen udgår og erstattes af et regneark. Høringsfrist: ingen. Bilag.«"],
+        ["fortaeller", "»Julestrategi 2030, udkast 14. Protokollen udgår og erstattes af et regneark. Nisserne beskæres med 2 procent om året efter grønthøstermodellen. Høringsfrist: i går. Bilag.«"],
         ["ida", "Så har han et navn. Bilag."],
         ["fortaeller", "Nederst står med blyant: »Husk at aflevere bogen.«"],
       ],
@@ -272,7 +272,7 @@ export const KALENDER = {
       ved: [98, 208], retning: 146, farve: "#2f5a43",
       praj: "Det Kongelige Bibliotek, det gamle hus af røde mursten. Kig på muren ud mod Bibliotekshaven.",
       bag: [
-        ["fortaeller", "Bag døren står en bog: »Sådan afskaffer man en tradition på tolv trin«. På lånerkortet står: Bilag. Afleveres: for længst."],
+        ["fortaeller", "Bag døren står en bog: »Regelforenkling for begyndere. Sådan afskaffer man en tradition på tolv trin«. På lånerkortet står: Bilag. Afleveres: for længst."],
         ["fortaeller", "Som bogmærke ligger en kvittering fra Snapstinget. Én portion risengrød, hver aften i tre uger."],
         ["ida", "Han spiser grød alene hver aften. Det er næsten synd for ham. Den korteste vej til Snapstinget går gennem Proviantpassagen."],
       ],
@@ -285,7 +285,7 @@ export const KALENDER = {
       praj: "Proviantpassagen, porten mellem Proviantgården og Rigsdagsgården. Gå ind i porten, og kig efter en luge i murvæggen.",
       bag: [
         ["fortaeller", "Lugen går op. Derinde sover en nisse oven på en stak finanslovsforslag. Ved siden af ham står et lys, der er brændt næsten ned."],
-        ["Nissen", "Til tredjebehandlingen."],
+        ["Nissen", "Vi vender tilbage efter tredjebehandlingen."],
         ["fortaeller", "Han vender sig om på den anden side og sover videre. Under hans hue stikker et stykke papir ud."],
       ],
       ting: { navn: "Et lys, der er brændt næsten ned", billede: "lys" },
@@ -325,7 +325,7 @@ export const KALENDER = {
       ved: [39.8, -41.2], retning: 225, farve: "#7a1f24",
       praj: "Slotspladsen foran slottet. Kig på slottets mur til højre for Kongeporten under tårnet.",
       bag: [
-        ["fortaeller", "Bag døren hænger et regneark, sat op med tape. »Julen, version 2. Gaver: 0. Grød: udgår. Stearinlys: erstattes af ét fælles lys. Besparelse: 100 procent.«"],
+        ["fortaeller", "Bag døren hænger et regneark, sat op med tape. »Julen, version 2. Gaver: 0. Grød: udgår. Stearinlys: ét fælles lys efter udbud. Nisser: erstattes af konsulenter. Besparelse: 100 procent.«"],
         ["fortaeller", "Nederst har nogen skrevet med rød tusch og en anden håndskrift: »Hvor er glæden? Den står ikke i nogen kolonne.«"],
         ["ida", "Så er der i hvert fald én til, der har læst det. Fodsporene går over Slotspladsen mod Børsen."],
       ],
@@ -366,7 +366,7 @@ export const KALENDER = {
       ],
       gaade: {
         foer: [
-          ["Kendelse", "Sagen Julen mod Bilag. Retten har ventet på et vidne. Det er dig."],
+          ["Kendelse", "Sagen Julen mod Bilag. Retten har modtaget fjorten udkast og et notat om notaterne, men mangler et vidne. Det er dig."],
           ["ida", "Kan han bare afskaffe protokollen?"],
           ["Kendelse", "Det afgør retten. Men først skal vidnet vise, at hun kender ordningen. Svar på én ting."],
         ],
@@ -409,7 +409,7 @@ export const KALENDER = {
         foer: [
           ["Stempel", "Du behøver ikke sige noget. Jeg har hørt det hele gennem væggen. Højesteret taler højt."],
           ["ida", "Hvor er Bilag?"],
-          ["Stempel", "Han var her og ville have protokollen stemplet som ophævet. Det ville jeg ikke. Men du får heller ikke noget, før du har svaret."],
+          ["Stempel", "Han var her og ville have protokollen stemplet som ophævet. Konsekvensanalysen fyldte én linje: »Ingen.« Det ville jeg ikke stemple. Men du får heller ikke noget, før du har svaret."],
         ],
         spoergsmaal: "Hvem udnævner statsministeren?",
         svar: [

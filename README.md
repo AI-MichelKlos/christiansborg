@@ -31,7 +31,7 @@ Spillets udseende ligger i et tema, som kan skiftes. Mordgåden bruger temaet `k
 Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er to spor: `mord` (mordgåden) og `jul` (julekalenderen).
 
 ## Julekalenderen
-En julekalender for voksne med 24 låger på Slotsholmen. Alle 24 låger er skrevet, og kalenderen kan spilles færdig. Prøv den her: https://ai-michelklos.github.io/christiansborg/?spor=jul
+En julekalender for voksne med 24 låger på Slotsholmen. Alle 24 låger er skrevet, og kalenderen kan spilles færdig. Den har sin egen adresse: https://ai-michelklos.github.io/christiansborg/jul/
 
 - Lågerne er døre med tal på rundt på Slotsholmen. De åbnes i rækkefølge, og den næste låge lyser svagt. Øverst til venstre står et praj om, hvor den er.
 - Der er tre slags: store låger (et rum med en nisse og en gåde), små låger (en dør, man åbner udefra) og mini-låger (en luge med en overraskelse).
