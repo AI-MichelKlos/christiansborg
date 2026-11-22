@@ -54,8 +54,8 @@ export const KALENDER = {
   datolaas: { aar: 2026 },
 
   start: {
-    ved: [-17.3, 119.1],   // porten i Tøjhusgade
-    kig: 329,              // ind mod Rigsdagsgården
+    ved: [-5, -212],       // Højbro Plads, ved Absalon
+    kig: 180,              // mod Højbro og slottet
     eyebrow: "1. december",
     titel: "En seddel i rygsækken",
     replikker: [

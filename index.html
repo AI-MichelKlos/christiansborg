@@ -555,6 +555,10 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 </div>
 
 <script>
+// The first seconds, before the 3D world and the edition's own file have loaded: show the right edition at once.
+(function(){ var q = new URLSearchParams(location.search), F = { jul: ['Nissernes protokol', 'Christiansborg · en julekalender for voksne', 'Julekalenderen hentes …'] }[q.get('spor')];
+  if (!F) return; document.documentElement.dataset.tema = q.get('tema') || 'jul'; document.title = F[0];
+  document.getElementById('introTitle').textContent = F[0]; document.querySelector('#intro .eyebrow').textContent = F[1]; document.getElementById('introLead').textContent = F[2]; })();
 setTimeout(function(){ if(!window.__gameReady){ var e=document.getElementById('loadErr'); if(e) e.hidden=false; var b=document.getElementById('goBtn'); if(b) b.textContent='Kunne ikke hente 3D-motoren'; } }, 12000);
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
@@ -4141,9 +4145,11 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
   let stopS = 0;   // where the middle car is right in front of the stairs
   for (let i = 1; i < R.pts.length; i++) { const [ax, az] = FT.loc(...R.pts[i - 1]), [bx, bz] = FT.loc(...R.pts[i]); if (az < 12 && bz < 12 && ax > 0 && bx <= 0) { stopS = R.d[i - 1] + (R.d[i] - R.d[i - 1]) * ax / (ax - bx); break; } }
   const GAP = 7.5, OFFS = [GAP, 0, -GAP];   // the first car, the prime minister's car, the last car
+  let carGateS = GAP + 0.5;   // the calendar's start: the first car just outside the gate from Tøjhusgade
+  for (let i = 1; i < R.pts.length; i++) if (Math.hypot(R.pts[i][0] + 3, R.pts[i][1] - 114) < 0.7) { carGateS = Math.max(carGateS, R.d[i] - 4); break; }
   // In the murder mystery the prime minister's cars come once in a game (flag biler_kom), the first time Ida is near
   const S = { phase: 'idle', s: 0, v: 0, t: 0, cool: 0, waved: false, ev: {} };
-  FT.state = S; FT.route = R; FT.stopS = stopS;
+  FT.state = S; FT.route = R; FT.stopS = stopS; FT.gateS = carGateS;
   const spawn = (p, lx, lz) => { const [x, z] = FT.at(lx, lz), h = Math.atan2(-FT.n[0], -FT.n[1]); Object.assign(p, { x, z, y: 0, path: [], on: true, wave: 0, h, dir: h, vx: 0, vz: 0, k: 0, climb: 0, look: null, lead: null }); if (p === PM) p.trail = [[x, z, 0]]; p.g.visible = true; };
   const goTo = (p, ...lpts) => { p.path = lpts.map(([lx, lz]) => FT.at(lx, lz)); };
   const carPos = (off) => { const [x, z, h] = routeAt(R, Math.max(0, Math.min(R.len, S.s + off))); return [x, z, h]; };
@@ -4221,10 +4227,12 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
   const hide = p => { Object.assign(p, { on: false, lead: null, path: [], vx: 0, vz: 0 }); p.g.visible = false; };
   const depthOf = p => FT.loc(p.x, p.z)[1];   // how far out from the facade
   HOOKS.frame.push((dt, t) => {
-    const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && !AAR_ON && Math.hypot(P.pos.x - ex, P.pos.z - ez) < 45;
+    // In the calendar Ida comes from Højbro Plads round the far end of the yard. The cars start a little earlier and are
+    // already turning in at the gate when she gets there, so she does not have to wait for them, and nothing is said.
+    const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && !AAR_ON && Math.hypot(P.pos.x - ex, P.pos.z - ez) < (KAL ? 72 : 45);
     if (S.phase === 'idle') {
       if (S.cool > 0) S.cool -= dt;
-      else if (near && !GAADE.G.flag.some(f => f === 'biler_kom' || f === 'beg_statsministeren') && !PERSONER.i1942()) { GAADE.G.flag.push('biler_kom'); S.phase = 'in'; S.s = GAP + 0.5; S.v = 6; S.ev = {}; FT_CARS.forEach(c => { c.g.visible = true; c.fresh = true; c.want = [0, 0]; c.doors.forEach(d => { d.userData.a = 0; d.rotation.y = 0; }); }); toast('Tre sorte biler kører ind i Rigsdagsgården.'); }
+      else if (near && !GAADE.G.flag.some(f => f === 'biler_kom' || f === 'beg_statsministeren') && !PERSONER.i1942()) { GAADE.G.flag.push('biler_kom'); S.phase = 'in'; S.s = KAL ? carGateS : GAP + 0.5; S.v = 6; S.ev = {}; FT_CARS.forEach(c => { c.g.visible = true; c.fresh = true; c.want = [0, 0]; c.doors.forEach(d => { d.userData.a = 0; d.rotation.y = 0; }); }); if (!KAL) toast('Tre sorte biler kører ind i Rigsdagsgården.'); }
     }
     const v0 = S.v;
     if (S.phase === 'in' || S.phase === 'out') {
@@ -4270,7 +4278,7 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
       once('pm', T, 3.0, () => {
         spawn(PM, l1[0] + 0.6, l1[1] - 0.6); PM.speed = 1.2; goTo(PM, [l1[0] + 0.75, l1[1] - 2.2], [0, 7.0], [0, 6.1]);
         const close = Math.hypot(P.pos.x - PM.x, P.pos.z - PM.z) < 16;
-        toast(close ? 'Statsministeren stiger ud og går op ad trappen.' : 'Statsministeren er ankommet til Folketinget.');
+        if (!KAL) toast(close ? 'Statsministeren stiger ud og går op ad trappen.' : 'Statsministeren er ankommet til Folketinget.');
       });
       once('c1b', T, 4.4, () => { door(C1, 1, false); G2.look = yardDir(-0.6, -1); });   // he shuts her door and watches her go
       if (PM.on && !E.foot && T > 3.5 && !PM.path.length) {   // at the foot of the stairs
