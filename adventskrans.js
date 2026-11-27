@@ -26,7 +26,7 @@ export const KALENDER = {
   version: 1,
   overskrift: "Christiansborg · et julespil for voksne",
   titel: "Nissernes adventskrans",
-  forside: "Adventskransen i Rigsdagsgården er blevet effektiviseret. Bilag fra Effektiviseringsenheden har fjernet alle fire lys efter grønthøstermodellen. Men fire nisser nåede at redde hver sit lys og gemme det på Slotsholmen. Find dem, og tænd kransen igen, før det bliver jul.",
+  forside: "Adventskransen i Rigsdagsgården er blevet effektiviseret, og alle fire lys er væk. Men fire nisser har gemt hver sit lys på Slotsholmen. Find dem, og tænd kransen igen, før det bliver jul.",
   gemTekst: "Spillet gemmer selv, så du kan fortsætte på denne telefon eller computer.",
 
   start: {
@@ -35,22 +35,18 @@ export const KALENDER = {
     eyebrow: "En aften i december",
     titel: "En krans uden lys",
     replikker: [
-      ["fortaeller", "Det sner over Slotsholmen. Ida er på vej hjem fra arkivet. På Højbro Plads står en meget lille mand med rød hue og en mappe under armen. Han har ventet på hende."],
-      ["Pind", "Kontorchef Pind, Finansministeriet. Vi har et problem. Adventskransen i Rigsdagsgården er blevet effektiviseret."],
-      ["ida", "Effektiviseret?"],
-      ["Pind", "Bilag fra Effektiviseringsenheden har fjernet de fire lys. Han kalder det en budgetneutral omlægning af julen. Heldigvis nåede fire af os at redde hver sit lys, før han fik dem talt op."],
-      ["Pind", "Find nisserne, få lysene, og tænd dem på kransen. Begynd i Folketinget. Slev står i køkkenet, og han giver ikke noget fra sig, før man har sagt goddag."],
+      ["fortaeller", "Det sner over Slotsholmen. På Højbro Plads står kontorchef Pind fra Finansministeriet og venter på Ida."],
+      ["Pind", "Adventskransen i Rigsdagsgården er blevet effektiviseret. Bilag fra Effektiviseringsenheden har fjernet de fire lys."],
+      ["Pind", "Heldigvis nåede fire nisser at redde hver sit. Find dem, og tænd lysene på kransen. Begynd hos Slev i køkkenet i Folketinget."],
     ],
   },
 
   hjaelpTitel: "Sådan tænder du kransen",
   hjaelpKnap: "Find det første lys",
   hjaelp: [
-    { b: "Fire lys.", t: "Fire nisser har reddet hver sit lys. Find dem i rækkefølge. Øverst til venstre står, hvor du skal hen, og pilen viser vejen." },
-    { b: "Find nissen.", t: "Gå hen til skiltet med tallet ved bygningens dør, og gå ind. Nissen står derinde og venter." },
-    { b: "Tænd lyset.", t: "Når du har fået et lys, går du til adventskransen ved den store trappe i Rigsdagsgården og tænder det. Så kan du hente det næste." },
-    { b: "Kransen.", t: "Under knappen Kransen øverst kan du se, hvilke lys du har fundet, og slå pilen til og fra." },
-    { b: "Når alle fire brænder,", t: "bliver det juleaften på Borgen. Så skal du op i Tårnet." },
+    { b: "Find lysene.", t: "Øverst til venstre står, hvor du skal hen, og pilen viser vejen. Gå ind, hvor skiltet med tallet står, og tal med nissen." },
+    { b: "Tænd dem.", t: "Tag lyset med til adventskransen ved den store trappe i Rigsdagsgården. Når alle fire brænder, skal du op i Tårnet." },
+    { b: "Styring.", t: "Gå med venstre tommel eller W, A, S, D. Knappen nederst bruger du til at gå ind og tale (E på tastaturet)." },
   ],
 
   // ét for hvert lys, der tændes. Navnet er overskriften, og teksten vises, når lyset er tændt

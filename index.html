@@ -4006,7 +4006,7 @@ const VEHICLES = [];
       const waiting = started && !MYBOAT.on && along > 0 && along < (v.kind === 'car' ? 9 : 6) && side < (v.kind === 'car' ? 2.0 : 1.4);
       if (waiting) {
         target = 0;
-        if (v.waitT <= 0 && Math.hypot(dx, dz) < 12) { if (v.kind === 'car') beep(); else bell(); if (clockT - saidT > 20) { saidT = clockT; toast(v.kind === 'car' ? 'Bilen holder stille og venter på dig.' : 'Cyklisten venter på dig.'); } }
+        if (v.waitT <= 0 && Math.hypot(dx, dz) < 12) { if (v.kind === 'car') beep(); else bell(); if (!KAL && clockT - saidT > 20) { saidT = clockT; toast(v.kind === 'car' ? 'Bilen holder stille og venter på dig.' : 'Cyklisten venter på dig.'); } }
         v.waitT = 4;
       } else if (v.waitT > 0) v.waitT -= dt;
       for (const o of VEHICLES) {
@@ -5081,9 +5081,9 @@ function opklarTrin() {
 function visTrin(box) { box.replaceChildren(...(KAL ? KALDATA.hjaelp : opklarTrin()).map(({ b, t }) => { const p = document.createElement('p'), s = document.createElement('b'); s.textContent = b + ' '; p.append(s, t); return p; })); }
 function openIntro(help) {
   paused = true; keys.clear(); resetTouch(); GAADE.startKnapper();
-  if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='riddersal'?'I Riddersalen':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='riddersal'?'Gå langs gobelinerne og det dækkede langbord. Hoffoureren står ved bordets ende. Gå tilbage til døren og vælg Gå udenfor for at komme ud i Prins Jørgens Gård. Salens mål er anslået, og gobelinerne er ikke kopier af de rigtige.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
+  if (help && KAL) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = KALDATA.hjaelpTitel || 'Sådan åbner du lågerne'; $('introLead').textContent = ''; }
+  else if (help && FX.interior?.on) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = FX.interior.place.startsWith('tower')?'Inde i Tårnet':FX.interior.place==='stables'?'Inde i De Kongelige Stalde':FX.interior.place==='courtEntry'?'Højesterets vindfang':FX.interior.place==='pmEntry'?'Statsministeriets forhal':FX.interior.place==='riddersal'?'I Riddersalen':FX.interior.place==='finance'?'Inde i Finansministeriet':FX.interior.place==='reform'?'Inde i Reformministeriet':'Inde i Folketinget'; $('introLead').textContent = 'Snapstinget nås til venstre og betjentstuen til højre ved indgangen. Kompaspartiets gang åbner fra Vandrehallen mod Folketingssalen. Begge ender af Vandrehallen har åbne døre til Folketingssalen og Landstingssalen. Gå op til Vandrehallen og videre gennem en af de to åbne døre til Samtaleværelset. Brug de samme taster eller venstre tommel til at gå. Træk for at kigge. Du kan gå tilbage til døren eller vælge Ud i gården. Interiøret er en foreløbig fortolkning; trappens udformning og forbindelsen til hallen er anslået.'; if(FX.interior.place!=='folketing')$('introLead').textContent=FX.interior.place.startsWith('tower')?'Vælg etage for at komme mellem elevatorhallen, restauranten og Udsigten. Inde i restauranten kan du gå frit mellem bordene og op ad sidetrappen. På Udsigten drejer du blikket og bruger Kikkert. Rummenes mål og forbindelser er tilpasset spillet.':FX.interior.place==='stables'?'Gå langs den brede staldgang mellem marmorsøjlerne og se spiltovene. Gå tilbage til den åbne port eller vælg Gå udenfor for at komme ud til Ridebanen. Rummet er en forenklet fortolkning efter billedreferencer.':FX.interior.place==='riddersal'?'Gå langs gobelinerne og det dækkede langbord. Hoffoureren står ved bordets ende. Gå tilbage til døren og vælg Gå udenfor for at komme ud i Prins Jørgens Gård. Salens mål er anslået, og gobelinerne er ikke kopier af de rigtige.':FX.interior.place==='courtEntry'?'Spillets vindfang er en forenkling. Gå tilbage gennem den åbne dør eller vælg Gå udenfor. Portalen bygger på fotos af de fire søjler, den buede rude og trappen.':FX.interior.place==='pmEntry'?'En lille forhal bag spillets åbne indgang. Dør, skilt og lamper bygger på et officielt foto; forhallens indretning er anslået. Gå tilbage til døren eller vælg Gå udenfor.':FX.interior.place==='finance'?'Garderoben ligger til venstre for foyeren. Følg gangen til forhandlingsrummet. Gå frit rundt, slip joysticket for at stoppe og træk til højre for at kigge. Vælg Gå udenfor for at komme tilbage til Slotspladsen. Rummenes placering er tilpasset spillet.':'Følg gangen til departementschefens kontor, printerområdet og sidedøren. Slip joysticket for at stoppe og træk til højre for at kigge. Handlingsknappen ved sidedøren fører ud på den side af bygningen. Reformministeriet og indretningen er fiktive.'; }
   else if(help&&FX.tower?.on){goBtn.textContent='Fortsæt';$('introTitle').textContent='Udsigten · 44 m';$('introLead').textContent='Drej rundt med piletasterne, joysticket eller ved at trække. Kikkert zoomer ind. Vælg etage for at komme til restauranten eller elevatorhallen. Slip joysticket for at stoppe med at dreje.';}
-  else if (help && KAL) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan åbner du lågerne'; $('introLead').textContent = 'Gå rundt på Slotsholmen, og find dørene med tal på. Handlingsknappen viser, hvad du kan gøre.'; }
   else if (help) { goBtn.textContent = 'Fortsæt'; $('introTitle').textContent = 'Sådan opklarer du mordet'; $('introLead').textContent = 'Gå rundt på Slotsholmen og ind i bygningerne. Åbne døre fører ind, og handlingsknappen viser, hvad du kan gøre. Tryk N for notesbogen, R for rygsækken og M for oversigtskortet. Uret går, når Ida går og taler. Går du i stå, kan Bente i betjentstuen give dig et hint, og under Indstillinger kan du slå Næste spor til.'; }
   if (help) visTrin($('introTrin'));
   $('introTrin').hidden = !help;
@@ -5301,7 +5301,7 @@ function frame(now) {
   sky.position.copy(camera.position);
   tmpA.copy(sunOff).normalize().multiplyScalar(420).add(camera.position); sunSprite.position.copy(tmpA);
   if (started) {
-    poiT -= dt; if (poiT < 0) { poiT = 0.25; showPoi(paused ? null : poiAt(P.pos.x, P.pos.z)); } if (!paused) tickPoi();
+    poiT -= dt; if (poiT < 0) { poiT = 0.25; showPoi(paused || KAL ? null : poiAt(P.pos.x, P.pos.z)); } if (!paused) tickPoi();   // a calendar edition has no place cards
     mapT -= dt; if (mapT < 0) { mapT = 1 / 30; drawMap(); }
     if (toastTimer > 0) { toastTimer -= dt; if (toastTimer <= 0) $('toast').hidden = true; }
   }
@@ -5974,9 +5974,9 @@ const TOWER = (() => {
       if (ride.t > 2.1 && !ride.dinged) { ride.dinged = true; ding(); lift.classList.remove('on'); }
       if (ride.t > 2.6) {
         const up = ride.up,room=ride.room; ride = null; T.busy = false;
-        if(room)toast(room==='towerRestaurant'?'Du er i restauranten, 34 meter over gaden.':'Du er i elevatorhallen ved Kongeporten.');
+        if(room){ if(!KAL)toast(room==='towerRestaurant'?'Du er i restauranten, 34 meter over gaden.':'Du er i elevatorhallen ved Kongeporten.'); }
         else if (up) { toast(firstUp ? `Du er 44 meter oppe. Drej rundt og kig ud over byen. ${isTouch ? 'Tryk på Kikkert' : 'Tryk på mellemrum'} for at kigge langt.` : 'Du er oppe i tårnet igen.'); firstUp = false; }
-        else toast('Nu er du nede igen.');
+        else if (!KAL) toast('Nu er du nede igen.');
       }
     }
     if (!started || paused) return;
@@ -7417,7 +7417,7 @@ const INTERIOR = (() => {
     build(); I.place=place; I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
     I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
     P.pos.set(I.x+(place==='towerLobby'?400:place==='towerRestaurant'?440:place==='courtEntry'?540:place==='pmEntry'?500:place==='riddersal'?607:place==='finance'?100:place==='stables'?300:place==='reform'?(side?212:200):0),0,place==='towerLobby'?7:place==='towerRestaurant'?11:place==='folketing'?21:place==='courtEntry'?3:place==='pmEntry'?2:place==='riddersal'?0:place==='stables'?18:side?-16:8);P.face=side?-Math.PI/2:place==='riddersal'?Math.PI/2:Math.PI;cam.yaw=P.face+Math.PI;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
-    document.body.classList.add('inFolketing');document.body.classList.toggle('inTowerRooms',place.startsWith('tower'));$('indoorExit').textContent=place==='towerRestaurant'?'Til elevatorhallen':place==='folketing'?'Ud i gården':'Gå udenfor';showPoi(null);toast(place==='towerLobby'?'Gå hen til elevatoren eller vælg en etage.':place==='towerRestaurant'?'Udforsk restauranten. Trappen og etagevalget fører til Udsigten.':place==='stables'?'Følg den brede staldgang mellem marmorsøjlerne.':place==='courtEntry'?'Du er i spillets forenklede vindfang. Udgangen fører tilbage gennem søjleportalen.':place==='pmEntry'?'Du er i spillets forenklede forhal. Udgangen fører til Prins Jørgens Gård.':place==='riddersal'?'Riddersalen er ved at blive dækket op til aftenens gallamiddag.':place==='finance'?'Garderoben er til venstre. Forhandlingsrummet ligger lige fremme.':place==='reform'?'Udforsk kontoret, printerområdet og gangen til sidedøren.':'Snapstinget er til venstre og betjentstuen til højre. Kompaspartiet ligger ved Vandrehallen.');
+    document.body.classList.add('inFolketing');document.body.classList.toggle('inTowerRooms',place.startsWith('tower'));$('indoorExit').textContent=place==='towerRestaurant'?'Til elevatorhallen':place==='folketing'?'Ud i gården':'Gå udenfor';showPoi(null);if(!KAL||place.startsWith('tower'))toast(place==='towerLobby'?'Gå hen til elevatoren eller vælg en etage.':place==='towerRestaurant'?'Udforsk restauranten. Trappen og etagevalget fører til Udsigten.':place==='stables'?'Følg den brede staldgang mellem marmorsøjlerne.':place==='courtEntry'?'Du er i spillets forenklede vindfang. Udgangen fører tilbage gennem søjleportalen.':place==='pmEntry'?'Du er i spillets forenklede forhal. Udgangen fører til Prins Jørgens Gård.':place==='riddersal'?'Riddersalen er ved at blive dækket op til aftenens gallamiddag.':place==='finance'?'Garderoben er til venstre. Forhandlingsrummet ligger lige fremme.':place==='reform'?'Udforsk kontoret, printerområdet og gangen til sidedøren.':'Snapstinget er til venstre og betjentstuen til højre. Kompaspartiet ligger ved Vandrehallen.');
   }
   function leave(side=false,transfer=false) {
     if(!I.on)return;
@@ -7425,7 +7425,7 @@ const INTERIOR = (() => {
     I.on=false;g.visible=false;world.visible=true;dyn.visible=true;scene.fog=I.fog;scene.background=I.bg;evApplied=-1;applyEvening();
     const d=I.place.startsWith('tower')?{x:TOWER.door[0],z:TOWER.door[1],nx:TOWER.OUT[0],nz:TOWER.OUT[1],ry:Math.atan2(...TOWER.OUT)}:I.place==='folketing'?null:MINISTRY_DOORS[I.place==='reform'&&side?'reformSide':I.place];
     const distance=I.place==='courtEntry'?8:3;const p=d?[d.x+d.nx*distance,d.z+d.nz*distance]:FT.at(0,2.5);P.pos.set(p[0],d?0:1.2,p[1]);P.face=d?d.ry:Math.atan2(FT.n[0],FT.n[1]);P.vel.set(0,0,0);cam.yaw=P.face+Math.PI;camInit=false;kid.root.position.copy(P.pos);
-    document.body.classList.remove('inFolketing','inTowerRooms');keys.clear();if(!transfer)toast(I.place.startsWith('tower')?'Du er tilbage ved Kongeporten.':I.place==='folketing'?'Du er tilbage i Rigsdagsgården.':(I.place==='pmEntry'||I.place==='courtEntry'||I.place==='riddersal')?'Du er tilbage i Prins Jørgens Gård.':I.place==='finance'?'Du er tilbage på Slotspladsen.':I.place==='stables'?'Du er tilbage ved Ridebanen.':'Du er tilbage ved Reformministeriet.');
+    document.body.classList.remove('inFolketing','inTowerRooms');keys.clear();if(!transfer&&!KAL)toast(I.place.startsWith('tower')?'Du er tilbage ved Kongeporten.':I.place==='folketing'?'Du er tilbage i Rigsdagsgården.':(I.place==='pmEntry'||I.place==='courtEntry'||I.place==='riddersal')?'Du er tilbage i Prins Jørgens Gård.':I.place==='finance'?'Du er tilbage på Slotspladsen.':I.place==='stables'?'Du er tilbage ved Ridebanen.':'Du er tilbage ved Reformministeriet.');
   }
   // Separate indoor navigation avoids outdoor building, water and bounds collisions.
   HOOKS.ride.unshift(dt=>{
@@ -7473,10 +7473,10 @@ const INTERIOR = (() => {
       if((I.place==='courtEntry'?z>3.5:I.place==='pmEntry'?z>2.5:I.place==='riddersal'?x<608.5:I.place==='stables'?z>17:(z>7&&x<(I.place==='finance'?102:202)))||side)offerAction({id:'ministry-exit',label:side?'Gå ud gennem sidedøren':'Gå udenfor',prio:10,run:()=>leave(side)});
     }
     if(room==='hall'&&z>19)offerAction({id:'folketing-exit',label:'Gå ud i Rigsdagsgården',prio:10,run:leave});
-        if(room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
+        if(!KAL&&room==='hall'&&z<4&&Math.abs(x)<5)offerAction({id:'rigetsmidte-info',label:'Om Rigets midte',prio:5,run:()=>toast('De seks marmorsøjler stammer fra det andet Christiansborg og overlevede branden.')});
 
   });
-  const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);if(isTouch)badge.querySelector('span').textContent='Kameraet følger · slip for at stoppe';
+  const badge=document.createElement('div');badge.id='indoorBadge';badge.innerHTML='<strong id="indoorName">Folketinget</strong><span>Gå frit rundt · træk for at kigge</span>';hud.appendChild(badge);if(isTouch)badge.querySelector('span').textContent='Kameraet følger · slip for at stoppe';if(KAL)badge.style.display='none';   // a calendar edition shows no room names
   const exit=document.createElement('button');exit.id='indoorExit';exit.className='sticker btn';exit.textContent='Ud i gården';exit.addEventListener('click',()=>I.place==='towerRestaurant'?liftTo('towerLobby'):leave());hud.appendChild(exit);
   const shortcut=document.createElement('button');shortcut.className='go alt';shortcut.id='goFolketing';shortcut.textContent='Start ved Folketingets indgang';goBtn.after(shortcut);if(!TESTMODE)shortcut.style.display='none';
   shortcut.addEventListener('click',()=>{if(!window.__gameReady)return;if(I.on){goBtn.click();return;}if(MYBOAT.on||TOWER.on||TOWER.busy)return;goBtn.click();const p=FT.at(0,6.5);P.pos.set(p[0],0,p[1]);P.face=Math.atan2(-FT.n[0],-FT.n[1]);cam.yaw=P.face+Math.PI;camInit=false;startBlend=1;toast('Gå op ad trappen og ind gennem den åbne hoveddør.');});
@@ -7536,7 +7536,7 @@ const WAYFIND=(()=>{
       {name:'Trappen · Snapstinget · ud',next:[0,8],text:'Gå tilbage til den brede trappe midt på hallens indgangsside. Gå ned ad begge trappeløb.'}
     ],true,true);
   }
-  HOOKS.frame.push(()=>{if(!started||paused||dialog.open||MYBOAT.on||TOWER.on||TOWER.busy)return;let best=null,bd=3.5;for(const sign of items){if(sign.inside!==INTERIOR.on||sign.inside&&INTERIOR.place!=='folketing'||Math.abs(P.pos.y-sign.y)>2.5)continue;const d=Math.hypot(P.pos.x-sign.x,P.pos.z-sign.z);if(d<bd){best=sign;bd=d;}}if(best)offerAction({id:'read-wayfinding',label:'Læs vejviser',prio:4,run:()=>show(best)});});
+  HOOKS.frame.push(()=>{if(KAL||!started||paused||dialog.open||MYBOAT.on||TOWER.on||TOWER.busy)return;let best=null,bd=3.5;for(const sign of items){if(sign.inside!==INTERIOR.on||sign.inside&&INTERIOR.place!=='folketing'||Math.abs(P.pos.y-sign.y)>2.5)continue;const d=Math.hypot(P.pos.x-sign.x,P.pos.z-sign.z);if(d<bd){best=sign;bd=d;}}if(best)offerAction({id:'read-wayfinding',label:'Læs vejviser',prio:4,run:()=>show(best)});});
   return {items,indoor,show,arrow,gates:{slots:slotsGate,toej:toejGate}};
 })();
 FX.wayfinding=WAYFIND;
@@ -9152,6 +9152,11 @@ const KALENDER = (() => {
   $('ur').hidden = true; $('bPack').hidden = true;
   $('bNotes').querySelector('span').textContent = KR ? 'Kransen' : 'Kalender';
   for (const id of ['setSpor', 'set1942']) { const l = $(id)?.closest('label'); if (l) l.hidden = true; }
+  // Less text in a calendar edition: no key list (the mystery's notebook and backpack keys do not exist here; the help under ? says how to walk), no "look around" hint, a short credit line, and a description that fits the game
+  { const sty = $('intro').querySelector('details.styring'); if (sty) sty.hidden = true; }
+  $('lookHint')?.remove();
+  { const foot = $('intro').querySelector('.foot'); if (foot) foot.textContent = 'Kortdata: © OpenStreetMap-bidragydere (ODbL).'; }
+  document.querySelector('meta[name="description"]')?.setAttribute('content', `${K.titel}: ${K.overskrift.replace(/^Christiansborg · /, '')} i 3D på Christiansborg og Slotsholmen i København.`);
   // The front page looks like a real advent calendar: Christiansborg in the snow over 24 doors. The doors already opened
   // show their thing, today's door glows, and the rest wait for their day. Tapping today's door goes into the game.
   const banner = el('div', 'kalBanner'); banner.setAttribute('aria-hidden', 'true');
@@ -9239,7 +9244,8 @@ const KALENDER = (() => {
   }
   function efterStart(nyt) {
     gem();
-    if (nyt) GAADE.scene({ eyebrow: K.start.eyebrow, title: K.start.titel, lines: K.start.replikker, efter: () =>
+    if (nyt && KR) GAADE.scene({ eyebrow: K.start.eyebrow, title: K.start.titel, lines: K.start.replikker, btn: K.hjaelpKnap || 'Videre' });   // the wreath game: one short scene, the help is under the ? button
+    else if (nyt) GAADE.scene({ eyebrow: K.start.eyebrow, title: K.start.titel, lines: K.start.replikker, efter: () =>
       GAADE.scene({ eyebrow: 'Før du går i gang', title: K.hjaelpTitel || 'Sådan åbner du lågerne', lines: K.hjaelp, btn: K.hjaelpKnap || 'Find låge 1' }) });
     else setTimeout(() => toast(KR ? `Velkommen tilbage. ${S.taendt.length} af ${N} lys er tændt.` : `Velkommen tilbage. Du har åbnet ${S.aabnet.length} af ${N} låger.`), 900);
   }
@@ -9471,7 +9477,7 @@ const KALENDER = (() => {
     S.aabnet.push(l.nr); S.klem = S.klem.filter(n => n !== l.nr); gem();
     const d = DOERE.find(d => d.l === l); if (d) saet(d);
     tone(170, 60, 0, 0.16, 0.2); chime([784, 988, 1319]); nyFelt = l.nr;   // the thump of the stamp
-    if (KR) { toast(`Du har fået ${l.ting.navn.toLowerCase()}. Tænd det på adventskransen i Rigsdagsgården.`); return; }
+    if (KR) return;   // the goal card at the top already says: light it on the wreath
     toast(`Låge ${l.nr} er åbnet. Du har fået stykke ${l.nr} af protokollen` + (trae ? ', og et lys er tændt på juletræet.' : '.'));
     const antal = S.aabnet.length, ikkeMere = () => { if (!naeste() && antal < N) GAADE.scene({ eyebrow: `${antal} af ${N} låger`, title: K.proeve.titel, lines: K.proeve.tekst }); };
     setTimeout(() => {
