@@ -7,6 +7,7 @@
 //   4. Prins Jørgens Gård: en embedsmand med en stak ringbind, der taber dem i sneen, igen og igen
 //   5. Ridebanen: to børn kaster snebolde efter en snemand med slips, hat og mappe
 //   6. Slotspladsen ved porten til Rigsdagsgården: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
+//   7. Tøjhusgade: cyklister, der kører frem og tilbage i højre side af vejen, og tre parkerede cykler ved en husmur
 //
 // index.html kalder episoder(...) én gang i KALENDER-blokken og derefter update(dt, t, pos, ude) i hver frame.
 // Ydelse: alle figurer er bagt til få meshes (menneske() i index.html), geometri og materialer deles, hver scene vises
@@ -355,6 +356,178 @@ export function episoder(H) {
     };
   });
 
+  // ---------------------------------------------------------------- 7. Cyklister i Tøjhusgade
+  // Den lange, lige gade fra porten ved Rigsdagsgården mod broen over Frederiksholms Kanal. Nogle cyklister kører frem
+  // og tilbage i højre side af vejen, hver i sin jakke og hue. En har lygte på, en har et juletræ på bagagebæreren, en
+  // har pakker. De kommer ind gennem porten i den ene ende eller over broen i den anden, og når de er kørt ud af
+  // gaden, venter de lidt og kommer tilbage den anden vej. Står Ida i vejen, svinger de udenom eller bremser og venter.
+  // Ida kan ikke støde ind i dem (ingen kollision), og de kører aldrig igennem hende.
+  {
+    const A = [-3, 114], B = [-134, 198];                 // gadens midterlinje (OpenStreetMap: Tøjhusgade)
+    const L = Math.hypot(B[0] - A[0], B[1] - A[1]), ux = (B[0] - A[0]) / L, uz = (B[1] - A[1]) / L;
+    const hx = -uz, hz = ux;                              // højre side, når man kører fra A mod B
+    const S0 = -16, S1 = L + 46, BANE = 2.5;              // fra lige inden for porten til over broen; 2,5 m fra midten
+    const hojde = []; for (let s = S0 - 2; s <= S1 + 2; s++) hojde.push(groundAt(A[0] + ux * s, A[1] + uz * s, 1.5));
+    const hAt = s => { const k = Math.max(0, Math.min(hojde.length - 1.001, s - S0 + 2)), i = Math.floor(k); return lerp(hojde[i], hojde[i + 1], k - i); };
+    const g = new THREE.Group(); gruppe.add(g);
+    const renMat = c => { const m = tm(c).clone(); m.onBeforeCompile = () => {}; m.userData.sne = true; return m; };   // cykler uden sne på
+    const CM = { daek: renMat('#26282c'), sort: renMat('#1d1e22'), staal: renMat('#a9adb3'), lygte: renMat('#f2ecd0') };
+    const FARVE_M = renMat('#ffffff'); FARVE_M.vertexColors = true;
+    function samlFarver(grp) {   // hele stellet med bagagen bliver ét mesh med farverne i hjørnerne: ét kald at tegne pr. cykel
+      grp.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(grp.matrixWorld).invert(), dele = [];
+      grp.traverse(m => { if (m.isMesh) dele.push(m); });
+      const geos = dele.map(m => { const g2 = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); g2.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, m.matrixWorld)); if (g2.attributes.color) return g2;   // allerede samlet (et stel)
+        const c = m.material.color, n = g2.attributes.position.count, col = new Float32Array(n * 3); for (let i = 0; i < n; i++) col.set([c.r, c.g, c.b], i * 3); g2.setAttribute('color', new THREE.BufferAttribute(col, 3)); return g2; });
+      for (const m of dele) m.parent.remove(m);
+      let n = 0; for (const d of geos) n += d.attributes.position.count;
+      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3); let i = 0;
+      for (const d of geos) { pos.set(d.attributes.position.array, i * 3); nor.set(d.attributes.normal.array, i * 3); col.set(d.attributes.color.array, i * 3); i += d.attributes.position.count; d.dispose(); }
+      const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); bg.setAttribute('color', new THREE.BufferAttribute(col, 3)); bg.computeBoundingSphere();
+      for (const c of [...grp.children]) grp.remove(c);
+      const mm = new THREE.Mesh(bg, FARVE_M); mm.castShadow = skygge; grp.add(mm);
+    }
+    const Y = new THREE.Vector3(0, 1, 0), va = new THREE.Vector3(), vb = new THREE.Vector3();
+    const ror = (mat, parent, a, b, r) => {   // et rør fra a til b ([x, y, z])
+      va.set(...a); vb.set(...b); const l = va.distanceTo(vb), m = new THREE.Mesh(G.cyl, mat);
+      m.position.copy(va).add(vb).multiplyScalar(0.5); m.scale.set(r, l, r); m.quaternion.setFromUnitVectors(Y, vb.sub(va).normalize());
+      m.castShadow = skygge; parent.add(m); return m;
+    };
+    const R_ = 0.33, AKSEL = 0.355, BB = [0.3, -0.04], KRANK = 0.16;   // hjulradius, akselhøjde, krankboks (y, z), krank
+    const hjulGeo = new THREE.TorusGeometry(R_, 0.028, 5, lav ? 14 : 18), egerGeo = new THREE.BoxGeometry(0.012, R_ * 2, 0.012);
+    function cykel(farve, o = {}) {
+      const c = new THREE.Group(), ramme = new THREE.Group(); c.add(ramme);
+      const F = renMat(farve), P = (y, z, x = 0) => [x, y, z];
+      const bag = P(AKSEL, -0.52), for_ = P(AKSEL, 0.52), bb = P(BB[0], BB[1]), sadelR = P(0.8, -0.2), hovedT = P(0.82, 0.36), hovedB = P(0.6, 0.41);
+      ror(F, ramme, bb, sadelR, 0.02); ror(F, ramme, bb, hovedB, 0.022); ror(F, ramme, hovedB, hovedT, 0.024);
+      if (o.dame) ror(F, ramme, P(0.42, -0.02), P(0.7, 0.38), 0.018); else ror(F, ramme, P(0.76, -0.19), P(0.78, 0.37), 0.019);
+      for (const s of [-1, 1]) { ror(F, ramme, P(BB[0], BB[1], s * 0.03), P(AKSEL, -0.52, s * 0.06), 0.013); ror(F, ramme, P(0.78, -0.2, s * 0.02), P(AKSEL, -0.52, s * 0.06), 0.012); ror(F, ramme, P(0.6, 0.41, s * 0.03), P(AKSEL, 0.52, s * 0.05), 0.014); }
+      ror(CM.staal, ramme, P(0.8, -0.2), P(0.88, -0.215), 0.014);                               // sadelpind
+      stk(G.kasse, CM.sort, ramme, 0, 0.9, -0.22, 0.11, 0.05, 0.24);                            // sadlen
+      ror(CM.staal, ramme, hovedT, P(1.02, 0.29), 0.014);                                        // frempind
+      ror(CM.staal, ramme, P(1.03, 0.28, -0.27), P(1.03, 0.28, 0.27), 0.012);                    // styret
+      for (const s of [-1, 1]) ror(CM.sort, ramme, P(1.03, 0.28, s * 0.2), P(1.03, 0.28, s * 0.3), 0.02);   // håndtag
+      // bagagebærer og skærme
+      stk(G.kasse, CM.staal, ramme, 0, 0.72, -0.5, 0.13, 0.015, 0.36);
+      for (const s of [-1, 1]) ror(CM.staal, ramme, P(0.72, -0.66, s * 0.06), P(AKSEL, -0.52, s * 0.06), 0.008);
+      for (const [z0, y0] of [[-0.52, AKSEL], [0.52, AKSEL]]) { const sk = new THREE.Mesh(new THREE.TorusGeometry(R_ + 0.05, 0.03, 3, 8, Math.PI * 0.75), F); sk.position.set(0, y0, z0); sk.rotation.y = Math.PI / 2; sk.rotation.z = z0 < 0 ? Math.PI * 0.2 : Math.PI * 0.05; sk.scale.z = 0.7; ramme.add(sk); }
+      if (o.lygte) { stk(G.cyl, CM.lygte, ramme, 0, 0.83, 0.43, 0.04, 0.07, 0.04).rotation.x = Math.PI / 2; }
+      if (o.kurv) { stk(G.kasse, renMat('#8a5a33'), ramme, 0, 0.82, 0.56, 0.32, 0.2, 0.26); }
+      if (o.trae) {   // et lille juletræ på tværs af bagagebæreren, toppen bagud, med en rød snor om
+        const t = new THREE.Group(); t.position.set(0, 0.86, -0.4); ramme.add(t);
+        const gr = renMat('#1f5a37');
+        for (let i = 0; i < 3; i++) { const k = new THREE.Mesh(G.kegle, gr); k.position.set(0, 0, -0.12 - i * 0.22); k.rotation.x = -Math.PI / 2; k.scale.set(0.2 - i * 0.04, 0.42, 0.2 - i * 0.04); k.castShadow = skygge; t.add(k); }
+        ror(renMat('#4a3323'), t, [0, 0, 0.2], [0, 0, -0.05], 0.03);
+        const snor = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.012, 4, 10), renMat('#b3262a')); snor.position.set(0, -0.02, -0.1); t.add(snor);
+      }
+      if (o.pakker) {
+        stk(G.kasse, renMat('#b3262a'), ramme, 0, 0.82, -0.47, 0.26, 0.18, 0.3);
+        stk(G.kasse, renMat('#2f6a45'), ramme, 0.02, 0.97, -0.5, 0.18, 0.13, 0.2).rotation.y = 0.3;
+        const baand = renMat('#e8c25a'); stk(G.kasse, baand, ramme, 0, 0.82, -0.47, 0.27, 0.19, 0.03); stk(G.kasse, baand, ramme, 0, 0.82, -0.47, 0.03, 0.19, 0.31);
+      }
+      samlFarver(ramme);
+      // hjulene (dæk og to eger, et mesh pr. hjul) og pedalerne drejer
+      const hjul = [-0.52, 0.52].map(z0 => {
+        const h = new THREE.Group(); h.position.set(0, AKSEL, z0); c.add(h);
+        const d = new THREE.Mesh(hjulGeo, CM.daek); d.rotation.y = Math.PI / 2; h.add(d);
+        for (const a of [0, Math.PI / 2]) { const e = new THREE.Mesh(egerGeo, CM.daek); e.rotation.x = a; h.add(e); }
+        saml(h); h.children.forEach(m => { m.castShadow = skygge; }); return h;
+      });
+      const krank = new THREE.Group(); krank.position.set(0, BB[0], BB[1]); c.add(krank);
+      for (const s of [-1, 1]) {
+        stk(G.kasse, CM.sort, krank, s * 0.09, s * KRANK / 2, 0, 0.02, KRANK, 0.025);
+        stk(G.kasse, CM.sort, krank, s * 0.13, s * KRANK, 0, 0.09, 0.02, 0.06);
+      }
+      stk(G.cyl, CM.sort, krank, 0.06, 0, 0, 0.09, 0.012, 0.09).rotation.z = Math.PI / 2;   // klingen
+      saml(krank);
+      let glod = null;
+      if (o.lygte) { glod = new THREE.Sprite(glodMat('#fff1b8', 0.85)); glod.position.set(0, 0.83, 0.52); glod.scale.setScalar(0.55); c.add(glod); }
+      return { c, hjul, krank, glod };
+    }
+    // rytteren: hofterne lige over sadlen, lænet lidt frem, hænderne på styret
+    const LAEN = 0.3, HOFTE = [0.92, -0.22], STYR = [1.03, 0.27];
+    const rodY = HOFTE[0] - 0.86 * Math.cos(LAEN), rodZ = HOFTE[1] - 0.86 * Math.sin(LAEN);
+    const skulder = [rodY + 1.53 * Math.cos(LAEN), rodZ + 1.53 * Math.sin(LAEN)];
+    const ARM = -Math.atan2(STYR[1] - skulder[1], skulder[0] - STYR[0]) - LAEN;
+    function rytter(o) {
+      const f = person(Object.assign({ gang: true }, o, { foer: f2 => { f2.g.rotation.x = LAEN; for (const [k, a] of f2.arms.entries()) { a.rotation.x = ARM; a.rotation.z = (k ? 1 : -1) * 0.03; } for (const el of f2.elbows) el.rotation.x = -0.08; f2.arms.length = 0; } }));   // armene står stille og bages ind i kroppen (færre ting at tegne)
+      f.root.position.set(0, rodY, rodZ); return f;
+    }
+    // benene følger pedalerne: to led (lår og skinneben, 0,42 m hver)
+    const L1 = 0.42, L2 = 0.43, cl = Math.cos(LAEN), sl = Math.sin(LAEN);
+    function ben(leg, phi) {
+      const py = BB[0] + Math.cos(phi) * KRANK - rodY, pz = BB[1] + Math.sin(phi) * KRANK - rodZ;   // pedalen i forhold til figurens fødder
+      let dy = py * cl + pz * sl - 0.86, dz = -py * sl + pz * cl;                                    // ind i den lænede krop, fra hoften
+      let D = Math.hypot(dy, dz); const Dm = L1 + L2 - 0.01; if (D > Dm) { dy *= Dm / D; dz *= Dm / D; D = Dm; }
+      const a = Math.atan2(-dz, -dy), b = Math.acos(Math.max(-1, Math.min(1, (L1 * L1 + D * D - L2 * L2) / (2 * L1 * D))));
+      const th = a - b, ky = -L1 * Math.cos(th), kz = -L1 * Math.sin(th);
+      leg.hip.rotation.x = th; leg.knee.rotation.x = Math.atan2(-(dz - kz), -(dy - ky)) - th;
+    }
+    const FOLK = [
+      { cyk: ['#2f5fa8', { lygte: true }], o: { coat: '#2f5f3a', trousers: '#2b2f36', hair: '#3b2a20', hairStyle: 'kort', toerklaede: '#e0a63a', extra: hue('#b3262a') }, v: 4.2, s: 40, dir: 1 },
+      { cyk: ['#e6dcc4', { dame: true, trae: true }], o: { coat: '#b3262a', trousers: '#24303a', hair: '#a8794c', kvinde: true, hairStyle: 'lang', extra: hue('#eef0ee', '#b3262a') }, v: 3.4, s: 125, dir: -1 },
+      { cyk: ['#24221f', { pakker: true }], o: { coat: '#4a5a6a', trousers: '#2d3340', hair: '#8c8c88', hairStyle: 'skaldet', toerklaede: '#b3262a', extra: hue('#2f5fa8', '#eef0ee') }, v: 3.8, s: 95, dir: 1 },
+      { cyk: ['#8a2a2e', { dame: true, kurv: true }], o: { coat: '#7d4f8a', trousers: '#2b2a30', hair: '#1f1a18', kvinde: true, hairStyle: 'knold', toerklaede: '#eef0ee' }, v: 4.6, s: 15, dir: -1 },
+    ].slice(0, lav ? 3 : 4);
+    const CY = FOLK.map(F_ => {
+      const b = cykel(...F_.cyk), f = rytter(F_.o); b.c.add(f.root); g.add(b.c);
+      return Object.assign(b, { f, s: F_.s, dir: F_.dir, v0: F_.v, v: F_.v, off: 0, pause: 0, phi: Math.random() * 6, rot: 0 });
+    });
+    // tre parkerede cykler op ad husmuren i højre side (set fra porten), bagt sammen til ét mesh
+    const parkeret = new THREE.Group(); g.add(parkeret);
+    for (const [s, farve, o] of [[21.5, '#3e7d4a', { kurv: true }], [22.7, '#6f7780', {}], [88, '#2f5fa8', { dame: true }]]) {
+      const b = cykel(farve, o), p = b.c, x = A[0] + ux * s + hx * 6.4, z = A[1] + uz * s + hz * 6.4;
+      p.position.set(x, groundAt(x, z, 1.5), z); p.rotation.set(0, Math.atan2(ux, uz) + (s > 50 ? Math.PI : 0), s > 50 ? -0.1 : 0.1, 'YXZ');
+      b.hjul.forEach(h => { h.rotation.x = s; }); parkeret.add(p);
+    }
+    samlFarver(parkeret); parkeret.children.forEach(m => { m.receiveShadow = true; });
+    // afstand fra Ida til gaden (vist og animeret kun, når hun er tæt på)
+    const afst = (x, z) => { const s = Math.max(S0, Math.min(S1, (x - A[0]) * ux + (z - A[1]) * uz)); return Math.hypot(x - A[0] - ux * s, z - A[1] - uz * s); };
+    const e = { x: A[0], z: A[1], g, t: 0, afst: p => afst(p.x, p.z) };
+    e.upd = (t, dt, pos) => {
+      for (const c of CY) {
+        if (c.pause > 0) {   // ude af gaden: vent lidt og kom så tilbage den anden vej
+          c.c.visible = false; c.pause -= dt;
+          if (c.pause <= 0) { c.dir = -c.dir; c.s = c.dir > 0 ? S0 : S1; c.v = c.v0 = 3.3 + Math.random() * 1.4; c.off = 0; }
+          continue;
+        }
+        const fx = ux * c.dir, fz = uz * c.dir, rx = hx * c.dir, rz = hz * c.dir;   // frem og højre for cyklisten
+        const lx = A[0] + ux * c.s + rx * BANE, lz = A[1] + uz * c.s + rz * BANE;      // midt i højre vejbane
+        // hvor står Ida i forhold til cyklisten?
+        const ia = (pos.x - lx) * fx + (pos.z - lz) * fz, il = (pos.x - lx) * rx + (pos.z - lz) * rz;
+        let offM = 0, vM = c.v0;
+        if (ia > -0.6 && ia < 9 && Math.abs(il - c.off) < 1.3) {
+          const mod = CY.some(o => o !== c && o.pause <= 0 && o.dir !== c.dir && Math.abs((o.s - c.s) * c.dir - 6) < 10);   // modkørende tæt på
+          const venstre = il - 1.35, hoejre = il + 1.35;
+          if (venstre >= (mod ? -1.2 : -3.4)) offM = venstre; else if (hoejre <= 1.2) offM = hoejre;
+          else vM = Math.max(0, (ia - 3.2) * 1.5);   // ingen plads: brems og vent lidt foran hende
+          if (ia < 4 && Math.abs(il - c.off) < 0.95) vM = Math.min(vM, Math.max(0, (ia - 1.6) * 1.2));   // for tæt på: brems
+        } else if (ia > -0.6 && ia < 4.5 && Math.abs(il - c.off) < 0.95) vM = Math.max(0, (ia - 1.6) * 1.2);
+        for (const o of CY) if (o !== c && o.pause <= 0 && o.dir === c.dir) { const gap = (o.s - c.s) * c.dir; if (gap > 0 && gap < 3.5) vM = Math.min(vM, o.v * (gap < 2.2 ? 0.5 : 1)); }   // ikke ind i den foran
+        c.v += Math.max(-5 * dt, Math.min(1.6 * dt, vM - c.v)); if (c.v < 0.02) c.v = 0;
+        const ds = c.v * dt, doff = Math.max(-0.45 * ds, Math.min(0.45 * ds, offM - c.off)); c.off += doff;   // svinger kun, mens den ruller
+        c.s += c.v * dt * c.dir;
+        if (c.s > S1 || c.s < S0) { c.pause = 2 + Math.random() * 7; c.c.visible = false; continue; }
+        // placering, retning, hældning på broen og en lille krængning i svinget
+        const x = A[0] + ux * c.s + rx * (BANE + c.off), z = A[1] + uz * c.s + rz * (BANE + c.off);
+        const h = hAt(c.s), fald = (hAt(c.s + c.dir * 0.5) - hAt(c.s - c.dir * 0.5));
+        c.c.position.set(x, h, z);
+        c.c.rotation.set(-Math.atan(fald), Math.atan2(fx, fz) - (ds > 1e-4 ? Math.atan(doff / ds) : 0), 0, 'YXZ');
+        const kant = Math.min(c.s - S0, S1 - c.s);   // de vokser frem bag porten og over broen
+        c.c.scale.setScalar(sm(kant / 3)); c.c.visible = Math.hypot(pos.x - x, pos.z - z) < (lav ? 90 : 130);
+        if (!c.c.visible) continue;
+        const stop = 1 - Math.min(1, c.v / 0.6);
+        c.c.rotation.z = stop * 0.1;    // står stille: cyklen hælder lidt, og hun sætter foden i jorden
+        for (const hj of c.hjul) hj.rotation.x += c.v * dt / R_;
+        c.phi += c.v * dt / R_ / 2.4; c.krank.rotation.x = c.phi;
+        ben(c.f.legs[0], c.phi + Math.PI); ben(c.f.legs[1], c.phi);
+        if (stop > 0.5) { c.f.legs[0].hip.rotation.x = lerp(c.f.legs[0].hip.rotation.x, -0.2, stop); c.f.legs[0].knee.rotation.x = lerp(c.f.legs[0].knee.rotation.x, 0.15, stop); }
+        c.f.g.rotation.z = Math.sin(c.phi) * 0.03 * (1 - stop);
+        if (c.glod) c.glod.material.opacity = 0.75 + Math.sin(t * 9 + c.s) * 0.05;
+      }
+    };
+    e.cy = CY; g.visible = false; EP.push(e);
+  }
+
   // ---------------------------------------------------------------- hver frame
   // pos: Idas plads. ude: hun er udenfor (ikke inde i en bygning, i Tårnet eller i båden)
   function update(dt, t, pos, ude) {
@@ -362,9 +535,9 @@ export function episoder(H) {
     if (!ude) return;
     const R = GFX.lav ? 50 : 80, d_ = Math.min(dt, 0.1);
     for (const e of EP) {
-      const vis = Math.hypot(pos.x - e.x, pos.z - e.z) < R;
+      const vis = (e.afst ? e.afst(pos) : Math.hypot(pos.x - e.x, pos.z - e.z)) < R;
       e.g.visible = vis;
-      if (vis) { e.t += d_; e.upd(e.t, d_); }
+      if (vis) { e.t += d_; e.upd(e.t, d_, pos); }
     }
   }
   return { gruppe, update, EP };
