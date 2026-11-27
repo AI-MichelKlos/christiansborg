@@ -1,4 +1,6 @@
 // Julekalender på Christiansborg: udgaven »Nissernes protokol« (politik og Christiansborg).
+// I ARKIVET til næste jul (lagt til side 27. november 2026). Den virker stadig og kan spilles på ?spor=kalender24.
+// Tag den frem igen ved at lade linjen jul i SPOR i index.html pege på denne fil.
 // Udarbejdet med AI (Claude) og med begrænset mennesketjek.
 //
 // Alt indhold i kalenderen står i denne fil. Rammen (dørene, kalenderkortet, stemplerne, gemningen)

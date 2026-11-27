@@ -480,12 +480,23 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .fTing svg{width:100%;height:100%}
 .fNr{position:absolute;left:3px;top:3px;min-width:18px;height:18px;padding:0 3px;border-radius:9px;background:#7a1f24;color:#fff;font:700 11px/18px var(--body);text-align:center}
 .fDoer:focus-visible{outline:3px solid #f3d98a;outline-offset:2px}
+.kransForside{grid-template-columns:repeat(4,1fr)!important;gap:4%!important;padding:6px 9% 30px;position:relative}
+.kransForside::after{content:"";position:absolute;left:3%;right:3%;bottom:4px;height:34px;border-radius:50%;border:13px solid #2f6b3f;box-shadow:inset 0 2px 0 rgba(255,255,255,.18),0 2px 0 rgba(0,0,0,.3);pointer-events:none}
+.fLys{position:relative;z-index:1;aspect-ratio:1/2;padding:0;border:0;background:none;cursor:default;opacity:.55;animation:fInd .5s cubic-bezier(.2,1.4,.4,1) var(--d,0s) both}
+.fLys svg{width:100%;height:100%;display:block}
+.fLys.taendt{opacity:1;cursor:pointer}
+.fLys.taendt svg path:first-of-type{transform-origin:30px 30px;animation:fFlamme 1.6s ease-in-out infinite alternate}
+.fLys.idag{opacity:1;cursor:pointer;filter:drop-shadow(0 0 8px #f3d98a)}
+.fLys.idag::after{content:"NÆSTE";position:absolute;left:0;right:0;bottom:-2px;font:700 9px/1 var(--body);letter-spacing:.14em;color:#f3d98a;text-align:center}
+.fLys:focus-visible{outline:3px solid #f3d98a;outline-offset:2px}
+@keyframes fFlamme{from{transform:scale(.94,1)}to{transform:scale(1.05,1.08)}}
+.kransGrid{grid-template-columns:repeat(4,1fr)!important}
 #intro.kalIntro .lead{font-size:15px;line-height:1.55;margin-bottom:14px}
 .kalForsideTekst{min-height:1.4em;margin:0 0 16px;font-weight:600;color:var(--ink)!important;font-size:14px;line-height:1.45;color:var(--daempet,#5d5368)}
 @keyframes fInd{from{transform:scale(.6) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes fGloed{0%,100%{box-shadow:inset 0 0 0 3px rgba(255,255,255,.06),0 0 0 rgba(243,217,138,0)}50%{box-shadow:inset 0 0 0 3px rgba(255,255,255,.06),0 0 18px rgba(243,217,138,.75)}}
 @media (max-width:600px){.kalBanner{margin:-22px -20px 10px;height:118px}#intro.kalIntro h1{font-size:34px;margin-bottom:10px}.kalForside{grid-template-columns:repeat(4,1fr);gap:7px}}
-@media (prefers-reduced-motion:reduce){.fDoer,.fDoer.idag{animation:none}}
+@media (prefers-reduced-motion:reduce){.fDoer,.fDoer.idag,.fLys,.fLys.taendt svg path{animation:none!important}}
 </style>
 </head>
 <body>
@@ -556,7 +567,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 
 <script>
 // The first seconds, before the 3D world and the edition's own file have loaded: show the right edition at once.
-(function(){ var q = new URLSearchParams(location.search), F = { jul: ['Nissernes protokol', 'Christiansborg · en julekalender for voksne', 'Julekalenderen hentes …'] }[q.get('spor')];
+(function(){ var q = new URLSearchParams(location.search), F = { jul: ['Nissernes adventskrans', 'Christiansborg · et julespil for voksne', 'Julespillet hentes …'], kalender24: ['Nissernes protokol', 'Christiansborg · en julekalender for voksne', 'Julekalenderen hentes …'] }[q.get('spor')];
   if (!F) return; document.documentElement.dataset.tema = q.get('tema') || 'jul'; document.title = F[0];
   document.getElementById('introTitle').textContent = F[0]; document.querySelector('#intro .eyebrow').textContent = F[1]; document.getElementById('introLead').textContent = F[2]; })();
 setTimeout(function(){ if(!window.__gameReady){ var e=document.getElementById('loadErr'); if(e) e.hidden=false; var b=document.getElementById('goBtn'); if(b) b.textContent='Kunne ikke hente 3D-motoren'; } }, 12000);
@@ -568,8 +579,10 @@ import * as THREE from 'three';
 // ?spor=<id> in the address picks another one than the first. To add an edition, add a line here and a tema block in the CSS.
 const SPOR = {
   mord: { titel: 'Mord i Rigets midte', type: 'gaade', fil: './mordgaade.js', tema: 'krimi', gem: 'mordIRigetsMidte.spil' },
-  // A calendar edition has 24 doors. Another edition (fx dagpenge) is one more line with its own file and save slot.
-  jul: { titel: 'Nissernes protokol', type: 'kalender', fil: './julekalender.js', tema: 'jul', gem: 'julekalender.jul.spil' },
+  // A calendar edition has 24 doors, or with spil: "krans" in its file four candles. Another edition is one more line here.
+  jul: { titel: 'Nissernes adventskrans', type: 'kalender', fil: './adventskrans.js', tema: 'jul', gem: 'adventskrans.jul.spil' },
+  // In the archive until next Christmas: the advent calendar with 24 doors. Still playable at ?spor=kalender24 for testing.
+  kalender24: { titel: 'Nissernes protokol', type: 'kalender', fil: './arkiv/julekalender-24-laager.js', tema: 'jul', gem: 'julekalender.jul.spil' },
 };
 const SPOR_ID = (id => (id && Object.hasOwn(SPOR, id)) ? id : 'mord')(new URLSearchParams(location.search).get('spor'));
 const SP = SPOR[SPOR_ID];
@@ -9093,17 +9106,24 @@ window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, star
 // for testing: __cb.tp(x, z, face) moves her, __cb.start() starts the walk
 // ======================================================================== JULEKALENDER
 // A calendar edition (a spor of type "kalender"): 24 numbered doors on Slotsholmen, opened in order. The frame is here;
+// the same frame also runs the shorter wreath game (spil: 'krans' in the edition's file): four nisser have each saved a
+// candle, Ida fetches them in order and lights each one on the advent wreath. Weather, light and the end are the same.
 // everything that is said and where each door sits is in the edition's own file (julekalender.js explains the format).
 // Small and mini doors are put on the nearest wall in front of the spot the file gives; a big door is a sign at a
 // building's own entrance, with a nisse and a riddle inside. Each opened door is a stamp on the calendar card.
 const KALENDER = (() => {
   if (!KAL) return null;
-  const K = KALDATA, I = INTERIOR, GEM = SP.gem, N = 24;
+  const K = KALDATA, I = INTERIOR, GEM = SP.gem, KR = K.spil === 'krans', N = KR ? K.laager.length : 24;
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const L = Object.fromEntries(K.laager.map(l => [l.nr, l]));
   const sidste = Math.max(...K.laager.map(l => l.nr));   // the last door that has been written
   const soendag = nr => Math.ceil(nr / 6);
-  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], vej: false, pos: null, face: 0, morgen: false });
+  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], taendt: [], vej: KR, pos: null, face: 0, morgen: false });
+  // How far the story has come, counted as doors of 24: the weather, the light and the tree follow it. In the wreath game
+  // each candle lit counts as a Sunday. faerdig: the end has come (all doors open, or all candles lit).
+  const frem = G => KR ? G.taendt.length * 24 / N : G.aabnet.length;
+  const faerdig = G => KR ? G.taendt.length >= N : G.aabnet.length >= N;
+  const tilKrans = () => KR && S.taendt.length < S.aabnet.length;   // she has a candle that is not lit yet
   function hent() { try { const g = JSON.parse(localStorage.getItem(GEM) || 'null'); if (g && g.v === 1 && g.id === K.id && Array.isArray(g.aabnet)) return Object.assign(ny(), g); } catch (e) {} return null; }
   let S = ny(), gemt = hent(), valg = gemt ? 'fortsaet' : 'nyt';
   function gem() { if (!started) return; try { localStorage.setItem(GEM, JSON.stringify(S)); gemt = S; } catch (e) {} }
@@ -9120,7 +9140,7 @@ const KALENDER = (() => {
   }
   const laast = l => l && l.nr > aabneIdag();
   const aabnerTekst = l => `Låge ${l.nr} åbner ${l.nr}. december`;
-  const naeste = () => { for (let n = 1; n <= sidste; n++) if (!S.aabnet.includes(n)) return L[n] || null; return null; };
+  const naeste = () => { if (tilKrans()) return null; for (let n = 1; n <= sidste; n++) if (!S.aabnet.includes(n)) return L[n] || null; return null; };
   const ude = () => !I.on && !FX.tower?.on && !TOWER.busy && !MYBOAT.on;
 
   // ---- the front page and the buttons at the top
@@ -9129,7 +9149,7 @@ const KALENDER = (() => {
   $('introTitle').textContent = K.titel; $('introLead').textContent = K.forside;
   const note = el('p', 'gemNote', K.gemTekst); $('goBtn').before(note);
   $('ur').hidden = true; $('bPack').hidden = true;
-  $('bNotes').querySelector('span').textContent = 'Kalender';
+  $('bNotes').querySelector('span').textContent = KR ? 'Kransen' : 'Kalender';
   for (const id of ['setSpor', 'set1942']) { const l = $(id)?.closest('label'); if (l) l.hidden = true; }
   // The front page looks like a real advent calendar: Christiansborg in the snow over 24 doors. The doors already opened
   // show their thing, today's door glows, and the rest wait for their day. Tapping today's door goes into the game.
@@ -9149,8 +9169,12 @@ const KALENDER = (() => {
     <g fill="#ffcf7a">${vinduer(116, 10, 0, 33)}${vinduer(136, 10, 0, 33)}<rect x="122" y="92" width="8" height="10" rx="1"/><rect x="170" y="92" width="8" height="10" rx="1"/><rect x="542" y="92" width="8" height="10" rx="1"/><rect x="590" y="92" width="8" height="10" rx="1"/><rect x="354" y="34" width="12" height="14" rx="6"/><rect x="348" y="64" width="24" height="30" rx="12"/><rect x="350" y="126" width="20" height="32" rx="10" fill="#e8a64a"/></g>
     <g fill="#fff">${Array.from({ length: 30 }, (_, i) => `<circle cx="${(i * 131 + 57) % 720}" cy="${(i * 71 + 23) % 160}" r="${1.1 + (i % 3) * 0.7}" opacity=".85"/>`).join('')}</g></svg>`;
   $('intro').querySelector('.card').prepend(banner);
-  const forsideGrid = el('div', 'kalForside'), forsideTekst = el('p', 'kalForsideTekst');
-  forsideGrid.setAttribute('role', 'group'); forsideGrid.setAttribute('aria-label', 'Kalenderens 24 låger');
+  const forsideGrid = el('div', 'kalForside' + (KR ? ' kransForside' : '')), forsideTekst = el('p', 'kalForsideTekst');
+  forsideGrid.setAttribute('role', 'group'); forsideGrid.setAttribute('aria-label', KR ? 'Adventskransens fire lys' : 'Kalenderens 24 låger');
+  // a candle on the front page of the wreath game: lit, ready to be fetched, or waiting
+  const lysSvg = (nr, taendt) => `<svg viewBox="0 0 60 120" aria-hidden="true">${taendt ? '<circle cx="30" cy="24" r="20" fill="#ffcf6a" opacity=".22"/><path d="M30 8c7 9 8 15 0 23-8-8-7-14 0-23z" fill="#ffd77a" stroke="#c9822e" stroke-width="1.5"/><path d="M30 17c3 5 3 8 0 12-3-4-3-7 0-12z" fill="#fff6d6"/>' : ''}
+    <path d="M30 36v-6" stroke="#2a2118" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="36" width="26" height="76" rx="3" fill="#b3262a" stroke="#2a2118" stroke-width="2.5"/>
+    <path d="M17 44q5 0 5 7t5 0 4-7" fill="none" stroke="#8e1c20" stroke-width="2"/><text x="30" y="88" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="22" fill="#f6e6b8">${nr}</text></svg>`;
   $('introTitle').after(forsideGrid, forsideTekst);   // the doors come first, the story under them
   function forside() {
     const vis = !started; forsideGrid.hidden = forsideTekst.hidden = banner.hidden = !vis; $('intro').classList.toggle('kalIntro', vis);
@@ -9158,6 +9182,19 @@ const KALENDER = (() => {
     const G = gemt || ny(), idag = aabneIdag(), aabne = G.aabnet;
     let naesteNr = 0; for (let n = 1; n <= sidste; n++) if (!aabne.includes(n)) { naesteNr = n; break; }
     forsideGrid.replaceChildren();
+    if (KR) {
+      const t = G.taendt.length, mangler = t < aabne.length ? t + 1 : 0;   // a candle she has fetched but not lit
+      for (let nr = 1; nr <= N; nr++) {
+        const l = L[nr], lit = G.taendt.includes(nr), klar = !lit && (nr === mangler || (!mangler && nr === naesteNr)), b = el('button', 'fLys' + (lit ? ' taendt' : klar ? ' idag' : ''));
+        b.type = 'button'; b.style.setProperty('--d', nr * 0.12 + 's'); b.innerHTML = lysSvg(nr, lit);
+        if (lit) { b.setAttribute('aria-label', `Lys ${nr}, tændt`); b.addEventListener('click', () => { forsideTekst.textContent = `${K.soendage[nr - 1].navn}: ${l ? l.ting.navn : ''}. ${K.soendage[nr - 1].tekst}`; }); }
+        else if (klar) { b.setAttribute('aria-label', `Lys ${nr}, det næste. Tryk for at gå i gang`); b.addEventListener('click', () => goBtn.click()); }
+        else { b.disabled = true; b.setAttribute('aria-label', `Lys ${nr}, ikke fundet endnu`); }
+        forsideGrid.append(b);
+      }
+      forsideTekst.textContent = t >= N ? 'Alle fire lys er tændt. Glædelig jul.' : mangler ? `Du har lys ${mangler} med dig. Tænd det på kransen i Rigsdagsgården.` : t ? `${t} af ${N} lys er tændt. Tryk på det næste lys for at gå videre.` : 'Tryk på det første lys for at gå i gang.';
+      return;
+    }
     for (let nr = 1; nr <= N; nr++) {
       const l = L[nr], op = aabne.includes(nr), dag = !op && nr === naesteNr && nr <= idag, b = el('button', 'fDoer');
       b.type = 'button'; b.style.setProperty('--d', (nr * 37 % 24) * 0.04 + 's');
@@ -9181,7 +9218,7 @@ const KALENDER = (() => {
   function startKnapper() {
     const n = $('newBtn'), a = gemt ? gemt.aabnet.length : 0;
     n.hidden = !gemt || started; n.dataset.sikker = ''; n.textContent = 'Nyt spil';
-    if (!started) goBtn.textContent = gemt ? `Fortsæt · ${a} af ${N} låger åbnet` : 'Åbn kalenderen';
+    if (!started) goBtn.textContent = KR ? (gemt ? `Fortsæt · ${gemt.taendt.length} af ${N} lys tændt` : 'Gå i gang') : gemt ? `Fortsæt · ${a} af ${N} låger åbnet` : 'Åbn kalenderen';
     forside();
   }
   $('newBtn').addEventListener('click', () => {
@@ -9202,8 +9239,8 @@ const KALENDER = (() => {
   function efterStart(nyt) {
     gem();
     if (nyt) GAADE.scene({ eyebrow: K.start.eyebrow, title: K.start.titel, lines: K.start.replikker, efter: () =>
-      GAADE.scene({ eyebrow: 'Før du går i gang', title: 'Sådan åbner du lågerne', lines: K.hjaelp, btn: 'Find låge 1' }) });
-    else setTimeout(() => toast(`Velkommen tilbage. Du har åbnet ${S.aabnet.length} af ${N} låger.`), 900);
+      GAADE.scene({ eyebrow: 'Før du går i gang', title: K.hjaelpTitel || 'Sådan åbner du lågerne', lines: K.hjaelp, btn: K.hjaelpKnap || 'Find låge 1' }) });
+    else setTimeout(() => toast(KR ? `Velkommen tilbage. ${S.taendt.length} af ${N} lys er tændt.` : `Velkommen tilbage. Du har åbnet ${S.aabnet.length} af ${N} låger.`), 900);
   }
 
   // ---- the doors in the world
@@ -9410,20 +9447,34 @@ const KALENDER = (() => {
       flammer.push({ flamme, glod });
     }
     colCirc(x, z, 0.85, 2);
-    krans_ = { g, flammer };
+    const [mx, mz] = FT.at(0, 14), ml = Math.hypot(mx - x, mz - z) || 1;   // she stands on the side towards the middle of the yard
+    const glod = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffd98a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); glod.position.y = 1.9; glod.scale.setScalar(3.4); g.add(glod);
+    krans_ = { g, flammer, glod, x, z, staa: [x + (mx - x) / ml * 1.7, z + (mz - z) / ml * 1.7], blink: 0 };
   }
 
   // ---- opening a door
-  const navn = l => `Låge ${l.nr} · ${K.soendage[soendag(l.nr) - 1].navn}`;
+  const navn = l => KR ? `Lys ${l.nr} · ${K.nisser[l.nisse]?.navn || ''}` : `Låge ${l.nr} · ${K.soendage[soendag(l.nr) - 1].navn}`;
+  // the end: the bells, the last words, and then the fireworks (fyrFrame) and the nisser in the tower (festFrame)
+  const slutScene = () => { klokker(); GAADE.scene({ eyebrow: K.soendage[3].navn, title: K.slut.titel, billede: billede({ ting: { navn: K.slut.ting || '', billede: K.slut.billede || 'stjerne' } }, 'ny'), lines: [K.soendage[3].tekst, ...K.slut.tekst], btn: I.on && I.place.startsWith('tower') ? 'Op på Udsigten' : 'Videre', efter: () => { if (I.on && I.place.startsWith('tower') && I.liftTo) I.liftTo('view'); } }); };
+  function taend(nr) {   // the wreath game: a candle is lit on the wreath
+    if (!KR || S.taendt.includes(nr)) return;
+    S.taendt.push(nr); gem(); bjaelder(10); chime([523, 659, 784, 1047], 0.05);
+    if (krans_) { const a = (nr - 1) * Math.PI / 2 + Math.PI / 4; gnist(krans_.x + Math.sin(a) * 0.72, groundAt(krans_.x, krans_.z, 2) + 2.1, krans_.z + Math.cos(a) * 0.72, 0, 0, 45); krans_.blink = 1; }
+    setTimeout(() => {
+      if (S.taendt.length >= N) slutScene();
+      else GAADE.scene({ eyebrow: `${S.taendt.length} af ${N} lys`, title: K.soendage[nr - 1].navn, lines: [K.soendage[nr - 1].tekst] });
+    }, 900);
+  }
   function stempl(l) {
     if (S.aabnet.includes(l.nr)) return;
     S.aabnet.push(l.nr); S.klem = S.klem.filter(n => n !== l.nr); gem();
     const d = DOERE.find(d => d.l === l); if (d) saet(d);
     tone(170, 60, 0, 0.16, 0.2); chime([784, 988, 1319]); nyFelt = l.nr;   // the thump of the stamp
+    if (KR) { toast(`Du har fået ${l.ting.navn.toLowerCase()}. Tænd det på adventskransen i Rigsdagsgården.`); return; }
     toast(`Låge ${l.nr} er åbnet. Du har fået stykke ${l.nr} af protokollen` + (trae ? ', og et lys er tændt på juletræet.' : '.'));
     const antal = S.aabnet.length, ikkeMere = () => { if (!naeste() && antal < N) GAADE.scene({ eyebrow: `${antal} af ${N} låger`, title: K.proeve.titel, lines: K.proeve.tekst }); };
     setTimeout(() => {
-      if (antal === N) { klokker(); GAADE.scene({ eyebrow: K.soendage[3].navn, title: K.slut.titel, billede: billede({ ting: { navn: K.slut.ting || '', billede: K.slut.billede || 'stjerne' } }, 'ny'), lines: [K.soendage[3].tekst, ...K.slut.tekst], btn: I.on && I.place.startsWith('tower') ? 'Op på Udsigten' : 'Videre', efter: () => { if (I.on && I.place.startsWith('tower') && I.liftTo) I.liftTo('view'); } }); }
+      if (antal === N) slutScene();
       else if (antal % 6 === 0) { bjaelder(10); GAADE.scene({ eyebrow: 'Et lys er tændt', title: K.soendage[antal / 6 - 1].navn, lines: [K.soendage[antal / 6 - 1].tekst], efter: ikkeMere }); }
       else ikkeMere();
     }, 1400);
@@ -9437,10 +9488,11 @@ const KALENDER = (() => {
     setTimeout(() => {
       if (stor) d.aabner = false;
       if (l.type === 'stor') { if (!S.klem.includes(l.nr)) { S.klem.push(l.nr); gem(); } GAADE.scene({ eyebrow: navn(l), title: l.navn, lines: l.bag, btn: I.on ? 'Videre' : 'Gå ind', efter: () => { if (!I.on) FX.interior.enter(indPlace(l)); } }); }
-      else GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l, 'ny'), lines: [...l.bag, { b: 'Stykke ' + l.nr + ':', t: l.stykke }], efter: () => flyv(l, () => stempl(l)) });
+      else GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l, 'ny'), lines: [...l.bag, ...stykkeLinje(l)], efter: () => flyv(l, () => stempl(l)) });
     }, stor ? 700 : 1500);
   }
-  const igen = l => GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...(l.type === 'stor' ? l.gaade.efter : l.bag), { b: 'Stykke ' + l.nr + ':', t: l.stykke }] });
+  const stykkeLinje = l => l.stykke ? [{ b: 'Stykke ' + l.nr + ':', t: l.stykke }] : [];
+  const igen = l => GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...(l.type === 'stor' ? l.gaade.efter : l.bag), ...stykkeLinje(l)] });
 
   // ---- small windows of my own: the riddle and the calendar card
   function vindue(id, titel, small) {
@@ -9461,26 +9513,58 @@ const KALENDER = (() => {
     const l = n.l, g = l.gaade, ns = K.nisser[l.nisse], body = spm.querySelector('.gdBody');
     $('kalSpmTitle').textContent = ns.navn;
     const log = el('div', 'sLog'); log.append(...g.foer.map(replik));
-    const q = el('p', 'aSpm', g.spoergsmaal), valgene = el('div', 'sEmner');
+    const q = el('p', 'aSpm', g.spoergsmaal || ''), valgene = el('div', 'sEmner');
     body.replaceChildren(el('p', 'gdSted', ns.rolle || ''), log, q, valgene);
+    const faa = () => {   // she gets what he has for her
+      log.append(...g.efter.map(replik)); const bil = billede(l, 'ny'); if (bil) log.append(bil); bjaelder(); chime([523, 659, 784, 1047], 0.045);
+      if (l.stykke) log.append(replik(['fortaeller', 'Stykke ' + l.nr + ': ' + l.stykke])); log.scrollTop = log.scrollHeight;
+      const ok = el('button', 'go', 'Tak'); ok.type = 'button'; ok.addEventListener('click', () => spm.close());
+      q.remove(); valgene.replaceChildren(ok); ok.focus(); spm.addEventListener('close', () => flyv(l, () => stempl(l)), { once: true });
+    };
+    if (!g.spoergsmaal) {   // no riddle: he talks, and she can take it
+      const b = el('button', 'go', g.knap || 'Tag imod det'); b.type = 'button'; b.addEventListener('click', faa); q.remove(); valgene.append(b); spm.vis(); return;
+    }
     for (const s of g.svar) {
       const b = el('button', 'sEmne'); b.type = 'button'; b.append(el('span', '', s.t));
       b.addEventListener('click', () => {
         if (!s.rigtig) { log.append(replik(['ida', s.t + '.']), replik(s.replik)); b.disabled = true; b.classList.add('spurgt'); log.scrollTop = log.scrollHeight; chime([330, 294], 0.03); return; }
-        log.append(replik(['ida', s.t + '.']), ...g.efter.map(replik)); const bil = billede(l, 'ny'); if (bil) log.append(bil); bjaelder(); chime([523, 659, 784, 1047], 0.045); log.append(replik(['fortaeller', 'Stykke ' + l.nr + ': ' + l.stykke])); log.scrollTop = log.scrollHeight;
-        const ok = el('button', 'go', 'Tak'); ok.type = 'button'; ok.addEventListener('click', () => spm.close());
-        q.remove(); valgene.replaceChildren(ok); ok.focus(); spm.addEventListener('close', () => flyv(l, () => stempl(l)), { once: true });
+        log.append(replik(['ida', s.t + '.'])); faa();
       });
       valgene.append(b);
     }
     spm.vis();
   }
 
-  const kort = vindue('kalDialog', 'Kalenderen');
+  const kort = vindue('kalDialog', KR ? 'Adventskransen' : 'Kalenderen');
   let valgt = 0, nyFelt = 0;
   function visKort() {
     const body = kort.querySelector('.gdBody'), nx = naeste(), a = S.aabnet.length;
     body.replaceChildren();
+    if (KR) {
+      const t = S.taendt.length;
+      body.append(el('p', 'kalStatus', `${t} af ${N} lys er tændt på adventskransen.`));
+      if (tilKrans()) body.append(el('p', 'gdNaeste', `Du har lys ${t + 1} med dig. ${K.adventskrans.praj || ''}`));
+      else if (nx) body.append(el('p', 'gdNaeste', nx.praj));
+      if (nx || tilKrans()) {
+        const lab = el('label', 'gdCheck'), cb = el('input'); cb.type = 'checkbox'; cb.checked = S.vej; lab.append(cb, ' Vis vej (pil og afstand)');
+        cb.addEventListener('change', () => { S.vej = cb.checked; gem(); }); body.append(lab);
+      }
+      const grid = el('div', 'kalGrid kransGrid');
+      for (let nr = 1; nr <= N; nr++) {
+        const op = S.aabnet.includes(nr), b = el('button', 'kalFelt' + (op ? ' aaben' : nx && nx.nr === nr ? ' naeste' : ''), String(nr)); b.type = 'button';
+        b.setAttribute('aria-label', `Lys ${nr}: ` + (S.taendt.includes(nr) ? 'tændt' : op ? 'fundet' : 'ikke fundet endnu'));
+        if (op && tegn(L[nr])) { b.classList.add('medTing'); const i = el('span', 'kalBillede'); i.innerHTML = tegn(L[nr]); i.querySelector('svg').setAttribute('aria-hidden', 'true'); b.replaceChildren(i, el('span', 'kalNr', String(nr))); }
+        if (op && nr === nyFelt) b.classList.add('ny');
+        if (op) { b.setAttribute('aria-pressed', String(valgt === nr)); b.addEventListener('click', () => { valgt = valgt === nr ? 0 : nr; visKort(); }); } else b.disabled = true;
+        grid.append(b);
+      }
+      body.append(grid);
+      if (valgt && L[valgt] && S.aabnet.includes(valgt)) {
+        const l = L[valgt], det = el('article', 'kalDetalje'), bi = billede(l); if (bi) det.append(bi);
+        det.append(el('h3', '', `${l.nr}. ${l.navn}`), ...l.gaade.efter.map(replik)); body.append(det);
+      }
+      return;
+    }
     body.append(el('p', 'kalStatus', `Protokollen: ${a} af ${N} stykker.` + (nx ? ` Næste er låge ${nx.nr}` + (laast(nx) ? `, som åbner ${nx.nr}. december.` : '.') : '')));
     if (nx) {
       body.append(el('p', 'gdNaeste', nx.praj));
@@ -9519,11 +9603,27 @@ const KALENDER = (() => {
   kort.addEventListener('close', () => { nyFelt = 0; });
 
   // ---- what to find now (the card in the top left corner; MAAL calls this)
-  $('maal').querySelector('small').textContent = 'Julekalenderen';
+  $('maal').querySelector('small').textContent = KR ? K.titel : 'Julekalenderen';
   function maal(M_, card) {
     const nx = started && M_.vis ? naeste() : null;
+    if (KR && started && M_.vis && (tilKrans() || (faerdig(S) && !S.morgen && !festSet))) {   // to the wreath, or up to the party in the tower
+      const tilT = !tilKrans(), T_ = FX.tower, mål = tilT ? [T_.door[0] + T_.OUT[0] * 3, T_.door[1] + T_.OUT[1] * 3] : krans_?.staa;
+      const hvad = tilT ? (K.fest?.overskrift || 'Juleaften i Tårnet') : `Tænd lys ${S.taendt.length + 1}`;
+      if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
+      let pil = null, hvor = tilT ? (K.fest?.vej || 'Gå til Kongeporten på Slotspladsen, og tag elevatoren op til restauranten.') : (K.adventskrans.praj || 'Adventskransen i Rigsdagsgården.');
+      if (tilT && I.on) hvor = I.place === K.fest?.place ? 'Her er det. Nisserne sidder ved bordene.' : 'Tag elevatoren op til restauranten.';
+      else if (S.vej && mål && !I.on && !FX.tower?.on) {
+        const v = MYBOAT.on ? null : M_.vej(P.pos.x, P.pos.z, mål), aim = v ? v.sigte : mål, lige = Math.hypot(mål[0] - P.pos.x, mål[1] - P.pos.z), len = v ? v.len : lige;
+        if (lige > 5) pil = Math.atan2(aim[0] - P.pos.x, aim[1] - P.pos.z) - (cam.yaw + Math.PI);
+        hvor = lige <= 5 ? 'Lige her' : 'Følg pilen · ' + Math.round(len / 5) * 5 + ' m';
+      }
+      M_.punkt = S.vej ? mål : null;
+      $('maalHvor').textContent = hvor; $('maalHvor').hidden = false;
+      const p = $('maalPil'); p.hidden = pil === null; if (pil !== null) p.style.transform = `rotate(${-pil}rad)`;
+      card.hidden = false; return;
+    }
     if (!nx) { card.hidden = true; M_.punkt = null; return; }
-    const d = DOERE.find(d => d.l === nx), vent = laast(nx), hvad = vent ? aabnerTekst(nx) : 'Find låge ' + nx.nr;
+    const d = DOERE.find(d => d.l === nx), vent = laast(nx), hvad = vent ? aabnerTekst(nx) : KR ? `Find lys ${nx.nr}` : 'Find låge ' + nx.nr;
     if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
     let pil = null, hvor = vent ? (S.aabnet.length ? 'Du har åbnet alle de låger, der er åbne i dag. Kom tilbage i morgen.' : 'Kalenderen åbner 1. december. Indtil da kan du gå rundt på Slotsholmen.') : nx.praj;
     if (I.on && nx.type === 'stor' && I.place === nx.inde.place) hvor = 'Her er det. Find nissen.';
@@ -9565,7 +9665,7 @@ const KALENDER = (() => {
   for (const g of [world, dyn]) g.traverse(o => { if (o.material) for (const m of Array.isArray(o.material) ? o.material : [o.material]) sneMat(m); });
   // The light follows the four Sundays: dusk at the first door, dark evening by the second Sunday, night from the third,
   // and when the last door is open the morning comes. 0 is daylight and 1 is dark.
-  const lysNu = () => { const a = (started ? S : gemt || S).aabnet.length; return a >= N ? ((started ? S : gemt || S).morgen ? 0.04 : 1) : a >= 12 ? 1 : 0.55 + 0.45 * a / 12; };   // after the last door the night lasts until the fireworks are over
+  const lysNu = () => { const G = started ? S : gemt || S, a = frem(G); return faerdig(G) ? (G.morgen ? 0.04 : 1) : a >= 12 ? 1 : 0.55 + 0.45 * a / 12; };   // after the last door the night lasts until the fireworks are over
   const sneMaal = a => 0.1 + 0.82 * Math.min(1, a / 18), faldMaal = a => a <= 12 ? 1 : Math.max(0, 1 - (a - 12) / 6);
   let sneNu = null, faldNu = 1, stjerner = null;
   {
@@ -9576,7 +9676,7 @@ const KALENDER = (() => {
     stjerner.frustumCulled = false; stjerner.renderOrder = -0.5; sky.add(stjerner);
   }
   function vejr(dt, straks) {
-    const a = (started ? S : gemt || S).aabnet.length, k = straks || sneNu === null ? 1 : 1 - Math.exp(-dt / 18);
+    const a = frem(started ? S : gemt || S), k = straks || sneNu === null ? 1 : 1 - Math.exp(-dt / 18);
     if (sneNu === null) sneNu = sneMaal(a);
     sneNu += (sneMaal(a) - sneNu) * k; faldNu += (faldMaal(a) - faldNu) * k;
     SNE_U.value = I.on ? 0 : sneNu;   // not on the floors indoors
@@ -9613,7 +9713,7 @@ const KALENDER = (() => {
     tone(90, 35, afst / 340, 0.7, v); for (let i = 0; i < 6; i++) tone(2500 + Math.random() * 2500, 2000, afst / 340 + 0.25 + i * 0.07 + Math.random() * 0.05, 0.05, v * 0.12, 'square');
   }
   function fyrFrame(dt) {
-    const a = S.aabnet.length, fest = started && a >= N && !S.morgen;
+    const fest = started && faerdig(S) && !S.morgen;
     if (fest && !paused && (!I.on || FX.tower?.on)) {
       festTid += dt; fNaeste -= dt;
       if (fNaeste <= 0) { affyr(); if (Math.random() < 0.35) affyr(); fNaeste = 0.5 + Math.random() * 0.9; }
@@ -9638,7 +9738,7 @@ const KALENDER = (() => {
     fyr.visible = liv && (!I.on || !!FX.tower?.on);
   }
   // all the nisser at the tables in the tower restaurant once the protocol is whole
-  const FEST = [];
+  const FEST = []; let festSet = false;   // festSet: she has been up to the party
   if (K.fest) for (const [id, p] of Object.entries(K.fest.nisser || {})) {
     const ns = K.nisser[id]; if (!ns) continue;
     const f = nisseFigur(ns); f.root.visible = false; inde.add(f.root);
@@ -9648,7 +9748,8 @@ const KALENDER = (() => {
     FEST.push({ id, ns, p, f, ting, face, yaw: face });
   }
   function festFrame(dt) {
-    const vis = started && S.aabnet.length >= N && I.on && I.place === K.fest?.place;
+    const vis = started && faerdig(S) && I.on && I.place === K.fest?.place;
+    if (vis) festSet = true;
     for (const n of FEST) {
       n.f.root.visible = n.ting.visible = vis; if (!vis) continue;
       const [ax, az] = n.p.at, gy = I.height(ax, az) + (n.p.dy || 0);
@@ -9685,11 +9786,16 @@ const KALENDER = (() => {
     }
     gnistFrame(dt);
     if (trae) {
-      const a = S.aabnet.length;
+      const a = frem(S);
       trae.kugler.forEach((k, i) => { const on = i < a; if (k.taendt !== on) { k.taendt = on; k.k.material.color.set(on ? k.farve : '#39423a'); } k.glod.material.opacity = on ? 0.55 + 0.3 * Math.sin(tid * 2.6 + i * 1.7) : 0; });
-      const alle = a >= N; trae.stjerne.material.color.set(alle ? '#ffe08a' : '#8a7436'); trae.stjerneGlod.material.opacity = alle ? 0.8 + 0.2 * Math.sin(tid * 3) : 0; trae.stjerne.rotation.y = tid * 0.6;
+      const alle = faerdig(S); trae.stjerne.material.color.set(alle ? '#ffe08a' : '#8a7436'); trae.stjerneGlod.material.opacity = alle ? 0.8 + 0.2 * Math.sin(tid * 3) : 0; trae.stjerne.rotation.y = tid * 0.6;
     }
-    if (krans_) { const lys_ = Math.floor(S.aabnet.length / 6); krans_.flammer.forEach((f, i) => { const on = i < lys_; f.flamme.visible = on; f.glod.material.opacity = on ? 0.7 + 0.25 * Math.sin(tid * 9 + i * 2) : 0; }); }
+    if (krans_) {
+      const lys_ = KR ? S.taendt.length : Math.floor(S.aabnet.length / 6); krans_.flammer.forEach((f, i) => { const on = i < lys_; f.flamme.visible = on; f.glod.material.opacity = on ? 0.7 + 0.25 * Math.sin(tid * 9 + i * 2) : 0; });
+      krans_.blink = Math.max(0, krans_.blink - dt * 0.8);
+      krans_.glod.material.opacity = Math.max(tilKrans() ? 0.3 + 0.18 * Math.sin(tid * 2.2) : 0, krans_.blink); krans_.glod.scale.setScalar(3.4 + krans_.blink * 5);
+      if (tilKrans() && ude() && !paused && Math.hypot(P.pos.x - krans_.x, P.pos.z - krans_.z) < 3) { const nr = S.taendt.length + 1; offerAction({ id: 'kal-krans', label: `Tænd lys ${nr}`, prio: 14, run: () => taend(nr) }); }
+    }
     for (const n of NISSER) {
       const her = I.on && I.place === n.l.inde.place, klar = S.klem.includes(n.l.nr) || S.aabnet.includes(n.l.nr);
       if (her && !klar && nx === n.l && !laast(nx) && $('scene').hidden && !paused) aabn(DOERE.find(d => d.l === n.l) || { l: n.l });   // she walked in by the building's own door
@@ -9711,8 +9817,11 @@ const KALENDER = (() => {
       for (const d of DOERE) {
         if (Math.hypot(P.pos.x - d.staa[0], P.pos.z - d.staa[1]) > d.r || d.aabner) continue;
         const l = d.l, nr = l.nr;
-        if (S.aabnet.includes(nr)) offerAction({ id: 'kal-' + nr, label: `Se låge ${nr} igen`, prio: 5, run: () => igen(l) });
-        else if (S.klem.includes(nr)) offerAction({ id: 'kal-' + nr, label: `Gå ind ad låge ${nr}`, prio: 13, run: () => FX.interior.enter(indPlace(l)) });
+        if (S.aabnet.includes(nr)) offerAction({ id: 'kal-' + nr, label: KR ? `Lys ${nr}: hør ${K.nisser[l.nisse]?.kort || ''} igen` : `Se låge ${nr} igen`, prio: 5, run: () => igen(l) });
+        else if (S.klem.includes(nr)) offerAction({ id: 'kal-' + nr, label: KR ? 'Gå ind' : `Gå ind ad låge ${nr}`, prio: 13, run: () => FX.interior.enter(indPlace(l)) });
+        else if (KR && tilKrans()) offerAction({ id: 'kal-' + nr, label: `Tænd lys ${S.taendt.length + 1} først`, prio: 4, run: () => toast(`Tænd lys ${S.taendt.length + 1} på adventskransen i Rigsdagsgården først.`) });
+        else if (KR && nx && nx.nr === nr) offerAction({ id: 'kal-' + nr, label: `Find lys ${nr}`, prio: 13, run: () => aabn(d) });
+        else if (KR) offerAction({ id: 'kal-' + nr, label: `Lys ${nr} venter`, prio: 4, run: () => toast(nx ? `Find lys ${nx.nr} først.` : 'Alle lysene er fundet.') });
         else if (nx && nx.nr === nr && laast(l)) offerAction({ id: 'kal-' + nr, label: aabnerTekst(l), prio: 13, run: () => toast(aabnerTekst(l) + '. Kom tilbage den dag.') });
         else if (nx && nx.nr === nr) offerAction({ id: 'kal-' + nr, label: `Åbn låge ${nr}`, prio: 13, run: () => aabn(d) });
         else offerAction({ id: 'kal-' + nr, label: `Låge ${nr} er lukket`, prio: l.type === 'stor' ? 4 : 13, run: () => toast(`Låge ${nr} kan ikke åbnes endnu. Find låge ${nx ? nx.nr : nr} først.`) });
@@ -9721,8 +9830,8 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, FEST, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
-  const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && S.aabnet.length >= N, hjaelp: K.hjaelp, titel: K.titel, test };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && faerdig(S), hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
 })();

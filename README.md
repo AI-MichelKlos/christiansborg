@@ -28,10 +28,22 @@ Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsni
 ## Udseende og spor
 Spillets udseende ligger i et tema, som kan skiftes. Mordgåden bruger temaet `krimi`: mørke flader, messingfarve, avisskrift i overskrifterne og en notesbog med linjeret papir og håndskrift. Temaet `jul` (mørkegrøn, rød og guld) ligger klar til en juleudgave og kan ses ved at skrive `?tema=jul` efter adressen.
 
-Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er to spor: `mord` (mordgåden) og `jul` (julekalenderen).
+Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er tre spor: `mord` (mordgåden), `jul` (julespillet Nissernes adventskrans) og `kalender24` (julekalenderen med 24 låger, som ligger i arkivet til næste år).
 
-## Julekalenderen
-En julekalender for voksne med 24 låger på Slotsholmen. Alle 24 låger er skrevet, og kalenderen kan spilles færdig. Den har sin egen adresse: https://ai-michelklos.github.io/christiansborg/jul/
+## Julespillet: Nissernes adventskrans
+Julespillet for 2026 har sin egen adresse: https://ai-michelklos.github.io/christiansborg/jul/
+
+Bilag fra Effektiviseringsenheden har fjernet de fire lys fra adventskransen i Rigsdagsgården. Fire nisser har reddet hver sit lys: Slev i Folketinget, Hov i De Kongelige Stalde, Kendelse i Højesteret og Stempel i Statsministeriet. Ida henter lysene i rækkefølge og tænder dem på kransen. Når alle fire brænder, ringer Holmens Kirke julen ind, der er fyrværkeri, og nisserne spiser grød i Tårnet. Der er ingen datolås, så man kan spille det hele på én gang.
+
+- Alt indhold står i `adventskrans.js`. Rammen er den samme som julekalenderens (afsnittet JULEKALENDER i `index.html`), så sne, lys, juletræ, fyrværkeri og alle bygninger er de samme.
+- Hvert tændt lys tæller som en søndag: sneen lægger sig, det bliver mørkt, sneen stopper ved det tredje lys, og ved det fjerde er det en klar nat.
+- Pilen, der viser vejen, er slået til fra start og kan slås fra under knappen Kransen.
+- Kør `node dev/tjek-kalender.js` efter en rettelse.
+
+## Arkivet: julekalenderen med 24 låger
+Julekalenderen »Nissernes protokol« er lagt til side til næste jul. Den ligger i `arkiv/julekalender-24-laager.js` og virker stadig. Den kan spilles på `?spor=kalender24` (tilføj `&alle` for at åbne alle låger), og git-mærket `arkiv-julekalender-24-laager` peger på den sidste udgave, før den blev lagt i arkivet. Tag den frem ved at lade linjen `jul` i `SPOR` i `index.html` pege på filen igen. Tjek den med `node dev/tjek-kalender.js --fil=arkiv/julekalender-24-laager.js`.
+
+Det følgende beskriver julekalenderen med 24 låger.
 
 - Lågerne er døre med tal på rundt på Slotsholmen. De åbnes i rækkefølge, og den næste låge lyser svagt. Øverst til venstre står et praj om, hvor den er.
 - Der er tre slags: store låger (et rum med en nisse og en gåde), små låger (en dør, man åbner udefra) og mini-låger (en luge med en overraskelse).
@@ -45,9 +57,9 @@ En julekalender for voksne med 24 låger på Slotsholmen. Alle 24 låger er skre
 - Spillet gemmer selv på den telefon eller computer, man spiller på, hver gang en låge åbnes. Julekalenderen og mordgåden har hver sin gemmeplads.
 - Går man i stå, kan man slå Vis vej til på kalenderkortet, så en pil peger mod den næste låge.
 
-Rammen ligger i `index.html` (afsnittet JULEKALENDER). Alt indhold står i `julekalender.js`: hvor hver låge sidder, hvad der er bag den, nisserne og gåderne. Formatet er forklaret øverst i filen. Kør `node dev/tjek-kalender.js` efter en rettelse.
+Rammen ligger i `index.html` (afsnittet JULEKALENDER). Alt indhold står i `arkiv/julekalender-24-laager.js`: hvor hver låge sidder, hvad der er bag den, nisserne og gåderne. Formatet er forklaret øverst i filen. Kør `node dev/tjek-kalender.js` efter en rettelse.
 
-En ny udgave, fx om dagpenge, er en kopi af `julekalender.js` med andre tekster og en linje mere i listen `SPOR`. Alle udgaver går rundt i den samme by, så en bygning, der bliver bygget flottere, bliver det i dem alle.
+En ny udgave, fx om dagpenge, er en kopi af `adventskrans.js` eller `arkiv/julekalender-24-laager.js` med andre tekster og en linje mere i listen `SPOR`. Alle udgaver går rundt i den samme by, så en bygning, der bliver bygget flottere, bliver det i dem alle.
 
 ## Om spillet
 - Spillet er `index.html` med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).
