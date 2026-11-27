@@ -17,8 +17,16 @@ export function historiskeGaester({ THREE, menneske, ctex, dyn, I, groundAt, hor
       if (geo.attributes.normal.getZ(0) < 0) { geo.setIndex([2,1,0]); geo.computeVertexNormals(); }
       part(geo, m(farve), g, 0, 0, 0, 0);
     };
-    felt([[-.085,1.57],[.085,1.57],[0,1.25]], skjorte, .012);
-    felt([[-.026,1.52],[.026,1.52],[0,1.32]], slips, .021);
+    // Follow the changing chest radius so the shirt and tie stay above the jacket.
+    function kile(bredder, farve, lag) {
+      for (let i=1; i<bredder.length; i++) {
+        const [top,y]=bredder[i-1], [bund,ny]=bredder[i];
+        felt([[-top,y],[top,y],[-bund,ny]],farve,lag);
+        if(bund) felt([[top,y],[bund,ny],[-bund,ny]],farve,lag);
+      }
+    }
+    kile([[.076,1.58],[.083,1.535],[.065,1.46],[.038,1.36],[0,1.27]],skjorte,.012);
+    kile([[.028,1.535],[.015,1.49],[.020,1.46],[.022,1.36],[0,1.31]],slips,.022);
     for (const side of [-1,1]) {
       felt([[side*.077,1.57],[side*.157,1.48],[side*.09,1.44]], revers, .021);
       felt([[side*.09,1.49],[side*.133,1.40],[0,1.23]], revers, .025);
@@ -27,16 +35,19 @@ export function historiskeGaester({ THREE, menneske, ctex, dyn, I, groundAt, hor
 
   const stauning = menneske({
     coat:'#292d34', trousers:'#34373d', shoes:'#252323', skin:'#e5b99d', hair:'#a69c92',
-    hairStyle:'skaldet', bryn:'#8b8177', ingenKrave:true, long:true,
+    hairStyle:'skaldet', bryn:'#8b8177', ingenKrave:true,
     grupper:f => [f.g, f.head, ...f.hips],
     extra(g, head, part, m, foran) {
       habit(g, part, m, foran, '#4c4d53', '#eee6d5', '#493641');
       const profil = [[.006,-.32],[.045,-.28],[.088,-.195],[.113,-.11],[.105,-.07],[.066,-.047]];
-      const skaeg = part(new THREE.LatheGeometry(profil.map(([r,y]) => new THREE.Vector2(r,y)),20), m('#c5bcb0'), head, 0,0,.060,0);
-      skaeg.scale.z=.73;
+      const skaeg = part(new THREE.LatheGeometry(profil.map(([r,y]) => new THREE.Vector2(r,y)),20), m('#c5bcb0'), head, 0,0,.126,0);
+      skaeg.scale.z=.75;
+      skaeg.rotation.x=-.25; // The beard hangs in front of the shirt and clears the collar.
+      oval(part,m('#e3b79d'),head,[0,-.019,.150],[.024,.029,.027]);
       for(const s of [-1,1]) {
-        oval(part,m('#ded7c9'),head,[s*.044,-.056,.130],[.053,.021,.018]).rotation.z=-s*.18;
-        const ring = part(new THREE.TorusGeometry(.044,.006,7,24),m('#574633'),head,s*.051,.012,.150,0);
+        oval(part,m('#ded7c9'),head,[s*.044,-.056,.168],[.053,.021,.018]).rotation.z=-s*.18;
+        oval(part,m('#b8aca0'),head,[s*.054,-.155,.191],[.033,.088,.014]).rotation.z=-s*.27;
+        const ring = part(new THREE.TorusGeometry(.044,.005,7,24),m('#574633'),head,s*.051,.012,.150,0);
         ring.rotation.y=s*.12;
         const stang = part(new THREE.BoxGeometry(.007,.008,.105),m('#574633'),head,s*.099,.013,.105,0);
         stang.rotation.y=-s*.22;
@@ -52,13 +63,17 @@ export function historiskeGaester({ THREE, menneske, ctex, dyn, I, groundAt, hor
     extra(g, head, part, m, foran) {
       habit(g, part, m, foran, '#80755f', '#e0dcca', '#794438');
       // Receding temples, waves swept back, small separate moustache and goatee.
-      oval(part,m('#b7b3ac'),head,[0,.105,-.047],[.130,.072,.110]);
+      oval(part,m('#b7b3ac'),head,[0,.105,-.041],[.132,.076,.113]);
+      oval(part,m('#c9c4b9'),head,[-.018,.134,-.004],[.088,.048,.075]).rotation.z=.20;
+      oval(part,m('#d9ac92'),head,[0,-.021,.148],[.024,.024,.030]);
       for (const s of [-1,1]) {
         oval(part,m('#c5c1b9'),head,[s*.107,.058,-.023],[.040,.077,.112]).rotation.x=-.40;
         oval(part,m('#766b60'),head,[s*.049,.047,.126],[.032,.010,.009]).rotation.z=-s*.14;
         oval(part,m('#a29686'),head,[s*.027,-.045,.142],[.029,.010,.010]).rotation.z=-s*.12;
       }
-      oval(part,m('#9a9082'),head,[0,-.112,.095],[.047,.040,.028]);
+      const hage = [[.002,-.160],[.023,-.146],[.046,-.114],[.039,-.099],[.018,-.095]];
+      const spids=part(new THREE.LatheGeometry(hage.map(([r,y])=>new THREE.Vector2(r,y)),14),m('#9a9082'),head,0,0,.10,0);
+      spids.scale.z=.51;
     }
   });
 
