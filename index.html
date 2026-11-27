@@ -9627,7 +9627,11 @@ const KALENDER = (() => {
     const d = DOERE.find(d => d.l === nx), vent = laast(nx), hvad = vent ? aabnerTekst(nx) : KR ? `Find lys ${nx.nr}` : 'Find låge ' + nx.nr;
     if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
     let pil = null, hvor = vent ? (S.aabnet.length ? 'Du har åbnet alle de låger, der er åbne i dag. Kom tilbage i morgen.' : 'Kalenderen åbner 1. december. Indtil da kan du gå rundt på Slotsholmen.') : nx.praj;
-    if (I.on && nx.type === 'stor' && I.place === nx.inde.place) hvor = 'Her er det. Find nissen.';
+    if (I.on && nx.type === 'stor' && I.place === nx.inde.place) {   // in the room: the arrow points at the nisse, a short text says what to do
+      const [ax, az] = nx.inde.at, dx = ax - (P.pos.x - I.x), dz = az - P.pos.z, lige = Math.hypot(dx, dz);
+      if (lige > 2.5) { hvor = 'Følg pilen · ' + Math.max(1, Math.round(lige)) + ' m'; if (S.vej) pil = Math.atan2(dx, dz) - (cam.yaw + Math.PI); }
+      else hvor = 'Lige her. Tal med nissen.';
+    }
     else if (I.on && nx.type === 'stor' && I.place === indPlace(nx) && nx.inde.vej) hvor = nx.inde.vej;   // fx the tower: in at the bottom, the nisse is higher up
     else if (!vent && S.vej && d && !I.on && !FX.tower?.on) {
       const v = MYBOAT.on ? null : M_.vej(P.pos.x, P.pos.z, d.staa), aim = v ? v.sigte : d.staa, lige = Math.hypot(d.staa[0] - P.pos.x, d.staa[1] - P.pos.z), len = v ? v.len : lige;
