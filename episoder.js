@@ -6,6 +6,7 @@
 //   3. Slotspladsen ved Tårnet: en julemand med en klokke og en gryde og et lille kor, der vugger i takt
 //   4. Prins Jørgens Gård: en embedsmand med en stak ringbind, der taber dem i sneen, igen og igen
 //   5. Ridebanen: to børn kaster snebolde efter en snemand med slips, hat og mappe
+//   6. Slotspladsen: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
 //
 // index.html kalder episoder(...) én gang i KALENDER-blokken og derefter update(dt, t, pos, ude) i hver frame.
 // Ydelse: alle figurer er bagt til få meshes (menneske() i index.html), geometri og materialer deles, hver scene vises
@@ -299,6 +300,58 @@ export function episoder(H) {
       pust.material.opacity = Math.max(0, 0.7 - pustT * 1.6); pust.scale.setScalar(0.4 + pustT * 1.4);
       const vip = Math.exp(-pustT * 3) * Math.sin(pustT * 18);
       hat.rotation.z = vip * 0.25; hat.rotation.x = -0.05; hoved.rotation.z = vip * 0.05;
+    };
+  });
+
+  // ---------------------------------------------------------------- 6. Demonstrationen (Slotspladsen)
+  // Ti venlige mennesker i alle aldre står med et banner. De to forreste holder stængerne, de andre vugger,
+  // klapper i takt og løfter en hånd på skift. En har en termokande, et barn sidder på sin fars skuldre.
+  scene(95, -27, Math.atan2(-0.55, -0.83), (g, e) => {
+    // banneret: tegnet på et lærred, så teksten står skarpt. Det får ikke sne på.
+    const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 200; const c = cv.getContext('2d');
+    c.fillStyle = '#f4efe2'; c.fillRect(0, 0, 1024, 200); c.strokeStyle = '#b3262a'; c.lineWidth = 14; c.strokeRect(7, 7, 1010, 186);
+    c.fillStyle = '#b3262a'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = '700 64px Georgia, serif'; c.fillText('NEJ TAK TIL', 512, 62);
+    c.font = '800 70px Georgia, serif'; c.fillText('DAGPENGEFORRINGELSER', 512, 140, 960);
+    const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4; if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
+    const bm = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }); bm.userData.sne = true; bm.onBeforeCompile = () => {};
+    const banner = new THREE.Group(); banner.userData.fri = true; banner.position.set(0, 0, 0.9); g.add(banner);
+    const klud = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 0.8, 12, 1), bm); klud.position.y = 1.22; klud.userData.fri = true; banner.add(klud);
+    const kludPos = klud.geometry.attributes.position, kludX = Float32Array.from({ length: kludPos.count }, (_, i) => kludPos.getX(i));
+    for (const s of [-1, 1]) { const st = stk(G.cyl, M.moerktTrae, banner, s * 2.02, 0.85, 0, 0.025, 1.7, 0.025, false); st.userData.fri = true; }
+    // folkene: to forrest med stængerne, resten i to rækker bag dem
+    const folk = [
+      [-2.3, 0.8, { coat: '#2f5fa8', trousers: '#2b2f36', hair: '#6b4a2f', hairStyle: 'kort', toerklaede: '#e0a63a', extra: hue('#b3262a') }, 'stang'],
+      [2.3, 0.8, { coat: '#7a2a24', trousers: '#2b2a30', hair: '#a8794c', kvinde: true, long: true, hairStyle: 'bob', toerklaede: '#eef0ee' }, 'stang'],
+      [-2.3, -0.5, { coat: '#3e7d4a', trousers: '#24303a', hair: '#d8d4ca', hairStyle: 'skaldet', toerklaede: '#b3262a', extra: hue('#3e7d4a') }, 'klap'],
+      [-1.2, -0.7, { coat: '#6a3a5a', trousers: '#2b2a30', hair: '#3b2a20', kvinde: true, hairStyle: 'hestehale', taske: true }, 'vink'],
+      [-0.2, -0.55, { coat: '#e0a63a', trousers: '#2f3a5a', hair: '#1f1a18', kvinde: true, hairStyle: 'knold', toerklaede: '#2f5fa8' }, 'klap'],
+      [0.8, -0.75, { coat: '#2b2f36', trousers: '#2b2f36', hair: '#8c8c88', hairStyle: 'kort', toerklaede: '#c0392b', solbriller: false }, 'termo'],
+      [1.85, -0.5, { coat: '#c0392b', trousers: '#24303a', hair: '#d9c08a', kvinde: true, long: true, hairStyle: 'lang', extra: hue('#eef0ee', '#c0392b') }, 'vink'],
+      [2.6, -0.2, { coat: '#4a5a3a', trousers: '#2d3340', hair: '#3b2a20', hairStyle: 'kort', toerklaede: '#e0a63a' }, 'far'],
+      [2.6, -0.2, { coat: '#2f5fa8', trousers: '#c0392b', hair: '#a8794c', barn: true, sidder: true, hairStyle: 'kort', extra: hue('#e0a63a', '#2f5fa8') }, 'skuldre'],
+      [-0.9, -1.6, { coat: '#7d4f8a', trousers: '#2b2a30', hair: '#f1eee6', kvinde: true, hairStyle: 'knold', long: true, extra: hue('#b3262a') }, 'klap'],
+    ].map(([lx, lz, o, rolle], i) => {
+      const f = placer(person(Object.assign({ statisk: rolle === 'skuldre' }, o)), g, lx, lz, 0);
+      if (rolle === 'skuldre') { f.root.position.set(2.6, 1.02, -0.12); f.root.scale.setScalar(0.85); }
+      if (rolle === 'termo') stk(G.cyl, M.roed, f.root, 0.27, 0.95, 0.12, 0.05, 0.26, 0.05, false).userData.fri = true;
+      return { f, rolle, i };
+    });
+    colCirc(...e.ver(0, 0), 3.2, 2.2);
+    return (t) => {
+      // banneret blafrer lidt
+      for (let i = 0; i < kludPos.count; i++) kludPos.setZ(i, Math.sin(kludX[i] * 2.2 + t * 2.4) * 0.05 * (0.4 + Math.abs(kludX[i]) / 2));
+      kludPos.needsUpdate = true; banner.position.y = Math.abs(Math.sin(t * 1.6)) * 0.03;
+      for (const { f, rolle, i } of folk) {
+        const sv = Math.sin(t * 1.6 + i * 0.7);
+        f.g.rotation.z = sv * 0.04; if (rolle !== 'skuldre') f.g.position.y = Math.abs(Math.sin(t * 3.2 + i)) * 0.015;
+        if (!f.arms) continue;
+        if (rolle === 'stang') { for (const a of f.arms) { a.rotation.x = -0.75; a.rotation.z = 0; } }
+        else if (rolle === 'klap') { const k = Math.abs(Math.sin(t * 4 + i)); f.arms[0].rotation.x = f.arms[1].rotation.x = -0.9; f.arms[0].rotation.z = -0.25 + k * 0.3; f.arms[1].rotation.z = 0.25 - k * 0.3; }
+        else if (rolle === 'vink') { const op = Math.max(0, Math.sin(t * 0.7 + i * 1.3)); f.arms[1].rotation.x = -op * 2.6; f.arms[1].rotation.z = Math.sin(t * 7) * 0.25 * op; }
+        else if (rolle === 'termo') { f.arms[1].rotation.x = -0.5 - Math.max(0, Math.sin(t * 0.5)) * 0.6; }
+        else if (rolle === 'far') { f.arms[0].rotation.x = f.arms[1].rotation.x = -2.7; }
+      }
     };
   });
 

@@ -9327,6 +9327,7 @@ const KALENDER = (() => {
       box(1.05, 0.07, 0.16, lys('#f4f6f8', 0.5), 0, 2.3, 0.02, { parent: d.g, cast: false });   // snow on top
       tal(d.g, l.nr, 1.83, 0.8, 0.07);
       d.pynt = krans(d.g, 2.42, 0.2); d.glimt = glimt(d.g, 1.9);
+      d.lur = { x: e.x - sx * (side + 2.6) + e.nx * (ud + 2.4), z: e.z - sz * (side + 2.6) + e.nz * (ud + 2.4), y: d.g.position.y, ud: [e.nx, e.nz], langs: [-sx, -sz] };   // where Bilag stands and watches
     } else {   // a door (lille) or a hatch (mini) on the wall
       const v = vaeg(l), mini = l.type === 'mini', w = mini ? 0.84 : 0.95, h = mini ? 0.84 : 2.0, y0 = mini ? 1.05 : 0;
       // a wall with a plinth: a hatch sits above it, and a door stands out on the face of the plinth with a deep frame behind it
@@ -9370,6 +9371,40 @@ const KALENDER = (() => {
           part(new THREE.SphereGeometry(0.035, 8, 6), m('#b3262a'), head, sx * 0.15, -0.3, 0.0);
         }
       } });
+  }
+  // ---- Bilag on the lookout: he stands near the next door with his clipboard and counts. When Ida comes close he hurries off.
+  const LUR = KR && K.nisser.bilag ? (() => {
+    const f = nisseFigur(K.nisser.bilag); gruppe.add(f.root); f.root.visible = false;
+    const plade = new THREE.Group(); plade.position.set(0.12, 0.62, 0.16); plade.rotation.x = -0.5; f.root.add(plade);
+    box(0.2, 0.26, 0.02, tm('#6b4a2e'), 0, 0, 0, { parent: plade, cast: false }); box(0.17, 0.21, 0.025, tm('#f4f1ea'), 0, 0.01, 0, { parent: plade, cast: false });
+    return { f, plade, nr: 0, x: 0, z: 0, yaw: 0, flugt: 0, vx: 0, vz: 0, skala: 0, gaa: 0 };
+  })() : null;
+  function lurFrame(dt) {
+    if (!LUR) return;
+    const b = LUR, f = b.f, nx = naeste(), ved = tilKrans() ? null : nx && DOERE.find(d => d.l === nx)?.lur;
+    const slut = faerdig(S) && !S.morgen && krans_, mål = ved ? { nr: nx.nr, x: ved.x, z: ved.z, y: ved.y } : slut ? { nr: 99, x: krans_.x - 3.2, z: krans_.z + 2.6, y: null } : null;
+    if (!started || !ude() || !mål) { f.root.visible = false; return; }
+    const dx0 = P.pos.x - mål.x, dz0 = P.pos.z - mål.z;
+    if (b.nr !== mål.nr) { b.nr = mål.nr; b.x = mål.x; b.z = mål.z; b.flugt = mål.nr !== 99 && Math.hypot(dx0, dz0) < 15 ? -1 : 0; b.skala = 0; b.gaa = 0; b.y0 = mål.y; }   // a new place: he is there already (not if Ida is standing right there)
+    if (b.flugt < 0) { f.root.visible = false; return; }
+    const dx = P.pos.x - b.x, dz = P.pos.z - b.z, dist = Math.hypot(dx, dz);
+    if (dist > 90) { f.root.visible = false; return; }
+    f.root.visible = true;
+    if (b.flugt === 0 && mål.nr !== 99 && dist < 6.5) { b.flugt = 0.001; const n = Math.max(0.1, dist); b.vx = -dx / n; b.vz = -dz / n; tone(880, 1320, 0, 0.06, 0.02); }   // caught: off he goes
+    if (b.flugt > 0) {
+      b.flugt += dt; const fart = b.flugt < 0.35 ? 0 : 3.4;   // a startled moment, then he runs
+      b.x += b.vx * fart * dt; b.z += b.vz * fart * dt; b.gaa += dt * 14 * (fart > 0 ? 1 : 0);
+      b.skala = b.flugt > 2.4 ? Math.max(0, b.skala - dt * 2.5) : Math.min(1, b.skala + dt * 3);
+      b.yaw = b.flugt < 0.35 ? Math.atan2(dx, dz) : Math.atan2(b.vx, b.vz);
+    } else {
+      b.skala = Math.min(1, b.skala + dt * 2); b.yaw += angDiff(dist < 25 ? Math.atan2(dx, dz) : b.yaw, b.yaw) * (1 - Math.exp(-dt * 2)); b.gaa = 0;
+      b.plade.rotation.z = Math.sin(tid * 7) * 0.05;   // he writes
+    }
+    const gy = groundAt(b.x, b.z, (b.y0 ?? groundAt(b.x, b.z, 30)) + 2.5);
+    f.root.position.set(b.x, gy + (b.flugt > 0.35 ? Math.abs(Math.sin(b.gaa)) * 0.05 : 0), b.z); f.root.rotation.y = b.yaw; f.root.scale.setScalar(Math.max(0.001, b.skala));
+    f.legs?.forEach((l, i) => { l.hip.rotation.x = Math.sin(b.gaa + i * Math.PI) * 0.7; });
+    f.arms?.forEach((a, i) => { if (b.flugt > 0.35) a.rotation.x = Math.sin(b.gaa + i * Math.PI + Math.PI) * 0.6; });
+    if (b.flugt === 0 && typeof animatePresence === 'function') animatePresence(f, dt, dist < 12);
   }
   const indPlace = l => l.inde.ind || l.inde.place;   // where the door leads in, if the nisse stands further inside
   const NISSER = [];
@@ -9865,6 +9900,7 @@ const KALENDER = (() => {
       }
     }
     if (!started) return;
+    lurFrame(dt);
     const nx = naeste();
     for (const d of DOERE) {
       if (d.led) { const maal_ = d.aabner || S.aabnet.includes(d.l.nr) ? 1 : 0; d.aaben += (maal_ - d.aaben) * Math.min(1, dt * 3.5); d.led.rotation.y = -d.aaben * 1.9; if (d.hul) d.hul.visible = d.aaben > 0.03; if (d.ting) d.ting.visible = d.aaben > 0.03; }
@@ -9928,7 +9964,7 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, lur: () => LUR && { x: LUR.x, z: LUR.z, vis: LUR.f.root.visible, flugt: LUR.flugt, skala: LUR.skala, nr: LUR.nr }, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
   const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && faerdig(S), hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
