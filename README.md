@@ -28,17 +28,20 @@ Spillet begyndte som en gåtur for børn med kronejagt, stjerneopgaver, oplæsni
 ## Udseende og spor
 Spillets udseende ligger i et tema, som kan skiftes. Mordgåden bruger temaet `krimi`: mørke flader, messingfarve, avisskrift i overskrifterne og en notesbog med linjeret papir og håndskrift. Temaet `jul` (mørkegrøn, rød og guld) ligger klar til en juleudgave og kan ses ved at skrive `?tema=jul` efter adressen.
 
-Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er tre spor: `mord` (mordgåden), `jul` (julespillet Nissernes adventskrans) og `kalender24` (julekalenderen med 24 låger, som ligger i arkivet til næste år).
+Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin egen gemmeplads. Sporene står i listen `SPOR` øverst i scriptet i `index.html`, og `?spor=navn` vælger et andet end mordgåden. Et nyt tema er en blok med farver og skrifter under overskriften TEMA i stilarket. Der er fire spor: `mord` (mordgåden), `jul` (julespillet Nissehuejagten), `krans` (sidste udgave af julespillet, Nissernes adventskrans, i arkivet) og `kalender24` (julekalenderen med 24 låger, som ligger i arkivet til næste år).
 
-## Julespillet: Nissernes adventskrans
+## Julespillet: Nissehuejagten
 Julespillet for 2026 har sin egen adresse: https://ai-michelklos.github.io/christiansborg/jul/
 
-Bilag fra Effektiviseringsstyrelsen har fjernet de fire lys fra adventskransen i Rigsdagsgården. Fire nisser har reddet hver sit lys: Anker i Folketinget, Gerda i De Kongelige Stalde, Thyra i Riddersalen og Elna i Statsministeriet. Ida henter lysene i rækkefølge og tænder dem på kransen. Når alle fire brænder, ringer Holmens Kirke julen ind, der er fyrværkeri, og nisserne spiser grød i Tårnet. Der er ingen datolås, så man kan spille det hele på én gang.
+En kort tur på telefonen, cirka 10 minutter. Nisserne har gemt otte nissehuer på deres yndlingssteder på Slotsholmen. For hver hue, Ida finder, tænder de tre lys på det store juletræ i Rigsdagsgården. Når alle 24 lys brænder, går hun hen til træet: kameraet glider op ad det, stjernen og lyskæden tænder, Holmens Kirke ringer julen ind, og der er fyrværkeri. Bagefter kan man gå op til nisserne i Tårnet og finde mandlen i risalamanden.
 
-- Alt indhold står i `adventskrans.js`. Rammen er den samme som julekalenderens (afsnittet JULEKALENDER i `index.html`), så sne, lys, juletræ, fyrværkeri og alle bygninger er de samme.
-- Hvert tændt lys tæller som en søndag: sneen lægger sig, det bliver mørkt, sneen stopper ved det tredje lys, og ved det fjerde er det en klar nat.
-- Pilen, der viser vejen, er slået til fra start og kan slås fra under knappen Kransen.
-- Kør `node dev/tjek-kalender.js` efter en rettelse.
+- Huerne ligger på Højbro (over havmanden), for enden af gallabordet i Riddersalen, på Marmorbroen, på en båsvæg i De Kongelige Stalde, på Kierkegaards hoved i Bibliotekshaven, på rækværket på Udsigten, på Frederik 7.s hoved og på talerstolen i Folketingssalen. Man tager en hue ved at gå hen til den. På Udsigten drejer man rundt, til man ser den.
+- Ved hver hue står en nisse. Man kan sige hej og høre en kort historie, der faktisk er sket på stedet. Man behøver ikke. Kilderne står i `dev/NISSEHUER.md`.
+- Øverst til venstre står, hvor den næste hue er. Pilen og afstanden kommer først, hvis man ikke er kommet nærmere i et halvt minut, eller hvis Vis altid vejen er slået til under knappen Træet. Over den første hue står en lysstribe.
+- Sneen ligger altid, og der kommer lette byger. Det bliver mørkere, jo flere lys der brænder.
+- Alt indhold står i `nissehuer.js`. Rammen er afsnittet JULEKALENDER i `index.html` (spil: "huer"). Kør `node dev/tjek-nissehuer.js` efter en rettelse.
+
+Sidste udgave, Nissernes adventskrans med fire lys, ligger i `arkiv/adventskrans-4-lys.js` og kan spilles på `?spor=krans`. Tjek den med `node dev/tjek-kalender.js`.
 
 ## Arkivet: julekalenderen med 24 låger
 Julekalenderen »Nissernes protokol« er lagt til side til næste jul. Den ligger i `arkiv/julekalender-24-laager.js` og virker stadig. Den kan spilles på `?spor=kalender24` (tilføj `&alle` for at åbne alle låger), og grenen `arkiv-julekalender-24-laager` på GitHub er hele spillet, som det så ud, før kalenderen blev lagt i arkivet. Tag den frem ved at lade linjen `jul` i `SPOR` i `index.html` pege på filen igen. Tjek den med `node dev/tjek-kalender.js --fil=arkiv/julekalender-24-laager.js`.
@@ -59,7 +62,7 @@ Det følgende beskriver julekalenderen med 24 låger.
 
 Rammen ligger i `index.html` (afsnittet JULEKALENDER). Alt indhold står i `arkiv/julekalender-24-laager.js`: hvor hver låge sidder, hvad der er bag den, nisserne og gåderne. Formatet er forklaret øverst i filen. Kør `node dev/tjek-kalender.js` efter en rettelse.
 
-En ny udgave, fx om dagpenge, er en kopi af `adventskrans.js` eller `arkiv/julekalender-24-laager.js` med andre tekster og en linje mere i listen `SPOR`. Alle udgaver går rundt i den samme by, så en bygning, der bliver bygget flottere, bliver det i dem alle.
+En ny udgave, fx om dagpenge, er en kopi af `nissehuer.js`, `arkiv/adventskrans-4-lys.js` eller `arkiv/julekalender-24-laager.js` med andre tekster og en linje mere i listen `SPOR`. Alle udgaver går rundt i den samme by, så en bygning, der bliver bygget flottere, bliver det i dem alle.
 
 ## Om spillet
 - Spillet er `index.html` med three.js 0.160. Motoren er den samme som i [Skolen på Duevej](https://github.com/AI-MichelKlos/skolen-paa-duevej).

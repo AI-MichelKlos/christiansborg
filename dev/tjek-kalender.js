@@ -1,4 +1,5 @@
-// Checks a calendar edition (adventskrans.js, or another file given as --fil=..., fx arkiv/julekalender-24-laager.js) for mistakes.
+// Checks a calendar edition (arkiv/adventskrans-4-lys.js, or another file given as --fil=..., fx arkiv/julekalender-24-laager.js) for mistakes.
+// The hat hunt (nissehuer.js) has its own check: node dev/tjek-nissehuer.js
 // Run from anywhere:   node dev/tjek-kalender.js
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -6,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const filArg = process.argv.find(a => a.startsWith('--fil='));
-const kilde = filArg ? resolve(filArg.slice(6)) : join(root, 'adventskrans.js');
+const kilde = filArg ? resolve(filArg.slice(6)) : join(root, 'arkiv', 'adventskrans-4-lys.js');
 const { KALENDER: K } = await import(pathToFileURL(kilde).href);
 const { TEGNINGER } = await import(pathToFileURL(join(root, 'tegninger.js')).href);
 const fejl = [], bem = [];

@@ -130,6 +130,8 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 
 #towerViewBadge{display:none;position:fixed;left:18px;top:18px;max-width:calc(100% - 180px);padding:12px 15px;background:#26372f;color:#f4e9c9;border:1px solid #bda66d;pointer-events:none;flex-direction:column;gap:5px}
 .inTowerView #towerViewBadge{display:flex}
+.inTowerView #maal{top:calc(122px + env(safe-area-inset-top,0px))!important}
+#bNotes{position:relative}.traeTal{position:absolute;right:-6px;top:-7px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:#f3d98a;color:#3a2a10;font:800 11px/20px var(--body,system-ui);text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none}
 #towerFloors{display:none;position:fixed;right:14px;top:168px;width:210px;max-width:55vw;background:#eee5cf}
 .inTowerRooms #towerFloors,.inTowerView #towerFloors{display:block}
 .inTowerView #towerFloors{top:78px}
@@ -493,6 +495,20 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .kkLys.idag::after{content:"NÆSTE";position:absolute;left:50%;top:2%;transform:translateX(-50%);padding:3px 7px 2px;border-radius:9px;background:#f3d98a;color:#3a2a10;font:800 9px/1 var(--body);letter-spacing:.14em;white-space:nowrap;box-shadow:0 0 12px rgba(243,217,138,.6)}
 .kkLys:focus-visible{outline:3px solid #f3d98a;outline-offset:2px;border-radius:6px}
 .kkGlint{animation:kkGlint 3s ease-in-out infinite;animation-delay:var(--g,0s)}
+.huerScene{position:relative;margin:0 -10px 10px}
+.huerScene>svg{display:block;width:100%;height:auto;aspect-ratio:600/330}
+.htSkaer{animation:kkSkaer 1.9s ease-in-out infinite alternate;animation-delay:var(--g,0s)}
+.huerRaekke{display:flex;justify-content:center;gap:2px;margin-top:4px}
+.huerIkon{display:inline-grid;place-items:center;width:clamp(30px,9vw,44px);aspect-ratio:1;animation:fInd .5s cubic-bezier(.2,1.4,.4,1) var(--d,0s) both}
+.huerIkon svg{width:100%;height:100%}
+.huerIkon:not(.fundet){opacity:.55}
+.huerListe{list-style:none;margin:10px 0;padding:0;display:grid;gap:6px}
+.huerListe li{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.04)}
+.huerListe li.naeste{outline:1px solid rgba(243,217,138,.55)}
+.huerListe li .huerIkon{width:40px;flex:none;animation:none}
+.huerListe li div{display:grid;gap:3px}
+.huerSted{font-size:.9em;opacity:.85}
+.huerHoer{justify-self:start;padding:4px 10px;font-size:.85em}
 @keyframes kkFlakker{0%{transform:scale(.95,.97) skewX(-2deg)}50%{transform:scale(1.04,1.06) skewX(1.5deg)}100%{transform:scale(.98,1.1) skewX(-1deg)}}
 @keyframes kkSkaer{from{opacity:.75}to{opacity:1}}
 @keyframes kkKald{0%,100%{filter:drop-shadow(0 0 3px rgba(243,217,138,.35))}50%{filter:drop-shadow(0 0 12px rgba(243,217,138,.95))}}
@@ -575,7 +591,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 
 <script>
 // The first seconds, before the 3D world and the edition's own file have loaded: show the right edition at once.
-(function(){ var q = new URLSearchParams(location.search), F = { jul: ['Nissernes adventskrans', 'Christiansborg', 'Julespillet hentes …'], kalender24: ['Nissernes protokol', 'Christiansborg · en julekalender for voksne', 'Julekalenderen hentes …'] }[q.get('spor')];
+(function(){ var q = new URLSearchParams(location.search), F = { jul: ['Nissehuejagten', 'Christiansborg', 'Julespillet hentes …'], krans: ['Nissernes adventskrans', 'Christiansborg', 'Julespillet hentes …'], kalender24: ['Nissernes protokol', 'Christiansborg · en julekalender for voksne', 'Julekalenderen hentes …'] }[q.get('spor')];
   if (!F) return; document.documentElement.dataset.tema = q.get('tema') || 'jul'; document.title = F[0];
   document.getElementById('introTitle').textContent = F[0]; document.querySelector('#intro .eyebrow').textContent = F[1]; document.getElementById('introLead').textContent = F[2]; })();
 setTimeout(function(){ if(!window.__gameReady){ var e=document.getElementById('loadErr'); if(e) e.hidden=false; var b=document.getElementById('goBtn'); if(b) b.textContent='Kunne ikke hente 3D-motoren'; } }, 12000);
@@ -587,8 +603,11 @@ import * as THREE from 'three';
 // ?spor=<id> in the address picks another one than the first. To add an edition, add a line here and a tema block in the CSS.
 const SPOR = {
   mord: { titel: 'Mord i Rigets midte', type: 'gaade', fil: './mordgaade.js', tema: 'krimi', gem: 'mordIRigetsMidte.spil' },
-  // A calendar edition has 24 doors, or with spil: "krans" in its file four candles. Another edition is one more line here.
-  jul: { titel: 'Nissernes adventskrans', type: 'kalender', fil: './adventskrans.js', tema: 'jul', gem: 'adventskrans.jul.spil' },
+  // A calendar edition has 24 doors, with spil: "krans" in its file four candles, or with spil: "huer" eight hats to find
+  // that light the Christmas tree three candles at a time. Another edition is one more line here.
+  jul: { titel: 'Nissehuejagten', type: 'kalender', fil: './nissehuer.js', tema: 'jul', gem: 'nissehuer.jul.spil' },
+  // In the archive: last year's wreath game with four candles. Still playable at ?spor=krans for testing.
+  krans: { titel: 'Nissernes adventskrans', type: 'kalender', fil: './arkiv/adventskrans-4-lys.js', tema: 'jul', gem: 'adventskrans.jul.spil' },
   // In the archive until next Christmas: the advent calendar with 24 doors. Still playable at ?spor=kalender24 for testing.
   kalender24: { titel: 'Nissernes protokol', type: 'kalender', fil: './arkiv/julekalender-24-laager.js', tema: 'jul', gem: 'julekalender.jul.spil' },
 };
@@ -9126,18 +9145,22 @@ window.claude?.hot?.snapshot?.(() => ({ pos: P.pos.toArray(), face: P.face, star
 // building's own entrance, with a nisse and a riddle inside. Each opened door is a stamp on the calendar card.
 const KALENDER = (() => {
   if (!KAL) return null;
-  const K = KALDATA, I = INTERIOR, GEM = SP.gem, KR = K.spil === 'krans', N = KR ? K.laager.length : 24;
+  const K = KALDATA, I = INTERIOR, GEM = SP.gem, KR = K.spil === 'krans', HU = K.spil === 'huer', N = KR ? K.laager.length : 24;
+  // The hat hunt (HU): eight hats hidden around Slotsholmen, each lights three of the tree's 24 candles. PR candles per hat.
+  const HUER = HU ? K.huer : [], NH = HUER.length, PR = HU ? N / NH : 0;
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const L = Object.fromEntries(K.laager.map(l => [l.nr, l]));
   const sidste = Math.max(...K.laager.map(l => l.nr));   // the last door that has been written
   const soendag = nr => Math.ceil(nr / 6);
-  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], taendt: [], vink: [], grod: 0, mandelI: Math.floor(Math.random() * 3), vej: KR, pos: null, face: 0, morgen: false });
+  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], taendt: [], vink: [], huer: [], hilst: [], traeSet: false, grod: 0, mandelI: Math.floor(Math.random() * 3), vej: KR, pos: null, face: 0, morgen: false });
   // How far the story has come, counted as doors of 24: the weather, the light and the tree follow it. In the wreath game
   // each candle lit counts as a Sunday. faerdig: the end has come (all doors open, or all candles lit).
-  const frem = G => KR ? G.taendt.length * 24 / N : G.aabnet.length;
-  const faerdig = G => KR ? G.taendt.length >= N : G.aabnet.length >= N;
+  // In the hat hunt each hat lights PR candles on the tree; the end comes when Ida has stood under the lit tree (traeSet).
+  const frem = G => HU ? G.huer.length * PR : KR ? G.taendt.length * 24 / N : G.aabnet.length;
+  const faerdig = G => HU ? G.huer.length >= NH : KR ? G.taendt.length >= N : G.aabnet.length >= N;
+  const festNu = G => (HU ? !!G.traeSet : faerdig(G)) && !G.morgen;   // the fireworks: from the end until the morning
   const tilKrans = () => KR && S.taendt.length < S.aabnet.length;   // she has a candle that is not lit yet
-  function hent() { try { const g = JSON.parse(localStorage.getItem(GEM) || 'null'); if (g && g.v === 1 && g.id === K.id && Array.isArray(g.aabnet)) return Object.assign(ny(), g); } catch (e) {} return null; }
+  function hent() { try { const g = JSON.parse(localStorage.getItem(GEM) || 'null'); if (g && g.v === 1 && g.id === K.id && Array.isArray(g.aabnet)) { const G = Object.assign(ny(), g); if (HU) G.huer = G.huer.filter(id => HUER.some(h => h.id === id)); return G; } } catch (e) {} return null; }
   let S = ny(), gemt = hent(), valg = gemt ? 'fortsaet' : 'nyt';
   function gem() { if (!started) return; try { localStorage.setItem(GEM, JSON.stringify(S)); gemt = S; } catch (e) {} }
   addEventListener('pagehide', gem);
@@ -9162,7 +9185,8 @@ const KALENDER = (() => {
   $('introTitle').textContent = K.titel; $('introLead').textContent = K.forside;
   const note = el('p', 'gemNote', K.gemTekst); $('goBtn').before(note);
   $('ur').hidden = true; $('bPack').hidden = true;
-  $('bNotes').querySelector('span').textContent = KR ? 'Kransen' : 'Kalender';
+  $('bNotes').querySelector('span').textContent = HU ? 'Træet' : KR ? 'Kransen' : 'Kalender';
+  const traeTal = el('b', 'traeTal', '0'); traeTal.hidden = true; if (HU) $('bNotes').append(traeTal);   // how many candles burn, also on a phone where the button has no text
   for (const id of ['setSpor', 'set1942']) { const l = $(id)?.closest('label'); if (l) l.hidden = true; }
   // Less text in a calendar edition: no key list (the mystery's notebook and backpack keys do not exist here; the help under ? says how to walk), no "look around" hint, a short credit line, and a description that fits the game
   { const sty = $('intro').querySelector('details.styring'); if (sty) sty.hidden = true; }
@@ -9262,8 +9286,23 @@ const KALENDER = (() => {
     <g fill="#fff">${Array.from({ length: 36 }, (_, i) => `<circle cx="${(i * 131 + 57) % 720}" cy="${(i * 71 + 23) % 180}" r="${0.9 + (i % 3) * 0.6}" opacity="${0.55 + (i % 2) * 0.3}"/>`).join('')}</g></svg>`;
   })();
   $('intro').querySelector('.card').prepend(banner);
-  const forsideGrid = el('div', KR ? 'kransScene' : 'kalForside'), forsideTekst = el('p', 'kalForsideTekst');
-  forsideGrid.setAttribute('role', 'group'); forsideGrid.setAttribute('aria-label', KR ? 'Adventskransens fire lys' : 'Kalenderens 24 låger');
+  const forsideGrid = el('div', HU ? 'huerScene' : KR ? 'kransScene' : 'kalForside'), forsideTekst = el('p', 'kalForsideTekst');
+  forsideGrid.setAttribute('role', 'group'); forsideGrid.setAttribute('aria-label', HU ? 'Juletræets 24 lys og de otte nissehuer' : KR ? 'Adventskransens fire lys' : 'Kalenderens 24 låger');
+  // The hat hunt's front page: the Christmas tree with its 24 candles (lit from the bottom up, three for every hat) and
+  // the eight hats in a row under it, coloured when found.
+  const hueSvg = (h, fundet, w = 60) => { const c = fundet ? h.farve : '#4a5560', k = fundet ? (h.kant || '#f4f1ea') : '#6d7782', st = fundet && h.striber;
+    return `<svg viewBox="0 0 60 60" width="${w}" height="${w}" aria-hidden="true"><path d="M10 46c2-14 8-27 18-34 7-5 16-6 22-2-6 0-11 3-12 8 4 9 6 18 7 28z" fill="${c}" stroke="#2a2118" stroke-width="2.4" stroke-linejoin="round"/>${st ? `<path d="M15 34c7-2 15-2 24 0M19 24c6-2 12-2 18 0" stroke="${st}" stroke-width="4" fill="none" opacity=".9"/>` : ''}<rect x="6" y="42" width="42" height="10" rx="5" fill="${k}" stroke="#2a2118" stroke-width="2.4"/><circle cx="50" cy="10" r="6" fill="${k}" stroke="#2a2118" stroke-width="2.4"/></svg>`; };
+  const traeLys = (() => {   // where the 24 candles sit on the drawn tree, from the bottom row up
+    const rows = [[6, 268], [5, 228], [5, 188], [4, 148], [3, 108], [1, 72]], ud = [];
+    for (const [n, y] of rows) { const half = (y - 30) * 0.62; for (let i = 0; i < n; i++) ud.push([300 + (n === 1 ? 0 : -half * 0.78 + (half * 1.56) * i / (n - 1)) + (rows.indexOf(rows.find(r => r[1] === y)) % 2 ? 6 : -6), y + (i % 2 ? -4 : 3)]); }
+    return ud.slice(0, 24);
+  })();
+  const traeSvg = (lit, stjerne) => { const farver = ['#ffd27a', '#ff6b5e', '#8fd8ff', '#a6e88f'];
+    let lag = ''; [[40, 105, 70], [80, 160, 118], [120, 220, 165], [160, 280, 212], [200, 300, 250]].forEach(([top, bund, w], i) => { lag += `<path d="M300 ${top}L${300 + w} ${bund}q-${w} 22-${2 * w} 0z" fill="${['#2f7343', '#2a6a3d', '#245f37', '#1f5531', '#1b4b2b'][i]}"/><path d="M300 ${top}l${w * 0.28} ${(bund - top) * 0.3}q-${w * 0.28} 9-${w * 0.56} 0z" fill="#f4f7f8" opacity=".85"/>`; });
+    const kugler = traeLys.map(([x, y], i) => i < lit ? `<circle cx="${x}" cy="${y}" r="16" fill="url(#htGlod${i % 4})" class="htSkaer" style="--g:${(i * 0.37) % 2}s"/><circle cx="${x}" cy="${y}" r="6.5" fill="${farver[i % 4]}" stroke="#fff6d8" stroke-width="1.5"/>` : `<circle cx="${x}" cy="${y}" r="6" fill="#3a443c" stroke="#1d2620" stroke-width="1.5"/>`).join('');
+    return `<svg viewBox="0 0 600 330" aria-hidden="true"><defs>${farver.map((c, i) => `<radialGradient id="htGlod${i}"><stop offset="0" stop-color="${c}" stop-opacity=".85"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`).join('')}<radialGradient id="htStjerne"><stop offset="0" stop-color="#fff2b8"/><stop offset="1" stop-color="#ffd25a" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="300" cy="318" rx="210" ry="12" fill="#000" opacity=".35"/><rect x="286" y="296" width="28" height="26" fill="#5a3b22"/>${lag}${kugler}
+      ${stjerne ? '<circle cx="300" cy="34" r="34" fill="url(#htStjerne)" class="htSkaer"/>' : ''}<path d="M300 14l6 13 14 1-11 9 4 14-13-8-13 8 4-14-11-9 14-1z" fill="${stjerne ? '#ffe08a' : '#8a7436'}" stroke="#5a4a1e" stroke-width="1.5"/></svg>`; };
   // The wreath on the front page of the wreath game: a fir wreath with berries, cones and a red bow, drawn in two layers
   // (behind and in front of the candles) so the four candle buttons stand in the greenery. Candles burn down as the
   // weeks go by: the first one lit is the shortest.
@@ -9338,6 +9377,15 @@ const KALENDER = (() => {
     const G = gemt || ny(), idag = aabneIdag(), aabne = G.aabnet;
     let naesteNr = 0; for (let n = 1; n <= sidste; n++) if (!aabne.includes(n)) { naesteNr = n; break; }
     forsideGrid.replaceChildren();
+    if (HU) {
+      const lit = Math.round(frem(G)), n = G.huer.length;
+      forsideGrid.innerHTML = traeSvg(lit, G.traeSet);
+      const raekke = el('div', 'huerRaekke');
+      HUER.forEach((h, i) => { const f = G.huer.includes(h.id), b = el('span', 'huerIkon' + (f ? ' fundet' : '')); b.innerHTML = hueSvg(h, f); b.title = f ? h.navn : 'Ikke fundet endnu'; b.style.setProperty('--d', i * 0.07 + 's'); raekke.append(b); });
+      forsideGrid.append(raekke);
+      forsideTekst.textContent = G.traeSet ? 'Alle 24 lys brænder på juletræet. Glædelig jul.' : n >= NH ? 'Alle huerne er fundet. Gå til juletræet i Rigsdagsgården, og se det tændt.' : n ? `${n} af ${NH} huer er fundet, og ${lit} af ${N} lys brænder.` : 'Find otte nissehuer, og tænd alle 24 lys på juletræet.';
+      return;
+    }
     if (KR) {
       const t = G.taendt.length, mangler = t < aabne.length ? t + 1 : 0;   // a candle she has fetched but not lit
       forsideGrid.innerHTML = kkBag(t);
@@ -9379,7 +9427,7 @@ const KALENDER = (() => {
   function startKnapper() {
     const n = $('newBtn'), a = gemt ? gemt.aabnet.length : 0;
     n.hidden = !gemt || started; n.dataset.sikker = ''; n.textContent = 'Nyt spil';
-    if (!started) goBtn.textContent = KR ? (gemt ? `Fortsæt · ${gemt.taendt.length} af ${N} lys tændt` : 'Gå i gang') : gemt ? `Fortsæt · ${a} af ${N} låger åbnet` : 'Åbn kalenderen';
+    if (!started) goBtn.textContent = HU ? (gemt ? `Fortsæt · ${Math.round(frem(gemt))} af ${N} lys tændt` : 'Gå i gang') : KR ? (gemt ? `Fortsæt · ${gemt.taendt.length} af ${N} lys tændt` : 'Gå i gang') : gemt ? `Fortsæt · ${a} af ${N} låger åbnet` : 'Åbn kalenderen';
     forside();
   }
   $('newBtn').addEventListener('click', () => {
@@ -9399,10 +9447,10 @@ const KALENDER = (() => {
   }
   function efterStart(nyt) {
     gem();
-    if (nyt && KR) GAADE.scene({ eyebrow: K.start.eyebrow, title: K.start.titel, lines: K.start.replikker, btn: K.hjaelpKnap || 'Videre' });   // the wreath game: one short scene, the help is under the ? button
+    if (nyt && (KR || HU)) GAADE.scene({ eyebrow: K.start.eyebrow, title: K.start.titel, lines: K.start.replikker, btn: K.hjaelpKnap || 'Videre' });   // the wreath game: one short scene, the help is under the ? button
     else if (nyt) GAADE.scene({ eyebrow: K.start.eyebrow, title: K.start.titel, lines: K.start.replikker, efter: () =>
       GAADE.scene({ eyebrow: 'Før du går i gang', title: K.hjaelpTitel || 'Sådan åbner du lågerne', lines: K.hjaelp, btn: K.hjaelpKnap || 'Find låge 1' }) });
-    else setTimeout(() => toast(KR ? `Velkommen tilbage. ${S.taendt.length} af ${N} lys er tændt.` : `Velkommen tilbage. Du har åbnet ${S.aabnet.length} af ${N} låger.`), 900);
+    else setTimeout(() => toast(HU ? `Velkommen tilbage. Du har fundet ${S.huer.length} af ${NH} huer, og ${Math.round(frem(S))} af ${N} lys brænder.` : KR ? `Velkommen tilbage. ${S.taendt.length} af ${N} lys er tændt.` : `Velkommen tilbage. Du har åbnet ${S.aabnet.length} af ${N} låger.`), 900);
   }
 
   // ---- the doors in the world
@@ -9604,7 +9652,8 @@ const KALENDER = (() => {
     if (b.flugt === 0 && typeof animatePresence === 'function') animatePresence(f, dt, dist < 12);
   }
   const indPlace = l => l.inde.ind || l.inde.place;   // where the door leads in, if the nisse stands further inside
-  if (KR) I.kalAabne = new Set(K.laager.map(l => l.indgang));   // the other entrances in Prins Jørgens Gård and elsewhere stay shut
+  if (KR) I.kalAabne = new Set(K.laager.map(l => l.indgang));
+  if (HU) I.kalAabne = new Set(HUER.map(h => h.indgang).filter(Boolean));   // only the buildings with a hat inside are open   // the other entrances in Prins Jørgens Gård and elsewhere stay shut
   const NISSER = [];
   for (const l of K.laager) {
     if (l.type !== 'stor' || !l.inde || !K.nisser[l.nisse]) continue;
@@ -9687,7 +9736,39 @@ const KALENDER = (() => {
 
   // ---- the Christmas tree: one light for every opened door. The edition's file says where it stands
   let trae = null;
-  if (K.juletrae) {
+  if (K.juletrae && K.juletrae.stor) {   // the hat hunt's big tree: 14 metres, 24 big candles in a spiral from the bottom up, a
+    // garland of small warm lights that comes on with the star when all 24 burn, and snow on every layer
+    const [x, z] = K.juletrae.ved, g = new THREE.Group(); g.position.set(x, groundAt(x, z, 2), z); gruppe.add(g);
+    const stamme = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.48, 1.8, 12), tm('#4a3323')); stamme.position.y = 0.9; g.add(stamme);
+    const groen = [lys('#1d5434', 0.2), lys('#22603b', 0.2), lys('#2a6c43', 0.22)], hvid = lys('#eef2f4', 0.35);
+    for (const m of groen) m.userData.sne = true;   // the snow shader would turn the whole tree white; it has its own snow caps
+    const LAG = 7, R0 = 4.6, H0 = 3.2, Y0 = 1.4, DY = 1.62;
+    const radius = y => { const t = (y - Y0) / (LAG * DY + 0.6); return Math.max(0.08, R0 * (1 - t) * 0.98); };
+    for (let i = 0; i < LAG; i++) {
+      const r = R0 * (1 - i / (LAG + 0.4)), h = H0 - i * 0.18, y = Y0 + i * DY;
+      const lag = new THREE.Mesh(new THREE.ConeGeometry(r, h, 18, 1, true), groen[i % 3]); lag.position.y = y + h / 2; g.add(lag);
+      const bund = new THREE.Mesh(new THREE.CircleGeometry(r, 18), groen[0]); bund.rotation.x = Math.PI / 2; bund.position.y = y + 0.01; g.add(bund);
+      const sne_ = new THREE.Mesh(new THREE.ConeGeometry(r * 0.6, h * 0.5, 18), hvid); sne_.position.y = y + h * 0.76; g.add(sne_);
+    }
+    const top = Y0 + (LAG - 1) * DY + H0 - (LAG - 1) * 0.18;
+    const stjerne = new THREE.Mesh(new THREE.OctahedronGeometry(0.62), new THREE.MeshBasicMaterial({ color: '#6b5a2e' })); stjerne.position.y = top + 0.4; stjerne.scale.set(1, 1.5, 0.45); g.add(stjerne);
+    const stjerneGlod = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffe08a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); stjerneGlod.position.y = top + 0.4; stjerneGlod.scale.setScalar(6.5); g.add(stjerneGlod);
+    const farver = ['#ffd27a', '#ff6b5e', '#8fd8ff', '#a6e88f'], kugler = [], kGeo = new THREE.SphereGeometry(0.3, 12, 10);
+    for (let i = 0; i < N; i++) {   // a spiral up the tree, the first candle at the bottom, facing the yard first
+      const t = (i + 0.5) / N, y = Y0 + 0.5 + t * (top - Y0 - 1.6), r = radius(y) * 0.94 + 0.12, a = -2.2 + i * 2.39;
+      const k = new THREE.Mesh(kGeo, new THREE.MeshBasicMaterial({ color: '#39423a' })); k.position.set(Math.sin(a) * r, y, Math.cos(a) * r); g.add(k);
+      const glod = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: farver[i % 4], transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); glod.position.set(Math.sin(a) * (r + 0.15), y, Math.cos(a) * (r + 0.15)); glod.scale.setScalar(2.4); g.add(glod);
+      kugler.push({ k, glod, farve: farver[i % 4], taendt: null });
+    }
+    // the garland: small warm lights wound round the tree
+    const nG = 260, gp = new Float32Array(nG * 3);
+    for (let i = 0; i < nG; i++) { const t = i / nG, y = Y0 + 0.3 + t * (top - Y0 - 0.8), r = radius(y) * 0.97 + 0.05, a = t * Math.PI * 2 * 9; gp.set([Math.sin(a) * r, y, Math.cos(a) * r], i * 3); }
+    const gGeo = new THREE.BufferGeometry(); gGeo.setAttribute('position', new THREE.BufferAttribute(gp, 3));
+    const guirlande = new THREE.Points(gGeo, new THREE.PointsMaterial({ color: '#ffe3a3', size: 0.32, map: TX.glow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    guirlande.visible = false; g.add(guirlande);
+    colCirc(x, z, R0 * 0.82, top);
+    trae = { g, kugler, stjerne, stjerneGlod, guirlande, x, z, top, stor: true, boelge: 0 };
+  } else if (K.juletrae) {
     const [x, z] = K.juletrae.ved, g = new THREE.Group(); g.position.set(x, groundAt(x, z, 2), z); gruppe.add(g);
     const stamme = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.3, 1.2, 10), tm('#4a3323')); stamme.position.y = 0.6; g.add(stamme);
     const groen = lys('#1f5a37', 0.22), hvid = lys('#eef2f4', 0.35);
@@ -9815,11 +9896,12 @@ const KALENDER = (() => {
     spm.vis();
   }
 
-  const kort = vindue('kalDialog', KR ? 'Adventskransen' : 'Kalenderen');
+  const kort = vindue('kalDialog', HU ? 'Juletræet' : KR ? 'Adventskransen' : 'Kalenderen');
   let valgt = 0, nyFelt = 0;
   function visKort() {
     const body = kort.querySelector('.gdBody'), nx = naeste(), a = S.aabnet.length;
     body.replaceChildren();
+    if (HU) { visKortHU(body); return; }
     if (KR) {
       const t = S.taendt.length;
       body.append(el('p', 'kalStatus', `${t} af ${N} lys er tændt på adventskransen.`));
@@ -9885,6 +9967,7 @@ const KALENDER = (() => {
   // ---- what to find now (the card in the top left corner; MAAL calls this)
   $('maal').querySelector('small').textContent = KR ? K.titel : 'Julekalenderen';
   function maal(M_, card) {
+    if (HU) return maalHU(M_, card);
     const nx = started && M_.vis ? naeste() : null;
     if (KR && started && M_.vis && (tilKrans() || (faerdig(S) && !S.morgen && (!festSet || (I.on && I.place === K.fest?.place))))) {   // to the wreath, or up to the party in the tower
       const tilT = !tilKrans(), T_ = FX.tower, mål = tilT ? [T_.door[0] + T_.OUT[0] * 3, T_.door[1] + T_.OUT[1] * 3] : krans_?.staa;
@@ -9967,7 +10050,7 @@ const KALENDER = (() => {
     byge.t += dt; if (byge.t > byge.sne + byge.klar) byge = nyByge(false);
     return byge.t < byge.sne ? byge.styrke : 0;
   }
-  let sneNu = null, faldNu = KR ? byge.styrke : 1, stjerner = null;
+  let sneNu = null, faldNu = KR || HU ? byge.styrke : 1, stjerner = null;
   {
     const n = 420, pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, y = 0.12 + Math.random() * 0.88, r = Math.sqrt(1 - y * y); pos.set([Math.cos(a) * r * 470, y * 470, Math.sin(a) * r * 470], i * 3); }
@@ -9977,7 +10060,7 @@ const KALENDER = (() => {
   }
   function vejr(dt, straks) {
     const a = frem(started ? S : gemt || S), k = straks || sneNu === null ? 1 : 1 - Math.exp(-dt / 18);
-    if (KR) {   // the showers fade in and out a little slower than the calendar's weather
+    if (KR || HU) {   // the showers fade in and out a little slower than the calendar's weather
       const maal_ = KR_SNE(a), fald = bygeMaal(dt || 0), kf = straks ? 1 : 1 - Math.exp(-(dt || 0) / 25);
       if (sneNu === null) sneNu = maal_;
       sneNu += (maal_ - sneNu) * k; faldNu += (fald - faldNu) * kf;
@@ -9986,7 +10069,7 @@ const KALENDER = (() => {
       sneNu += (sneMaal(a) - sneNu) * k; faldNu += (faldMaal(a) - faldNu) * k;
     }
     SNE_U.value = I.on ? 0 : sneNu;   // not on the floors indoors
-    stjerner.material.opacity = (KR ? Math.max(0, 1 - faldNu * 5) : 1 - faldNu) * ev * 0.9; stjerner.visible = stjerner.material.opacity > 0.01;   // in the wreath game: stars only in the clear spells
+    stjerner.material.opacity = (KR || HU ? Math.max(0, 1 - faldNu * 5) : 1 - faldNu) * ev * 0.9; stjerner.visible = stjerner.material.opacity > 0.01;   // in the wreath game: stars only in the clear spells
     if (sne) sne.geometry.setDrawRange(0, Math.round(sne.geometry.attributes.position.count * faldNu * (GFX.lav ? 0.6 : 1)));   // a little less snow on the low graphics setting
   }
 
@@ -10019,8 +10102,8 @@ const KALENDER = (() => {
     tone(90, 35, afst / 340, 0.7, v); for (let i = 0; i < 6; i++) tone(2500 + Math.random() * 2500, 2000, afst / 340 + 0.25 + i * 0.07 + Math.random() * 0.05, 0.05, v * 0.12, 'square');
   }
   function fyrFrame(dt) {
-    const fest = started && faerdig(S) && !S.morgen;
-    if (fest && !paused && (!I.on || FX.tower?.on)) {
+    const fest = started && festNu(S);
+    if (fest && (!paused || (HU && cer)) && (!I.on || FX.tower?.on)) {
       festTid += dt; fNaeste -= dt;
       if (fNaeste <= 0) { affyr(); if (Math.random() < 0.35) affyr(); fNaeste = 0.5 + Math.random() * 0.9; }
       if (festTid > (K.fest?.sekunder || 75)) { S.morgen = true; gem(); toast(K.fest?.morgen || 'Det bliver lyst over Slotsholmen.'); }
@@ -10093,7 +10176,7 @@ const KALENDER = (() => {
     if (!paused && Math.hypot(P.pos.x - I.x - MD.at[0], P.pos.z - MD.at[1]) < 2) offerAction({ id: 'kal-mandel', label: fundet ? 'Se mandelgaven' : MD.knap, prio: 11, run: grodSkaal });
   }
   function festFrame(dt) {
-    const vis = started && faerdig(S) && I.on && I.place === K.fest?.place;
+    const vis = started && (HU ? !!S.traeSet : faerdig(S)) && I.on && I.place === K.fest?.place;
     if (vis) festSet = true;
     mandelFrame(dt, vis);
     for (const n of FEST) {
@@ -10103,6 +10186,239 @@ const KALENDER = (() => {
       const dist = Math.hypot(P.pos.x - I.x - ax, P.pos.z - az), want = dist < 6 ? Math.atan2(P.pos.x - I.x - ax, P.pos.z - az) : n.face;
       if (!paused) { n.yaw += angDiff(want, n.yaw) * (1 - Math.exp(-dt * 2)); n.f.root.rotation.y = n.yaw; if (typeof animatePresence === 'function') animatePresence(n.f, dt, dist < 3.5); nisseLiv(n.f, dist); }
       if (dist < 2.6 && !paused) offerAction({ id: 'kal-fest-' + n.id, label: 'Tal med ' + (n.ns.kort || n.ns.navn), prio: 9, run: () => GAADE.scene({ eyebrow: K.fest.overskrift || 'Juleaften i Tårnet', title: n.ns.navn, lines: [[n.ns.kort || n.ns.navn, n.p.replik]] }) });
+    }
+  }
+
+  // ---- the hat hunt (spil: "huer"): eight hats around Slotsholmen, a nisse beside each one, and the tree that lights up
+  // Ida takes a hat by walking up to it (no aiming): outdoors, inside a room, or on Udsigten by turning until she faces it.
+  // Each hat lights PR candles on the tree. When all are found she walks to the tree, the camera sweeps up it, the star
+  // and the garland come on, the bells ring and the fireworks start. The nisser then celebrate round the tree.
+  let cer = null;   // the end at the tree: { t, var_ }
+  const HUO = [], VAERTER = [];
+  const hueMat = c => toon(c, { emissive: c, emissiveIntensity: 0.25 });
+  function hueMesh(h, st) {   // a knitted nisse hat: a soft cone with a floppy tip, a fur brim and a pom-pom
+    const g = new THREE.Group(), kant = h.kant || '#f4f1ea', ind = new THREE.Group(); g.add(ind);
+    const brem = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.068, 8, 22), hueMat(kant)); brem.rotation.x = Math.PI / 2; brem.position.y = 0.05; ind.add(brem);
+    const kegle = new THREE.Mesh(new THREE.ConeGeometry(0.205, 0.36, 18, 1, true), hueMat(h.farve)); kegle.position.y = 0.22; ind.add(kegle);
+    const tip = new THREE.Group(); tip.position.set(0, 0.36, 0); tip.rotation.z = -0.85; ind.add(tip);
+    const k2 = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.32, 14), hueMat(h.farve)); k2.position.y = 0.13; tip.add(k2);
+    const kvast = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 10), hueMat(kant)); kvast.position.y = 0.3; tip.add(kvast);
+    if (h.striber) for (const [y, r] of [[0.15, 0.175], [0.28, 0.115]]) { const b = new THREE.Mesh(new THREE.TorusGeometry(r, 0.024, 6, 20), hueMat(h.striber)); b.rotation.x = Math.PI / 2; b.position.y = y; ind.add(b); }
+    g.scale.setScalar(st); return { g, ind, tip };
+  }
+  const T_ = TOWER;
+  const taarnPunkt = (f, ud = 0.95) => { const [gx, gz] = T_.gallery(f); return [gx + Math.sin(f) * ud, gz + Math.cos(f) * ud]; };
+  if (HU) for (const h of HUER) {
+    const erUde = !!h.ude, erInde = !!h.inde, taarn = !!h.taarn, st = erUde ? 2.1 * (h.ude.stor || 1) : taarn ? 0.9 : 1.5 * (h.inde.stor || 1);
+    const m = hueMesh(h, st), o = { h, ...m, ude: erUde, inde: erInde, taarn, st, tagT: 0, x: 0, y: 0, z: 0, r: 0 };
+    const glod = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffe0a0', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 }));
+    glod.position.y = 0.25; glod.scale.setScalar(erInde ? 2.6 : 1.9); o.g.add(glod); o.glod = glod;
+    if (erUde) { o.x = h.ude.x; o.z = h.ude.z; o.y = h.ude.abs ? h.ude.y : groundAt(o.x, o.z, 30) + h.ude.y; o.r = h.ude.r || 3.4; gruppe.add(o.g); }
+    else if (erInde) { o.x = h.inde.x; o.z = h.inde.z; o.y = (h.inde.gulv ? I.floor : 0) + h.inde.y; o.r = h.inde.r || (h.inde.place === 'stables' ? 3.4 : 2.6); inde.add(o.g); }
+    else { [o.x, o.z] = taarnPunkt(h.taarn.f); o.y = T_.FLOOR + 1.12; gruppe.add(o.g); }
+    o.g.position.set(o.x, o.y, o.z); if (erInde && h.inde.rot != null) o.g.rotation.y = h.inde.rot * Math.PI / 180;
+    if (erUde) {   // a soft column of light over the hat: shown for the first hat, and for the next one when Ida is stuck
+      const straale = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 1.1, 16, 14, 1, true), new THREE.MeshBasicMaterial({ color: '#ffe6a8', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false }));
+      straale.position.set(o.x, o.y + 8.5, o.z); straale.visible = false; gruppe.add(straale); o.straale = straale;
+    }
+    HUO.push(o);
+    // the host: a nisse beside the hat who says hello and tells a short story from the place
+    const ns = K.nisser[h.nisse]; if (!ns) continue;
+    const f = nisseFigur(ns), v = h.vaert || {}, rod = erInde ? inde : gruppe; rod.add(f.root); f.root.visible = false;
+    let vx, vz, vy, face;
+    if (taarn) { [vx, vz] = taarnPunkt(h.taarn.f + 0.2, 0.9); vy = T_.FLOOR + 1.05; face = h.taarn.f + Math.PI; }
+    else { vx = v.x; vz = v.z; face = (v.face || 0) * Math.PI / 180; vy = erUde ? groundAt(vx, vz, 30) : (v.gulv ? I.floor : 0); }
+    if (v.balle) {   // Gerda stands on a bale of straw
+      const hb = 0.5, bg = new THREE.Group(), straa = new THREE.MeshStandardMaterial({ color: '#d9b45a', roughness: 1 }), baand = new THREE.MeshStandardMaterial({ color: '#8a6a3a', roughness: 1 });
+      const kasse = new THREE.Mesh(new THREE.BoxGeometry(1.0, hb, 0.62), straa); kasse.position.y = hb / 2; bg.add(kasse);
+      for (const dx of [-0.25, 0.25]) { const b_ = new THREE.Mesh(new THREE.BoxGeometry(0.03, hb + 0.01, 0.63), baand); b_.position.set(dx, hb / 2, 0); bg.add(b_); }
+      bg.position.set(vx, vy, vz); bg.rotation.y = face; rod.add(bg); vy += hb;
+      if (erInde) I.obstacles.push([vx - 0.55, vx + 0.55, vz - 0.55, vz + 0.55]);
+    }
+    VAERTER.push({ h, o, ns, f, x: vx, y: vy, z: vz, face, yaw: face });
+  }
+  const huePaaSted = o => o.ude ? !I.on && !T_.on : o.inde ? I.on && I.place === o.h.inde.place : T_.on;
+  const naesteHue = () => HUER.find(h => !S.huer.includes(h.id)) || null;
+  function hils(h) {
+    const ns = K.nisser[h.nisse]; if (!S.hilst.includes(h.id)) { S.hilst.push(h.id); gem(); }
+    GAADE.scene({ eyebrow: h.sted, title: ns.navn, lines: h.historie, btn: 'Tak' });
+  }
+  function flyvSvg(svg, efter) {   // a drawing flies from the middle of the screen up to the tree button
+    const m = $('bNotes'), r = m.getBoundingClientRect();
+    if (reduceMotion || !r.width) { efter(); return; }
+    const f = el('div', 'kalFlyv'); f.innerHTML = svg; document.body.append(f);
+    const x = r.left + r.width / 2 - innerWidth / 2, y = r.top + r.height / 2 - innerHeight * 0.42;
+    let faerdig_ = false; const slut = () => { if (faerdig_) return; faerdig_ = true; f.remove(); m.classList.remove('kalPuls'); void m.offsetWidth; m.classList.add('kalPuls'); efter(); };
+    f.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: 0.25 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.45 }, { transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(.16) rotate(20deg)`, opacity: 0.9 }], { duration: 1100, easing: 'cubic-bezier(.45,0,.6,1)' }).onfinish = slut;
+    setTimeout(slut, 1600);
+  }
+  function tagHue(o) {
+    const h = o.h; if (S.huer.includes(h.id)) return;
+    S.huer.push(h.id); gem(); o.tagT = 0.001; vink.id = null;
+    const p = o.g.getWorldPosition(new THREE.Vector3()), n = S.huer.length;
+    bjaelder(9); chime([523, 659, 784, 1047, 1319], 0.05); gnist(p.x, p.y + 0.3 * o.st, p.z, 0, 0, 70);
+    if (trae) trae.boelge = 1;
+    flyvSvg(hueSvg(h, true, 140), () => {
+      toast(n >= NH ? `Hue ${n} af ${NH}. Alle ${N} lys brænder. ${K.traePraj}` : `Hue ${n} af ${NH}. ${Math.round(n * PR)} af ${N} lys brænder på træet.`);
+      chime([784, 988, 1175], 0.035);
+    });
+  }
+  // ---- the end at the tree: the camera sweeps up the tree while the candles light again from the bottom, then the star
+  function startCer() {
+    if (cer || !trae) return;
+    S.traeSet = true; gem(); festTid = 0;
+    cer = { t: 0, var_: paused, klokke: false, lyd: 0, p0: camera.position.clone(), m0: new THREE.Vector3(P.pos.x, P.pos.y + 1.4, P.pos.z) };
+    paused = true; keys.clear(); if (typeof resetTouch === 'function') resetTouch(); P.vel.set(0, 0, 0);
+  }
+  const CER_T = 11;
+  HOOKS.frame.push(dt => {
+    if (!cer) return;
+    cer.t += dt;
+    const tx = trae.x, tz = trae.z, ty = trae.g.position.y, [fx, fz] = FT.n, sx = fz, sz = -fx;   // the yard side of the tree, away from the palace
+    const u = Math.min(1, cer.t / CER_T), e = u * u * (3 - 2 * u);
+    const p1 = new THREE.Vector3(tx + fx * 15 - sx * 9, ty + 2.2, tz + fz * 15 - sz * 9), p2 = new THREE.Vector3(tx + fx * 17 + sx * 8, ty + 12.5, tz + fz * 17 + sz * 8);
+    const kurve = new THREE.CatmullRomCurve3([cer.p0, p1, p2]);
+    camera.position.copy(kurve.getPoint(Math.min(1, e * 1.02)));
+    const se = new THREE.Vector3(tx, ty + 3 + (trae.top - 5) * e, tz).lerp(cer.m0, Math.max(0, 1 - cer.t / 1.2));
+    camera.lookAt(se);
+    const lit = Math.max(0, Math.floor((cer.t - 0.6) / 0.1));
+    if (lit > cer.lyd && lit <= N) { cer.lyd = lit; tone(440 * Math.pow(2, lit / 12), 440 * Math.pow(2, lit / 12), 0, 0.12, 0.018, 'triangle'); }
+    if (cer.t > 3.2 && !cer.klokke) { cer.klokke = true; klokker(); chime([523, 659, 784, 1047, 1319, 1568], 0.06); gnist(tx, ty + trae.top + 0.4, tz, 0, 0, 90); }
+    if (cer.t > CER_T) {
+      const v = cer.var_; cer = null; paused = v; camInit = false;
+      const sl = K.slut; GAADE.scene({ eyebrow: sl.eyebrow, title: sl.titel, lines: sl.tekst, btn: sl.knap || 'Videre' });
+    }
+  });
+  // the nisser round the lit tree: all the hosts, the cook and Bilag, on the yard side
+  const TRAENISSER = [];
+  if (HU && trae) {
+    const ids = [...new Set([...HUER.map(h => h.nisse), 'slev', 'bilag'])].filter(id => K.nisser[id]), [fx, fz] = FT.n;
+    const a0 = Math.atan2(fx, fz);
+    ids.forEach((id, i) => {
+      const a = a0 - 1.25 + 2.5 * i / Math.max(1, ids.length - 1), r = 6.2 + (i % 2) * 1.1, x = trae.x + Math.sin(a) * r, z = trae.z + Math.cos(a) * r;
+      const f = nisseFigur(K.nisser[id]); f.root.visible = false; gruppe.add(f.root);
+      TRAENISSER.push({ id, f, x, z, y: groundAt(x, z, 4), face: Math.atan2(trae.x - x, trae.z - z), yaw: 0 });
+    });
+  }
+  const vink = { id: null, best: Infinity, t0: 0 };
+  function huerFrame(dt) {
+    const ude_ = !I.on && !T_.on, n = S.huer.length;
+    for (const o of HUO) {
+      const fundet = S.huer.includes(o.h.id);
+      if (o.straale) { const vis = !fundet && huePaaSted(o) && naesteHue() === o.h && (S.huer.length === 0 || S.vej || (vink.id && vink.id.startsWith(o.h.id) && tid - vink.t0 > 30)); o.straale.visible = vis; if (vis) o.straale.material.opacity = 0.16 + 0.06 * Math.sin(tid * 2); }
+      if (fundet && !o.tagT) { o.g.visible = false; continue; }
+      if (o.tagT) {   // taken: it jumps up, spins and shrinks away
+        o.tagT += dt; const k = o.tagT / 0.7; o.g.visible = k < 1 && huePaaSted(o);
+        o.g.position.y = o.y + Math.sin(Math.min(1, k) * Math.PI) * 0.8 + k * 0.6; o.ind.rotation.y += dt * 14; o.g.scale.setScalar(o.st * Math.max(0.001, 1 + k * 0.4 - k * k * 1.4));
+        if (k >= 1) o.tagT = 0;
+        continue;
+      }
+      const her = huePaaSted(o); o.g.visible = her && (o.inde || o.taarn || Math.hypot(P.pos.x - o.x, P.pos.z - o.z) < 260);
+      if (!o.g.visible) continue;
+      const naeste = naesteHue() === o.h;
+      o.ind.rotation.y += dt * 0.7; o.g.position.y = o.y + Math.sin(tid * 2 + o.x) * 0.04 * o.st; o.tip.rotation.x = Math.sin(tid * 1.6 + o.z) * 0.15;
+      o.glod.material.opacity = (naeste ? 0.55 : 0.38) + 0.2 * Math.sin(tid * 2.4 + o.x);
+      if (paused || cer || !started) continue;
+      let naer = false;
+      if (o.taarn) naer = !T_.busy && Math.abs(angDiff(o.h.taarn.f, P.face)) < 0.42;
+      else if (o.inde) naer = Math.hypot(P.pos.x - I.x - o.x, P.pos.z - o.z) < o.r;
+      else naer = Math.hypot(P.pos.x - o.x, P.pos.z - o.z) < o.r;
+      if (naer) { o.naerT = (o.naerT || 0) + dt; if (o.naerT > (o.taarn ? 0.5 : 0.05)) tagHue(o); } else o.naerT = 0;
+    }
+    // the hosts
+    for (const v of VAERTER) {
+      const o = v.o, f = v.f, efter = !!S.traeSet;   // after the end they have all gone to the tree
+      const her = !efter && huePaaSted(o) && (o.inde || o.taarn || Math.hypot(P.pos.x - v.x, P.pos.z - v.z) < 90);
+      f.root.visible = her; if (!her) continue;
+      f.root.position.set(v.x, v.y, v.z);
+      const lx = o.inde ? P.pos.x - I.x : P.pos.x, dist = o.taarn ? (Math.abs(angDiff(v.face + Math.PI, P.face)) < 0.7 ? 1 : 99) : Math.hypot(lx - v.x, P.pos.z - v.z);
+      const want = o.taarn ? v.face : dist < 7 ? Math.atan2(lx - v.x, P.pos.z - v.z) : v.face;
+      if (!paused) { v.yaw += angDiff(want, v.yaw) * (1 - Math.exp(-dt * 2)); f.root.rotation.y = v.yaw; if (typeof animatePresence === 'function') animatePresence(f, dt, dist < 4); nisseLiv(f, dist); }
+      if (!paused && !cer && dist < (o.ude ? 3.3 : 2.8)) offerAction({ id: 'hu-hej', label: `Sig hej til ${v.ns.kort || v.ns.navn}`, prio: 9, run: () => hils(v.h) });
+    }
+    // the end
+    if (trae && n >= NH && !S.traeSet && ude_ && !paused && $('scene').hidden && Math.hypot(P.pos.x - trae.x, P.pos.z - trae.z) < 16) startCer();
+    for (const t of TRAENISSER) {
+      const vis = !!S.traeSet && ude_ && Math.hypot(P.pos.x - t.x, P.pos.z - t.z) < 90; t.f.root.visible = vis; if (!vis) continue;
+      t.f.root.position.set(t.x, t.y, t.z);
+      const dist = Math.hypot(P.pos.x - t.x, P.pos.z - t.z), want = dist < 5 && !cer ? Math.atan2(P.pos.x - t.x, P.pos.z - t.z) : t.face;
+      t.yaw += angDiff(want, t.yaw) * (1 - Math.exp(-dt * 2)); t.f.root.rotation.y = t.yaw;
+      if (typeof animatePresence === 'function') animatePresence(t.f, dt, true); nisseLiv(t.f, cer ? 2 : dist);
+      if (!paused && !cer && dist < 2.4) { const ns = K.nisser[t.id], rep = K.fest?.nisser?.[t.id]?.replik; offerAction({ id: 'hu-jul', label: `Sig glædelig jul til ${ns.kort || ns.navn}`, prio: 8, run: () => GAADE.scene({ eyebrow: 'Ved juletræet', title: ns.navn, lines: [[ns.kort || ns.navn, rep || 'Glædelig jul! Se, hvor det lyser.']], btn: 'Glædelig jul' }) }); }
+    }
+  }
+  // what to do now (the card in the top left corner). The place is always named; the arrow and the distance only come
+  // when Ida has not come closer for half a minute, or when "Vis altid vejen" is on, so the hunt is hers to find.
+  function maalHU(M_, card) {
+    const lit = Math.round(frem(S)), lille = $('maal').querySelector('small'), lt = `${K.titel} · ${lit} af ${N} lys`;
+    if (lille.textContent !== lt) { lille.textContent = lt; traeTal.textContent = String(lit); traeTal.hidden = !started; $('bNotes').setAttribute('aria-label', `Juletræet, ${lit} af ${N} lys tændt`); }
+    if (!started || !M_.vis || cer) { card.hidden = true; M_.punkt = null; return; }
+    let id, hvad, hvor, maalP = null, lokal = null, pil = null, altid = !!S.vej, kort_ = null;
+    const h = naesteHue();
+    if (!h && !S.traeSet) { id = 'trae'; hvad = 'Gå til juletræet'; kort_ = 'Juletræet';
+      if (T_.on) hvor = 'Kør ned igen. ' + K.juletrae.praj; else if (I.on) hvor = (I.place === 'folketing' ? 'Gå ud i Rigsdagsgården. ' : 'Gå ud igen. ') + K.juletrae.praj;
+      else { hvor = K.juletrae.praj; maalP = [trae.x, trae.z]; altid = true; } }
+    else if (!h) {
+      const iFest = I.on && I.place === K.fest?.place;
+      if (!K.fest || (festSet && !iFest)) { card.hidden = true; M_.punkt = null; return; }
+      id = 'fest'; hvad = K.fest.overskrift; kort_ = 'Tårnet';
+      if (iFest) hvor = K.fest.mandel && S.grod <= S.mandelI ? 'Find mandlen i risalamanden på det runde bord.' : 'Her er festen. Nisserne sidder ved bordene.';
+      else if (I.on && I.place.startsWith('tower')) hvor = 'Tag elevatoren op til restauranten.';
+      else if (I.on || T_.on) hvor = 'Gå ud, og ' + K.fest.vej.charAt(0).toLowerCase() + K.fest.vej.slice(1);
+      else { hvor = K.fest.vej; maalP = [T_.door[0] + T_.OUT[0] * 3, T_.door[1] + T_.OUT[1] * 3]; altid = true; }
+    }
+    else {
+      id = h.id; hvad = `Find hue ${S.huer.length + 1} af ${NH}`; hvor = h.hvor; kort_ = h.sted;
+      if (h.inde && I.on && I.place === h.inde.place) {
+        const lx = P.pos.x - I.x, lz = P.pos.z; let til = [h.inde.x, h.inde.z];
+        for (const w of h.inde.vej || []) if (w.naar(lx, lz)) { til = w.til; break; }
+        lokal = { til, d: Math.hypot(h.inde.x - lx, h.inde.z - lz), lx, lz }; hvor = 'Huen er herinde. ' + (h.inde.place === 'folketing' ? 'Den ligger i Folketingssalen.' : 'Kig dig omkring.');
+      }
+      else if (h.taarn && T_.on) { const d = angDiff(h.taarn.f, P.face); hvor = 'Drej rundt, til du ser huen på rækværket.'; if (Math.abs(d) > 0.3) pil = d; }
+      else if (h.taarn && I.on && I.place.startsWith('tower')) hvor = 'Tag elevatoren op til Udsigten.';
+      else if (I.on || T_.on) hvor = (T_.on ? 'Kør ned igen. ' : 'Gå ud igen. ') + h.hvor;
+      else maalP = h.ude ? [h.ude.x, h.ude.z] : h.taarn ? [T_.door[0] + T_.OUT[0] * 3, T_.door[1] + T_.OUT[1] * 3] : h.indgang === 'folketing' ? FT.at(0, 3) : (d => d ? [d.x + d.nx * 3, d.z + d.nz * 3] : null)(MINISTRY_DOORS[h.indgang]);
+    }
+    // stuck? the distance has not shrunk by 3 m in 30 seconds (counted again when she goes in or out)
+    const key = id + (I.on ? I.place : T_.on ? 'T' : 'ude');
+    let afst = null, v = null;
+    if (maalP && !MYBOAT.on) { v = M_.vej(P.pos.x, P.pos.z, maalP); afst = v ? v.len : Math.hypot(maalP[0] - P.pos.x, maalP[1] - P.pos.z); }
+    else if (maalP) afst = Math.hypot(maalP[0] - P.pos.x, maalP[1] - P.pos.z);
+    else if (lokal) afst = lokal.d;
+    if (vink.id !== key) { vink.id = key; vink.best = afst ?? Infinity; vink.t0 = tid; }
+    else if (afst != null && afst < vink.best - 3) { vink.best = afst; vink.t0 = tid; }
+    const vis = altid || tid - vink.t0 > 30;
+    if (maalP && vis) {
+      const lige = Math.hypot(maalP[0] - P.pos.x, maalP[1] - P.pos.z), aim = v ? v.sigte : maalP;
+      if (lige > 5) pil = Math.atan2(aim[0] - P.pos.x, aim[1] - P.pos.z) - (cam.yaw + Math.PI);
+      hvor = lige <= 5 ? `${kort_ || ''} · Lige her`.replace(/^ · /, '') : `${kort_ ? kort_ + ' · ' : ''}Følg pilen · ${Math.round((afst ?? lige) / 5) * 5} m`;
+    } else if (lokal && vis) {
+      const dx = lokal.til[0] - lokal.lx, dz = lokal.til[1] - lokal.lz;
+      if (Math.hypot(dx, dz) > 1.5) pil = Math.atan2(dx, dz) - (cam.yaw + Math.PI);
+      hvor = `Følg pilen · ${Math.max(1, Math.round(lokal.d))} m`;
+    }
+    M_.punkt = vis && maalP ? maalP : null;
+    if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
+    $('maalHvor').textContent = hvor; $('maalHvor').hidden = false;
+    const p = $('maalPil'); p.hidden = pil === null; if (pil !== null) p.style.transform = `rotate(${-pil}rad)`;
+    card.hidden = false;
+  }
+  // the tree card (the Træet button): the candles, the hats found, the next place, and the nisser's stories again
+  function visKortHU(body) {
+    const lit = Math.round(frem(S)), h0 = naesteHue();
+    body.append(el('p', 'kalStatus', S.traeSet ? `Alle ${N} lys brænder på juletræet. Glædelig jul.` : `${lit} af ${N} lys brænder på juletræet. Du har fundet ${S.huer.length} af ${NH} nissehuer.`));
+    const ol = el('ol', 'huerListe');
+    for (const h of HUER) {
+      const f = S.huer.includes(h.id), li = el('li', f ? 'fundet' : h === h0 ? 'naeste' : ''), ik = el('span', 'huerIkon' + (f ? ' fundet' : '')); ik.innerHTML = hueSvg(h, f, 40);
+      const tx = el('div'); tx.append(el('b', '', f ? h.navn : h === h0 ? 'Næste: ' + h.sted : 'Ikke fundet endnu'));
+      if (f) { const ns = K.nisser[h.nisse], b = el('button', 'sticker btn huerHoer', `Hør ${ns.kort || ns.navn}`); b.type = 'button'; b.addEventListener('click', () => { kort.close(); hils(h); }); tx.append(b); }
+      else if (h === h0) tx.append(el('span', 'huerSted', h.hvor));
+      li.append(ik, tx); ol.append(li);
+    }
+    body.append(ol);
+    if (!S.traeSet) {
+      const lab = el('label', 'gdCheck'), cb = el('input'); cb.type = 'checkbox'; cb.checked = !!S.vej; lab.append(cb, ' Vis altid vejen (pil og afstand)');
+      cb.addEventListener('change', () => { S.vej = cb.checked; gem(); }); body.append(lab);
     }
   }
 
@@ -10123,7 +10439,7 @@ const KALENDER = (() => {
       }
     }
     if (!started) return;
-    lurFrame(dt);
+    lurFrame(dt); if (HU) huerFrame(dt);
     const nx = naeste();
     for (const d of DOERE) {
       if (d.led) { const maal_ = d.aabner || S.aabnet.includes(d.l.nr) ? 1 : 0; d.aaben += (maal_ - d.aaben) * Math.min(1, dt * 3.5); d.led.rotation.y = -d.aaben * 1.9; if (d.hul) d.hul.visible = d.aaben > 0.03; if (d.ting) d.ting.visible = d.aaben > 0.03; }
@@ -10133,9 +10449,10 @@ const KALENDER = (() => {
     }
     gnistFrame(dt);
     if (trae) {
-      const a = frem(S);
+      const a = HU && cer && cer.t < 3.2 ? Math.max(0, Math.floor((cer.t - 0.6) / 0.1)) : frem(S);   // the end: the candles go out and light again from the bottom up
       trae.kugler.forEach((k, i) => { const on = i < a; if (k.taendt !== on) { k.taendt = on; k.k.material.color.set(on ? k.farve : '#39423a'); } k.glod.material.opacity = on ? 0.55 + 0.3 * Math.sin(tid * 2.6 + i * 1.7) : 0; });
-      const alle = faerdig(S); trae.stjerne.material.color.set(alle ? '#ffe08a' : '#8a7436'); trae.stjerneGlod.material.opacity = alle ? 0.8 + 0.2 * Math.sin(tid * 3) : 0; trae.stjerne.rotation.y = tid * 0.6;
+      if (trae.guirlande) { const on = !!S.traeSet && !(cer && cer.t < 3.2); trae.guirlande.visible = on; if (on) trae.guirlande.material.opacity = 0.75 + 0.2 * Math.sin(tid * 1.7); }
+      const alle = HU ? !!S.traeSet && !(cer && cer.t < 3.2) : faerdig(S); trae.stjerne.material.color.set(alle ? '#ffe08a' : '#8a7436'); trae.stjerneGlod.material.opacity = alle ? 0.8 + 0.2 * Math.sin(tid * 3) : 0; trae.stjerne.rotation.y = tid * 0.6;
     }
     if (krans_) {
       const lys_ = KR ? S.taendt.length : Math.floor(S.aabnet.length / 6); krans_.flammer.forEach((f, i) => { const on = i < lys_; f.flamme.visible = on; f.glod.material.opacity = on ? 0.7 + 0.25 * Math.sin(tid * 9 + i * 2) : 0; });
@@ -10188,7 +10505,7 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, lur: () => LUR && { x: LUR.x, z: LUR.z, vis: LUR.f.root.visible, flugt: LUR.flugt, skala: LUR.skala, nr: LUR.nr }, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, sne: () => ({ fnug: !!sne, vis: !!sne && sne.visible, tegnet: sne ? sne.geometry.drawRange.count : 0, u: SNE_U.value, fald: +faldNu.toFixed(3), byge: KR ? { ...byge } : null, inde: I.on }), vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, lur: () => LUR && { x: LUR.x, z: LUR.z, vis: LUR.f.root.visible, flugt: LUR.flugt, skala: LUR.skala, nr: LUR.nr }, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, sne: () => ({ fnug: !!sne, vis: !!sne && sne.visible, tegnet: sne ? sne.geometry.drawRange.count : 0, u: SNE_U.value, fald: +faldNu.toFixed(3), byge: KR || HU ? { ...byge } : null, inde: I.on }), vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); }, HUO, VAERTER, TRAENISSER, trae: () => trae, cer: () => cer && { t: +cer.t.toFixed(2) }, tag: id => { const o = HUO.find(o => o.h.id === id); if (o) tagHue(o); }, gem, vink: () => ({ ...vink, tid }) };
   const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && faerdig(S), hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
