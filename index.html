@@ -480,15 +480,23 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .fTing svg{width:100%;height:100%}
 .fNr{position:absolute;left:3px;top:3px;min-width:18px;height:18px;padding:0 3px;border-radius:9px;background:#7a1f24;color:#fff;font:700 11px/18px var(--body);text-align:center}
 .fDoer:focus-visible{outline:3px solid #f3d98a;outline-offset:2px}
-.kransForside{grid-template-columns:repeat(4,1fr)!important;gap:4%!important;padding:6px 9% 30px;position:relative}
-.kransForside::after{content:"";position:absolute;left:3%;right:3%;bottom:4px;height:34px;border-radius:50%;border:13px solid #2f6b3f;box-shadow:inset 0 2px 0 rgba(255,255,255,.18),0 2px 0 rgba(0,0,0,.3);pointer-events:none}
-.fLys{position:relative;z-index:1;aspect-ratio:1/2;padding:0;border:0;background:none;cursor:default;opacity:.55;animation:fInd .5s cubic-bezier(.2,1.4,.4,1) var(--d,0s) both}
-.fLys svg{width:100%;height:100%;display:block}
-.fLys.taendt{opacity:1;cursor:pointer}
-.fLys.taendt svg path:first-of-type{transform-origin:30px 30px;animation:fFlamme 1.6s ease-in-out infinite alternate}
-.fLys.idag{opacity:1;cursor:pointer;filter:drop-shadow(0 0 8px #f3d98a)}
-.fLys.idag::after{content:"NÆSTE";position:absolute;left:0;right:0;bottom:-2px;font:700 9px/1 var(--body);letter-spacing:.14em;color:#f3d98a;text-align:center}
-.fLys:focus-visible{outline:3px solid #f3d98a;outline-offset:2px}
+.kransScene{position:relative;aspect-ratio:600/330;margin:0 -10px 14px}
+.kransScene>svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.kransScene .kkFor{z-index:2}
+.kkLys{position:absolute;z-index:1;padding:0;border:0;background:none;cursor:default;animation:fInd .55s cubic-bezier(.2,1.4,.4,1) var(--d,0s) both;-webkit-tap-highlight-color:transparent}
+.kkLys svg{width:100%;height:100%;display:block;overflow:visible}
+.kkLys:disabled{filter:brightness(.8) saturate(.8)}
+.kkLys.taendt,.kkLys.idag{cursor:pointer}
+.kkLys .kkFlamme{transform-box:fill-box;transform-origin:50% 100%;animation:kkFlakker 1.7s ease-in-out infinite alternate}
+.kkLys .kkSkaer{animation:kkSkaer 2.3s ease-in-out infinite alternate}
+.kkLys.idag svg{animation:kkKald 1.9s ease-in-out infinite}
+.kkLys.idag::after{content:"NÆSTE";position:absolute;left:50%;top:2%;transform:translateX(-50%);padding:3px 7px 2px;border-radius:9px;background:#f3d98a;color:#3a2a10;font:800 9px/1 var(--body);letter-spacing:.14em;white-space:nowrap;box-shadow:0 0 12px rgba(243,217,138,.6)}
+.kkLys:focus-visible{outline:3px solid #f3d98a;outline-offset:2px;border-radius:6px}
+.kkGlint{animation:kkGlint 3s ease-in-out infinite;animation-delay:var(--g,0s)}
+@keyframes kkFlakker{0%{transform:scale(.95,.97) skewX(-2deg)}50%{transform:scale(1.04,1.06) skewX(1.5deg)}100%{transform:scale(.98,1.1) skewX(-1deg)}}
+@keyframes kkSkaer{from{opacity:.75}to{opacity:1}}
+@keyframes kkKald{0%,100%{filter:drop-shadow(0 0 3px rgba(243,217,138,.35))}50%{filter:drop-shadow(0 0 12px rgba(243,217,138,.95))}}
+@keyframes kkGlint{0%,70%,100%{opacity:0}80%{opacity:1}}
 @keyframes fFlamme{from{transform:scale(.94,1)}to{transform:scale(1.05,1.08)}}
 .kransGrid{grid-template-columns:repeat(4,1fr)!important}
 #intro.kalIntro .lead{font-size:15px;line-height:1.55;margin-bottom:14px}
@@ -496,7 +504,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 @keyframes fInd{from{transform:scale(.6) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes fGloed{0%,100%{box-shadow:inset 0 0 0 3px rgba(255,255,255,.06),0 0 0 rgba(243,217,138,0)}50%{box-shadow:inset 0 0 0 3px rgba(255,255,255,.06),0 0 18px rgba(243,217,138,.75)}}
 @media (max-width:600px){.kalBanner{margin:-22px -20px 10px;height:118px}#intro.kalIntro h1{font-size:34px;margin-bottom:10px}.kalForside{grid-template-columns:repeat(4,1fr);gap:7px}}
-@media (prefers-reduced-motion:reduce){.fDoer,.fDoer.idag,.fLys,.fLys.taendt svg path{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.fDoer,.fDoer.idag,.kkLys,.kkLys svg,.kkLys .kkFlamme,.kkLys .kkSkaer,.kkGlint{animation:none!important}}
 </style>
 </head>
 <body>
@@ -9176,12 +9184,75 @@ const KALENDER = (() => {
     <g fill="#ffcf7a">${vinduer(116, 10, 0, 33)}${vinduer(136, 10, 0, 33)}<rect x="122" y="92" width="8" height="10" rx="1"/><rect x="170" y="92" width="8" height="10" rx="1"/><rect x="542" y="92" width="8" height="10" rx="1"/><rect x="590" y="92" width="8" height="10" rx="1"/><rect x="354" y="34" width="12" height="14" rx="6"/><rect x="348" y="64" width="24" height="30" rx="12"/><rect x="350" y="126" width="20" height="32" rx="10" fill="#e8a64a"/></g>
     <g fill="#fff">${Array.from({ length: 30 }, (_, i) => `<circle cx="${(i * 131 + 57) % 720}" cy="${(i * 71 + 23) % 160}" r="${1.1 + (i % 3) * 0.7}" opacity=".85"/>`).join('')}</g></svg>`;
   $('intro').querySelector('.card').prepend(banner);
-  const forsideGrid = el('div', 'kalForside' + (KR ? ' kransForside' : '')), forsideTekst = el('p', 'kalForsideTekst');
+  const forsideGrid = el('div', KR ? 'kransScene' : 'kalForside'), forsideTekst = el('p', 'kalForsideTekst');
   forsideGrid.setAttribute('role', 'group'); forsideGrid.setAttribute('aria-label', KR ? 'Adventskransens fire lys' : 'Kalenderens 24 låger');
-  // a candle on the front page of the wreath game: lit, ready to be fetched, or waiting
-  const lysSvg = (nr, taendt) => `<svg viewBox="0 0 60 120" aria-hidden="true">${taendt ? '<circle cx="30" cy="24" r="20" fill="#ffcf6a" opacity=".22"/><path d="M30 8c7 9 8 15 0 23-8-8-7-14 0-23z" fill="#ffd77a" stroke="#c9822e" stroke-width="1.5"/><path d="M30 17c3 5 3 8 0 12-3-4-3-7 0-12z" fill="#fff6d6"/>' : ''}
-    <path d="M30 36v-6" stroke="#2a2118" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="36" width="26" height="76" rx="3" fill="#b3262a" stroke="#2a2118" stroke-width="2.5"/>
-    <path d="M17 44q5 0 5 7t5 0 4-7" fill="none" stroke="#8e1c20" stroke-width="2"/><text x="30" y="88" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="22" fill="#f6e6b8">${nr}</text></svg>`;
+  // The wreath on the front page of the wreath game: a fir wreath with berries, cones and a red bow, drawn in two layers
+  // (behind and in front of the candles) so the four candle buttons stand in the greenery. Candles burn down as the
+  // weeks go by: the first one lit is the shortest.
+  const KK = { cx: 300, cy: 246, rx: 240, ry: 64 };
+  const kkPlads = [211.8, 252.5, 287.5, 328.2].map((g, i) => { const a = g * Math.PI / 180; return { x: KK.cx + KK.rx * Math.cos(a), y: KK.cy + KK.ry * Math.sin(a), s: i === 0 || i === 3 ? 1 : 0.9 }; });
+  const kkLag = (() => {
+    let fro = 11; const rnd = () => (fro = fro * 16807 % 2147483647) / 2147483647;
+    const farver = ['#163d24', '#215a33', '#2f7343', '#4a925a'], f = (n) => n.toFixed(1);
+    const nyLag = () => ({ d: farver.map(() => ''), sne: '', baer: '', ting: '' });
+    const bag = nyLag(), for_ = nyLag();
+    function kvist(L, x, y, v, len) {   // a fir sprig: a stem with needles, flattened a little for the perspective
+      const c = rnd() < 0.18 ? 0 : rnd() < 0.45 ? 1 : rnd() < 0.8 ? 2 : 3, cs = Math.cos(v), sn = Math.sin(v) * 0.62;
+      const x0 = x - cs * len / 2, y0 = y - sn * len / 2; let d = `M${f(x0)} ${f(y0)}l${f(cs * len)} ${f(sn * len)}`;
+      for (let k = 1; k <= 6; k++) {
+        const t = k / 7, px = x0 + cs * len * t, py = y0 + sn * len * t, nl = 8.5 * (1.15 - t * 0.6);
+        for (const sgn of [-1, 1]) { const w = v + sgn * 0.95; d += `M${f(px)} ${f(py)}l${f(Math.cos(w) * nl)} ${f(Math.sin(w) * nl * 0.62)}`; }
+      }
+      L.d[c] += d;
+      if (rnd() < 0.16) L.sne += `<circle cx="${f(x + (rnd() - 0.5) * 8)}" cy="${f(y - 2 - rnd() * 3)}" r="${f(1 + rnd() * 1.1)}"/>`;
+    }
+    const paaRing = (g, u) => { const a = g * Math.PI / 180; return [KK.cx + (KK.rx + u * 34) * Math.cos(a), KK.cy + (KK.ry + u * 19) * Math.sin(a), a]; };
+    for (let i = 0; i < 460; i++) {
+      const g = i * 360 / 460 + rnd() * 2, [x, y, a] = paaRing(g, rnd() * 2 - 1), tan = Math.atan2(KK.ry * Math.cos(a), -KK.rx * Math.sin(a)) * (rnd() < 0.5 ? 1 : -1);
+      kvist(Math.sin(a) < 0 ? bag : for_, x, y, Math.atan2(Math.sin(tan) / 0.62, Math.cos(tan)) + (rnd() - 0.5) * 1.3, 24 + rnd() * 12);
+    }
+    for (const p of kkPlads) for (let i = 0; i < 13; i++) kvist(for_, p.x + (rnd() - 0.5) * 62 * p.s, p.y + 4 + (rnd() - 0.3) * 12, (rnd() - 0.5) * 2.2 + (rnd() < 0.5 ? 0 : Math.PI), 20 + rnd() * 10);
+    const baer = (L, x, y) => { for (const [dx, dy] of [[0, 0], [5.5, 2], [2, 5.5]]) L.baer += `<circle cx="${f(x + dx)}" cy="${f(y + dy)}" r="4.3"/><circle cx="${f(x + dx - 1.4)}" cy="${f(y + dy - 1.5)}" r="1.3" fill="#ffd9d9" opacity=".75" stroke="none"/>`; };
+    [8, 35, 62, 118, 145, 172, 196, 236, 270, 304, 344].forEach(g => { const [x, y, a] = paaRing(g, rnd() - 0.4); baer(Math.sin(a) < 0 ? bag : for_, x, y - 3); });
+    for (const p of kkPlads) baer(for_, p.x + 18 * p.s, p.y + 8);
+    const kogle = (L, x, y, v) => { let d = ''; for (let r = 0; r < 4; r++) d += `<path d="M${f(-7 + r * 4.4)} -4q2.2 4 4.4 0M${f(-7 + r * 4.4)} 1q2.2 4 4.4 0" />`;
+      L.ting += `<g transform="translate(${f(x)} ${f(y)}) rotate(${v})"><ellipse rx="11" ry="7.5" fill="#6b4024"/><g fill="none" stroke="#3d2312" stroke-width="1.3">${d}</g><ellipse cx="-3" cy="-3" rx="4" ry="2" fill="#a8744a" opacity=".5"/></g>`; };
+    [[180, 0], [270, 0.3], [0, -10], [48, 18], [132, -14]].forEach(([g, v]) => { const [x, y, a] = paaRing(g, 0.25); kogle(Math.sin(a) < -0.01 || g === 180 || g === 0 ? bag : for_, x, y, v); });
+    const kugle = (L, x, y, i) => { L.ting += `<circle cx="${f(x)}" cy="${f(y)}" r="6" fill="url(#kkGuld)" stroke="#7a5418" stroke-width=".8"/><circle cx="${f(x - 2)}" cy="${f(y - 2.2)}" r="1.6" fill="#fff" class="kkGlint" style="--g:${i * 0.7}s"/>`; };
+    [[160, -0.6], [20, -0.6], [228, 0.7], [312, 0.7], [70, 0.5], [110, 0.5]].forEach(([g, u], i) => { const [x, y, a] = paaRing(g, u); kugle(Math.sin(a) < 0 ? bag : for_, x, y, i); });
+    const bx = KK.cx, by = KK.cy + KK.ry + 6;   // the bow at the front
+    for_.ting += `<g transform="translate(${bx} ${by})" stroke="#5e0c12" stroke-width="1.4" stroke-linejoin="round">
+      <path d="M-4 2l-15 30 7-2 4 8 13-34z" fill="#9d1d24"/><path d="M4 2l15 30-7-2-4 8-13-34z" fill="#8a161d"/>
+      <path d="M0 0c-9-15-36-20-41-7-4 11 22 13 41 7z" fill="url(#kkSloejfe)"/><path d="M0 0c9-15 36-20 41-7 4 11-22 13-41 7z" fill="url(#kkSloejfe)"/>
+      <path d="M-6-3c-10-8-24-11-30-5M6-3c10-8 24-11 30-5" fill="none" stroke="#e4565c" stroke-width="1.6" opacity=".7"/>
+      <ellipse cx="0" cy="0" rx="7.5" ry="6.5" fill="#b3262a"/><ellipse cx="-2" cy="-2" rx="3" ry="2" fill="#e4565c" stroke="none" opacity=".6"/></g>`;
+    const tegn = (L) => L.d.map((d, i) => `<path d="${d}" stroke="${farver[i]}" stroke-width="${i ? 2.5 : 3.2}"/>`).join('');
+    const ring = (k) => `<path d="M${KK.cx - KK.rx - 36} ${KK.cy}a${KK.rx + 36} ${KK.ry + 20} 0 1 0 ${2 * (KK.rx + 36)} 0a${KK.rx + 36} ${KK.ry + 20} 0 1 0 ${-2 * (KK.rx + 36)} 0zM${KK.cx - KK.rx + 32} ${KK.cy}a${KK.rx - 32} ${KK.ry - 17} 0 1 0 ${2 * (KK.rx - 32)} 0a${KK.rx - 32} ${KK.ry - 17} 0 1 0 ${-2 * (KK.rx - 32)} 0z" fill="#11301c" fill-rule="evenodd" clip-path="url(#${k})"/>`;
+    const lag = (L, k) => `${ring(k)}<g fill="none" stroke-linecap="round">${tegn(L)}</g><g fill="#f4f7f8" opacity=".85">${L.sne}</g>${L.ting}<g fill="#c4202b" stroke="#6d0e14" stroke-width=".8">${L.baer}</g>`;
+    return { bag: lag(bag, 'kkBagKlip'), for: lag(for_, 'kkForKlip') };
+  })();
+  const kkBag = (t) => `<svg viewBox="0 0 600 330" aria-hidden="true"><defs>
+    <linearGradient id="kkVoks" x1="0" x2="1"><stop offset="0" stop-color="#6e1014"/><stop offset=".22" stop-color="#c3302f"/><stop offset=".38" stop-color="#dc4a43"/><stop offset=".72" stop-color="#a51f22"/><stop offset="1" stop-color="#5e0c10"/></linearGradient>
+    <radialGradient id="kkFlamme" cx=".5" cy=".78" r=".75"><stop offset="0" stop-color="#fffbe6"/><stop offset=".35" stop-color="#ffe27a"/><stop offset=".75" stop-color="#ffa82c"/><stop offset="1" stop-color="#ec6a18"/></radialGradient>
+    <radialGradient id="kkGlod"><stop offset="0" stop-color="#ffd27a" stop-opacity=".6"/><stop offset=".45" stop-color="#ffb347" stop-opacity=".18"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+    <linearGradient id="kkGuld" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b4"/><stop offset=".5" stop-color="#e0b24a"/><stop offset="1" stop-color="#8f6418"/></linearGradient>
+    <linearGradient id="kkSloejfe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d93a40"/><stop offset="1" stop-color="#8a161d"/></linearGradient>
+    <radialGradient id="kkVarme" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb84d" stop-opacity=".55"/><stop offset="1" stop-color="#ffb84d" stop-opacity="0"/></radialGradient>
+    <filter id="kkBlur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+    <clipPath id="kkBagKlip"><rect x="0" y="0" width="600" height="${KK.cy}"/></clipPath><clipPath id="kkForKlip"><rect x="0" y="${KK.cy}" width="600" height="${330 - KK.cy}"/></clipPath></defs>
+    <ellipse cx="300" cy="160" rx="270" ry="150" fill="url(#kkVarme)" opacity="${(0.08 + t * 0.16).toFixed(2)}"/>
+    <ellipse cx="300" cy="${KK.cy + 16}" rx="${KK.rx + 40}" ry="${KK.ry + 28}" fill="#000" opacity=".5" filter="url(#kkBlur)"/><ellipse cx="300" cy="${KK.cy + 2}" rx="${KK.rx - 40}" ry="${KK.ry - 22}" fill="url(#kkVarme)" opacity="${(0.15 + t * 0.2).toFixed(2)}"/>
+    ${kkLag.bag}</svg>`;
+  const kkFor = () => `<svg class="kkFor" viewBox="0 0 600 330" aria-hidden="true">${kkLag.for}</svg>`;
+  const lysSvg = (nr, taendt, h) => { const top = 200 - h, ty = top + Math.min(64, h * 0.5);
+    return `<svg viewBox="0 0 80 200" aria-hidden="true">${taendt ? `<circle class="kkSkaer" cx="40" cy="${top - 22}" r="38" fill="url(#kkGlod)"/>` : ''}
+    <rect x="17" y="${top}" width="46" height="${h + 4}" rx="4" fill="url(#kkVoks)"/>
+    <rect x="23" y="${top + 7}" width="6" height="${h - 14}" rx="3" fill="#fff" opacity=".16"/>
+    <path d="M18 ${top + 2}q-1 14 3 19q4 4 4-3v-16zM52 ${top + 2}q1 9 4 11q3 2 3-4v-7z" fill="#c9393a"/>
+    <ellipse cx="40" cy="${top + 1}" rx="23" ry="5" fill="#cf3f3f"/><ellipse cx="40" cy="${top + 1.5}" rx="17" ry="3.2" fill="${taendt ? '#f07a5e' : '#8f1b1f'}"/>
+    <text x="40" y="${ty}" text-anchor="middle" dominant-baseline="middle" font-family="'Playfair Display',Georgia,serif" font-weight="800" font-size="34" fill="#f6dc8c" stroke="#4a0a0d" stroke-width="2.2" paint-order="stroke">${nr}</text>
+    <path d="M40 ${top + 1}q-1.5-5 .8-9" fill="none" stroke="#24180f" stroke-width="2.4" stroke-linecap="round"/>
+    ${taendt ? `<g class="kkFlamme"><ellipse cx="40.5" cy="${top - 9}" rx="3.4" ry="2.4" fill="#6fa8ff" opacity=".7"/><path d="M40.5 ${top - 50}c8 12 12 21 8 29c-2 5-5 7-8 7s-6-2-8-7c-4-8 0-17 8-29z" fill="url(#kkFlamme)"/><path d="M40.5 ${top - 27}c3 4 4 8 2 11c-1 2-3 2-4 0c-2-3-1-7 2-11z" fill="#fffdf2"/></g><circle cx="40.8" cy="${top - 8}" r="1.3" fill="#ff7a2a"/>` : ''}</svg>`; };
   $('introTitle').after(forsideGrid, forsideTekst);   // the doors come first, the story under them
   function forside() {
     const vis = !started; forsideGrid.hidden = forsideTekst.hidden = banner.hidden = !vis; $('intro').classList.toggle('kalIntro', vis);
@@ -9191,14 +9262,19 @@ const KALENDER = (() => {
     forsideGrid.replaceChildren();
     if (KR) {
       const t = G.taendt.length, mangler = t < aabne.length ? t + 1 : 0;   // a candle she has fetched but not lit
+      forsideGrid.innerHTML = kkBag(t);
       for (let nr = 1; nr <= N; nr++) {
-        const l = L[nr], lit = G.taendt.includes(nr), klar = !lit && (nr === mangler || (!mangler && nr === naesteNr)), b = el('button', 'fLys' + (lit ? ' taendt' : klar ? ' idag' : ''));
-        b.type = 'button'; b.style.setProperty('--d', nr * 0.12 + 's'); b.innerHTML = lysSvg(nr, lit);
+        const l = L[nr], lit = G.taendt.includes(nr), klar = !lit && (nr === mangler || (!mangler && nr === naesteNr)), b = el('button', 'kkLys' + (lit ? ' taendt' : klar ? ' idag' : ''));
+        const p = kkPlads[(nr - 1) % 4], w = 80 * p.s, hh = 200 * p.s, bund = p.y + 10;
+        b.type = 'button'; b.style.setProperty('--d', nr * 0.12 + 's');
+        Object.assign(b.style, { left: (p.x - w / 2) / 6 + '%', top: (bund - hh) / 3.3 + '%', width: w / 6 + '%', height: hh / 3.3 + '%' });
+        b.innerHTML = lysSvg(nr, lit, 142 - (lit ? (t - nr) * 9 : 0));
         if (lit) { b.setAttribute('aria-label', `Lys ${nr}, tændt`); b.addEventListener('click', () => { forsideTekst.textContent = `${K.soendage[nr - 1].navn}: ${l ? l.ting.navn : ''}. ${K.soendage[nr - 1].tekst}`; }); }
         else if (klar) { b.setAttribute('aria-label', `Lys ${nr}, det næste. Tryk for at gå i gang`); b.addEventListener('click', () => goBtn.click()); }
         else { b.disabled = true; b.setAttribute('aria-label', `Lys ${nr}, ikke fundet endnu`); }
         forsideGrid.append(b);
       }
+      forsideGrid.insertAdjacentHTML('beforeend', kkFor());
       forsideTekst.textContent = t >= N ? 'Alle fire lys er tændt. Glædelig jul.' : mangler ? `Du har lys ${mangler} med dig. Tænd det på kransen i Rigsdagsgården.` : t ? `${t} af ${N} lys er tændt. Tryk på det næste lys for at gå videre.` : 'Tryk på det første lys for at gå i gang.';
       return;
     }
