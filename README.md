@@ -41,7 +41,7 @@ Bilag fra Effektiviseringsenheden har fjernet de fire lys fra adventskransen i R
 - Kør `node dev/tjek-kalender.js` efter en rettelse.
 
 ## Arkivet: julekalenderen med 24 låger
-Julekalenderen »Nissernes protokol« er lagt til side til næste jul. Den ligger i `arkiv/julekalender-24-laager.js` og virker stadig. Den kan spilles på `?spor=kalender24` (tilføj `&alle` for at åbne alle låger), og git-mærket `arkiv-julekalender-24-laager` peger på den sidste udgave, før den blev lagt i arkivet. Tag den frem ved at lade linjen `jul` i `SPOR` i `index.html` pege på filen igen. Tjek den med `node dev/tjek-kalender.js --fil=arkiv/julekalender-24-laager.js`.
+Julekalenderen »Nissernes protokol« er lagt til side til næste jul. Den ligger i `arkiv/julekalender-24-laager.js` og virker stadig. Den kan spilles på `?spor=kalender24` (tilføj `&alle` for at åbne alle låger), og grenen `arkiv-julekalender-24-laager` på GitHub er hele spillet, som det så ud, før kalenderen blev lagt i arkivet. Tag den frem ved at lade linjen `jul` i `SPOR` i `index.html` pege på filen igen. Tjek den med `node dev/tjek-kalender.js --fil=arkiv/julekalender-24-laager.js`.
 
 Det følgende beskriver julekalenderen med 24 låger.
 
