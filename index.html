@@ -460,7 +460,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 
 /* Julekalenderens forside: Christiansborg i sne over 24 låger */
 #intro.kalIntro .card{max-width:640px}
-.kalBanner{margin:-30px -32px 14px;height:160px;overflow:hidden;border-radius:var(--radius,6px) var(--radius,6px) 0 0}
+.kalBanner{margin:-30px -32px 14px;height:178px;overflow:hidden;border-radius:var(--radius,6px) var(--radius,6px) 0 0}
 .kalBanner svg{display:block;width:100%;height:100%}
 #intro.kalIntro h1{margin-top:4px}
 .kalForside{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:2px 0 8px}
@@ -503,7 +503,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 .kalForsideTekst{min-height:1.4em;margin:0 0 16px;font-weight:600;color:var(--ink)!important;font-size:14px;line-height:1.45;color:var(--daempet,#5d5368)}
 @keyframes fInd{from{transform:scale(.6) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes fGloed{0%,100%{box-shadow:inset 0 0 0 3px rgba(255,255,255,.06),0 0 0 rgba(243,217,138,0)}50%{box-shadow:inset 0 0 0 3px rgba(255,255,255,.06),0 0 18px rgba(243,217,138,.75)}}
-@media (max-width:600px){.kalBanner{margin:-22px -20px 10px;height:118px}#intro.kalIntro h1{font-size:34px;margin-bottom:10px}.kalForside{grid-template-columns:repeat(4,1fr);gap:7px}}
+@media (max-width:600px){.kalBanner{margin:-22px -20px 10px;height:136px}#intro.kalIntro h1{font-size:34px;margin-bottom:10px}.kalForside{grid-template-columns:repeat(4,1fr);gap:7px}}
 @media (prefers-reduced-motion:reduce){.fDoer,.fDoer.idag,.kkLys,.kkLys svg,.kkLys .kkFlamme,.kkLys .kkSkaer,.kkGlint{animation:none!important}}
 </style>
 </head>
@@ -575,7 +575,7 @@ body.i1942 #c{filter:sepia(.62) saturate(.7) contrast(1.06) brightness(.94)}
 
 <script>
 // The first seconds, before the 3D world and the edition's own file have loaded: show the right edition at once.
-(function(){ var q = new URLSearchParams(location.search), F = { jul: ['Nissernes adventskrans', 'Christiansborg · et julespil for voksne', 'Julespillet hentes …'], kalender24: ['Nissernes protokol', 'Christiansborg · en julekalender for voksne', 'Julekalenderen hentes …'] }[q.get('spor')];
+(function(){ var q = new URLSearchParams(location.search), F = { jul: ['Nissernes adventskrans', 'Christiansborg', 'Julespillet hentes …'], kalender24: ['Nissernes protokol', 'Christiansborg · en julekalender for voksne', 'Julekalenderen hentes …'] }[q.get('spor')];
   if (!F) return; document.documentElement.dataset.tema = q.get('tema') || 'jul'; document.title = F[0];
   document.getElementById('introTitle').textContent = F[0]; document.querySelector('#intro .eyebrow').textContent = F[1]; document.getElementById('introLead').textContent = F[2]; })();
 setTimeout(function(){ if(!window.__gameReady){ var e=document.getElementById('loadErr'); if(e) e.hidden=false; var b=document.getElementById('goBtn'); if(b) b.textContent='Kunne ikke hente 3D-motoren'; } }, 12000);
@@ -9167,24 +9167,99 @@ const KALENDER = (() => {
   { const sty = $('intro').querySelector('details.styring'); if (sty) sty.hidden = true; }
   $('lookHint')?.remove();
   { const foot = $('intro').querySelector('.foot'); if (foot) foot.textContent = 'Kortdata: © OpenStreetMap-bidragydere (ODbL).'; }
-  document.querySelector('meta[name="description"]')?.setAttribute('content', `${K.titel}: ${K.overskrift.replace(/^Christiansborg · /, '')} i 3D på Christiansborg og Slotsholmen i København.`);
+  document.querySelector('meta[name="description"]')?.setAttribute('content', `${K.titel}: ${K.overskrift.split(' · ')[1] || 'et julespil'} i 3D på Christiansborg og Slotsholmen i København.`);
   // The front page looks like a real advent calendar: Christiansborg in the snow over 24 doors. The doors already opened
   // show their thing, today's door glows, and the rest wait for their day. Tapping today's door goes into the game.
   const banner = el('div', 'kalBanner'); banner.setAttribute('aria-hidden', 'true');
-  const vinduer = (y, h, n0, n1) => Array.from({ length: n1 - n0 }, (_, k) => { const i = k + n0, x = 92 + i * 17; return x > 322 && x < 398 ? '' : `<rect x="${x}" y="${y}" width="7" height="${h}" rx="1" opacity="${(i * 7 + y) % 5 ? 0.92 : 0.22}"/>`; }).join('');
-  banner.innerHTML = `<svg viewBox="0 0 720 180" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="kbHimmel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#081521"/><stop offset="1" stop-color="#1e3d3b"/></linearGradient><radialGradient id="kbMaane"><stop offset=".55" stop-color="#fff4cf"/><stop offset="1" stop-color="#fff4cf" stop-opacity="0"/></radialGradient></defs>
-    <rect width="720" height="180" fill="url(#kbHimmel)"/><circle cx="620" cy="38" r="32" fill="url(#kbMaane)" opacity=".5"/><circle cx="620" cy="38" r="14" fill="#fff4cf"/>
-    <g fill="#fff6dc">${Array.from({ length: 46 }, (_, i) => `<circle cx="${(i * 97 + 31) % 720}" cy="${(i * 53 + 11) % 96}" r="${i % 5 ? 0.9 : 1.6}" opacity="${0.3 + (i % 4) * 0.15}"/>`).join('')}</g>
-    <g fill="#0c1612">
-      <rect x="70" y="104" width="580" height="60"/><path d="M58 106l24-16h556l24 16z"/>
-      <rect x="112" y="84" width="76" height="24"/><path d="M106 86l44-16 44 16z"/><rect x="532" y="84" width="76" height="24"/><path d="M526 86l44-16 44 16z"/>
-      <rect x="334" y="54" width="52" height="56"/><rect x="328" y="50" width="64" height="6"/>
-      <rect x="342" y="30" width="36" height="22"/><rect x="338" y="27" width="44" height="5"/>
-      <path d="M346 27q14-16 28 0z"/><rect x="357" y="6" width="6" height="16"/></g>
-    <g fill="#d9b25a"><path d="M347 27l2-7 4 4 7-8 7 8 4-4 2 7z"/><path d="M352 15l1.5-5 3 3 3.5-6 3.5 6 3-3 1.5 5z"/><path d="M356 6l1-3 2 2 1-4 1 4 2-2 1 3z"/></g>
-    <g fill="#f4f7f8"><path d="M82 90h556l5 3H77z"/><path d="M106 86l44-16 44 16-6 1-38-13-38 13z"/><path d="M526 86l44-16 44 16-6 1-38-13-38 13z"/><path d="M328 50h64v2h-64zM338 27h44v2h-44z"/><path d="M0 158c90-12 170-6 250 0s160 8 230 0 170-10 240-3v25H0z"/></g>
-    <g fill="#ffcf7a">${vinduer(116, 10, 0, 33)}${vinduer(136, 10, 0, 33)}<rect x="122" y="92" width="8" height="10" rx="1"/><rect x="170" y="92" width="8" height="10" rx="1"/><rect x="542" y="92" width="8" height="10" rx="1"/><rect x="590" y="92" width="8" height="10" rx="1"/><rect x="354" y="34" width="12" height="14" rx="6"/><rect x="348" y="64" width="24" height="30" rx="12"/><rect x="350" y="126" width="20" height="32" rx="10" fill="#e8a64a"/></g>
-    <g fill="#fff">${Array.from({ length: 30 }, (_, i) => `<circle cx="${(i * 131 + 57) % 720}" cy="${(i * 71 + 23) % 160}" r="${1.1 + (i % 3) * 0.7}" opacity=".85"/>`).join('')}</g></svg>`;
+  // Christiansborg on a winter night, seen from Slotspladsen: the long granite palace lit from below, the copper roofs
+  // (brown again after the renovation) under snow, and the tower with its lantern, spire and three gold crowns.
+  banner.innerHTML = (() => {
+    const f = n => +n.toFixed(1), lys = (i, r) => (i * 7 + r * 5) % 6 === 0 ? '#1c2631' : (i + r) % 5 === 1 ? '#ffe7b0' : '#ffcd7c';
+    const bue = (x, y, w, h, c) => `<path d="M${x} ${y + h}V${f(y + w / 2)}a${w / 2} ${w / 2} 0 0 1 ${w} 0V${y + h}z" fill="${c}"/>`;
+    const sne = (x0, x1, y, d) => { let p = `M${x0} ${y}H${x1}`; for (let x = x1, k = 0; x > x0; x -= 7, k++) { const n = Math.max(x0, x - 7); p += `Q${f((x + n) / 2)} ${f(y + d * (k % 3 ? 1 : 1.7))} ${n} ${f(y + d * 0.35)}`; } return `<path d="${p}z"/>`; };
+    const xs = (a, b, s) => { const r = []; for (let x = a; x <= b; x += s) r.push(x); return r; };
+    // The two long wings between the corner pavilions and the middle
+    const flojX = [...xs(178, 306, 16), ...xs(414, 542, 16)];
+    let flojV = '', flojS = '', kviste = '';
+    flojX.forEach((x, i) => {
+      flojV += `<rect x="${x - 3}" y="114" width="6" height="8" rx=".6" fill="${lys(i, 0)}"/>` + bue(x - 3.5, 130, 7, 17, lys(i, 1)) + bue(x - 3, 158, 6, 11, lys(i, 2) === '#1c2631' ? '#1c2631' : '#e9a957');
+      flojS += `<rect x="${x - 4.5}" y="147" width="9" height="1.4"/><rect x="${x - 4}" y="122" width="8" height="1.1"/>`;
+      if (i % 2 === 0) kviste += `<path d="M${x - 4} 105v-6.5l4-4 4 4v6.5z" fill="#55606b"/><rect x="${x - 2}" y="99" width="4" height="5" fill="${lys(i, 3)}"/><path d="M${x - 5.5} 98.8l5.5-5.4 5.5 5.4h-2l-3.5-3.2-3.5 3.2z" fill="#f4f7f8"/>`;
+    });
+    // A corner pavilion with its tall curved roof
+    const pavillon = (cx, i0) => {
+      let v = '';
+      [-24, -8, 8, 24].forEach((d, k) => { const x = cx + d; v += `<rect x="${x - 3.5}" y="108" width="7" height="9" rx=".6" fill="${lys(i0 + k, 0)}"/>` + bue(x - 4, 124, 8, 23, lys(i0 + k, 1)) + bue(x - 3.5, 157, 7, 12, '#e9a957') + `<rect x="${x - 5}" y="147" width="10" height="1.4" fill="#f4f7f8"/>`; });
+      return `<path d="M${cx - 42} 101c3-12 7-19 10-26h64c3 7 7 14 10 26z" fill="url(#kbKobber)"/>
+        <path d="M${cx - 33} 74.6h66l1.2 2.4c-8 1.2-15-.8-23 .6s-14-.9-22 .3-15-.4-23.4-.1z" fill="#f4f7f8"/>
+        <path d="M${cx - 40} 96c4-1 7-6 9-12M${cx + 40} 96c-4-1-7-6-9-12" stroke="#f4f7f8" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".85"/>
+        ${[-16, 0, 16].map(d => `<path d="M${cx + d - 4.5} 98v-9.5l4.5-4.5 4.5 4.5v9.5z" fill="#5b6570"/>` + bue(cx + d - 2.5, 89, 5, 7.5, lys(i0 + d, 4)) + `<path d="M${cx + d - 6} 88.6l6-6 6 6h-2.2l-3.8-3.6-3.8 3.6z" fill="#f4f7f8"/>`).join('')}
+        <rect x="${cx - 38}" y="101" width="76" height="81" fill="url(#kbMurL)"/>
+        <rect x="${cx - 38}" y="101" width="3.5" height="81" fill="#8a9097" opacity=".55"/><rect x="${cx + 34.5}" y="101" width="3.5" height="81" fill="#8a9097" opacity=".55"/>
+        <rect x="${cx - 40}" y="99" width="80" height="3" fill="#8d9399"/><rect x="${cx - 40}" y="97.8" width="80" height="1.7" fill="#f4f7f8"/>
+        <rect x="${cx - 38}" y="151" width="76" height="2" fill="#8d9399"/><rect x="${cx - 38}" y="150.2" width="76" height="1" fill="#f4f7f8"/>${v}`;
+    };
+    // The middle: a temple front with columns, and the tower behind it
+    let midte = '';
+    [322, 336, 350, 370, 384, 398].forEach(x => { midte += `<rect x="${x - 1.8}" y="104" width="3.6" height="46" fill="#9097a0"/><rect x="${x - 2.6}" y="103" width="5.2" height="1.6" fill="#a7adb4"/>`; });
+    [329, 343, 377, 391].forEach((x, k) => { midte += `<rect x="${x - 3}" y="108" width="6" height="9" rx=".6" fill="${lys(k, 5)}"/>` + bue(x - 3, 124, 6, 22, lys(k, 6)); });
+    midte += bue(355, 106, 10, 40, '#ffd893');
+    return `<svg viewBox="0 0 720 200" preserveAspectRatio="xMidYMax slice"><defs>
+    <linearGradient id="kbHimmel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050d18"/><stop offset=".55" stop-color="#0f2236"/><stop offset="1" stop-color="#2b4554"/></linearGradient>
+    <radialGradient id="kbMaane"><stop offset=".45" stop-color="#fff4cf"/><stop offset="1" stop-color="#fff4cf" stop-opacity="0"/></radialGradient>
+    <linearGradient id="kbMur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46515d"/><stop offset="1" stop-color="#6d665d"/></linearGradient>
+    <linearGradient id="kbMurL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#525d69"/><stop offset="1" stop-color="#7c7367"/></linearGradient>
+    <linearGradient id="kbKobber" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5693f"/><stop offset="1" stop-color="#5e3820"/></linearGradient>
+    <linearGradient id="kbKobberS" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5e3820"/><stop offset=".4" stop-color="#ad7246"/><stop offset="1" stop-color="#4e2e1a"/></linearGradient>
+    <linearGradient id="kbGuld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a6"/><stop offset="1" stop-color="#c8922c"/></linearGradient>
+    <linearGradient id="kbSne" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f9fb"/><stop offset="1" stop-color="#d7e1ea"/></linearGradient>
+    <radialGradient id="kbSkaer"><stop offset="0" stop-color="#ffd58a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient>
+    <filter id="kbGlod" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <rect width="720" height="200" fill="url(#kbHimmel)"/><circle cx="584" cy="36" r="34" fill="url(#kbMaane)" opacity=".45"/><circle cx="584" cy="36" r="13" fill="#fff4cf"/><circle cx="579" cy="33" r="2.4" fill="#efe2b8"/><circle cx="588" cy="40" r="1.6" fill="#efe2b8"/>
+    <g fill="#fff6dc">${Array.from({ length: 56 }, (_, i) => `<circle cx="${(i * 97 + 31) % 720}" cy="${(i * 53 + 11) % 110}" r="${i % 5 ? 0.8 : 1.4}" opacity="${0.3 + (i % 4) * 0.15}"/>`).join('')}</g>
+    <g fill="#0d1a25"><path d="M0 128h22l9-9 9 9h26v54H0zM620 130h30l8-8 8 8h20l7-12 7 12h28v52H620z"/><path d="M44 128v-30l3-12 3 12v30z"/></g>
+    <g fill="#ffcd7c" opacity=".7">${[[8, 140], [30, 152], [56, 140], [632, 142], [664, 154], [700, 142], [690, 160]].map(([x, y]) => `<rect x="${x}" y="${y}" width="4" height="5"/>`).join('')}</g>
+    <g filter="url(#kbGlod)">
+      <path d="M341 52c0-10 6-14 11-21 3-4 4-6.6 4-10h8c0 3.4 1 6 4 10 5 7 11 11 11 21z" fill="url(#kbKobberS)"/>
+      <path d="M348 51.5c1-8 5-12 7.4-17.4M372 51.5c-1-8-5-12-7.4-17.4M360 51.5V21.5" stroke="#3f2414" stroke-width=".8" fill="none" opacity=".6"/>
+      <path d="M355.6 20.6h8.8l.8 2h-10.4z" fill="#f4f7f8" opacity=".9"/><path d="M343.5 50.5c2-4 5-7 8-9.6M376.5 50.5c-2-4-5-7-8-9.6" stroke="#f4f7f8" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".55"/>
+      <rect x="355" y="13.4" width="10" height="7.4" fill="#6b4329"/>${[356.2, 359, 361.8].map(x => bue(x, 14.6, 2, 5, '#ffdf9a')).join('')}
+      <rect x="354" y="12.6" width="12" height="1.4" fill="#f4f7f8"/>
+      <path d="M355 12.8q5-5.6 10 0z" fill="url(#kbKobberS)"/>
+      <path d="M359.5 11l.35-10.6h.3l.35 10.6z" fill="#b5852c"/></g>
+    <ellipse cx="360" cy="7" rx="8" ry="8" fill="url(#kbSkaer)"/><g fill="url(#kbGuld)" stroke="#8a6420" stroke-width=".25" transform="translate(0 1.2)"><path d="M356 9.8v-3.2l1.5 1.3 1.2-2.4 1.3 2 1.3-2 1.2 2.4 1.5-1.3v3.2z"/><path d="M356.9 5.4v-2.6l1.2 1 1-2 .9 1.6.9-1.6 1 2 1.2-1v2.6z"/><path d="M357.7 1.8v-1.9l.9.7.7-1.4.7 1.1.7-1.1.7 1.4.9-.7v1.9z"/></g>
+    <g transform="translate(0 8)">
+    <path d="M160 108l8-15h384l8 15z" fill="url(#kbKobber)"/>
+    <g fill="#f4f7f8">${sne(166, 554, 92.4, 3)}</g>${kviste}
+    <rect x="343" y="46" width="34" height="56" fill="url(#kbMurL)"/>
+    <rect x="343" y="46" width="3" height="56" fill="#8d9399" opacity=".7"/><rect x="374" y="46" width="3" height="56" fill="#8d9399" opacity=".7"/>
+    <rect x="340" y="44" width="40" height="3.2" fill="#9aa0a6"/><rect x="340" y="42.6" width="40" height="1.8" fill="#f4f7f8"/>
+    <rect x="343" y="63" width="34" height="1.6" fill="#9aa0a6"/><rect x="343" y="62.4" width="34" height=".9" fill="#f4f7f8"/>
+    <g filter="url(#kbGlod)">${bue(349.5, 67, 7, 17, '#ffd893')}${bue(363.5, 67, 7, 17, '#ffd893')}<circle cx="360" cy="54.6" r="4.4" fill="#8d9399"/><circle cx="360" cy="54.6" r="3.2" fill="#ffe7b0"/></g>
+    <rect x="160" y="108" width="400" height="74" fill="url(#kbMur)"/>
+    <g stroke="#000" stroke-opacity=".14" stroke-width=".7">${[160, 166, 172].map(y => `<path d="M160 ${y}H560"/>`).join('')}</g>
+    <rect x="158" y="107" width="404" height="3" fill="#8d9399"/><rect x="158" y="105.8" width="404" height="1.8" fill="#f4f7f8"/>
+    <rect x="160" y="125" width="400" height="1.4" fill="#7f868d"/><rect x="160" y="151" width="400" height="2" fill="#8d9399"/><rect x="160" y="150.2" width="400" height="1" fill="#f4f7f8"/>
+    <g filter="url(#kbGlod)">${flojV}</g><g fill="#f4f7f8" opacity=".9">${flojS}</g>
+    <g filter="url(#kbGlod)">${pavillon(134, 1)}${pavillon(586, 7)}</g>
+    <rect x="318" y="100" width="84" height="82" fill="url(#kbMurL)"/>
+    <path d="M313 100.5l47-17 47 17z" fill="#8d9399"/><path d="M322 98.5l38-13.4 38 13.4z" fill="#5b6570"/>
+    <path d="M311.5 100.6l48.5-17.6 48.5 17.6h-3l-45.5-15.6-45.5 15.6z" fill="#f4f7f8"/><circle cx="360" cy="94" r="3.4" fill="#d9b25a"/>
+    <rect x="314" y="100" width="92" height="3.4" fill="#9aa0a6"/>
+    <g filter="url(#kbGlod)">${midte}</g>
+    <rect x="318" y="150" width="84" height="2.4" fill="#9aa0a6"/><rect x="318" y="149.2" width="84" height="1.2" fill="#f4f7f8"/>
+    <ellipse cx="360" cy="176" rx="40" ry="22" fill="url(#kbSkaer)"/>
+    <g filter="url(#kbGlod)">${bue(349, 157, 22, 25, '#f2b45c')}${bue(331, 160, 10, 22, '#e9a957')}${bue(379, 160, 10, 22, '#e9a957')}</g>
+    <g><path d="M262 182l-15-.2 7.6-10.2h-4.6l6.8-9.6h-3.6l6.2-9.4h-2.8L262 140l5.6 12.6h-2.8l6.2 9.4h-3.6l6.8 9.6h-4.6l7.6 10.2z" fill="#173b27"/>
+      <path d="M262 140l3.6 8h-7.2zM255 152.4l7-1.6 7 1.6-1.6 1.4-5.4-1-5.4 1zM252.4 162l9.6-1.8 9.6 1.8-1.8 1.4-7.8-1.2-7.8 1.2zM249.4 171.8l12.6-2 12.6 2-2 1.4-10.6-1.2-10.6 1.2z" fill="#f4f7f8"/>
+      <path d="M262 135.6l1.2 2.6 2.8.3-2.1 1.9.6 2.8-2.5-1.4-2.5 1.4.6-2.8-2.1-1.9 2.8-.3z" fill="url(#kbGuld)" filter="url(#kbGlod)"/>
+      <g filter="url(#kbGlod)">${[[259, 150, '#ffd26b'], [265, 156, '#ff7a6b'], [257, 159, '#ffe7b0'], [268, 165, '#ffd26b'], [255, 168, '#ff7a6b'], [262, 166, '#ffe7b0'], [251, 177, '#ffe7b0'], [266, 176, '#ff7a6b'], [273, 178, '#ffd26b'], [261, 174, '#ffd26b']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r=".95" fill="${c}"/>`).join('')}</g></g>
+    ${[216, 504].map(x => `<ellipse cx="${x}" cy="146" rx="14" ry="12" fill="url(#kbSkaer)"/><path d="M${x - 0.8} 184v-34h1.6v34z" fill="#1a1f24"/><path d="M${x - 3} 150h6l-1-6h-4z" fill="#1a1f24"/><rect x="${x - 2.2}" y="144.6" width="4.4" height="4.6" fill="#ffe1a0" filter="url(#kbGlod)"/><path d="M${x - 3.6} 144.4l3.6-2.4 3.6 2.4z" fill="#f4f7f8"/>`).join('')}
+    </g>
+    <path d="M0 184c60-8 130-9 200-5s110 4 160 2 120-6 190-3 120 4 170 0v22H0z" fill="url(#kbSne)"/>
+    <path d="M0 190c70-4 150-2 230 1s170 1 250-2 160-1 240 2v9H0z" fill="#e8eef3" opacity=".7"/>
+    <g fill="#fff">${Array.from({ length: 36 }, (_, i) => `<circle cx="${(i * 131 + 57) % 720}" cy="${(i * 71 + 23) % 180}" r="${0.9 + (i % 3) * 0.6}" opacity="${0.55 + (i % 2) * 0.3}"/>`).join('')}</g></svg>`;
+  })();
   $('intro').querySelector('.card').prepend(banner);
   const forsideGrid = el('div', KR ? 'kransScene' : 'kalForside'), forsideTekst = el('p', 'kalForsideTekst');
   forsideGrid.setAttribute('role', 'group'); forsideGrid.setAttribute('aria-label', KR ? 'Adventskransens fire lys' : 'Kalenderens 24 låger');

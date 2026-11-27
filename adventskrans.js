@@ -24,7 +24,7 @@ export const KALENDER = {
   id: "krans",
   spil: "krans",
   version: 1,
-  overskrift: "Christiansborg · et julespil for voksne",
+  overskrift: "Christiansborg",
   titel: "Nissernes adventskrans",
   forside: "Adventskransen i Rigsdagsgården er blevet effektiviseret, og alle fire lys er væk. Men fire nisser har gemt hver sit lys på Slotsholmen. Find dem, og tænd kransen igen, før det bliver jul.",
   gemTekst: "Spillet gemmer selv, så du kan fortsætte på denne telefon eller computer.",
