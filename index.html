@@ -9120,7 +9120,7 @@ const KALENDER = (() => {
   const L = Object.fromEntries(K.laager.map(l => [l.nr, l]));
   const sidste = Math.max(...K.laager.map(l => l.nr));   // the last door that has been written
   const soendag = nr => Math.ceil(nr / 6);
-  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], taendt: [], vink: [], vej: KR, pos: null, face: 0, morgen: false });
+  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], taendt: [], vink: [], grod: 0, mandelI: Math.floor(Math.random() * 3), vej: KR, pos: null, face: 0, morgen: false });
   // How far the story has come, counted as doors of 24: the weather, the light and the tree follow it. In the wreath game
   // each candle lit counts as a Sunday. faerdig: the end has come (all doors open, or all candles lit).
   const frem = G => KR ? G.taendt.length * 24 / N : G.aabnet.length;
@@ -9645,12 +9645,12 @@ const KALENDER = (() => {
   $('maal').querySelector('small').textContent = KR ? K.titel : 'Julekalenderen';
   function maal(M_, card) {
     const nx = started && M_.vis ? naeste() : null;
-    if (KR && started && M_.vis && (tilKrans() || (faerdig(S) && !S.morgen && !festSet))) {   // to the wreath, or up to the party in the tower
+    if (KR && started && M_.vis && (tilKrans() || (faerdig(S) && !S.morgen && (!festSet || (I.on && I.place === K.fest?.place))))) {   // to the wreath, or up to the party in the tower
       const tilT = !tilKrans(), T_ = FX.tower, mål = tilT ? [T_.door[0] + T_.OUT[0] * 3, T_.door[1] + T_.OUT[1] * 3] : krans_?.staa;
       const hvad = tilT ? (K.fest?.overskrift || 'Juleaften i Tårnet') : `Tænd lys ${S.taendt.length + 1}`;
       if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
       let pil = null, hvor = tilT ? (K.fest?.vej || 'Gå til Kongeporten på Slotspladsen, og tag elevatoren op til restauranten.') : (K.adventskrans.praj || 'Adventskransen i Rigsdagsgården.');
-      if (tilT && I.on) hvor = I.place === K.fest?.place ? 'Her er det. Nisserne sidder ved bordene.' : 'Tag elevatoren op til restauranten.';
+      if (tilT && I.on) hvor = I.place === K.fest?.place ? (K.fest.mandel && S.grod <= S.mandelI ? 'Find mandlen i grøden på det runde bord.' : 'Her er det. Nisserne sidder ved bordene.') : 'Tag elevatoren op til restauranten.';
       else if (S.vej && mål && !I.on && !FX.tower?.on) {
         const v = MYBOAT.on ? null : M_.vej(P.pos.x, P.pos.z, mål), aim = v ? v.sigte : mål, lige = Math.hypot(mål[0] - P.pos.x, mål[1] - P.pos.z), len = v ? v.len : lige;
         if (lige > 5) pil = Math.atan2(aim[0] - P.pos.x, aim[1] - P.pos.z) - (cam.yaw + Math.PI);
@@ -9795,9 +9795,49 @@ const KALENDER = (() => {
     const face = (p.face || 0) * Math.PI / 180;
     FEST.push({ id, ns, p, f, ting, face, yaw: face });
   }
+  // the porridge with the almond: three bowls on a small round table in the middle of the restaurant
+  const MD = K.fest?.mandel, mandel = MD ? (() => {
+    const g = new THREE.Group(), [x, z] = MD.at, hvid = new THREE.MeshStandardMaterial({ color: '#f4efe4', roughness: 0.6 }), grod = new THREE.MeshStandardMaterial({ color: '#efe1bd', roughness: 0.9 }), trae = new THREE.MeshStandardMaterial({ color: '#5a3b22', roughness: 0.8 }), jern = new THREE.MeshStandardMaterial({ color: '#2f3134', roughness: 0.5, metalness: 0.5 });
+    const plade = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.05, 24), trae); plade.position.y = 0.76; g.add(plade);
+    const ben = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.2, 0.74, 10), trae); ben.position.y = 0.37; g.add(ben);
+    const gryde = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.17, 0.22, 16), jern); gryde.position.set(0, 0.9, -0.22); g.add(gryde);
+    const skaale = [-0.36, 0, 0.36].map(dx => {
+      const sk = new THREE.Group(); sk.position.set(dx, 0.79, 0.24); g.add(sk);
+      const kop = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.08, 0.08, 16), hvid); kop.position.y = 0.04; sk.add(kop);
+      const fyld = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.01, 16), grod); fyld.position.y = 0.075; sk.add(fyld);
+      const smoer = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), new THREE.MeshStandardMaterial({ color: '#f2c94c', roughness: 0.4 })); smoer.position.y = 0.085; sk.add(smoer);
+      return { sk, fyld, smoer };
+    });
+    const gris = new THREE.Group(), pink = new THREE.MeshStandardMaterial({ color: '#f2b8c0', roughness: 0.7 });
+    const krop = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 10), pink); krop.scale.set(1.4, 1, 1); krop.position.y = 0.1; gris.add(krop);
+    const hoved = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), pink); hoved.position.set(0.14, 0.14, 0); gris.add(hoved);
+    gris.position.set(0, 0.79, 0.02); gris.visible = false; g.add(gris);
+    const damp = [0, 1, 2].map(i => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffffff', transparent: true, opacity: 0, depthWrite: false })); g.add(sp); return { sp, t: i / 3 }; });
+    g.position.set(x, 0, z); g.visible = false; inde.add(g);
+    return { g, skaale, gris, damp, klods: false };
+  })() : null;
+  function grodSkaal() {   // she takes the next bowl; the almond is in the bowl number S.mandelI
+    if (S.grod > S.mandelI) return GAADE.scene({ eyebrow: K.fest.overskrift, title: MD.gave.navn, billede: billede({ ting: MD.gave }), lines: MD.igen });
+    const nr = S.grod; S.grod++; gem(); bjaelder();
+    if (nr < S.mandelI) { tone(330, 260, 0, 0.1, 0.04); return GAADE.scene({ eyebrow: K.fest.overskrift, title: 'Skål ' + (nr + 1), lines: MD.forbi[Math.min(nr, MD.forbi.length - 1)] }); }
+    chime([523, 659, 784, 1047, 1319], 0.05);
+    const p = mandel.g.getWorldPosition(new THREE.Vector3()); gnist(p.x, p.y + 1, p.z, 0, 1, 60);
+    GAADE.scene({ eyebrow: K.fest.overskrift, title: MD.gave.navn, billede: billede({ ting: MD.gave }, 'ny'), lines: MD.fundet });
+  }
+  function mandelFrame(dt, vis) {
+    if (!mandel) return; mandel.g.visible = vis; if (!vis) return;
+    if (!mandel.klods) { mandel.klods = true; const [x, z] = MD.at; I.obstacles.push([x - 0.65, x + 0.65, z - 0.65, z + 0.65]); }
+    mandel.g.position.y = I.height(MD.at[0], MD.at[1]);
+    const spist = Math.min(S.grod, 3), fundet = S.grod > S.mandelI;
+    mandel.skaale.forEach((b, i) => { b.fyld.visible = b.smoer.visible = i >= spist; });
+    mandel.gris.visible = fundet;
+    for (const d of mandel.damp) { d.t = (d.t + dt * 0.3) % 1; d.sp.position.set(Math.sin(d.t * 6 + tid) * 0.05, 1.05 + d.t * 0.8, -0.22); d.sp.scale.setScalar(0.22 + d.t * 0.45); d.sp.material.opacity = 0.3 * Math.sin(d.t * Math.PI); }
+    if (!paused && Math.hypot(P.pos.x - I.x - MD.at[0], P.pos.z - MD.at[1]) < 2) offerAction({ id: 'kal-mandel', label: fundet ? 'Se mandelgaven' : MD.knap, prio: 11, run: grodSkaal });
+  }
   function festFrame(dt) {
     const vis = started && faerdig(S) && I.on && I.place === K.fest?.place;
     if (vis) festSet = true;
+    mandelFrame(dt, vis);
     for (const n of FEST) {
       n.f.root.visible = n.ting.visible = vis; if (!vis) continue;
       const [ax, az] = n.p.at, gy = I.height(ax, az) + (n.p.dy || 0);
@@ -9888,7 +9928,7 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, FEST, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
   const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && faerdig(S), hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;

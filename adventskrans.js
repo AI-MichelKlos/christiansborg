@@ -77,6 +77,37 @@ export const KALENDER = {
     vej: "Gå til Kongeporten på Slotspladsen, gå ind, og tag elevatoren op til restauranten.",
     sekunder: 75,
     morgen: "Fyrværkeriet er slut, og det bliver lyst over en hvid Slotsholm. Glædelig jul.",
+    // grøden med mandlen: tre skåle på et lille bord midt i restauranten. Mandlen ligger i en tilfældig skål.
+    mandel: {
+      at: [440, 3.2],
+      knap: "Tag en skål grød",
+      forbi: [
+        [["fortaeller", "Grøden er varm og god. Der er ingen mandel."], ["Pind", "Det var forventet. Chancen var en ud af tre. Nu er den en ud af to."]],
+        [["fortaeller", "Heller ingen mandel i den skål."], ["Elna", "Jeg har stemplet skålen som tom. Så er det på plads."]],
+      ],
+      fundet: [
+        ["fortaeller", "Der er noget hårdt i grøden. Det er mandlen."],
+        ["Anker", "Så er det dig, der får mandelgaven. Elna har allerede stemplet den."],
+        ["Bilag", "Jeg foreslog at dele mandlen i seks lige store stykker. Det blev ikke vedtaget."],
+      ],
+      igen: [["Anker", "Mandlen er fundet. Resten af grøden er bare grød. Der er nok til alle."]],
+      gave: {
+        navn: "Mandelgaven",
+        billede: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="240" height="240">
+  <ellipse cx="60" cy="104" rx="40" ry="7" fill="#e6dfcc" ${S}/>
+  <path d="M38 88v12M50 90v12M70 90v12M82 88v12" ${S}/>
+  <ellipse cx="60" cy="74" rx="34" ry="22" fill="#f2b8c0" ${S}/>
+  <circle cx="90" cy="62" r="16" fill="#f2b8c0" ${S}/>
+  <path d="M84 48l2-10 8 8z" fill="#e89aa6" ${S}/>
+  <ellipse cx="102" cy="66" rx="6" ry="5" fill="#e89aa6" ${S}/>
+  <circle cx="92" cy="58" r="1.8" fill="#2a2118"/>
+  <path d="M26 70q-8-4-4-10" fill="none" ${S}/>
+  <path d="M70 56l-6-6 0 12z M70 56l6-6 0 12z" fill="#b3262a" ${S}/>
+  <g transform="rotate(-10 52 77)"><rect x="32" y="70" width="40" height="13" rx="2" fill="#f2b8c0" stroke="#2f5d8a" stroke-width="2.2"/>
+  <text x="52" y="79.6" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="6.6" letter-spacing="0.3" fill="#2f5d8a">GODKENDT</text></g>
+</svg>`,
+      },
+    },
     nisser: {
       pind: { at: [433.2, -6.2], face: 0, dy: 0.76, replik: "Jeg har regnet på det. Fire lys koster mindre end en evaluering af, om vi skal have fire lys. Det skriver jeg et notat om." },
       hov: { at: [433.2, 0.8], face: 0, dy: 0.76, replik: "Mit lys lå i havrekassen hele ugen. Hestene lod det være. De ved godt, hvad der er vigtigt." },
