@@ -590,6 +590,7 @@ document.documentElement.dataset.tema = new URLSearchParams(location.search).get
 const KAL = SP.type === 'kalender';   // a calendar edition: the murder mystery is switched off and the doors are switched on
 const KALDATA = KAL ? (await import(SP.fil)).KALENDER : null;
 const TEGNINGER = KAL ? (await import('./tegninger.js')).TEGNINGER : {};   // the drawings of what lies behind the doors
+const EPISODER = KAL ? (await import('./episoder.js')).episoder : null;   // small Christmas scenes along the ways (episoder.js)
 const { MANUS } = await import(KAL ? './mordgaade.js' : SP.fil);   // the whole story: people, places, things, clues and the reveal
 
 const $ = id => document.getElementById(id);
@@ -9705,6 +9706,11 @@ const KALENDER = (() => {
     m.needsUpdate = true;
   }
   for (const g of [world, dyn]) g.traverse(o => { if (o.material) for (const m of Array.isArray(o.material) ? o.material : [o.material]) sneMat(m); });
+  // small Christmas scenes along the ways (episoder.js): shown and moving only outdoors and near Ida
+  const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch }) : { gruppe: new THREE.Group(), update() {} };
+  EPI.gruppe.traverse(o => { if (o.material) sneMat(o.material); });
+  HOOKS.frame.push((dt, t) => EPI.update(dt, t, P.pos, ude()));
+  if (TESTMODE) window.__epi = EPI;
   // The light follows the four Sundays: dusk at the first door, dark evening by the second Sunday, night from the third,
   // and when the last door is open the morning comes. 0 is daylight and 1 is dark.
   const lysNu = () => { const G = started ? S : gemt || S, a = frem(G); return faerdig(G) ? (G.morgen ? 0.04 : 1) : a >= 12 ? 1 : 0.55 + 0.45 * a / 12; };   // after the last door the night lasts until the fireworks are over
