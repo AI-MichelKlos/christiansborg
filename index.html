@@ -9436,17 +9436,60 @@ const KALENDER = (() => {
 
   // ---- the nisser inside the big doors
   const inde = new THREE.Group(); inde.userData.keep = true; I.group.add(inde);
+  function nisseLiv(f, dist) {   // the nisser are never quite still: they rock a little, shift their weight and nod when Ida is near
+    const t = (f.presence?.time || 0) + (f.presence?.phase || 0) * 3, naer = dist < 3.5;
+    f.g.rotation.z = Math.sin(t * 1.2) * 0.04; f.g.rotation.x = Math.sin(t * 0.8) * 0.02 + (naer ? 0.03 : 0);
+    f.g.position.y = Math.abs(Math.sin(t * 2.4)) * 0.012;
+    f.head.rotation.y = Math.sin(t * 0.55) * 0.25 * (naer ? 0.3 : 1);
+    if (naer && f.arms?.[0] && f.presence?.arms?.[0]?.free) { const v = Math.max(0, Math.sin(t * 0.9)); f.arms[0].rotation.x = -v * 2.4; f.arms[0].rotation.z = -0.1 - Math.sin(t * 8) * 0.25 * v; }   // a wave with the left hand
+  }
   function nisseFigur(n) {
-    return PERSONER.figur({ coat: n.toej || '#6f7780', trousers: nuance(n.toej || '#6f7780', -0.1), shoes: '#3a2a1e', hair: '#f1eee6', bryn: '#d8d4ca', skin: '#f0c9ab', scale: 0.6, ingenKrave: true,
-      extra: (g, head, part, m) => {
-        const hue = part(new THREE.ConeGeometry(0.17, 0.42, 14), m(n.hue || '#a8252b'), head, 0, 0.26, -0.02); hue.rotation.x = -0.18;
-        part(new THREE.SphereGeometry(0.045, 10, 8), m('#f4f1ea'), head, 0, 0.46, -0.07);
-        if (!n.pige) part(new THREE.SphereGeometry(0.13, 12, 10), m('#f1eee6'), head, 0, -0.12, 0.07).scale.set(1, 1.15, 0.7);   // the beard
-        else for (const sx of [-1, 1]) {   // the girls get two braids instead of a beard
-          part(new THREE.SphereGeometry(0.06, 10, 8), m('#c9a46a'), head, sx * 0.15, -0.12, 0.0).scale.set(1, 2.2, 1);
-          part(new THREE.SphereGeometry(0.035, 8, 6), m('#b3262a'), head, sx * 0.15, -0.3, 0.0);
+    const hueF = n.hue || '#a8252b', pels = '#f4f1ea';
+    return PERSONER.figur({ coat: n.toej || '#6f7780', trousers: n.bukser || nuance(n.toej || '#6f7780', -0.1), shoes: '#2a1d14', hair: n.pige ? (n.haar || '#c9a46a') : '#f1eee6', hairStyle: n.pige ? 'bob' : 'kort', bryn: n.pige ? nuance(n.haar || '#c9a46a', -0.15) : '#e4e0d6', skin: '#f0c9ab', scale: 0.6, ingenKrave: true,
+      extra: (g, head, part, m, foran) => {
+        // the cap: a fur brim, a soft cone that flops to the side, and a pom-pom at the tip
+        const brem = part(new THREE.TorusGeometry(0.15, 0.04, 8, 20), m(pels), head, 0, 0.075, -0.01); brem.rotation.x = Math.PI / 2 - 0.12;
+        const hue = new THREE.Group(); hue.position.set(0, 0.09, -0.02); hue.rotation.x = -0.12; head.add(hue);
+        part(new THREE.ConeGeometry(0.16, 0.24, 16, 1, true), m(hueF), hue, 0, 0.12, 0);
+        const top = new THREE.Group(); top.position.set(0, 0.22, 0); top.rotation.set(-0.5, 0, 0.75); hue.add(top);
+        part(new THREE.ConeGeometry(0.075, 0.26, 12), m(hueF), top, 0, 0.11, 0);
+        part(new THREE.SphereGeometry(0.055, 10, 8), m(pels), top, 0, 0.25, 0);
+        // the face: a round nose and red cheeks
+        part(new THREE.SphereGeometry(0.035, 10, 8), m('#e8a08a'), head, 0, -0.005, 0.15);
+        for (const sx of [-1, 1]) part(new THREE.SphereGeometry(0.035, 8, 6), m('#ef9a92'), head, sx * 0.075, -0.02, 0.115).scale.set(1, 0.7, 0.4);
+        if (!n.pige) {   // a full beard in three tufts and a moustache
+          part(new THREE.SphereGeometry(0.13, 12, 10), m('#f4f1ea'), head, 0, -0.13, 0.06).scale.set(1.05, 1.2, 0.72);
+          for (const sx of [-1, 1]) part(new THREE.SphereGeometry(0.08, 10, 8), m('#eceae2'), head, sx * 0.08, -0.1, 0.07).scale.set(1, 1.1, 0.75);
+          part(new THREE.SphereGeometry(0.06, 10, 8), m('#f4f1ea'), head, 0, -0.27, 0.075).scale.set(1, 1.3, 0.7);
+          for (const sx of [-1, 1]) { const ms = part(new THREE.SphereGeometry(0.045, 10, 8), m('#ffffff'), head, sx * 0.042, -0.045, 0.14); ms.scale.set(1.3, 0.55, 0.6); ms.rotation.z = sx * 0.35; }
+        } else for (const sx of [-1, 1]) {   // the girls get two braids instead of a beard
+          for (let k = 0; k < 3; k++) part(new THREE.SphereGeometry(0.042 - k * 0.004, 10, 8), m(n.haar || '#c9a46a'), head, sx * (0.145 + k * 0.01), -0.08 - k * 0.075, -0.02 + k * 0.01).scale.set(1, 1.25, 1);
+          part(new THREE.SphereGeometry(0.03, 8, 6), m('#b3262a'), head, sx * 0.17, -0.3, 0.0).scale.set(1.4, 0.8, 1);
         }
-      } });
+        // a belt with a brass buckle
+        part(new THREE.CylinderGeometry(0.205, 0.205, 0.06, 20, 1, true), m('#3a2618'), g, 0, 1.08, 0).scale.set(1, 1, 0.92);
+        part(new THREE.BoxGeometry(0.08, 0.07, 0.02), m('#d9b25a'), g, 0, 1.08, foran(1.08) + 0.02);
+        if (n.forklaede) {   // the cook's apron: a bib, a skirt with a red edge and a pocket
+          part(new THREE.BoxGeometry(0.22, 0.24, 0.015), m(n.forklaede), g, 0, 1.3, foran(1.3) + 0.012).rotation.x = -0.12;
+          const sk = part(new THREE.CylinderGeometry(0.215, 0.26, 0.42, 20, 1, true, -0.95, 1.9), m(n.forklaede), g, 0, 0.86, 0); sk.scale.set(1, 1, 0.95);
+          part(new THREE.CylinderGeometry(0.262, 0.262, 0.035, 20, 1, true, -0.95, 1.9), m('#b3262a'), g, 0, 0.665, 0).scale.set(1, 1, 0.95);
+          part(new THREE.BoxGeometry(0.11, 0.08, 0.012), m('#e6e0d2'), g, 0.05, 0.86, 0.255);
+          for (const sx of [-1, 1]) part(new THREE.CylinderGeometry(0.012, 0.012, 0.2, 6), m(n.forklaede), g, sx * 0.1, 1.5, foran(1.5) - 0.01).rotation.z = sx * 0.35;
+        }
+      },
+      arm: n.slev ? [null, (sh, part, m, el) => {   // Anker holds up his big wooden ladle
+        sh.rotation.x = -0.35; el.rotation.x = -1.25;
+        const h = new THREE.Group(); h.position.set(0, -0.3, 0.02); h.rotation.x = 1.6; el.add(h);
+        const trae = m('#a0703f');
+        part(new THREE.CylinderGeometry(0.016, 0.02, 0.62, 8), trae, h, 0, 0.2, 0);
+        const sk = part(new THREE.SphereGeometry(0.085, 14, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), trae, h, 0, 0.53, 0.05); sk.rotation.x = -1.2;
+      }] : n.hoetyv ? [null, (sh, part, m, el) => {   // Gerda leans on her pitchfork
+        sh.rotation.x = -0.25; el.rotation.x = -0.55;
+        const h = new THREE.Group(); h.position.set(0, -0.3, 0.03); h.rotation.x = 0.8; el.add(h);
+        part(new THREE.CylinderGeometry(0.017, 0.017, 1.7, 8), m('#9a6a3a'), h, 0, -0.1, 0);
+        part(new THREE.BoxGeometry(0.2, 0.03, 0.03), m('#5a5c60'), h, 0, 0.75, 0);
+        for (const tx of [-0.09, -0.03, 0.03, 0.09]) part(new THREE.CylinderGeometry(0.008, 0.004, 0.24, 5), m('#6a6c70'), h, tx, 0.88, 0);
+      }] : undefined });
   }
   // ---- Bilag on the lookout: he stands near the next door with his clipboard and counts. When Ida comes close he hurries off.
   const LUR = KR && K.nisser.bilag ? (() => {
@@ -9490,6 +9533,14 @@ const KALENDER = (() => {
     f.root.visible = false; inde.add(f.root);
     const ting = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, opacity: 0, depthWrite: false })); tingTex(l, ting.material);   // what he has for Ida lies beside him
     ting.scale.setScalar(0.5); ting.visible = false; inde.add(ting);
+    if (l.inde.balle) {   // a bale of straw to stand on
+      const [bx, bz] = l.inde.at, hb = l.inde.dy || 0.5, bg = new THREE.Group(), straa = new THREE.MeshStandardMaterial({ color: '#d9b45a', roughness: 1 }), baand = new THREE.MeshStandardMaterial({ color: '#8a6a3a', roughness: 1 });
+      const kasse = new THREE.Mesh(new THREE.BoxGeometry(1.0, hb, 0.62), straa); kasse.position.y = hb / 2; bg.add(kasse);
+      for (const dx of [-0.25, 0.25]) { const b_ = new THREE.Mesh(new THREE.BoxGeometry(0.03, hb + 0.01, 0.63), baand); b_.position.set(dx, hb / 2, 0); bg.add(b_); }
+      for (let i = 0; i < 7; i++) { const st = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.012, 0.012), straa); st.position.set(-0.45 + i * 0.15, hb + 0.005, (i % 3 - 1) * 0.2); st.rotation.y = i * 1.3; bg.add(st); }
+      bg.position.set(bx, 0, bz); bg.rotation.y = face; bg.userData.hoejde = true; inde.add(bg); l._balle = bg;
+      I.obstacles.push([bx - 0.55, bx + 0.55, bz - 0.55, bz + 0.55]);
+    }
     NISSER.push({ l, f, face, yaw: face, ting, skab: l.inde.skab ? grydeskab(l.inde.skab) : null });
   }
   function grydeskab(sk) {   // a low cupboard with a pot of steaming porridge on top; Ida opens it herself
@@ -9954,7 +10005,7 @@ const KALENDER = (() => {
       const [ax, az] = n.p.at, gy = I.height(ax, az) + (n.p.dy || 0);
       n.f.root.position.set(ax, gy, az); n.ting.position.set(ax + 0.55, gy + 0.27, az + 0.2);
       const dist = Math.hypot(P.pos.x - I.x - ax, P.pos.z - az), want = dist < 6 ? Math.atan2(P.pos.x - I.x - ax, P.pos.z - az) : n.face;
-      if (!paused) { n.yaw += angDiff(want, n.yaw) * (1 - Math.exp(-dt * 2)); n.f.root.rotation.y = n.yaw; if (typeof animatePresence === 'function') animatePresence(n.f, dt, dist < 3.5); }
+      if (!paused) { n.yaw += angDiff(want, n.yaw) * (1 - Math.exp(-dt * 2)); n.f.root.rotation.y = n.yaw; if (typeof animatePresence === 'function') animatePresence(n.f, dt, dist < 3.5); nisseLiv(n.f, dist); }
       if (dist < 2.6 && !paused) offerAction({ id: 'kal-fest-' + n.id, label: 'Tal med ' + (n.ns.kort || n.ns.navn), prio: 9, run: () => GAADE.scene({ eyebrow: K.fest.overskrift || 'Juleaften i Tårnet', title: n.ns.navn, lines: [[n.ns.kort || n.ns.navn, n.p.replik]] }) });
     }
   }
@@ -10012,9 +10063,10 @@ const KALENDER = (() => {
       if (!klar) continue;
       const [ax, az] = n.l.inde.at, gy = I.height(ax, az) + (n.l.inde.dy || 0), [tx, tz] = n.l.inde.ting || [ax + 0.6, az];
       n.f.root.position.set(ax, gy, az); n.ting.position.set(tx, gy + 0.27 + Math.sin(tid * 2) * 0.02, tz);
+      if (n.l._balle) n.l._balle.position.y = I.height(ax, az);
       if (!her) continue;
       const dist = Math.hypot(P.pos.x - I.x - ax, P.pos.z - az), want = dist < 6 ? Math.atan2(P.pos.x - I.x - ax, P.pos.z - az) : n.face;
-      if (!paused) { n.yaw += angDiff(want, n.yaw) * (1 - Math.exp(-dt * 2)); n.f.root.rotation.y = n.yaw; if (typeof animatePresence === 'function') animatePresence(n.f, dt, dist < 3.5); }
+      if (!paused) { n.yaw += angDiff(want, n.yaw) * (1 - Math.exp(-dt * 2)); n.f.root.rotation.y = n.yaw; if (typeof animatePresence === 'function') animatePresence(n.f, dt, dist < 3.5); nisseLiv(n.f, dist); }
       if (dist < 2.6 && !paused) {
         const ns = K.nisser[n.l.nisse];
         if (S.aabnet.includes(n.l.nr)) offerAction({ id: 'kal-nisse', label: 'Tal med ' + (ns.kort || ns.navn), prio: 9, run: () => igen(n.l) });

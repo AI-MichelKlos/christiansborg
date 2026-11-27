@@ -122,8 +122,8 @@ export const KALENDER = {
     bilag: { navn: "Bilag", kort: "Bilag", rolle: "Nisse i Effektiviseringsstyrelsen. Den yngste nisse på Christiansborg", hue: "#59636d", toej: "#2b2f36" },
     kendelse: { navn: "Dommer Thyra", kort: "Thyra", pige: true, rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for hun har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
     stempel: { navn: "Sekretær Elna", kort: "Elna", pige: true, rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før hun har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
-    slev: { navn: "Køkkenmester Anker", kort: "Anker", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
-    hov: { navn: "Staldmester Gerda", kort: "Gerda", pige: true, rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
+    slev: { navn: "Køkkenmester Anker", kort: "Anker", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#c22a2f", toej: "#8e1f24", bukser: "#3a2a20", forklaede: "#f4f1ea", slev: true },
+    hov: { navn: "Staldmester Gerda", kort: "Gerda", pige: true, hoetyv: true, haar: "#b8743a", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
     pind: { navn: "Kontorchef Pind", kort: "Pind", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
   },
 
@@ -131,7 +131,7 @@ export const KALENDER = {
     {
       nr: 1, type: "stor", navn: "Lyset i grydeskabet",
       indgang: "folketing", nisse: "slev",
-      inde: { place: "folketing", at: [-17.6, 25.5], face: 90, dy: 0.83, ting: [-17.0, 24.7],   // han står på bordet lige inden for døren
+      inde: { place: "folketing", at: [-17.5, 24.75], face: 90, dy: 0.83, ting: [-16.95, 24.6],   // han står på bordet lige inden for døren
         // Efter samtalen skal Ida selv åbne grydeskabet ved kaffedisken
         skab: { at: [-21.8, 31.35], knap: "Åbn grydeskabet", hvor: "Grydeskabet ved kaffedisken",
           fund: [
@@ -159,7 +159,7 @@ export const KALENDER = {
     {
       nr: 2, type: "stor", navn: "Lyset i havrekassen",
       indgang: "stables", nisse: "hov",
-      inde: { place: "stables", at: [302.6, -13.6], face: 300, dy: 1.22 },
+      inde: { place: "stables", at: [302.6, -13.6], face: 300, dy: 0.5, balle: true, ting: [302.78, -13.3] },   // hun står på en halmballe
       praj: "De Kongelige Stalde ved Ridebanen. Gå ind ad den åbne staldport.",
       bag: [
         ["fortaeller", "Der lugter af hø og varm hest. Inde mellem marmorsøjlerne er der en, der nynner."],
