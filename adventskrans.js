@@ -37,7 +37,7 @@ export const KALENDER = {
     replikker: [
       ["fortaeller", "Det sner over Slotsholmen. På Højbro Plads står kontorchef S. Pind fra Finansministeriet og venter på Ida."],
       ["Pind", "Adventskransen i Rigsdagsgården er blevet effektiviseret. Bilag fra Effektiviseringsstyrelsen har fjernet de fire lys."],
-      ["Pind", "Heldigvis nåede fire nisser at redde hver sit. Find dem, og tænd lysene på kransen. Begynd hos Slev i køkkenet i Folketinget."],
+      ["Pind", "Heldigvis nåede fire nisser at redde hver sit. Find dem, og tænd lysene på kransen. Begynd hos Anker i køkkenet i Folketinget."],
     ],
   },
 
@@ -91,7 +91,7 @@ export const KALENDER = {
     bilag: { navn: "Bilag", kort: "Bilag", rolle: "Nisse i Effektiviseringsstyrelsen. Den yngste nisse på Christiansborg", hue: "#59636d", toej: "#2b2f36" },
     kendelse: { navn: "Dommer Kendelse", kort: "Kendelse", rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for han har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
     stempel: { navn: "Sekretær Stempel", kort: "Stempel", rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før han har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
-    slev: { navn: "Køkkenmester Slev", kort: "Slev", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
+    slev: { navn: "Køkkenmester Anker", kort: "Anker", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
     hov: { navn: "Staldmester Hov", kort: "Hov", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
     pind: { navn: "Kontorchef Pind", kort: "Pind", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
   },
@@ -107,13 +107,13 @@ export const KALENDER = {
       ],
       gaade: {
         foer: [
-          ["Slev", "Goddag. Du er hende, Pind har sendt. Bilag var her i går. Han ville skære grøden ned til en halv skål om dagen og kalde det et omprioriteringsbidrag."],
+          ["Anker", "Goddag. Du er hende, Pind har sendt. Bilag var her i går. Han ville skære grøden ned til en halv skål om dagen og kalde det et omprioriteringsbidrag."],
           ["ida", "Har du et af lysene?"],
-          ["Slev", "Jeg gemte det i grydeskabet. Der kigger ingen fra Effektiviseringsstyrelsen. De har aldrig været i et køkken."],
+          ["Anker", "Jeg gemte det i grydeskabet. Der kigger ingen fra Effektiviseringsstyrelsen. De har aldrig været i et køkken."],
         ],
         efter: [
-          ["Slev", "Her. Det lugter lidt af kanel. Tænd det på kransen ude ved trappen."],
-          ["Slev", "Det næste lys har Hov i De Kongelige Stalde ved Ridebanen. Han har gemt det et sted, hvor hestene passer på det."],
+          ["Anker", "Her. Det lugter lidt af kanel. Tænd det på kransen ude ved trappen."],
+          ["Anker", "Det næste lys har Hov i De Kongelige Stalde ved Ridebanen. Han har gemt det et sted, hvor hestene passer på det."],
         ],
       },
       ting: { navn: "Det første lys", billede: lys(1, `<path d="M18 98l30-14" stroke="#7a4a26" stroke-width="7" stroke-linecap="round"/><path d="M22 96l26-12" stroke="#a8693a" stroke-width="2" stroke-linecap="round"/>`) },
