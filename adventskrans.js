@@ -35,8 +35,8 @@ export const KALENDER = {
     eyebrow: "En aften i december",
     titel: "En krans uden lys",
     replikker: [
-      ["fortaeller", "Det sner over Slotsholmen. På Højbro Plads står kontorchef Pind fra Finansministeriet og venter på Ida."],
-      ["Pind", "Adventskransen i Rigsdagsgården er blevet effektiviseret. Bilag fra Effektiviseringsenheden har fjernet de fire lys."],
+      ["fortaeller", "Det sner over Slotsholmen. På Højbro Plads står kontorchef S. Pind fra Finansministeriet og venter på Ida."],
+      ["Pind", "Adventskransen i Rigsdagsgården er blevet effektiviseret. Bilag fra Effektiviseringsstyrelsen har fjernet de fire lys."],
       ["Pind", "Heldigvis nåede fire nisser at redde hver sit. Find dem, og tænd lysene på kransen. Begynd hos Slev i køkkenet i Folketinget."],
     ],
   },
@@ -88,7 +88,7 @@ export const KALENDER = {
   },
 
   nisser: {
-    bilag: { navn: "Bilag", kort: "Bilag", rolle: "Nisse i Effektiviseringsenheden. Den yngste nisse på Christiansborg", hue: "#59636d", toej: "#2b2f36" },
+    bilag: { navn: "Bilag", kort: "Bilag", rolle: "Nisse i Effektiviseringsstyrelsen. Den yngste nisse på Christiansborg", hue: "#59636d", toej: "#2b2f36" },
     kendelse: { navn: "Dommer Kendelse", kort: "Kendelse", rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for han har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
     stempel: { navn: "Sekretær Stempel", kort: "Stempel", rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før han har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
     slev: { navn: "Køkkenmester Slev", kort: "Slev", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
@@ -109,7 +109,7 @@ export const KALENDER = {
         foer: [
           ["Slev", "Goddag. Du er hende, Pind har sendt. Bilag var her i går. Han ville skære grøden ned til en halv skål om dagen og kalde det et omprioriteringsbidrag."],
           ["ida", "Har du et af lysene?"],
-          ["Slev", "Jeg gemte det i grydeskabet. Der kigger ingen fra Effektiviseringsenheden. De har aldrig været i et køkken."],
+          ["Slev", "Jeg gemte det i grydeskabet. Der kigger ingen fra Effektiviseringsstyrelsen. De har aldrig været i et køkken."],
         ],
         efter: [
           ["Slev", "Her. Det lugter lidt af kanel. Tænd det på kransen ude ved trappen."],
