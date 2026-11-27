@@ -100,7 +100,14 @@ export const KALENDER = {
     {
       nr: 1, type: "stor", navn: "Lyset i grydeskabet",
       indgang: "folketing", nisse: "slev",
-      inde: { place: "folketing", at: [-17.6, 25.5], face: 90, dy: 0.83, ting: [-17.0, 24.7] },   // han står på bordet lige inden for døren
+      inde: { place: "folketing", at: [-17.6, 25.5], face: 90, dy: 0.83, ting: [-17.0, 24.7],   // han står på bordet lige inden for døren
+        // Efter samtalen skal Ida selv åbne grydeskabet ved kaffedisken
+        skab: { at: [-21.8, 31.35], knap: "Åbn grydeskabet", hvor: "Grydeskabet ved kaffedisken",
+          fund: [
+            ["fortaeller", "Bag lågen står tre gryder, en suppeske og et rødt lys med tallet 1. Det lugter af kanel."],
+            ["Anker", "Der kan du se. Tænd det på kransen ude ved trappen."],
+            ["Anker", "Det næste lys har Gerda i De Kongelige Stalde ved Ridebanen. Hun har gemt det et sted, hvor hestene passer på det."],
+          ] } },
       praj: "Folketinget i Rigsdagsgården. Gå op ad den store trappe, og find Snapstinget til venstre for indgangen.",
       bag: [
         ["fortaeller", "Der er mørkt i huset, men fra Snapstinget kommer der lys og en lugt af kanel."],
@@ -112,9 +119,9 @@ export const KALENDER = {
           ["Anker", "Jeg gemte det i grydeskabet. Der kigger ingen fra Effektiviseringsstyrelsen. De har aldrig været i et køkken."],
         ],
         efter: [
-          ["Anker", "Her. Det lugter lidt af kanel. Tænd det på kransen ude ved trappen."],
-          ["Anker", "Det næste lys har Gerda i De Kongelige Stalde ved Ridebanen. Hun har gemt det et sted, hvor hestene passer på det."],
+          ["Anker", "Grydeskabet står ved kaffedisken. Åbn det selv. Jeg har lovet Effektiviseringsstyrelsen ikke at løfte mere end højst nødvendigt."],
         ],
+        knap: "Hvor er grydeskabet?",
       },
       ting: { navn: "Det første lys", billede: lys(1, `<path d="M18 98l30-14" stroke="#7a4a26" stroke-width="7" stroke-linecap="round"/><path d="M22 96l26-12" stroke="#a8693a" stroke-width="2" stroke-linecap="round"/>`) },
     },

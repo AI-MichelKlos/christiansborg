@@ -9119,7 +9119,7 @@ const KALENDER = (() => {
   const L = Object.fromEntries(K.laager.map(l => [l.nr, l]));
   const sidste = Math.max(...K.laager.map(l => l.nr));   // the last door that has been written
   const soendag = nr => Math.ceil(nr / 6);
-  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], taendt: [], vej: KR, pos: null, face: 0, morgen: false });
+  const ny = () => ({ v: 1, id: K.id, aabnet: [], klem: [], taendt: [], vink: [], vej: KR, pos: null, face: 0, morgen: false });
   // How far the story has come, counted as doors of 24: the weather, the light and the tree follow it. In the wreath game
   // each candle lit counts as a Sunday. faerdig: the end has come (all doors open, or all candles lit).
   const frem = G => KR ? G.taendt.length * 24 / N : G.aabnet.length;
@@ -9378,7 +9378,33 @@ const KALENDER = (() => {
     f.root.visible = false; inde.add(f.root);
     const ting = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, opacity: 0, depthWrite: false })); tingTex(l, ting.material);   // what he has for Ida lies beside him
     ting.scale.setScalar(0.5); ting.visible = false; inde.add(ting);
-    NISSER.push({ l, f, face, yaw: face, ting });
+    NISSER.push({ l, f, face, yaw: face, ting, skab: l.inde.skab ? grydeskab(l.inde.skab) : null });
+  }
+  function grydeskab(sk) {   // a low cupboard with a pot of steaming porridge on top; Ida opens it herself
+    const g = new THREE.Group(), [x, z] = sk.at, trae = new THREE.MeshStandardMaterial({ color: '#6b4426', roughness: 0.8 }), lys = new THREE.MeshStandardMaterial({ color: '#8a5a33', roughness: 0.7 }), jern = new THREE.MeshStandardMaterial({ color: '#2f3134', roughness: 0.5, metalness: 0.5 });
+    const kasse = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.9, 0.55), trae); kasse.position.y = 0.45; g.add(kasse);
+    const top = new THREE.Mesh(new THREE.BoxGeometry(1.02, 0.05, 0.6), lys); top.position.y = 0.92; g.add(top);
+    const inde_ = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.78, 0.02), new THREE.MeshBasicMaterial({ color: '#1d130b' })); inde_.position.set(0, 0.46, -0.285); g.add(inde_);
+    const laager = [-1, 1].map(side => {   // two doors hinged at the outer edges, facing the room (-z)
+      const h = new THREE.Group(); h.position.set(side * 0.46, 0, -0.29); g.add(h);
+      const d = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.8, 0.035), lys); d.position.set(-side * 0.225, 0.46, 0); h.add(d);
+      const k = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 6), jern); k.position.set(-side * 0.4, 0.5, -0.03); h.add(k);
+      return { h, side };
+    });
+    const gryde = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.18, 0.24, 16), jern); gryde.position.set(0.12, 1.07, 0); g.add(gryde);
+    const laag = new THREE.Mesh(new THREE.CylinderGeometry(0.23, 0.23, 0.025, 16), jern); laag.position.set(0.12, 1.2, 0); laag.rotation.z = 0.12; g.add(laag);
+    const damp = [0, 1, 2, 3].map(i => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffffff', transparent: true, opacity: 0, depthWrite: false })); g.add(sp); return { sp, t: i / 4 }; });
+    const glimt = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffd98a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    glimt.position.set(0, 0.5, -0.4); glimt.scale.setScalar(1.8); g.add(glimt);
+    g.position.set(x, 0, z); g.rotation.y = 0; inde.add(g);
+    I.obstacles.push([x - 0.5, x + 0.5, z - 0.3, z + 0.3]);
+    return { g, sk, laager, damp, glimt, aaben: 0, aabner: false };
+  }
+  function aabnSkab(n) {   // the doors swing open, sparks, and then the light flies up
+    const sb = n.skab, l = n.l; if (sb.aabner) return; sb.aabner = true; bjaelder(); tone(240, 180, 0, 0.12, 0.05);
+    const p = sb.g.getWorldPosition(new THREE.Vector3());
+    setTimeout(() => { gnist(p.x, p.y + 0.5, p.z - 0.4, 0, -1, 50); chime([523, 659, 784, 1047], 0.045); }, 350);
+    setTimeout(() => GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l, 'ny'), lines: sb.sk.fund, efter: () => flyv(l, () => { stempl(l); sb.aabner = false; }) }), 900);
   }
 
   // ---- what makes a door worth opening: bells, a burst of sparks, the thing popping out and flying up to the calendar
@@ -9503,7 +9529,7 @@ const KALENDER = (() => {
     }, stor ? 700 : 1500);
   }
   const stykkeLinje = l => l.stykke ? [{ b: 'Stykke ' + l.nr + ':', t: l.stykke }] : [];
-  const igen = l => GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...(l.type === 'stor' ? l.gaade.efter : l.bag), ...stykkeLinje(l)] });
+  const igen = l => GAADE.scene({ eyebrow: navn(l), title: l.navn, billede: billede(l), lines: [...(l.type === 'stor' ? (l.inde?.skab ? l.inde.skab.fund : l.gaade.efter) : l.bag), ...stykkeLinje(l)] });
 
   // ---- small windows of my own: the riddle and the calendar card
   function vindue(id, titel, small) {
@@ -9527,10 +9553,11 @@ const KALENDER = (() => {
     const q = el('p', 'aSpm', g.spoergsmaal || ''), valgene = el('div', 'sEmner');
     body.replaceChildren(el('p', 'gdSted', ns.rolle || ''), log, q, valgene);
     const faa = () => {   // she gets what he has for her
-      log.append(...g.efter.map(replik)); const bil = billede(l, 'ny'); if (bil) log.append(bil); bjaelder(); chime([523, 659, 784, 1047], 0.045);
+      const skab = l.inde?.skab;
+      log.append(...g.efter.map(replik)); const bil = skab ? null : billede(l, 'ny'); if (bil) log.append(bil); if (!skab) bjaelder(); chime(skab ? [523, 659] : [523, 659, 784, 1047], 0.045);
       if (l.stykke) log.append(replik(['fortaeller', 'Stykke ' + l.nr + ': ' + l.stykke])); log.scrollTop = log.scrollHeight;
       const ok = el('button', 'go', 'Tak'); ok.type = 'button'; ok.addEventListener('click', () => spm.close());
-      q.remove(); valgene.replaceChildren(ok); ok.focus(); spm.addEventListener('close', () => flyv(l, () => stempl(l)), { once: true });
+      q.remove(); valgene.replaceChildren(ok); ok.focus(); spm.addEventListener('close', () => { if (skab) { S.vink ||= []; if (!S.vink.includes(l.nr)) S.vink.push(l.nr); gem(); } else flyv(l, () => stempl(l)); }, { once: true });
     };
     if (!g.spoergsmaal) {   // no riddle: he talks, and she can take it
       const b = el('button', 'go', g.knap || 'Tag imod det'); b.type = 'button'; b.addEventListener('click', faa); q.remove(); valgene.append(b); spm.vis(); return;
@@ -9638,9 +9665,9 @@ const KALENDER = (() => {
     if ($('maalHvad').textContent !== hvad) { $('maalHvad').textContent = hvad; card.classList.remove('ny'); void card.offsetWidth; card.classList.add('ny'); }
     let pil = null, hvor = vent ? (S.aabnet.length ? 'Du har åbnet alle de låger, der er åbne i dag. Kom tilbage i morgen.' : 'Kalenderen åbner 1. december. Indtil da kan du gå rundt på Slotsholmen.') : nx.praj;
     if (I.on && nx.type === 'stor' && I.place === nx.inde.place) {   // in the room: the arrow points at the nisse, a short text says what to do
-      const [ax, az] = nx.inde.at, dx = ax - (P.pos.x - I.x), dz = az - P.pos.z, lige = Math.hypot(dx, dz);
-      if (lige > 2.5) { hvor = 'Følg pilen · ' + Math.max(1, Math.round(lige)) + ' m'; if (S.vej) pil = Math.atan2(dx, dz) - (cam.yaw + Math.PI); }
-      else hvor = 'Lige her. Tal med nissen.';
+      const sk = nx.inde.skab && S.vink?.includes(nx.nr) ? nx.inde.skab : null, [ax, az] = sk ? sk.at : nx.inde.at, dx = ax - (P.pos.x - I.x), dz = az - P.pos.z, lige = Math.hypot(dx, dz);
+      if (lige > (sk ? 1.8 : 2.5)) { hvor = (sk ? sk.hvor + ' · ' : 'Følg pilen · ') + Math.max(1, Math.round(lige)) + ' m'; if (S.vej) pil = Math.atan2(dx, dz) - (cam.yaw + Math.PI); }
+      else hvor = sk ? 'Lige her. Åbn skabet.' : 'Lige her. Tal med nissen.';
     }
     else if (I.on && nx.type === 'stor' && I.place === indPlace(nx) && nx.inde.vej) hvor = nx.inde.vej;   // fx the tower: in at the bottom, the nisse is higher up
     else if (!vent && S.vej && d && !I.on && !FX.tower?.on) {
@@ -9814,7 +9841,16 @@ const KALENDER = (() => {
     for (const n of NISSER) {
       const her = I.on && I.place === n.l.inde.place, klar = S.klem.includes(n.l.nr) || S.aabnet.includes(n.l.nr);
       if (her && !klar && nx === n.l && !laast(nx) && $('scene').hidden && !paused) aabn(DOERE.find(d => d.l === n.l) || { l: n.l });   // she walked in by the building's own door
-      n.f.root.visible = klar; n.ting.visible = klar && !S.aabnet.includes(n.l.nr);   // when she has got it, it is no longer beside him
+      n.f.root.visible = klar; n.ting.visible = klar && !S.aabnet.includes(n.l.nr) && !n.skab;   // when she has got it, it is no longer beside him
+      if (n.skab) {   // the cupboard: steam always, a soft glow once Anker has told her about it, doors open when she has the light
+        const sb = n.skab, vinket = S.vink?.includes(n.l.nr), fundet = S.aabnet.includes(n.l.nr);
+        sb.g.position.y = I.height(sb.sk.at[0], sb.sk.at[1]);
+        sb.aaben += ((sb.aabner || fundet ? 1 : 0) - sb.aaben) * Math.min(1, dt * 5);
+        for (const lg of sb.laager) lg.h.rotation.y = -lg.side * sb.aaben * 1.9;
+        if (her) for (const d of sb.damp) { d.t = (d.t + dt * 0.35) % 1; d.sp.position.set(0.12 + Math.sin(d.t * 6 + tid) * 0.05, 1.25 + d.t * 0.9, 0); d.sp.scale.setScalar(0.25 + d.t * 0.5); d.sp.material.opacity = 0.35 * Math.sin(d.t * Math.PI); }
+        sb.glimt.material.opacity = vinket && !fundet && !sb.aabner ? 0.35 + 0.25 * Math.sin(tid * 3) : 0;
+        if (her && vinket && !fundet && !sb.aabner && !paused && Math.hypot(P.pos.x - I.x - sb.sk.at[0], P.pos.z - sb.sk.at[1]) < 2.2) offerAction({ id: 'kal-skab', label: sb.sk.knap || 'Åbn skabet', prio: 13, run: () => aabnSkab(n) });
+      }
       if (!klar) continue;
       const [ax, az] = n.l.inde.at, gy = I.height(ax, az) + (n.l.inde.dy || 0), [tx, tz] = n.l.inde.ting || [ax + 0.6, az];
       n.f.root.position.set(ax, gy, az); n.ting.position.set(tx, gy + 0.27 + Math.sin(tid * 2) * 0.02, tz);
@@ -9824,6 +9860,7 @@ const KALENDER = (() => {
       if (dist < 2.6 && !paused) {
         const ns = K.nisser[n.l.nisse];
         if (S.aabnet.includes(n.l.nr)) offerAction({ id: 'kal-nisse', label: 'Tal med ' + (ns.kort || ns.navn), prio: 9, run: () => igen(n.l) });
+        else if (n.skab && S.vink?.includes(n.l.nr)) offerAction({ id: 'kal-nisse', label: 'Tal med ' + (ns.kort || ns.navn), prio: 6, run: () => GAADE.scene({ eyebrow: navn(n.l), title: ns.navn, lines: n.l.gaade.efter }) });
         else offerAction({ id: 'kal-nisse', label: 'Tal med ' + (ns.kort || ns.navn), prio: 12, run: () => tal_med(n) });
       }
     }
