@@ -5092,10 +5092,11 @@ function openIntro(help) {
 goBtn.addEventListener('click', () => {
   audio();
   const first = !started, nyt = first && GAADE.begynd();   // Nyt spil or Fortsæt
-  intro.hidden = true; hud.hidden = false; paused = false;
+  intro.hidden = true; hud.hidden = !!(first && KAL); paused = false;   // in the calendar the camera glides in over the city first, with no text on top
   if (!started) { started = true; startBlend = 0; shadowExtent(60); for (const h of HOOKS.start) h(); }
   canvas.focus();
-  if (first) GAADE.efterStart(nyt);
+  if (first && KAL) { const landet = () => { if (startBlend < 1) { setTimeout(landet, 80); return; } hud.hidden = false; GAADE.efterStart(nyt); }; landet(); }   // the texts come when the camera has landed
+  else if (first) GAADE.efterStart(nyt);
 });
 
 if (isTouch) { $('keysDesk').hidden = true; $('keysTouch').hidden = false; $('jump').hidden = false; $('touchHint').hidden = false; $('lookHint').hidden = false; }
