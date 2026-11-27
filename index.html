@@ -9948,7 +9948,7 @@ const KALENDER = (() => {
   }
   for (const g of [world, dyn]) g.traverse(o => { if (o.material) for (const m of Array.isArray(o.material) ? o.material : [o.material]) sneMat(m); });
   // small Christmas scenes along the ways (episoder.js): shown and moving only outdoors and near Ida
-  const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch }) : { gruppe: new THREE.Group(), update() {} };
+  const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch, GARDEN, toast }) : { gruppe: new THREE.Group(), update() {} };
   EPI.gruppe.traverse(o => { if (o.material) sneMat(o.material); });
   HOOKS.frame.push((dt, t) => EPI.update(dt, t, P.pos, ude()));
   if (TESTMODE) window.__epi = EPI;

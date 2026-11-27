@@ -8,6 +8,7 @@
 //   5. Ridebanen: to børn kaster snebolde efter en snemand med slips, hat og mappe
 //   6. Slotspladsen ved porten til Rigsdagsgården: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
 //   7. Tøjhusgade: cyklister, der kører frem og tilbage i højre side af vejen, og tre parkerede cykler ved en husmur
+//   8. Bibliotekshaven: H.C. Andersen går en tur om bassinet med høj hat og stok og letter på hatten for Ida
 //
 // index.html kalder episoder(...) én gang i KALENDER-blokken og derefter update(dt, t, pos, ude) i hver frame.
 // Ydelse: alle figurer er bagt til få meshes (menneske() i index.html), geometri og materialer deles, hver scene vises
@@ -817,6 +818,276 @@ export function episoder(H) {
       }
     };
     e.cy = CY; g.visible = false; EP.push(e);
+  }
+
+  // ---------------------------------------------------------------- 8. H.C. Andersen i Bibliotekshaven
+  // En høj, tynd herre i lang sort frakke, lys vest, sort halsklud og høj hat går langsomt rundt om bassinet på grusstien
+  // med sin stok. Han har en rød blomst i knaphullet og grå handsker. En gang imellem står han lidt og kigger på
+  // springvandet. Når Ida kommer tæt på, vender han sig mod hende, løfter hatten med en lille bukken, sætter den på igen
+  // og går videre. Højst én gang hver gang han går forbi hende.
+  // Ydelse: han er ti bagte dele (krop, hoved, hat, to arme, en underarm og fire bendele), og han tegnes kun, når Ida er
+  // tæt på og udenfor.
+  if (H.GARDEN) {
+    const GD = H.GARDEN, S = 1.06, K = 1.17;               // overall size and how much longer his legs are
+    const LEG = 0.84 * (K - 1);                             // the extra leg length (in his own measure)
+    const HC = { coat: '#2b2c35', lapel: '#41434f', trousers: '#6d6862', vest: '#dccb9f', vestK: '#a88c52', shirt: '#f4f1ea', cravat: '#1b1a1f',
+      hat: '#1f1e24', band: '#46404a', skin: '#efc9a8', hair: '#7a5434', glove: '#cfc8ba', cane: '#4a3323', knob: '#d9b25a', rose: '#c0262d', leaf: '#2f6b3a', button: '#17171b' };
+    // the path: a loop round the pond on the gravel, in the garden's own frame, well clear of the pond, the statue and the benches
+    const LOOP = [[0, -15], [9.6, -13.6], [14.9, -8.4], [15.8, 0], [14.9, 8.6], [10.4, 14.4], [0, 15.6], [-10.4, 14.6], [-15.2, 9.2], [-15.8, 0], [-14.9, -8.6], [-9.6, -13.8]];
+    const kurve = new THREE.CatmullRomCurve3(LOOP.map(([x, z]) => { const p = GD.at(x, z); return new THREE.Vector3(p[0], 0, p[1]); }), true, 'centripetal');
+    const NS = 480, sti = kurve.getSpacedPoints(NS), LEN = kurve.getLength();
+    for (const p of sti) p.y = groundAt(p.x, p.z, 0.3);
+    const paaSti = (s, ud) => {   // position and heading at arc length s
+      const k = (((s / LEN) % 1) + 1) % 1 * NS, i = Math.floor(k), a = sti[i], b = sti[(i + 1) % NS], f = k - i;
+      ud.set(lerp(a.x, b.x, f), lerp(a.y, b.y, f), lerp(a.z, b.z, f)); return Math.atan2(b.x - a.x, b.z - a.z);
+    };
+    const KIG = LEN * 0.6;   // where he stops for a while and looks at the fountain
+    const springvand = GD.at(0, 0);
+
+    // shapes on the body: a curved patch round the body's axis with radius R(y), from angle a0(y) to a1(y) (0 is straight ahead)
+    function flade(y0, y1, R, a0, a1, ny = 8, na = 10) {
+      const pos = [], idx = [];
+      for (let i = 0; i <= ny; i++) { const y = lerp(y0, y1, i / ny), r = R(y); for (let j = 0; j <= na; j++) { const a = lerp(a0(y), a1(y), j / na); pos.push(r * Math.sin(a), y, r * ZF * Math.cos(a)); } }
+      for (let i = 0; i < ny; i++) for (let j = 0; j < na; j++) { const a = i * (na + 1) + j, b = a + 1, c = a + na + 1, d = c + 1; idx.push(a, b, c, b, d, c); }
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals(); return geo;
+    }
+    const kurveR = pts => y => {   // a radius that follows [radius, height] points, top down
+      for (let i = 1; i < pts.length; i++) if (y >= pts[i][1]) { const [r0, y0] = pts[i - 1], [r1, y1] = pts[i]; return lerp(r1, r0, (y - y1) / (y0 - y1)); }
+      return pts[pts.length - 1][0];
+    };
+    const nuance = (c, dl) => '#' + new THREE.Color(c).offsetHSL(0, 0, dl).getHexString();
+    const drejet = (pts, seg) => new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg);
+    // bakes the matrix fn(mesh) (in the frame of rod) into the parts under rod, except those under the groups in stop
+    const _inv = new THREE.Matrix4();
+    function form(rod, fn, stop = new Set()) {
+      rod.updateMatrixWorld(true); _inv.copy(rod.matrixWorld).invert();
+      const ud = [];
+      rod.traverse(x => { if (!x.isMesh || !x.userData.fig || x.userData.fast) return; for (let p = x.parent; p && p !== rod; p = p.parent) if (stop.has(p)) return; ud.push(x); });
+      for (const x of ud) {
+        const geo = x.geometry.clone(); geo.applyMatrix4(fn(x).multiply(new THREE.Matrix4().multiplyMatrices(_inv, x.matrixWorld)));
+        x.geometry.dispose(); x.geometry = geo; x.parent.remove(x); rod.add(x); x.position.set(0, 0, 0); x.rotation.set(0, 0, 0); x.scale.set(1, 1, 1);
+      }
+    }
+    const skal = (sx, sy, sz) => () => new THREE.Matrix4().makeScale(sx, sy, sz);
+
+    // the left hand holds the cane: it touches the ground just in front of him when the arm swings forward
+    const ARM_FREM = -0.22, ALBUE_V = 0.42, STOK_HAELD = 0.12;
+    let hat = null, P_ = null;
+    const f = menneske({
+      coat: HC.coat, trousers: HC.trousers, skin: HC.skin, hair: HC.hair, hairStyle: 'kort', shoes: '#141316', ingenKrave: true,
+      scale: S, skygge, detalje: GFX.lav ? 'lav' : undefined,
+      extra: (g, head, part, m, foran) => {
+        P_ = { part, m };
+        const krop = y => foran(y) / ZF;
+        // the waistcoat in the opening of the coat, the shirt above it and the coat's lapels on both sides
+        const vV = y => 0.03 + (y - 1.1) / 0.43 * 0.52, lapB = y => 0.07 + (y - 1.1) / 0.43 * 0.3, sk = y => Math.max(0, (y - 1.37) / 0.17 * 0.34);
+        part(flade(1.1, 1.53, y => krop(y) + 0.004, y => -vV(y), y => vV(y)), m(HC.vest), g, 0, 0, 0, 0);
+        part(flade(1.37, 1.545, y => krop(y) + 0.008, y => -sk(y), y => sk(y), 5, 6), m(HC.shirt), g, 0, 0, 0, 0);
+        for (const s of [-1, 1]) {
+          part(flade(1.08, 1.54, y => krop(y) + 0.013, s < 0 ? (y => -vV(y) - lapB(y)) : vV, s < 0 ? (y => -vV(y)) : (y => vV(y) + lapB(y)), 8, 5), m(HC.lapel), g, 0, 0, 0, 0);
+        }
+        for (const y of [1.17, 1.25, 1.33]) part(SG(0.011, 8, 6), m(HC.vestK), g, 0, y, krop(y) * ZF + 0.01, 0);   // waistcoat buttons
+        for (const s of [-1, 1]) { const a = s * 0.1; part(SG(0.016, 8, 6), m(HC.button), g, krop(1.08) * Math.sin(a), 1.08, krop(1.08) * ZF * Math.cos(a) + 0.012, 0); }
+        // the watch chain across the waistcoat
+        part(streg([0, 1.25, krop(1.25) * ZF + 0.012], [0.07, 1.215, krop(1.215) * ZF - 0.006], 0.004, 4), m(HC.knob), g, 0, 0, 0, 0);
+        // the long skirt of the frock coat, open at the front so the legs can move
+        const skoedR = kurveR([[0.198, 1.07], [0.212, 0.95], [0.226, 0.84], [0.242, 0.66], [0.258, 0.47], [0.262, 0.43]]);
+        const aab = y => lerp(0.92, 0.16, Math.max(0, Math.min(1, (y - 0.43) / 0.64)));
+        part(flade(0.43, 1.07, skoedR, aab, y => Math.PI * 2 - aab(y), 10, lav ? 16 : 24), m(HC.coat), g);
+        for (const s of [-1, 1]) part(SG(0.014, 8, 6), m(HC.button), g, s * 0.06, 1.06, -0.19, 0);   // two buttons at the back of the waist
+        // the neck, the black neckcloth with a bow and the white collar points of the shirt
+        part(new THREE.CylinderGeometry(0.05, 0.053, 0.13, 12), m(HC.skin), g, 0, 1.69, 0, 0);
+        ring(part, m, HC.cravat, g, 0.062, 0.03, 1.615, 0.95, 6, 20, 1);
+        ring(part, m, HC.cravat, g, 0.058, 0.026, 1.655, 0.95, 6, 20, 1);
+        part(SG(0.022, 10, 8), m(HC.cravat), g, 0, 1.6, 0.085).scale.set(1, 0.8, 0.7);
+        for (const s of [-1, 1]) {
+          const v = part(SG(0.036, 10, 8), m(HC.cravat), g, s * 0.036, 1.6, 0.078); v.scale.set(1, 0.55, 0.4); v.rotation.z = s * 0.25;
+          const sn = part(new THREE.BoxGeometry(0.018, 0.075, 0.006), m(HC.cravat), g, s * 0.018, 1.545, 0.08); sn.rotation.set(-0.15, 0, s * 0.18);   // the ends hang down
+          const k = part(new THREE.BoxGeometry(0.045, 0.075, 0.01), m(HC.shirt), g, s * 0.066, 1.672, 0.07); k.rotation.set(-0.3, s * 0.5, s * 0.5);   // the high collar points by the chin
+        }
+        // the coat's collar, rolled round the back of the neck
+        { const c = part(TG(0.1, 0.03, 6, 16, Math.PI * 1.25), m(HC.lapel), g, 0, 1.6, -0.005); c.rotation.set(Math.PI / 2 - 0.35, 0, Math.PI * 0.125 + Math.PI); c.scale.set(1, 0.9, 1.3); }
+        // a red flower in the buttonhole of the left lapel, with two leaves
+        { const y = 1.43, a = vV(y) + lapB(y) * 0.5, r = krop(y) + 0.03, x = r * Math.sin(a), z = r * ZF * Math.cos(a);
+          for (let i = 0; i < 5; i++) { const b = i * 1.26; part(SG(0.016, 8, 6), m(HC.rose), g, x + Math.cos(b) * 0.012, y + Math.sin(b) * 0.012, z + 0.004, 0); }
+          part(SG(0.014, 8, 6), m('#8e1a20'), g, x, y, z + 0.014, 0);
+          for (const s of [-1, 1]) { const l = part(SG(0.018, 6, 4), m(HC.leaf), g, x + s * 0.017, y - 0.02, z - 0.004, 0); l.scale.set(0.5, 1, 0.3); l.rotation.z = s * 0.7; } }
+        // the face: a long chin and the big nose
+        part(SG(0.072, 14, 10), m(HC.skin), head, 0, -0.118, 0.052).scale.set(0.82, 0.85, 0.8);
+        { const n = part(SG(0.03, 14, 10), m(nuance(HC.skin, -0.03)), head, 0, -0.018, 0.15); n.scale.set(0.72, 1.35, 1.25); n.rotation.x = -0.55; }   // one smooth, long nose
+        for (const s of [-1, 1]) part(SG(0.009, 8, 6), m(nuance(HC.skin, -0.1)), head, s * 0.014, -0.05, 0.168, 0);   // nostrils
+        // the wavy brown hair at the sides and the back (the hat covers the top)
+        for (const s of [-1, 1]) for (const [x, y, z, r, rz] of [[0.132, 0.03, -0.01, 0.042, 0.3], [0.138, -0.03, -0.035, 0.04, -0.2], [0.124, -0.075, -0.06, 0.034, 0.35], [0.112, 0.01, -0.085, 0.045, 0]]) {
+          const l = part(CG(r, r * 1.2, 10), m(HC.hair), head, s * x, y, z); l.rotation.z = s * rz; l.scale.set(0.75, 1, 1);
+        }
+        part(SG(0.1, 14, 10), m(HC.hair), head, 0, -0.035, -0.08).scale.set(1.18, 0.85, 0.75);
+        // the top hat (its own part, so he can take it off)
+        hat = new THREE.Group(); hat.position.set(0, 0.07, -0.004); hat.rotation.x = -0.1; head.add(hat);
+        const hg = drejet([[0.001, 0.008], [0.112, 0.008], [0.114, 0], [0.168, 0.003], [0.186, 0.018], [0.181, 0.029], [0.165, 0.024], [0.118, 0.021],
+          [0.113, 0.07], [0.11, 0.15], [0.113, 0.22], [0.12, 0.27], [0.117, 0.283], [0.001, 0.285]], lav ? 16 : 26);
+        const hp = hg.attributes.position;
+        for (let i = 0; i < hp.count; i++) { const x = hp.getX(i), z = hp.getZ(i), r = Math.hypot(x, z); if (r > 0.12) hp.setY(i, hp.getY(i) + 0.05 * (r - 0.12) / 0.066 * (x * x) / (r * r)); }   // the brim curls up at the sides
+        hg.computeVertexNormals();
+        part(hg, m(HC.hat), hat).scale.set(0.94, 1, 1.08);
+        part(drejet([[0.1135, 0.026], [0.1158, 0.026], [0.1146, 0.068], [0.1122, 0.068]], lav ? 16 : 26), m(HC.band), hat, 0, 0, 0, 0).scale.set(0.94, 1, 1.08);
+      },
+      arm: [-1, 1].map(s => (sh, part, m, el) => {
+        // grey gloves and a white shirt cuff
+        part(SG(0.054, 10, 8), m(HC.glove), el, 0, -0.3, 0.004).scale.set(0.82, 1.12, 0.64);
+        const tu = part(CG(0.017, 0.032, 6), m(HC.glove), el, -s * 0.03, -0.285, 0.024); tu.rotation.z = s * 0.5;
+        ring(part, m, HC.shirt, el, 0.05, 0.011, -0.225, 1, 5, 14, 0);
+        if (s < 0) return;
+        // the cane in the left hand, with a brass knob
+        const tot = ARM_FREM - ALBUE_V, haand = new THREE.Vector3(0, -0.3, 0.02);
+        const albue = 1.53 - 0.3 * Math.cos(ARM_FREM), hy = albue - 0.3 * Math.cos(tot);
+        const L = (hy + LEG + 0.02) / Math.cos(STOK_HAELD);
+        const d = new THREE.Vector3(0, -Math.cos(STOK_HAELD), Math.sin(STOK_HAELD)).applyAxisAngle(new THREE.Vector3(1, 0, 0), -tot);
+        const top = haand.clone().addScaledVector(d, -0.13), bund = haand.clone().addScaledVector(d, L);
+        const st = part(new THREE.CylinderGeometry(0.011, 0.009, L + 0.13, 8), m(HC.cane), el); st.position.copy(top).add(bund).multiplyScalar(0.5);
+        st.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), d);
+        const kn = part(SG(0.022, 10, 8), m(HC.knob), el); kn.position.copy(top);
+        const fe = part(new THREE.CylinderGeometry(0.01, 0.01, 0.04, 8), m('#b9b4a8'), el, 0, 0, 0, 0); fe.position.copy(bund).addScaledVector(d, -0.02); fe.quaternion.copy(st.quaternion);
+        for (const x of [st, kn, fe]) x.userData.fast = true;   // not made thinner with the arm
+      }),
+      foer: f => {
+        f.head.rotation.order = 'YXZ';
+        // tall and thin: a narrower body, thin arms and long thin legs; a long face
+        const ben = new Set([f.head, ...f.arms, ...f.hips]);
+        form(f.g, skal(0.86, 1, 0.88), ben);
+        f.head.position.y += 0.03;
+        form(f.head, skal(0.93, 1.06, 1), new Set([hat]));
+        for (const [i, sh] of f.arms.entries()) { sh.position.x = (i ? 1 : -1) * 0.228; form(sh, skal(0.84, 1, 0.84), new Set([f.elbows[i]])); form(f.elbows[i], skal(0.84, 1, 0.84)); }
+        for (const [i, l] of f.legs.entries()) {
+          l.hip.position.x = (i ? 1 : -1) * 0.088;
+          form(l.hip, skal(0.8, K, 0.82), new Set([l.knee]));
+          l.knee.position.y = -0.42 * K;
+          const [skin, ...sko] = l.knee.children.filter(x => x.isMesh);
+          form(l.knee, x => x === skin ? new THREE.Matrix4().makeScale(0.8, K, 0.82) : sko.includes(x) ? new THREE.Matrix4().makeTranslation(0, -0.42 * (K - 1), 0).multiply(new THREE.Matrix4().makeScale(1, 1, 1.12)) : new THREE.Matrix4());
+        }
+        f.elbows[1].rotation.x = -ALBUE_V;   // the cane arm's elbow is baked with its bend
+      },
+      grupper: f => [f.g, f.head, hat, f.arms[0], f.elbows[0], f.arms[1], ...f.hips, ...f.legs.map(l => l.knee)],
+    });
+    const g = new THREE.Group(); gruppe.add(g); g.add(f.root);
+    const hjem = { p: hat.position.clone(), q: hat.quaternion.clone() }, hatHjem = new THREE.Object3D(); hatHjem.position.copy(hjem.p); hatHjem.quaternion.copy(hjem.q); f.head.add(hatHjem);
+    const Y0 = LEG * S, HOFTE = 0.86 * S, BENL = (0.84 * K + 0.05) * S;
+    const A = 0.3, SKRIDT = 4 * BENL * Math.sin(A);        // one full step cycle (two steps)
+    const V = 0.78;                                         // a slow stroll
+
+    // the right arm: two-bone reach for the hand to a point in his own frame, with the elbow out to the side
+    const vS = new THREE.Vector3(), vD = new THREE.Vector3(), vE = new THREE.Vector3(), vP = new THREE.Vector3(), vX = new THREE.Vector3(), vY = new THREE.Vector3(), vZ = new THREE.Vector3();
+    const mR = new THREE.Matrix4(), qIK = new THREE.Quaternion(), qGaa = new THREE.Quaternion(), eGaa = new THREE.Euler();
+    function naa(T) {   // sets qIK and returns the elbow bend
+      vS.copy(f.arms[0].position); vD.copy(T).sub(vS); const d = Math.max(0.2, Math.min(0.595, vD.length())); vD.normalize();
+      const phi = Math.acos(Math.max(-1, Math.min(1, d * d / 0.18 - 1)));
+      vP.set(-1, -0.55, 0.25).normalize(); vP.addScaledVector(vD, -vP.dot(vD)).normalize();
+      const a = d / 2, h = Math.sqrt(Math.max(0, 0.09 - a * a));
+      vE.copy(vS).addScaledVector(vD, a).addScaledVector(vP, h);                     // the elbow
+      vY.copy(vS).sub(vE).normalize();
+      const hand = vX.copy(vS).addScaledVector(vD, d).sub(vE).divideScalar(0.3);        // forearm direction
+      vZ.copy(hand).addScaledVector(vY, Math.cos(phi)).divideScalar(Math.max(0.05, Math.sin(phi))).normalize();
+      vZ.addScaledVector(vY, -vZ.dot(vY)).normalize(); vX.crossVectors(vY, vZ);
+      qIK.setFromRotationMatrix(mR.makeBasis(vX, vY, vZ));
+      return phi;
+    }
+    const tw = new THREE.Vector3(), mal = new THREE.Vector3(), grebPkt = new THREE.Vector3(-0.035, 0.05, 0.14), here = new THREE.Vector3();
+    const iEgen = w => { f.g.updateWorldMatrix(true, false); return f.g.worldToLocal(w); };
+    const vinkel = (a, b) => { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; };
+    const REPLIK = ['God aften!', 'God aften, lille frøken!', 'Glædelig jul!', 'Sikke en aften til et eventyr.'];
+    const st = { s: LEN * 0.15, v: V, fase: 0, yaw: 0, mode: 'gaa', T: 0, hilst: 0, gaaet: 99, vaek: true, kigT: 0, kigget: false, hy: 0, hp: 0, ik: 0, bue: 0, hatHaand: false, hatTilbage: 0, gange: 0 };
+    st.yaw = paaSti(st.s, here);
+    // a greeting: turn to her, lift the hat off with a small bow, put it back on, walk on
+    const KF = [[0, 'greb'], [1.15, 'greb'], [1.55, 'op'], [2.05, 'ud'], [2.85, 'ud'], [3.3, 'op'], [3.75, 'greb']];
+    const e = { x: here.x, z: here.z, g, t: 0, afst: p => Math.hypot(p.x - here.x, p.z - here.z), hc: { st, f, hat, sti, LEN } };
+    e.upd = (t, dt, pos) => {
+      const dx = pos.x - here.x, dz = pos.z - here.z, dI = Math.hypot(dx, dz), tilIda = Math.atan2(dx, dz);
+      // where on the path, and is Ida in the way?
+      const vej = paaSti(st.s, tw);
+      const foran = dx * Math.sin(vej) + dz * Math.cos(vej), side = Math.abs(dx * Math.cos(vej) - dz * Math.sin(vej));
+      if (dI > 7) st.vaek = true;
+      if (st.mode === 'gaa' && dI < 4.2 && st.vaek && st.gaaet > 12 && Math.abs(vinkel(st.yaw, tilIda)) < 2.1 && pos.y < 1) {
+        st.mode = 'hils'; st.T = 0; st.vaek = false; st.gaaet = 0; st.gange++;
+      }
+      if (st.mode === 'gaa' && !st.kigget && ((st.s - KIG) % LEN + LEN) % LEN < 0.5) { st.mode = 'kig'; st.kigT = 0; st.kigget = true; }
+      if (st.mode === 'kig' && ((st.kigT += dt) > 5 || dI < 3)) st.mode = 'gaa';
+      if (st.kigget && ((st.s - KIG) % LEN + LEN) % LEN > LEN * 0.5) st.kigget = false;
+      // speed: stop to greet or to look, and wait if Ida stands right in front of him
+      let vM = st.mode === 'gaa' ? V : 0;
+      if (st.mode === 'gaa' && foran > 0 && foran < 1.6 && side < 0.8) vM = 0;
+      st.v += Math.max(-1.6 * dt, Math.min(0.8 * dt, vM - st.v));
+      const ds = Math.max(0, st.v) * dt; st.s = (st.s + ds) % LEN; st.gaaet += ds;
+      st.fase += ds / SKRIDT * Math.PI * 2;
+      const vejYaw = paaSti(st.s, here);
+      // turn: along the path, toward Ida while greeting, half toward the fountain while looking
+      let yM = vejYaw;
+      if (st.mode === 'hils' && st.T < 4.1) yM = tilIda;
+      if (st.mode === 'kig') yM = vejYaw + vinkel(vejYaw, Math.atan2(springvand[0] - here.x, springvand[1] - here.z)) * 0.6;
+      st.yaw += vinkel(st.yaw, yM) * (1 - Math.exp(-dt * (st.mode === 'hils' ? 3.2 : 2.2)));
+      f.root.position.copy(here); f.root.rotation.y = st.yaw;
+      e.x = here.x; e.z = here.z;
+      // the lanky walk: long legs, the knee bends in the swing, a little bob and sway
+      const w = Math.min(1, st.v / (V * 0.7)), ph = st.fase;
+      const hofte = [], knae = [];
+      for (let i = 0; i < 2; i++) {
+        const p = ph + i * Math.PI, sv = Math.cos(p);
+        hofte[i] = -A * Math.sin(p) * w - 0.03 * w; knae[i] = (0.6 * Math.max(0, sv) ** 1.4 + 0.06) * w;
+        f.legs[i].hip.rotation.set(hofte[i], 0, (i ? 1 : -1) * 0.025); f.legs[i].knee.rotation.x = knae[i];
+      }
+      const stoette = Math.cos(ph) < 0 ? 0 : 1;   // the leg on the ground
+      const bob = BENL * (Math.cos(hofte[stoette]) - 1) - 0.012 * w * Math.abs(Math.sin(ph * 2));
+      // the bow: from the hips, while the legs stay upright
+      let bue = 0;
+      if (st.mode === 'hils') { const T = st.T; bue = ramp(T, 1.5, 2.05) * (1 - ramp(T, 2.85, 3.35)); }
+      const B = bue * 0.36 + 0.035 + 0.02 * w;
+      f.g.rotation.set(B, Math.sin(ph) * 0.05 * w, Math.sin(ph) * 0.022 * w);
+      f.g.position.set(0, Y0 + bob + HOFTE * (1 - Math.cos(B)), -HOFTE * Math.sin(B));
+      for (const l of f.legs) l.hip.rotation.x -= B;
+      // the head: ahead, at Ida when she is near, at the fountain when he stops to look
+      let hY = Math.sin(t * 0.31) * 0.25 * w, hP = 0.05;
+      if (st.mode === 'kig') { hY = vinkel(st.yaw, Math.atan2(springvand[0] - here.x, springvand[1] - here.z)); hP = 0.15; }
+      const rel = vinkel(st.yaw, tilIda);
+      if (dI < 8 && Math.abs(rel) < 1.6) { hY = rel; hP = Math.atan2(2.05 - 1.1, Math.max(0.5, dI)); }
+      st.hy += (Math.max(-1.1, Math.min(1.1, hY)) - st.hy) * (1 - Math.exp(-dt * 3));
+      st.hp += (Math.max(-0.2, Math.min(0.5, hP)) - st.hp) * (1 - Math.exp(-dt * 3));
+      const nik = st.mode === 'hils' ? bue * 0.22 : 0;
+      f.head.rotation.set(st.hp + nik - B * 0.4, st.hy, Math.sin(t * 0.47) * 0.03);
+      // arms: the cane arm swings with the right leg and plants the cane, the right arm swings free
+      const aL = lerp(ARM_FREM, -0.05 + 0.17 * Math.sin(ph), w);
+      f.arms[1].rotation.set(aL, 0, 0.07);
+      eGaa.set(-0.2 * Math.sin(ph) * w + 0.03, 0, -0.08); qGaa.setFromEuler(eGaa);
+      let albue = 0.22;
+      if (st.mode === 'hils') {
+        const T = st.T;
+        st.ik = ramp(T, 0.45, 1.15) * (1 - ramp(T, 3.8, 4.45));
+        // where the hand goes: to the hat on his head, up, and out to the side with the hat
+        f.head.updateMatrixWorld(true);
+        const greb = iEgen(hatHjem.localToWorld(mal.copy(grebPkt))).clone();
+        const op = greb.clone().add(tw.set(0.02, 0.15, 0.06)), ud = tw.set(-0.42, 1.24, 0.26).clone();
+        const P = { greb, op, ud };
+        let k = 0; while (k < KF.length - 1 && T > KF[k + 1][0]) k++;
+        const [t0, a] = KF[k], [t1, b] = KF[Math.min(k + 1, KF.length - 1)];
+        mal.copy(P[a]).lerp(P[b], t1 > t0 ? sm((T - t0) / (t1 - t0)) : 1);
+        const phi = naa(mal);
+        f.arms[0].quaternion.copy(qGaa).slerp(qIK, st.ik); albue = lerp(albue, phi, st.ik);
+        // the hat goes into the hand and back onto the head
+        if (!st.hatHaand && T >= 1.15 && T < 3.75) { f.elbows[0].rotation.x = -albue; f.elbows[0].updateMatrixWorld(true); f.elbows[0].attach(hat); st.hatHaand = true; }
+        if (st.hatHaand && T >= 3.75) { f.head.attach(hat); st.hatHaand = false; st.hatTilbage = 1; }
+        if (T > 1.6 && T - dt <= 1.6 && H.toast && (st.gange === 1 || Math.random() < 0.35)) {
+          const el = document.getElementById('toast');
+          if (!el || el.hidden) H.toast('H.C. Andersen: ' + (st.gange === 1 ? REPLIK[0] : REPLIK[Math.floor(Math.random() * REPLIK.length)]));
+        }
+        if ((st.T += dt) > 4.6) { st.mode = 'gaa'; st.ik = 0; }
+      } else f.arms[0].quaternion.copy(qGaa);
+      f.elbows[0].rotation.x = -albue;
+      if (st.hatTilbage > 0) {   // settle the hat in its place
+        st.hatTilbage = Math.max(0, st.hatTilbage - dt * 4);
+        hat.position.lerp(hjem.p, 1 - st.hatTilbage); hat.quaternion.slerp(hjem.q, 1 - st.hatTilbage);
+        if (!st.hatTilbage) { hat.position.copy(hjem.p); hat.quaternion.copy(hjem.q); }
+      }
+      // breathing
+      f.g.scale.y = S * (1 + Math.sin(t * 1.6) * 0.004);
+    };
+    g.visible = false; EP.push(e);
   }
 
   // ---------------------------------------------------------------- hver frame
