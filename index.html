@@ -9880,7 +9880,18 @@ const KALENDER = (() => {
   // and when the last door is open the morning comes. 0 is daylight and 1 is dark.
   const lysNu = () => { const G = started ? S : gemt || S, a = frem(G); return faerdig(G) ? (G.morgen ? 0.04 : 1) : a >= 12 ? 1 : 0.55 + 0.45 * a / 12; };   // after the last door the night lasts until the fireworks are over
   const sneMaal = a => 0.1 + 0.82 * Math.min(1, a / 18), faldMaal = a => a <= 12 ? 1 : Math.max(0, 1 - (a - 12) / 6);
-  let sneNu = null, faldNu = 1, stjerner = null;
+  // The wreath game has only four candles, so the calendar's weather would stop the snowfall for good at the third candle,
+  // and a saved or finished game never saw snow again. Here the snow always lies white on roofs and ground, and light snow
+  // comes and goes in calm showers that do not follow the candles: it snows a little at the start, thins out and stops,
+  // and after a clear spell of a few minutes it starts again.
+  const KR_SNE = a => 0.84 + 0.06 * Math.min(1, a / 24);
+  const nyByge = (forste) => ({ t: 0, sne: forste ? 150 : 100 + Math.random() * 110, klar: 110 + Math.random() * 130, styrke: forste ? 0.7 : 0.4 + Math.random() * 0.25 });
+  let byge = nyByge(true);
+  function bygeMaal(dt) {   // how much snow falls now, 0 to 1
+    byge.t += dt; if (byge.t > byge.sne + byge.klar) byge = nyByge(false);
+    return byge.t < byge.sne ? byge.styrke : 0;
+  }
+  let sneNu = null, faldNu = KR ? byge.styrke : 1, stjerner = null;
   {
     const n = 420, pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, y = 0.12 + Math.random() * 0.88, r = Math.sqrt(1 - y * y); pos.set([Math.cos(a) * r * 470, y * 470, Math.sin(a) * r * 470], i * 3); }
@@ -9890,10 +9901,16 @@ const KALENDER = (() => {
   }
   function vejr(dt, straks) {
     const a = frem(started ? S : gemt || S), k = straks || sneNu === null ? 1 : 1 - Math.exp(-dt / 18);
-    if (sneNu === null) sneNu = sneMaal(a);
-    sneNu += (sneMaal(a) - sneNu) * k; faldNu += (faldMaal(a) - faldNu) * k;
+    if (KR) {   // the showers fade in and out a little slower than the calendar's weather
+      const maal_ = KR_SNE(a), fald = bygeMaal(dt || 0), kf = straks ? 1 : 1 - Math.exp(-(dt || 0) / 25);
+      if (sneNu === null) sneNu = maal_;
+      sneNu += (maal_ - sneNu) * k; faldNu += (fald - faldNu) * kf;
+    } else {
+      if (sneNu === null) sneNu = sneMaal(a);
+      sneNu += (sneMaal(a) - sneNu) * k; faldNu += (faldMaal(a) - faldNu) * k;
+    }
     SNE_U.value = I.on ? 0 : sneNu;   // not on the floors indoors
-    stjerner.material.opacity = (1 - faldNu) * ev * 0.9; stjerner.visible = stjerner.material.opacity > 0.01;
+    stjerner.material.opacity = (KR ? Math.max(0, 1 - faldNu * 5) : 1 - faldNu) * ev * 0.9; stjerner.visible = stjerner.material.opacity > 0.01;   // in the wreath game: stars only in the clear spells
     if (sne) sne.geometry.setDrawRange(0, Math.round(sne.geometry.attributes.position.count * faldNu * (GFX.lav ? 0.6 : 1)));   // a little less snow on the low graphics setting
   }
 
@@ -10095,7 +10112,7 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, lur: () => LUR && { x: LUR.x, z: LUR.z, vis: LUR.f.root.visible, flugt: LUR.flugt, skala: LUR.skala, nr: LUR.nr }, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, lur: () => LUR && { x: LUR.x, z: LUR.z, vis: LUR.f.root.visible, flugt: LUR.flugt, skala: LUR.skala, nr: LUR.nr }, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, sne: () => ({ fnug: !!sne, vis: !!sne && sne.visible, tegnet: sne ? sne.geometry.drawRange.count : 0, u: SNE_U.value, fald: +faldNu.toFixed(3), byge: KR ? { ...byge } : null, inde: I.on }), vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); } };
   const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && faerdig(S), hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
