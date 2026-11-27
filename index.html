@@ -1903,11 +1903,12 @@ const ROOFS = [ROOF_TILE, ROOF_TILE, '#a8604a', ROOF_SLATE, '#7d4a3a'];
 // house get no windows. The houses use their own random numbers, so nothing else in the world moves.
 const husRand = mulberry32(1849);
 const hPick = a => a[Math.floor(husRand() * a.length)];
+let HUS_UDEN = false;   // a building with its own facade drawn by hand (Thorvaldsens Museum) gets no town-house windows
 function husVindue(kind, x, y, z, ry, w, h, litP) {
   _e.set(0, ry, 0, 'YXZ'); _q.setFromEuler(_e);
   const m = new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), _q.clone(), new THREE.Vector3(w, h, 1));
   WIN[kind] = WIN[kind] || { lit: [], dark: [] };
-  (husRand() < litP ? WIN[kind].lit : WIN[kind].dark).push(m);
+  const r = husRand(); if (!HUS_UDEN) (r < litP ? WIN[kind].lit : WIN[kind].dark).push(m);   // HUS_UDEN: the random numbers are used all the same, so the other houses stay as they are
 }
 const HUS_NABO = [];   // the outlines of all houses from the map, to find the walls two houses share
 function husVaeg(x, z, self) { for (const r of HUS_NABO) { if (r === self || x < r.bb.x0 || x > r.bb.x1 || z < r.bb.z0 || z > r.bb.z1) continue; if (ptIn(r.ring, x, z)) return true; } return false; }
@@ -2004,7 +2005,7 @@ for (const b of DATA.B) {
   if (b.n === 'Slotsholmen' && b.rings[0][0][0] === 107 && b.rings[0][0][1] === 66) { passageHouse(b.rings[0]); continue; }   // Rigsarkivet, the long house with Proviantpassagen
   if (b.n === 'Proviantgården') { PROVIANT.ring = b.rings[0]; pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 17, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: ROOF_TILE, line: true }); continue; }   // drawn in PROVIANTGÅRDEN further down
   if (b.n === 'Assistenshuset') { for (let i = 0; i < 85; i++) husRand(); pcols.push({ rings: b.rings, ...bboxOf(b.rings[0]), top: 18.6, bot: 0 }); mapItems.push({ k: 'p', pts: b.rings[0], fill: ROOF_TILE, line: true }); continue; }   // Kulturministeriet, drawn in KULTURMINISTERIET further down. The 85 numbers are the ones byhus drew for it, so the houses after it keep their windows
-  byhus(b, h, wall, roof);
+  HUS_UDEN = b.n === 'Thorvaldsens Museum'; byhus(b, h, wall, roof); HUS_UDEN = false;
 }
 
 // ======================================================================== CHRISTIANSBORG SLOT
