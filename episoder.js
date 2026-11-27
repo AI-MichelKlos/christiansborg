@@ -3,7 +3,7 @@
 // Fem små optrin, som Ida går forbi på vej mellem nisserne. De siger ikke noget, de er bare noget at se på:
 //   1. Højbro Plads: en mandelbod med glød og damp fra panden og en lille kø
 //   2. Slotspladsen: en far, der slæber på et alt for stort juletræ. Han trækker, glider og sætter sig i sneen, og børnene griner
-//   3. Slotspladsen ved Tårnet: en julemand med en klokke og en gryde og et lille kor, der vugger i takt
+//   3. Slotspladsen ved Tårnet: en julemand med en messingklokke ved en gryde og et kor på fire, der synger »Glade jul«
 //   4. Prins Jørgens Gård: en embedsmand med en stak ringbind, der taber dem i sneen, igen og igen
 //   5. Ridebanen: to børn kaster snebolde efter en snemand med slips, hat og mappe
 //   6. Slotspladsen ved porten til Rigsdagsgården: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
@@ -170,44 +170,6 @@ export function episoder(H) {
         b.arms[0].rotation.x = -grin * 0.4 - (1 - grin) * 0.3; b.arms[1].rotation.x = lerp(-0.3, -1.5, grin);   // peger på far
         b.arms[0].rotation.z = -0.15 - (1 - grin) * Math.max(0, Math.sin(tt * 5 + ph)) * 0.4;
       }
-    };
-  });
-
-  // ---------------------------------------------------------------- 3. Julemanden og koret (Slotspladsen, ved Tårnet)
-  // Julemanden ringer med en klokke ved en gryde på et stativ. Tre sangere med nodemapper vugger i takt.
-  scene(63, -50, Math.PI / 2, (g, e) => {
-    const julemand = placer(person({ coat: '#b3262a', trousers: '#b3262a', shoes: '#1a1412', hair: '#f1eee6', bryn: '#e8e4da', skin: '#f0c9ab', hairStyle: 'kort', scale: 1.04,
-      extra: (g2, head, part, m, foran) => {
-        part(new THREE.SphereGeometry(0.15, 12, 10), m('#f4f1ea'), head, 0, -0.1, 0.07).scale.set(1.05, 1.25, 0.75);   // skægget
-        const h = part(new THREE.ConeGeometry(0.16, 0.4, 12), m('#b3262a'), head, 0, 0.24, -0.04); h.rotation.x = -0.45;
-        part(new THREE.TorusGeometry(0.145, 0.035, 6, 16), m('#f4f1ea'), head, 0, 0.07, -0.01).rotation.x = Math.PI / 2;
-        part(new THREE.SphereGeometry(0.05, 8, 6), m('#f4f1ea'), head, 0, 0.36, -0.2);
-        part(new THREE.CylinderGeometry(0.205, 0.215, 0.07, 16), m('#1a1412'), g2, 0, 1.06, 0, 0).scale.set(1, 1, 0.92);   // bæltet
-        part(new THREE.BoxGeometry(0.09, 0.08, 0.02), m('#d9b25a'), g2, 0, 1.06, foran(1.06) + 0.012, 0);
-      },
-      arm: [null, (sh, part, m, el) => {   // klokken i højre hånd
-        part(new THREE.CylinderGeometry(0.012, 0.012, 0.12, 6), m('#4a3323'), el, 0, -0.38, 0.0, 0);
-        part(new THREE.ConeGeometry(0.07, 0.11, 10, 1, true), m('#d9b25a'), el, 0, -0.47, 0.0, 0).rotation.x = Math.PI;
-      }],
-      foer: f => { f.elbows[1].rotation.x = -1.0; } }), g, 0, 0, 0);
-    // gryden på et stativ
-    const stativ = new THREE.Group(); stativ.position.set(0.85, 0, 0.35); g.add(stativ);
-    for (let i = 0; i < 3; i++) { const a = i * 2.09, b = stk(G.cyl, M.jern, stativ, Math.sin(a) * 0.25, 0.55, Math.cos(a) * 0.25, 0.015, 1.15, 0.015, false); b.rotation.set(Math.cos(a) * 0.22, 0, -Math.sin(a) * 0.22); }
-    const gryde = stk(G.kugle, M.roed, stativ, 0, 0.62, 0, 0.2, 0.17, 0.2); gryde.userData.fri = true;
-    colCirc(...e.ver(0.85, 0.35), 0.35, 1.2);
-    // koret: tre sangere på række bag ham med nodemapper
-    const kor = [[-1.0, -0.9, '#24303a', '#c0392b', false, '#3b2a20'], [0, -1.25, '#4a3a5a', '#e0a63a', true, '#a8794c'], [1.0, -0.9, '#2f3a2f', '#eef0ee', true, '#1f1a18']].map(([lx, lz, coat, toer, kv, hair], i) => {
-      const f = placer(person({ coat, trousers: '#2b2a30', hair, kvinde: kv, long: kv, hairStyle: kv ? (i === 1 ? 'bob' : 'lang') : 'skaldet', toerklaede: toer, statisk: true,
-        extra: (g2, head, part, m, foran) => { const mp = part(new THREE.BoxGeometry(0.26, 0.2, 0.02), m('#1f2a44'), g2, 0, 1.2, foran(1.2) + 0.2, 0); mp.rotation.x = -0.6; },
-        foer: f2 => { for (const [k, a] of f2.arms.entries()) { a.rotation.x = -0.75; a.rotation.z = (k ? 1 : -1) * -0.12; } for (const el of f2.elbows) el.rotation.x = -0.9; } }), g, lx, lz, 0);
-      return f;
-    });
-    return (t) => {
-      const ring = Math.sin(t * 9);
-      julemand.arms[1].rotation.x = -0.9 + ring * 0.35; julemand.arms[1].rotation.z = 0.15;
-      julemand.g.rotation.z = Math.sin(t * 1.4) * 0.03; julemand.g.position.y = Math.abs(Math.sin(t * 1.4)) * 0.015;
-      gryde.rotation.y = Math.sin(t * 0.8) * 0.2;
-      kor.forEach((f, i) => { f.g.rotation.z = Math.sin(t * 1.4 + i * 0.25) * 0.07; f.g.position.y = Math.abs(Math.sin(t * 2.8 + i * 0.5)) * 0.02; });
     };
   });
 
@@ -647,6 +609,136 @@ export function episoder(H) {
         putDamp(k++, tw, Math.sin(kk * Math.PI) * 0.16);
       }
       dGeo.attributes.position.needsUpdate = true; dGeo.attributes.color.needsUpdate = true;
+    };
+  });
+
+  // ---------------------------------------------------------------- 3. Julemanden og koret (Slotspladsen, ved Tårnet)
+  // Julemanden står ved en gryde på et stativ og ringer med en messingklokke. Bag ham synger fire i vintertøj med åbne
+  // nodehæfter »Glade jul« (Franz Gruber, 1818). De vugger i takt, munden åbner sig på hver tone, og ånden damper i kulden.
+  // Melodien spiller stille, når Ida er tæt på og lyden er slået til. Når hun kommer helt hen, vinker julemanden.
+  // Bygget med demonstranternes tøj og ansigter (afsnit 6), så den står efter dem i filen.
+  const pelsBort = (pels) => (g, head, part, m, foran) => {   // the white fur edge down the front and round the hem of Santa's coat
+    const pts = []; for (let k = 0; k <= 10; k++) { const y = 0.84 + 0.78 * k / 10; pts.push(new THREE.Vector3(0, y, foran(y) + 0.012)); }
+    part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 14, 0.032, 6), m(pels), g, 0, 0, 0, 0);
+    ring(part, m, pels, g, foran(0.86) / ZF + 0.012, 0.038, 0.86, ZF, 6, 26);
+  };
+  const pelsAerme = (pels) => (sh, part, m, el) => { ring(part, m, pels, el, 0.062, 0.026, -0.24, 1, 6, 16); };
+  const klokke = () => (sh, part, m, el) => {   // a brass hand bell with a wooden handle, hanging from the right hand
+    const h = holdGruppe(el, 0.0);
+    stk(new THREE.CylinderGeometry(0.016, 0.02, 0.12, 8), M.moerktTrae, h, 0, 0.02, 0.0, 1, 1, 1, false).userData.fri = true;
+    const kl = stk(new THREE.CylinderGeometry(0.035, 0.085, 0.13, 16, 1, true), tm('#d9b25a'), h, 0, -0.1, 0.0, 1, 1, 1, false); kl.userData.fri = true; kl.material.side = THREE.DoubleSide;
+    stk(G.kugle, tm('#8a6a2a'), h, 0, -0.17, 0.0, 0.024, 0.024, 0.024, false).userData.fri = true;
+  };
+  const hefte = (farve) => (g, head, part, m, foran) => {   // an open songbook held in front of the chest, tilted up to the eyes
+    const b = new THREE.Group(); b.position.set(0, 1.2, foran(1.2) + 0.2); b.rotation.x = -0.75; g.add(b);
+    for (const s of [-1, 1]) {
+      const d = part(BG(0.15, 0.2, 0.012), m(farve), b, s * 0.073, 0, 0, 0); d.rotation.y = -s * 0.22;
+      const p = part(BG(0.135, 0.185, 0.006), m('#f7f2e6'), b, s * 0.07, 0, 0.009, 0); p.rotation.y = -s * 0.22;
+      for (let k = 0; k < 5; k++) { const l = part(BG(0.1, 0.004, 0.002), m('#3a3a40'), b, s * 0.07, 0.07 - k * 0.035, 0.013, 0); l.rotation.y = -s * 0.22; }
+    }
+  };
+  // »Glade jul«: [halvtone over C4, ottendedele]. Melodien er fra 1818 og fri at bruge.
+  const GLADE_JUL = (() => {
+    const N = { C4: 0, D4: 2, E4: 4, F4: 5, G4: 7, A4: 9, B4: 11, C5: 12, D5: 14, E5: 16, F5: 17 };
+    const linje = s => s.trim().split(/\s+/).map(x => { const [n, d] = x.split(':'); return [N[n], +d]; });
+    const a = linje('G4:3 A4:1 G4:2 E4:6 G4:3 A4:1 G4:2 E4:6 D5:4 D5:2 B4:6 C5:4 C5:2 G4:6');
+    const b = linje('A4:4 A4:2 C5:3 B4:1 A4:2 G4:3 A4:1 G4:2 E4:6');
+    const c = linje('D5:4 D5:2 F5:3 D5:1 B4:2 C5:6 E5:6 C5:2 G4:2 E4:2 G4:3 F4:1 D4:2 C4:10');
+    return [...a, ...b, ...b, ...c, [null, 6]];
+  })();
+  scene(63, -50, Math.PI / 2, (g, e) => {
+    const HV = '#f4f1ea';
+    const julemand = demonstrant({ coat: '#b3262a', trousers: '#b3262a', skin: '#f0c9ab', hair: HV, bryn: '#e8e4da', hairStyle: 'kort', scale: 1.06, ben: -1,
+      hue: [strikhue('#b3262a', HV, HV)], ansigt: [skaeg(HV), briller('#d9b25a'), kinder('#e98a80')],
+      toej: [pelsBort(HV), baelte('#1a1412', '#d9b25a', 1.08)], vanter: ['#1a1412', HV], stoevle: ['#1a1412', HV],
+      arm: [pelsAerme(HV), flere(pelsAerme(HV), klokke())], boej: [0.5, 1.1] });
+    placer(julemand, g, 0, 0, 0);
+    // gryden på et stativ
+    const stativ = new THREE.Group(); stativ.position.set(0.85, 0, 0.35); g.add(stativ);
+    for (let i = 0; i < 3; i++) { const a = i * 2.09, b = stk(G.cyl, M.jern, stativ, Math.sin(a) * 0.25, 0.55, Math.cos(a) * 0.25, 0.015, 1.15, 0.015, false); b.rotation.set(Math.cos(a) * 0.22, 0, -Math.sin(a) * 0.22); }
+    // the kettle: a red pot with a gold rim and a handle, hanging from the top of the tripod on a short chain
+    const gryde = new THREE.Group(); gryde.position.y = 0.66; gryde.userData.fri = true; stativ.add(gryde);
+    const guld = tm('#d9b25a');
+    stk(new THREE.CylinderGeometry(0.2, 0.16, 0.26, 18), M.roed, gryde, 0, 0, 0, 1, 1, 1).userData.fri = true;
+    const rand = stk(TG(0.2, 0.018, 6, 22), guld, gryde, 0, 0.13, 0, 1, 1, 1, false); rand.rotation.x = Math.PI / 2; rand.userData.fri = true;
+    const hank = stk(TG(0.2, 0.01, 5, 18, Math.PI), M.jern, gryde, 0, 0.13, 0, 1, 1, 1, false); hank.userData.fri = true;
+    stk(G.cyl, M.jern, gryde, 0, 0.36, 0, 0.008, 0.26, 0.008, false).userData.fri = true;
+    stk(new THREE.BoxGeometry(0.16, 0.012, 0.03), M.kul, gryde, 0, 0.135, 0, 1, 1, 1, false).userData.fri = true;   // the slot for coins
+    colCirc(...e.ver(0.85, 0.35), 0.35, 1.2);
+    // koret: fire i en lille bue bag ham
+    const kor = [
+      [-1.25, -0.75, 0.25, { coat: '#24303a', trousers: '#2b2a30', skin: '#f2c6a4', hair: '#3b2a20', hairStyle: 'kort', scale: 1.04, ben: 1, hue: [pelshue('#3a2a20', '#d9cdb6')], ansigt: [skaeg('#3b2a20', false)], toej: [knapper('#c9c4b8', [0.95, 1.1, 1.25, 1.4]), halstoerklaede('#c0392b', HV), hefte('#7a1f24')], vanter: ['#3a2a20'], stoevle: ['#2a1d14'] }],
+      [-0.42, -1.15, 0.08, { coat: '#4a3a5a', trousers: '#2b2a30', skin: '#e9bd99', hair: '#a8794c', kvinde: true, long: true, hairStyle: 'bob', scale: 0.96, ben: -1, hue: [strikhue('#e0a63a', '#e0a63a', HV, '#b3262a')], toej: [knapper('#e0a63a', [0.9, 1.05, 1.2, 1.35]), halstoerklaede('#e0a63a', '#4a3a5a'), hefte('#1f2a44')], vanter: [HV, '#e0a63a'], stoevle: ['#3a2a20', '#e8dcc6'] }],
+      [0.42, -1.15, -0.08, { coat: '#2f3a2f', trousers: '#2b2a30', skin: '#7d4f36', hair: '#1f1a18', kvinde: true, long: true, hairStyle: 'lang', scale: 0.98, ben: 1, hue: [oerevarmere('#f1e6d6')], toej: [baelte('#1e261e', '#d9b25a', 1.1), halstoerklaede(HV, '#2f3a2f'), hefte('#2f5fa8')], vanter: ['#b3262a', HV], stoevle: ['#1f1b1a', '#e8dcc6'] }],
+      [1.25, -0.75, -0.25, { coat: '#5a3a24', trousers: '#24303a', skin: '#f4d2b8', hair: '#d8d4ca', hairStyle: 'skaldet', bryn: '#bdb8ae', scale: 1.0, ben: -1, hue: [strikhue('#2f5fa8', '#2f5fa8', HV, HV)], ansigt: [briller('#5a4a3a'), skaeg('#e4e0d6')], toej: [lommer('#4a3020', 1.0), halstoerklaede('#3e7d4a', HV), hefte('#3e2a1a')], vanter: ['#3e7d4a'], stoevle: ['#2a1d14'] }],
+    ].map(([lx, lz, ry, o], i) => {
+      const f = placer(demonstrant(Object.assign(o, { boej: [1.55, 1.55] })), g, lx, lz, ry);
+      const mund = new THREE.Mesh(SG(0.026, 10, 8), tm('#5a2320')); mund.userData.fri = true; mund.position.set(0, -0.076, 0.13); mund.scale.set(1, 0.25, 0.5); f.head.add(mund);
+      return { f, i, lx, lz, ry, o, mund, p: Math.random() * 6.3, sc: f.g.scale.y };
+    });
+    colCirc(...e.ver(0, -0.9), 1.7, 2.0);
+    // ånden: én sky pr. sanger, og den stiger på hver tone
+    const N = kor.length, dPos = new Float32Array(N * 3), dFarve = new Float32Array(N * 4);
+    for (let i = 0; i < N; i++) dFarve.set([0.93, 0.95, 0.98, 0], i * 4);
+    const dGeo = new THREE.BufferGeometry(); dGeo.setAttribute('position', new THREE.BufferAttribute(dPos, 3)); dGeo.setAttribute('color', new THREE.BufferAttribute(dFarve, 4));
+    const damp = new THREE.Points(dGeo, new THREE.PointsMaterial({ size: 0.24, map: TX.glow, transparent: true, depthWrite: false, vertexColors: true }));
+    damp.frustumCulled = false; damp.userData.fri = true; g.add(damp);
+    const va = new THREE.Vector3(), vb = new THREE.Vector3(), tw = new THREE.Vector3();
+    function grib(f, i, x, y, z) {   // the shoulder turns so the hand (with its fixed elbow bend) reaches a point in the person's own frame
+      const sh = f.arms[i], phi = -f.elbows[i].rotation.x, A = 0.3, B = 0.3;
+      vb.set(0, -A - B * Math.cos(phi), B * Math.sin(phi)).normalize();
+      sh.quaternion.setFromUnitVectors(vb, va.set(x, y, z).sub(sh.position).normalize());
+    }
+    const qA = new THREE.Quaternion(), qB = new THREE.Quaternion();
+    function lodret(f, i) { const h = f.elbows[i].userData.hold; if (!h) return; h.parent.updateWorldMatrix(true, false); h.parent.getWorldQuaternion(qA).invert(); f.root.getWorldQuaternion(qB); h.quaternion.copy(qA.multiply(qB)); }
+    // melodien
+    const BEAT = 0.3, takt = GLADE_JUL.reduce((s, [, d]) => s + d, 0) * BEAT;
+    let node = 0, nodeT = 0, aaben = 0, ringT = 0, vinkT = 9, varNaer = false;
+    const hz = n => 261.63 * Math.pow(2, n / 12);
+    return (t, dt, pos) => {
+      const dI = Math.hypot(pos.x - e.x, pos.z - e.z), naer = dI < 7;
+      if (naer && !varNaer) vinkT = 0; varNaer = naer; vinkT += dt;
+      // the song: the next note when its time has come; louder the closer Ida is
+      nodeT -= dt;
+      if (nodeT <= 0) {
+        const [n, d] = GLADE_JUL[node]; node = (node + 1) % GLADE_JUL.length; nodeT += d * BEAT; if (nodeT < 0) nodeT = d * BEAT;
+        if (n !== null) {
+          aaben = 1;
+          const vol = Math.max(0, 1 - dI / 26) ** 1.5;
+          if (vol > 0.02 && H.tone) { const f0 = hz(n), dur = d * BEAT * 0.92; H.tone(f0, f0 * 1.002, 0, dur, 0.05 * vol, 'triangle'); H.tone(f0 / 2, f0 / 2, 0, dur, 0.025 * vol, 'sine'); }
+        }
+      }
+      aaben = Math.max(0, aaben - dt * 2.2);
+      const sving = Math.sin(t * Math.PI / (BEAT * 3));   // one sway for every bar (6/8)
+      kor.forEach((d, i) => {
+        const { f, p } = d;
+        f.g.rotation.z = sving * 0.045; f.g.position.x = sving * 0.015;
+        f.g.scale.y = d.sc * (1 + Math.sin(t * 1.6 + p) * 0.004);
+        f.head.rotation.set(-0.18 + Math.sin(t * 0.7 + p) * 0.03 + aaben * 0.05, Math.sin(t * 0.3 + p) * 0.08, sving * 0.06);
+        d.mund.scale.set(1 - aaben * 0.25, 0.22 + aaben * 0.75, 0.5);
+        const s = d.o.scale || 1, by = 1.2, bz = 0.32;
+        grib(f, 0, -0.12, by - 0.02, bz); grib(f, 1, 0.12, by - 0.02, bz);
+        // the breath rises from the mouth on each note
+        const k = i, a = aaben * 0.45;
+        f.head.getWorldPosition(tw); tw.y += -0.05 * s; const fw = vb.set(Math.sin(f.root.rotation.y + g.rotation.y), 0, Math.cos(f.root.rotation.y + g.rotation.y));
+        tw.addScaledVector(fw, 0.22 + (1 - aaben) * 0.25); tw.y += (1 - aaben) * 0.15; g.worldToLocal(tw);
+        dPos.set([tw.x, tw.y, tw.z], k * 3); dFarve[k * 4 + 3] = a;
+      });
+      dGeo.attributes.position.needsUpdate = true; dGeo.attributes.color.needsUpdate = true;
+      // Santa: rings the bell two beats in three, and waves when Ida comes close
+      const jf = julemand;
+      jf.g.rotation.z = sving * 0.025; jf.g.scale.y = 1.06 * (1 + Math.sin(t * 1.3) * 0.005);
+      if (vinkT < 3.2) {
+        const v = Math.sin(vinkT * 9); grib(jf, 0, -0.45, 1.95 + v * 0.03, 0.15 + v * 0.06);
+        const ry = e.g.rotation.y, dx = pos.x - e.x, dz = pos.z - e.z, lx = dx * Math.cos(ry) - dz * Math.sin(ry), lz = dx * Math.sin(ry) + dz * Math.cos(ry);
+        jf.head.rotation.set(0.05, Math.max(-1, Math.min(1, Math.atan2(lx, lz))), 0.08 * v);
+      } else { grib(jf, 0, -0.2, 1.0, 0.12); jf.head.rotation.set(-0.05, Math.sin(t * 0.4) * 0.25, sving * 0.05); }
+      const ring_ = Math.sin(t * 7.5);
+      grib(jf, 1, 0.34, 1.12 + ring_ * 0.1, 0.32); lodret(jf, 1);
+      jf.elbows[1].userData.hold && (jf.elbows[1].userData.hold.rotation.z += ring_ * 0.35);
+      ringT -= dt;
+      if (ringT <= 0) { ringT = BEAT * 2; const vol = Math.max(0, 1 - dI / 20) ** 2; if (vol > 0.02 && H.tone) H.tone(2093, 2080, 0, 0.35, 0.02 * vol, 'sine'); }
+      gryde.rotation.y = Math.sin(t * 0.8) * 0.2;
     };
   });
 
