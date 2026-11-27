@@ -731,7 +731,8 @@ const HUD = ['#f2c6a4', '#e9bd99', '#f4d2b8', '#d9a984', '#c98d62', '#a86f4c', '
 // across the body), barn, scale, alvor (a serious face), lukket (closed eyes), detalje: 'lav' for people far away,
 // sidder, extra(g, head, part, m, foran) and arm: [left, right] (sh, part, m, el) for things they wear or hold (el: the elbow),
 // foer(f) to set a pose before the parts are merged, statisk (one group), enkel (head on the body, knees on the thighs),
-// bag: false to merge later (several people as one), skygge: false for no shadow.
+// bag: false to merge later (several people as one), skygge: false for no shadow, grupper(f) to choose the moving groups
+// yourself (for example [f.g, f.head, ...f.arms]: legs merged into the body, but the head can still turn).
 // Returns { root, g, head, legs: [{ hip, knee }], hips, arms, grupper }.
 function menneske(o = {}) {
   const lav = o.detalje === 'lav', kv = !!o.kvinde, seg = n => Math.max(5, Math.round(n * (lav ? 0.6 : 1)));
@@ -845,8 +846,8 @@ function menneske(o = {}) {
   const root = new THREE.Group(); root.add(g);
   const f = { root, g, head, legs, hips, arms, elbows, eyes };
   if (o.foer) o.foer(f);
-  f.grupper = o.statisk ? [g] : o.enkel ? [g, ...arms, ...hips] : [g, head, ...arms, ...hips, ...legs.map(l => l.knee)];
-  if (o.gang && o.enkel && !o.statisk) f.grupper.push(...legs.map(l=>l.knee));
+  f.grupper = o.grupper ? o.grupper(f) : o.statisk ? [g] : o.enkel ? [g, ...arms, ...hips] : [g, head, ...arms, ...hips, ...legs.map(l => l.knee)];
+  if (o.gang && o.enkel && !o.statisk && !o.grupper) f.grupper.push(...legs.map(l=>l.knee));
   if (lively) f.grupper.push(...eyes);
   if (o.bag !== false) bagFigur(f.grupper, { skygge: o.skygge });
   if (lively) f.presence = {
