@@ -112,7 +112,7 @@ export const KALENDER = {
       pind: { at: [433.2, -6.2], face: 0, dy: 0.76, replik: "Jeg har regnet på det. Fire lys koster mindre end en evaluering af, om vi skal have fire lys. Det skriver jeg et notat om." },
       hov: { at: [433.2, 0.8], face: 0, dy: 0.76, replik: "Mit lys lå i havrekassen hele ugen. Hestene lod det være. De ved godt, hvad der er vigtigt." },
       slev: { at: [433.2, 7.8], face: 0, dy: 0.76, replik: "Ingen spiser grød alene på Borgen. Sæt dig. Der er en mandel i en af skålene." },
-      kendelse: { at: [445.8, 0.8], face: 0, dy: 0.76, replik: "Retten konstaterer, at kransen er tændt på lovlig vis. Sagen er afsluttet. Retten går over til grøden." },
+      kendelse: { at: [445.8, 0.8], face: 0, dy: 0.76, replik: "Jeg har talt lysene på kransen. Der er fire. Det stemmer med protokollen, og så kan vi spise." },
       stempel: { at: [445.8, 7.8], face: 0, dy: 0.76, replik: "Stemplet og godkendt. Jeg har også stemplet grøden. Det var nok ikke nødvendigt." },
       bilag: { at: [445.8, -6.2], face: 0, dy: 0.76, replik: "Næste år effektiviserer jeg ikke julen. Jeg sender den i høring. Med en meget lang høringsfrist." },
     },
@@ -120,7 +120,7 @@ export const KALENDER = {
 
   nisser: {
     bilag: { navn: "Bilag", kort: "Bilag", rolle: "Nisse i Effektiviseringsstyrelsen. Den yngste nisse på Christiansborg", hue: "#59636d", toej: "#2b2f36" },
-    kendelse: { navn: "Dommer Thyra", kort: "Thyra", pige: true, rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for hun har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
+    kendelse: { navn: "Hofdame Thyra", kort: "Thyra", pige: true, haar: "#5a3a26", rolle: "Taffelnisse i De Kongelige Repræsentationslokaler. Har dækket op til 117 gallamiddage og aldrig selv fået en tallerken", hue: "#7a1f24", toej: "#2b3a6a" },
     stempel: { navn: "Sekretær Elna", kort: "Elna", pige: true, rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før hun har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
     slev: { navn: "Køkkenmester Anker", kort: "Anker", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#c22a2f", toej: "#8e1f24", bukser: "#3a2a20", forklaede: "#f4f1ea", slev: true },
     hov: { navn: "Staldmester Gerda", kort: "Gerda", pige: true, hoetyv: true, haar: "#b8743a", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
@@ -172,37 +172,37 @@ export const KALENDER = {
         ],
         efter: [
           ["Gerda", "Lyset ligger i havrekassen. Hestene har passet på det hele ugen. Tag det, og tænd det på kransen i Rigsdagsgården."],
-          ["Gerda", "Det tredje lys har Thyra i Højesteret. Hun har gjort det til bevismateriale, og hun giver det ikke fra sig uden en kendelse."],
+          ["Gerda", "Det tredje lys har Thyra i Riddersalen. Hun dækker op til gallamiddag, og hun har gemt det, hvor ingen ville lede: mellem alle de andre lys."],
         ],
       },
       ting: { navn: "Det andet lys", billede: lys(2, `<path d="M16 100l18-16M22 104l20-14M30 104l12-18M86 102l16-18M80 104l22-10" stroke="#d9b25a" stroke-width="3" stroke-linecap="round"/>`) },
     },
     {
-      nr: 3, type: "stor", navn: "Bevismateriale",
-      indgang: "courtEntry", nisse: "kendelse",
-      inde: { place: "courtEntry", at: [544, -1.5], face: 270, dy: 0.6, ting: [544, -0.4] },   // hun står på bænken til højre
-      praj: "Højesteret i Prins Jørgens Gård. Gå gennem porten i Kirkeløngangen fra Slotspladsen og op ad trappen mellem de fire søjler.",
+      nr: 3, type: "stor", navn: "Et lys for meget",
+      indgang: "riddersal", nisse: "kendelse",
+      inde: { place: "riddersal", at: [638.2, 0], face: 270, dy: 0.8, ting: [638.9, 0.35] },   // hun står for enden af det lange taffelbord
+      praj: "Riddersalen i De Kongelige Repræsentationslokaler. Indgangen ligger i Prins Jørgens Gård mellem statuerne.",
       bag: [
-        ["fortaeller", "Der er lys bag søjlerne. Inde i vindfanget står en lille skikkelse i sort kappe ved siden af et stearinlys med et mærkat på."],
+        ["fortaeller", "Riddersalen er dækket op til gallamiddag. For enden af det lange bord står en lille skikkelse i kjole og tæller stearinlys."],
       ],
       gaade: {
         foer: [
-          ["Thyra", "Retten har beslaglagt et stearinlys. Bilag ville have det kasseret som en overflødig driftsudgift."],
-          ["ida", "Må jeg få det?"],
-          ["Thyra", "Retten har vurderet sagen. Et lys, der brænder i december, er ikke en driftsudgift. Det er en tradition, og den kan ikke spares væk ved et notat."],
+          ["Thyra", "Der skal stå 18 lys på taffelbordet. Bilag har talt dem og fundet 19. Han vil have det ene sparet væk."],
+          ["ida", "Er det et af adventslysene?"],
+          ["Thyra", "Det står ikke i protokollen. Men det har et tal på, og gæsterne her har aldrig tal på."],
         ],
         efter: [
-          ["Thyra", "Lyset er hermed frigivet. Tænd det på kransen."],
+          ["Thyra", "Tag det, før Bilag tæller igen. Tænd det på kransen."],
           ["Thyra", "Det sidste lys har Elna i Statsministeriet, lige ved siden af. Hun vil nok have noget stemplet, før hun giver det fra sig."],
         ],
       },
-      ting: { navn: "Det tredje lys", billede: lys(3, `<circle cx="82" cy="52" r="12" fill="#7a1f24" ${S}/><path d="M76 52l4 4 8-8" fill="none" stroke="#f6e6b8" stroke-width="3" stroke-linecap="round"/>`) },
+      ting: { navn: "Det tredje lys", billede: lys(3, `<path d="M74 58l3-12 6 7 5-9 5 9 6-7 3 12z" fill="#d9b25a" ${S}/><circle cx="88" cy="44" r="2.5" fill="#b3262a"/>`) },
     },
     {
       nr: 4, type: "stor", navn: "Til orientering",
       indgang: "pmEntry", nisse: "stempel",
       inde: { place: "pmEntry", at: [500, -3.25], face: 0, dy: 0.55, ting: [501, -3.2] },   // hun står på disken
-      praj: "Statsministeriet i Prins Jørgens Gård, ved siden af Højesteret. Indgangen har nummer 11.",
+      praj: "Statsministeriet i Prins Jørgens Gård. Indgangen har nummer 11.",
       bag: [
         ["fortaeller", "I forhallen brænder en enkelt lampe. På disken står en nisse med ærmeholdere og stempler i papirer, der ikke er der."],
       ],

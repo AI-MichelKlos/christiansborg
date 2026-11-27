@@ -7459,6 +7459,7 @@ const INTERIOR = (() => {
       const p=FT.loc(P.pos.x,P.pos.z);
       const canEnter=!paused&&!MYBOAT.on&&!TOWER.on&&!TOWER.busy;
       if(canEnter&&P.onGround&&P.pos.y<.8)for(const [key,d] of Object.entries(MINISTRY_DOORS)){
+        if(I.kalAabne&&!I.kalAabne.has(key))continue;   // the Christmas game: only the doors the story uses are open
         const dx=P.pos.x-d.x,dz=P.pos.z-d.z,depth=dx*d.nx+dz*d.nz,across=dx*d.nz-dz*d.nx;
         const go=()=>enter(key==='courtEntry'?'courtEntry':key==='pmEntry'?'pmEntry':key==='finance'?'finance':key==='stables'?'stables':key==='riddersal'?'riddersal':'reform',key==='reformSide');
         if(Math.abs(across)<1.05&&depth>.65&&depth<1.65){go();return;}
@@ -9527,6 +9528,7 @@ const KALENDER = (() => {
     if (b.flugt === 0 && typeof animatePresence === 'function') animatePresence(f, dt, dist < 12);
   }
   const indPlace = l => l.inde.ind || l.inde.place;   // where the door leads in, if the nisse stands further inside
+  if (KR) I.kalAabne = new Set(K.laager.map(l => l.indgang));   // the other entrances in Prins Jørgens Gård and elsewhere stay shut
   const NISSER = [];
   for (const l of K.laager) {
     if (l.type !== 'stor' || !l.inde || !K.nisser[l.nisse]) continue;
