@@ -10034,6 +10034,7 @@ const KALENDER = (() => {
   const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch, GARDEN, toast }) : { gruppe: new THREE.Group(), update() {} };
   EPI.gruppe.traverse(o => { if (o.material) sneMat(o.material); });
   HOOKS.frame.push((dt, t) => EPI.update(dt, t, P.pos, ude()));
+  if (EPI.slaede) EPI.slaede({ fald: () => faldNu, inde: () => I.on, aktiv: () => started && !paused, camera, tone, toast, loft, drej, slange, rundKasse, nuance });   // Santa's sleigh flies over when it snows (slaede.js)
   if (TESTMODE) window.__epi = EPI;
   // The light follows the four Sundays: dusk at the first door, dark evening by the second Sunday, night from the third,
   // and when the last door is open the morning comes. 0 is daylight and 1 is dark.

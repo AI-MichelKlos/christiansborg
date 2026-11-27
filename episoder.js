@@ -15,6 +15,8 @@
 // og animeres kun, når Ida er tæt på (kortere på lav grafik), og det hele er skjult, når hun er indendørs.
 // Tekster og kommentarer må ikke indeholde tankestreg. Brug bindestreg.
 
+import { slaede } from './slaede.js';   // Julemanden i kanen, der flyver forbi, når det sner
+
 export function episoder(H) {
   const { THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch } = H;
   const gruppe = new THREE.Group(); gruppe.name = 'episoder'; dyn.add(gruppe);
@@ -1092,7 +1094,12 @@ export function episoder(H) {
 
   // ---------------------------------------------------------------- hver frame
   // pos: Idas plads. ude: hun er udenfor (ikke inde i en bygning, i Tårnet eller i båden)
+  // Julemanden i kanen (slaede.js): index.html giver den vejret og lydene, når alt det er klar
+  let SL = null;
+  const medSlaede = (X) => { SL = slaede(Object.assign({}, H, X)); return SL; };
+
   function update(dt, t, pos, ude) {
+    if (SL) SL.update(dt, t, pos);   // kanen flyver også videre, når Ida står i Tårnet
     gruppe.visible = !!ude;
     if (!ude) return;
     const R = GFX.lav ? 50 : 80, d_ = Math.min(dt, 0.1);
@@ -1102,5 +1109,5 @@ export function episoder(H) {
       if (vis) { e.t += d_; e.upd(e.t, d_, pos); }
     }
   }
-  return { gruppe, update, EP };
+  return { gruppe, update, EP, slaede: medSlaede, get SL() { return SL; } };
 }
