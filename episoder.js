@@ -6,7 +6,7 @@
 //   3. Slotspladsen ved Tårnet: en julemand med en klokke og en gryde og et lille kor, der vugger i takt
 //   4. Prins Jørgens Gård: en embedsmand med en stak ringbind, der taber dem i sneen, igen og igen
 //   5. Ridebanen: to børn kaster snebolde efter en snemand med slips, hat og mappe
-//   6. Slotspladsen: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
+//   6. Slotspladsen ved porten til Rigsdagsgården: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
 //
 // index.html kalder episoder(...) én gang i KALENDER-blokken og derefter update(dt, t, pos, ude) i hver frame.
 // Ydelse: alle figurer er bagt til få meshes (menneske() i index.html), geometri og materialer deles, hver scene vises
@@ -303,10 +303,10 @@ export function episoder(H) {
     };
   });
 
-  // ---------------------------------------------------------------- 6. Demonstrationen (Slotspladsen)
+  // ---------------------------------------------------------------- 6. Demonstrationen (Slotspladsen, ved porten ind til Rigsdagsgården)
   // Ti venlige mennesker i alle aldre står med et banner. De to forreste holder stængerne, de andre vugger,
   // klapper i takt og løfter en hånd på skift. En har en termokande, et barn sidder på sin fars skuldre.
-  scene(95, -27, Math.atan2(-0.55, -0.83), (g, e) => {
+  scene(85.3, 32.6, Math.atan2(0.95, -0.25), (g, e) => {
     // banneret: tegnet på et lærred, så teksten står skarpt. Det får ikke sne på.
     const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 200; const c = cv.getContext('2d');
     c.fillStyle = '#f4efe2'; c.fillRect(0, 0, 1024, 200); c.strokeStyle = '#b3262a'; c.lineWidth = 14; c.strokeRect(7, 7, 1010, 186);
