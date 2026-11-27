@@ -33,7 +33,7 @@ Et spor er en udgave af spillet med sit eget manuskript, sit eget tema og sin eg
 ## Julespillet: Nissernes adventskrans
 Julespillet for 2026 har sin egen adresse: https://ai-michelklos.github.io/christiansborg/jul/
 
-Bilag fra Effektiviseringsenheden har fjernet de fire lys fra adventskransen i Rigsdagsgården. Fire nisser har reddet hver sit lys: Anker i Folketinget, Hov i De Kongelige Stalde, Kendelse i Højesteret og Stempel i Statsministeriet. Ida henter lysene i rækkefølge og tænder dem på kransen. Når alle fire brænder, ringer Holmens Kirke julen ind, der er fyrværkeri, og nisserne spiser grød i Tårnet. Der er ingen datolås, så man kan spille det hele på én gang.
+Bilag fra Effektiviseringsstyrelsen har fjernet de fire lys fra adventskransen i Rigsdagsgården. Fire nisser har reddet hver sit lys: Anker i Folketinget, Gerda i De Kongelige Stalde, Thyra i Højesteret og Elna i Statsministeriet. Ida henter lysene i rækkefølge og tænder dem på kransen. Når alle fire brænder, ringer Holmens Kirke julen ind, der er fyrværkeri, og nisserne spiser grød i Tårnet. Der er ingen datolås, så man kan spille det hele på én gang.
 
 - Alt indhold står i `adventskrans.js`. Rammen er den samme som julekalenderens (afsnittet JULEKALENDER i `index.html`), så sne, lys, juletræ, fyrværkeri og alle bygninger er de samme.
 - Hvert tændt lys tæller som en søndag: sneen lægger sig, det bliver mørkt, sneen stopper ved det tredje lys, og ved det fjerde er det en klar nat.

@@ -89,10 +89,10 @@ export const KALENDER = {
 
   nisser: {
     bilag: { navn: "Bilag", kort: "Bilag", rolle: "Nisse i Effektiviseringsstyrelsen. Den yngste nisse på Christiansborg", hue: "#59636d", toej: "#2b2f36" },
-    kendelse: { navn: "Dommer Kendelse", kort: "Kendelse", rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for han har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
-    stempel: { navn: "Sekretær Stempel", kort: "Stempel", rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før han har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
+    kendelse: { navn: "Dommer Thyra", kort: "Thyra", pige: true, rolle: "Retsnisse i Højesteret. Har aldrig tabt en sag, for hun har aldrig ført en", hue: "#7a1f24", toej: "#2b2a30" },
+    stempel: { navn: "Sekretær Elna", kort: "Elna", pige: true, rolle: "Forkontorsnisse i Statsministeriet. Intet gælder, før hun har stemplet det", hue: "#a8252b", toej: "#3a4a5a" },
     slev: { navn: "Køkkenmester Anker", kort: "Anker", rolle: "Køkkennisse i Snapstinget. Har rørt i den samme gryde siden systemskiftet", hue: "#a8252b", toej: "#d9d2c2" },
-    hov: { navn: "Staldmester Hov", kort: "Hov", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
+    hov: { navn: "Staldmester Gerda", kort: "Gerda", pige: true, rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
     pind: { navn: "Kontorchef Pind", kort: "Pind", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
   },
 
@@ -113,7 +113,7 @@ export const KALENDER = {
         ],
         efter: [
           ["Anker", "Her. Det lugter lidt af kanel. Tænd det på kransen ude ved trappen."],
-          ["Anker", "Det næste lys har Hov i De Kongelige Stalde ved Ridebanen. Han har gemt det et sted, hvor hestene passer på det."],
+          ["Anker", "Det næste lys har Gerda i De Kongelige Stalde ved Ridebanen. Hun har gemt det et sted, hvor hestene passer på det."],
         ],
       },
       ting: { navn: "Det første lys", billede: lys(1, `<path d="M18 98l30-14" stroke="#7a4a26" stroke-width="7" stroke-linecap="round"/><path d="M22 96l26-12" stroke="#a8693a" stroke-width="2" stroke-linecap="round"/>`) },
@@ -128,13 +128,13 @@ export const KALENDER = {
       ],
       gaade: {
         foer: [
-          ["Hov", "Nå, Pind har sendt dig. Bilag kom forbi med et måleskema. Han ville vide, om hestene kunne nøjes med tre ben hver i december."],
+          ["Gerda", "Nå, Pind har sendt dig. Bilag kom forbi med et måleskema. Han ville vide, om hestene kunne nøjes med tre ben hver i december."],
           ["ida", "Hvad sagde du til ham?"],
-          ["Hov", "At det ville jeg vende tilbage på. Det sagde han også, så vi forstod hinanden."],
+          ["Gerda", "At det ville jeg vende tilbage på. Det sagde han også, så vi forstod hinanden."],
         ],
         efter: [
-          ["Hov", "Lyset ligger i havrekassen. Hestene har passet på det hele ugen. Tag det, og tænd det på kransen i Rigsdagsgården."],
-          ["Hov", "Det tredje lys har Kendelse i Højesteret. Han har gjort det til bevismateriale, og han giver det ikke fra sig uden en kendelse."],
+          ["Gerda", "Lyset ligger i havrekassen. Hestene har passet på det hele ugen. Tag det, og tænd det på kransen i Rigsdagsgården."],
+          ["Gerda", "Det tredje lys har Thyra i Højesteret. Hun har gjort det til bevismateriale, og hun giver det ikke fra sig uden en kendelse."],
         ],
       },
       ting: { navn: "Det andet lys", billede: lys(2, `<path d="M16 100l18-16M22 104l20-14M30 104l12-18M86 102l16-18M80 104l22-10" stroke="#d9b25a" stroke-width="3" stroke-linecap="round"/>`) },
@@ -142,20 +142,20 @@ export const KALENDER = {
     {
       nr: 3, type: "stor", navn: "Bevismateriale",
       indgang: "courtEntry", nisse: "kendelse",
-      inde: { place: "courtEntry", at: [544, -1.5], face: 270, dy: 0.6, ting: [544, -0.4] },   // han står på bænken til højre
+      inde: { place: "courtEntry", at: [544, -1.5], face: 270, dy: 0.6, ting: [544, -0.4] },   // hun står på bænken til højre
       praj: "Højesteret i Prins Jørgens Gård. Gå gennem porten i Kirkeløngangen fra Slotspladsen og op ad trappen mellem de fire søjler.",
       bag: [
         ["fortaeller", "Der er lys bag søjlerne. Inde i vindfanget står en lille skikkelse i sort kappe ved siden af et stearinlys med et mærkat på."],
       ],
       gaade: {
         foer: [
-          ["Kendelse", "Retten har beslaglagt et stearinlys. Bilag ville have det kasseret som en overflødig driftsudgift."],
+          ["Thyra", "Retten har beslaglagt et stearinlys. Bilag ville have det kasseret som en overflødig driftsudgift."],
           ["ida", "Må jeg få det?"],
-          ["Kendelse", "Retten har vurderet sagen. Et lys, der brænder i december, er ikke en driftsudgift. Det er en tradition, og den kan ikke spares væk ved et notat."],
+          ["Thyra", "Retten har vurderet sagen. Et lys, der brænder i december, er ikke en driftsudgift. Det er en tradition, og den kan ikke spares væk ved et notat."],
         ],
         efter: [
-          ["Kendelse", "Lyset er hermed frigivet. Tænd det på kransen."],
-          ["Kendelse", "Det sidste lys har Stempel i Statsministeriet, lige ved siden af. Han vil nok have noget stemplet, før han giver det fra sig."],
+          ["Thyra", "Lyset er hermed frigivet. Tænd det på kransen."],
+          ["Thyra", "Det sidste lys har Elna i Statsministeriet, lige ved siden af. Hun vil nok have noget stemplet, før hun giver det fra sig."],
         ],
       },
       ting: { navn: "Det tredje lys", billede: lys(3, `<circle cx="82" cy="52" r="12" fill="#7a1f24" ${S}/><path d="M76 52l4 4 8-8" fill="none" stroke="#f6e6b8" stroke-width="3" stroke-linecap="round"/>`) },
@@ -163,19 +163,19 @@ export const KALENDER = {
     {
       nr: 4, type: "stor", navn: "Til orientering",
       indgang: "pmEntry", nisse: "stempel",
-      inde: { place: "pmEntry", at: [500, -3.25], face: 0, dy: 0.55, ting: [501, -3.2] },   // han står på disken
+      inde: { place: "pmEntry", at: [500, -3.25], face: 0, dy: 0.55, ting: [501, -3.2] },   // hun står på disken
       praj: "Statsministeriet i Prins Jørgens Gård, ved siden af Højesteret. Indgangen har nummer 11.",
       bag: [
         ["fortaeller", "I forhallen brænder en enkelt lampe. På disken står en nisse med ærmeholdere og stempler i papirer, der ikke er der."],
       ],
       gaade: {
         foer: [
-          ["Stempel", "Bilag lagde sit papir her: »Adventskransen udgår. Fire lys erstattes af ét fælles lys efter udbud.« Han ville have det stemplet."],
+          ["Elna", "Bilag lagde sit papir her: »Adventskransen udgår. Fire lys erstattes af ét fælles lys efter udbud.« Han ville have det stemplet."],
           ["ida", "Gjorde du det?"],
-          ["Stempel", "Nej. Der var ikke vedlagt en konsekvensanalyse. Kun et notat om, at den var på vej. Så jeg stemplede det »Til orientering« og lagde det nederst i bunken."],
+          ["Elna", "Nej. Der var ikke vedlagt en konsekvensanalyse. Kun et notat om, at den var på vej. Så jeg stemplede det »Til orientering« og lagde det nederst i bunken."],
         ],
         efter: [
-          ["Stempel", "Her er det sidste lys. Jeg har stemplet det, så nu gælder det. Tænd det, så er kransen hel."],
+          ["Elna", "Her er det sidste lys. Jeg har stemplet det, så nu gælder det. Tænd det, så er kransen hel."],
         ],
       },
       ting: { navn: "Det fjerde lys", billede: lys(4, `<rect x="70" y="46" width="34" height="16" rx="2" fill="none" stroke="#2f5fa8" stroke-width="3" transform="rotate(-14 87 54)"/><path d="M76 56l22-6" stroke="#2f5fa8" stroke-width="3" stroke-linecap="round"/>`) },

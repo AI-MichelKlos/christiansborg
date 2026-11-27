@@ -9363,7 +9363,11 @@ const KALENDER = (() => {
       extra: (g, head, part, m) => {
         const hue = part(new THREE.ConeGeometry(0.17, 0.42, 14), m(n.hue || '#a8252b'), head, 0, 0.26, -0.02); hue.rotation.x = -0.18;
         part(new THREE.SphereGeometry(0.045, 10, 8), m('#f4f1ea'), head, 0, 0.46, -0.07);
-        part(new THREE.SphereGeometry(0.13, 12, 10), m('#f1eee6'), head, 0, -0.12, 0.07).scale.set(1, 1.15, 0.7);   // the beard
+        if (!n.pige) part(new THREE.SphereGeometry(0.13, 12, 10), m('#f1eee6'), head, 0, -0.12, 0.07).scale.set(1, 1.15, 0.7);   // the beard
+        else for (const sx of [-1, 1]) {   // the girls get two braids instead of a beard
+          part(new THREE.SphereGeometry(0.06, 10, 8), m('#c9a46a'), head, sx * 0.15, -0.12, 0.0).scale.set(1, 2.2, 1);
+          part(new THREE.SphereGeometry(0.035, 8, 6), m('#b3262a'), head, sx * 0.15, -0.3, 0.0);
+        }
       } });
   }
   const indPlace = l => l.inde.ind || l.inde.place;   // where the door leads in, if the nisse stands further inside
