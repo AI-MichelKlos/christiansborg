@@ -34,7 +34,7 @@ export const KALENDER = {
   hjaelpTitel: "Sådan finder du huerne",
   hjaelpKnap: "Find den første hue",
   hjaelp: [
-    { b: "Find huerne.", t: "Gå hen til en hue, så tager Ida den. Øverst til venstre står, hvor den næste er. Går du i stå, kommer der en pil." },
+    { b: "Find huerne.", t: "Gå hen til en hue, så tager Ida den. Øverst til venstre står, hvor den næste er, og pilen viser vejen." },
     { b: "Sig hej.", t: "Ved hver hue står en nisse. Gå hen og sig hej, hvis du vil høre en historie fra stedet. Du kan også bare gå videre." },
     { b: "Styring.", t: "Gå med venstre tommel eller W, A, S, D. Hold tommelen helt ude for at løbe. Knappen nederst bruger du til at tale og gå ind." },
   ],

@@ -4,7 +4,6 @@
 //   1. Højbro Plads: en mandelbod med glød og damp fra panden og en lille kø
 //   2. Slotspladsen: en far, der slæber på et alt for stort juletræ. Han trækker, glider og sætter sig i sneen, og børnene griner
 //   3. Slotspladsen ved Tårnet: en julemand med en messingklokke ved en gryde og et kor på fire, der synger »Glade jul«
-//   4. Prins Jørgens Gård: en embedsmand med en stak ringbind, der taber dem i sneen, igen og igen
 //   5. Ridebanen: to børn kaster snebolde efter en snemand med slips, hat og mappe
 //   6. Slotspladsen ved porten til Rigsdagsgården: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
 //   7. Tøjhusgade: cyklister, der kører frem og tilbage i højre side af vejen, og tre parkerede cykler ved en husmur
@@ -40,8 +39,6 @@ export function episoder(H) {
     sne: tm('#f4f7fa'), kul: tm('#24221f'), gulerod: tm('#e07a2e'), trae: tm('#7a4f2e'), moerktTrae: tm('#4a3323'),
     groen: tm('#1f5a37'), roed: tm('#b3262a'), hvid: tm('#eef0ee'), kobber: tm('#b8733a'), mandel: tm('#8a5a33'),
     sort: tm('#202226'), messing: tm('#d9b25a'), jern: tm('#3a3c40'),
-    // ringbindene får deres egne materialer uden sne, så farverne kan ses ovenfra
-    ringbind: ['#2f5fa8', '#b3262a', '#3e7d4a', '#e0a63a', '#6f7780', '#7d4f8a'].map(c => { const m = tm(c).clone(); m.onBeforeCompile = () => {}; m.userData.sne = true; return m; }),
   };
   const glodMat = (farve, op = 0.8) => new THREE.SpriteMaterial({ map: TX.glow, color: farve, transparent: true, opacity: op, depthWrite: false, blending: THREE.AdditiveBlending });
   const dampMat = () => new THREE.SpriteMaterial({ map: TX.glow, color: '#ffffff', transparent: true, opacity: 0, depthWrite: false });
@@ -335,50 +332,6 @@ export function episoder(H) {
         b.arms[0].rotation.x = -grin * 0.4 - (1 - grin) * 0.3; b.arms[1].rotation.x = lerp(-0.3, -1.5, grin);   // peger på far
         b.arms[0].rotation.z = -0.15 - (1 - grin) * Math.max(0, Math.sin(tt * 5 + ph)) * 0.4;
       }
-    };
-  });
-
-  // ---------------------------------------------------------------- 4. Embedsmanden og ringbindene (Prins Jørgens Gård)
-  // En embedsmand bærer en stak ringbind over gården. Det øverste glider ned i sneen. Han bukker sig efter det,
-  // og så glider det næste ned på den anden side. Han samler dem op, retter stakken til og står lidt. Så igen.
-  scene(-39, -65.5, Math.PI / 4, (g, e) => {
-    const mand = placer(demonstrant({ coat: '#2b2f36', trousers: '#2b2f36', skin: '#f0c9ab', hair: '#8c8c88', bryn: '#8c8c88', hairStyle: 'skaldet', alvor: true, scale: 1.02,
-      grupper: f => [f.g, f.head, ...f.arms, ...f.hips],
-      hue: [hat('#3a3d44', '#1a1412')], ansigt: [briller('#1d1a1c'), skaeg('#9a9a96', false)], toej: [knapper('#1d1a1c', [0.92, 1.07, 1.22, 1.37], [-0.06, 0.06]), lommer('#25292f', 0.98), halstoerklaede('#6f7780', '#2b2f36')],
-      vanter: ['#3a2a20'], stoevle: ['#1a1412'], boej: [1.35, 1.35],
-      foer2: f => { for (const [k, a] of f.arms.entries()) { a.rotation.x = -0.35; a.rotation.z = (k ? 1 : -1) * 0.05; } } }), g, 0, 0, 0);
-    // stakken sidder på kroppen, så den følger med, når han bukker sig
-    const stak = new THREE.Group(); stak.position.set(0, 1.12, 0.36); stak.userData.fri = true; mand.g.add(stak);
-    const bind = M.ringbind.map((mat, i) => { const b = stk(G.kasse, mat, stak, (i % 2 ? 0.015 : -0.01), i * 0.075, 0, 0.32, 0.07, 0.28); b.rotation.y = (i % 3 - 1) * 0.05; return b; });
-    const loese = [0, 1].map(i => { const b = stk(G.kasse, M.ringbind[5 - i], g, 0, 0, 0, 0.32, 0.07, 0.28); b.visible = false; b.userData.fri = true; return b; });
-    colCirc(...e.ver(0, 0), 0.35, 1.8);
-    const T = 10, start = [new THREE.Vector3(), new THREE.Vector3()], slut = [new THREE.Vector3(0.75, 0.035, 0.75), new THREE.Vector3(-0.7, 0.035, 0.45)];
-    let sidste = -1;
-    return (tt) => {
-      const t = tt % T;
-      if (t < sidste) { for (const b of bind) b.visible = true; for (const l of loese) l.visible = false; }
-      sidste = t;
-      const buk = ramp(t, 3.3, 4.2) * (1 - ramp(t, 6.3, 7.2));
-      mand.g.rotation.x = buk * 0.75 + Math.sin(tt * 0.9) * 0.015;
-      mand.hips[0].rotation.x = mand.hips[1].rotation.x = -buk * 0.5; mand.g.position.y = -buk * 0.05;
-      mand.g.rotation.z = (1 - buk) * Math.sin(tt * 1.3) * 0.02;
-      // de to ringbind, der glider af: nummer 5 (øverst) efter 2 sekunder, nummer 4, mens han bukker sig
-      for (let i = 0; i < 2; i++) {
-        const b0 = bind[5 - i], l = loese[i], t0 = i ? 4.0 : 2.0, t1 = t0 + 0.65, op = ramp(t, 6.4, 7.2);
-        if (t >= t0 && !l.visible && t < 7.2) { b0.updateWorldMatrix(true, false); start[i].copy(g.worldToLocal(b0.getWorldPosition(v3))); b0.visible = false; l.visible = true; }
-        if (!l.visible) continue;
-        if (t >= 7.2) { l.visible = false; b0.visible = true; continue; }
-        const k = ramp(t, t0, t1), s = start[i], e2 = slut[i];
-        if (op > 0) {   // han samler dem op: tilbage op i stakken
-          l.position.set(lerp(e2.x, s.x, op), lerp(e2.y, s.y, op) + Math.sin(op * Math.PI) * 0.2, lerp(e2.z, s.z, op)); l.rotation.set(0, 0, lerp(i ? 0.25 : -0.3, 0, op));
-        } else {
-          l.position.set(lerp(s.x, e2.x, k), lerp(s.y, e2.y, k * k) + Math.sin(k * Math.PI) * 0.15, lerp(s.z, e2.z, k));
-          l.rotation.set(k * (i ? -1.2 : 1.4) * (1 - ramp(t, t1 - 0.1, t1)), 0, (i ? 0.25 : -0.3) * k);
-        }
-      }
-      // han kigger ned efter dem og retter stakken til bagefter
-      const ret = ramp(t, 7.6, 8.0) * (1 - ramp(t, 8.6, 9.0));
-      stak.rotation.z = ret * Math.sin(tt * 14) * 0.05 + (ramp(t, 1.5, 2.0) - ramp(t, 2.0, 2.4)) * 0.12;
     };
   });
 

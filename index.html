@@ -10229,7 +10229,7 @@ const KALENDER = (() => {
     else if (erInde) { o.x = h.inde.x; o.z = h.inde.z; o.y = (h.inde.gulv ? I.floor : 0) + h.inde.y; o.r = h.inde.r || (h.inde.place === 'stables' ? 3.4 : 2.6); inde.add(o.g); }
     else { [o.x, o.z] = taarnPunkt(h.taarn.f); o.y = T_.FLOOR + 1.12; gruppe.add(o.g); }
     o.g.position.set(o.x, o.y, o.z); if (erInde && h.inde.rot != null) o.g.rotation.y = h.inde.rot * Math.PI / 180;
-    if (erUde) {   // a soft column of light over the hat: shown for the first hat, and for the next one when Ida is stuck
+    if (erUde) {   // a soft column of light over the next hat
       const straale = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 1.1, 16, 14, 1, true), new THREE.MeshBasicMaterial({ color: '#ffe6a8', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false }));
       straale.position.set(o.x, o.y + 8.5, o.z); straale.visible = false; gruppe.add(straale); o.straale = straale;
     }
@@ -10317,7 +10317,7 @@ const KALENDER = (() => {
     const ude_ = !I.on && !T_.on, n = S.huer.length;
     for (const o of HUO) {
       const fundet = S.huer.includes(o.h.id);
-      if (o.straale) { const vis = !fundet && huePaaSted(o) && naesteHue() === o.h && (S.huer.length === 0 || S.vej || (vink.id && vink.id.startsWith(o.h.id) && tid - vink.t0 > 30)); o.straale.visible = vis; if (vis) o.straale.material.opacity = 0.16 + 0.06 * Math.sin(tid * 2); }
+      if (o.straale) { const vis = !fundet && huePaaSted(o) && naesteHue() === o.h; o.straale.visible = vis; if (vis) o.straale.material.opacity = 0.16 + 0.06 * Math.sin(tid * 2); }
       if (fundet && !o.tagT) { o.g.visible = false; continue; }
       if (o.tagT) {   // taken: it jumps up, spins and shrinks away
         o.tagT += dt; const k = o.tagT / 0.7; o.g.visible = k < 1 && huePaaSted(o);
@@ -10359,13 +10359,12 @@ const KALENDER = (() => {
       if (!paused && !cer && dist < 2.4) { const ns = K.nisser[t.id], rep = K.fest?.nisser?.[t.id]?.replik; offerAction({ id: 'hu-jul', label: `Sig glædelig jul til ${ns.kort || ns.navn}`, prio: 8, run: () => GAADE.scene({ eyebrow: 'Ved juletræet', title: ns.navn, lines: [[ns.kort || ns.navn, rep || 'Glædelig jul! Se, hvor det lyser.']], btn: 'Glædelig jul' }) }); }
     }
   }
-  // what to do now (the card in the top left corner). The place is always named; the arrow and the distance only come
-  // when Ida has not come closer for half a minute, or when "Vis altid vejen" is on, so the hunt is hers to find.
+  // what to do now (the card in the top left corner): the next hat, the place and an arrow with the distance at once.
   function maalHU(M_, card) {
     const lit = Math.round(frem(S)), lille = $('maal').querySelector('small'), lt = `${K.titel} · ${lit} af ${N} lys`;
     if (lille.textContent !== lt) { lille.textContent = lt; traeTal.textContent = String(lit); traeTal.hidden = !started; $('bNotes').setAttribute('aria-label', `Juletræet, ${lit} af ${N} lys tændt`); }
     if (!started || !M_.vis || cer) { card.hidden = true; M_.punkt = null; return; }
-    let id, hvad, hvor, maalP = null, lokal = null, pil = null, altid = !!S.vej, kort_ = null;
+    let id, hvad, hvor, maalP = null, lokal = null, pil = null, altid = true, kort_ = null;   // the arrow shows the way at once
     const h = naesteHue();
     if (!h && !S.traeSet) { id = 'trae'; hvad = 'Gå til juletræet'; kort_ = 'Juletræet';
       if (T_.on) hvor = 'Kør ned igen. ' + K.juletrae.praj; else if (I.on) hvor = (I.place === 'folketing' ? 'Gå ud i Rigsdagsgården. ' : 'Gå ud igen. ') + K.juletrae.praj;
@@ -10428,10 +10427,6 @@ const KALENDER = (() => {
       li.append(ik, tx); ol.append(li);
     }
     body.append(ol);
-    if (!S.traeSet) {
-      const lab = el('label', 'gdCheck'), cb = el('input'); cb.type = 'checkbox'; cb.checked = !!S.vej; lab.append(cb, ' Vis altid vejen (pil og afstand)');
-      cb.addEventListener('change', () => { S.vej = cb.checked; gem(); }); body.append(lab);
-    }
   }
 
   // ---- every frame: the doors swing, the next one glows, and the button offers what Ida can do

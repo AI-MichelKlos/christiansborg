@@ -37,7 +37,7 @@ En kort tur på telefonen, cirka 10 minutter. Nisserne har gemt otte nissehuer p
 
 - Huerne ligger på Højbro (over havmanden), for enden af gallabordet i Riddersalen, på Marmorbroen, på en båsvæg i De Kongelige Stalde, på Kierkegaards hoved i Bibliotekshaven, på rækværket på Udsigten, på Frederik 7.s hoved og på talerstolen i Folketingssalen. Man tager en hue ved at gå hen til den. På Udsigten drejer man rundt, til man ser den.
 - Ved hver hue står en nisse. Man kan sige hej og høre en kort historie, der faktisk er sket på stedet. Man behøver ikke. Kilderne står i `dev/NISSEHUER.md`.
-- Øverst til venstre står, hvor den næste hue er. Pilen og afstanden kommer først, hvis man ikke er kommet nærmere i et halvt minut, eller hvis Vis altid vejen er slået til under knappen Træet. Over den første hue står en lysstribe.
+- Øverst til venstre står, hvor den næste hue er, og en pil med afstanden viser vejen med det samme. Over den næste hue udenfor står en lysstribe.
 - Sneen ligger altid, og der kommer lette byger. Det bliver mørkere, jo flere lys der brænder.
 - Alt indhold står i `nissehuer.js`. Rammen er afsnittet JULEKALENDER i `index.html` (spil: "huer"). Kør `node dev/tjek-nissehuer.js` efter en rettelse.
 

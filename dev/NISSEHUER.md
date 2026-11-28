@@ -33,8 +33,7 @@ Den længste strækning er fra Stalden til Bibliotekshaven (476 m). Undervejs ko
 
 ## Hvordan man finder vej
 
-- Øverst til venstre står hele tiden, hvilken hue man mangler, og hvor den er (fx "Riddersalen. Indgangen ligger i Prins Jørgens Gård, mellem de to statuer.").
-- Pilen og afstanden kommer først, hvis man ikke er kommet 3 m nærmere i 30 sekunder, eller hvis "Vis altid vejen" er slået til under knappen Træet. Det samme gælder lysstriben over en hue udenfor. Lysstriben over den første hue står der fra start.
+- Øverst til venstre står hele tiden, hvilken hue man mangler, og hvor den er, og en pil med afstanden viser vejen med det samme (ændret 28. nov. 2026 efter ønske fra Michel; før kom pilen først, når man gik i stå). Over den næste hue udenfor står en lysstribe.
 - Indenfor peger pilen via trappen og døren, når det er nødvendigt (Folketinget). På Udsigten viser pilen, hvilken vej man skal dreje.
 - Huen tages, når man er tæt på (3,4 m udenfor, 2,6-4,3 m indenfor, 7,5 m ved statuen). Man skal ikke ramme noget præcist.
 - Når man tager en hue, hopper den op og forsvinder, der kommer gnister og klokker, og en tegning af huen flyver op til knappen Træet. Tallet på knappen viser, hvor mange lys der brænder. Der kommer ikke et kort, man skal lukke, så man kan gå direkte videre.
