@@ -5261,7 +5261,8 @@ function updCamera(dt, t) {
   }
   if (startBlend >= 0 && startBlend < 1) {
     const fra = INTRO.fraPos;   // from the opening shot over the roofs, or from the circling view on the start screen
-    startBlend = Math.min(1, startBlend + dt / (fra ? 3.4 : 2.2)); const e = startBlend * startBlend * (3 - 2 * startBlend);
+    // the Christmas games fly in slowly from the circling view, so there is time to see Slotsholmen in the snow
+    startBlend = Math.min(1, startBlend + dt / (fra ? 3.4 : KAL ? 7 : 2.2)); const u_ = startBlend, e = KAL && !fra ? u_ * u_ * u_ * (u_ * (u_ * 6 - 15) + 10) : u_ * u_ * (3 - 2 * u_);
     if (fra) { const k = INTRO.bue, u = 1 - e; camera.position.set(u * u * fra.x + 2 * u * e * k.x + e * e * camPos.x, u * u * fra.y + 2 * u * e * k.y + e * e * camPos.y, u * u * fra.z + 2 * u * e * k.z + e * e * camPos.z); }
     else camera.position.lerpVectors(orbitPos, camPos, e);
     tmpA.lerpVectors(INTRO.fraLook || orbitC, camLook, fra ? Math.min(1, e * 2) : e);   // in the glide she looks ahead toward Ida early
