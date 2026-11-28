@@ -35,7 +35,7 @@ Julespillet for 2026 har sin egen adresse: https://ai-michelklos.github.io/chris
 
 En kort tur på telefonen, cirka 10 minutter. Nisserne har gemt otte nissehuer på deres yndlingssteder på Slotsholmen. For hver hue, Ida finder, tænder de tre lys på det store juletræ i Rigsdagsgården. Når alle 24 lys brænder, går hun hen til træet: kameraet glider op ad det, stjernen og lyskæden tænder, Holmens Kirke ringer julen ind, og der er fyrværkeri. Bagefter kan man gå op til nisserne i Tårnet og finde mandlen i risalamanden.
 
-- Huerne ligger på Højbro (over havmanden), for enden af gallabordet i Riddersalen, på Marmorbroen, på en båsvæg i De Kongelige Stalde, på Kierkegaards hoved i Bibliotekshaven, på rækværket på Udsigten, på Frederik 7.s hoved og på talerstolen i Folketingssalen. Man tager en hue ved at gå hen til den. På Udsigten drejer man rundt, til man ser den.
+- Huerne ligger på Højbro (midt på broen, med en nisse i kajak nedenunder), for enden af gallabordet i Riddersalen, på Marmorbroen, på en båsvæg i De Kongelige Stalde, på Kierkegaards hoved i Bibliotekshaven, på rækværket på Udsigten, på Frederik 7.s hoved og på talerstolen i Folketingssalen. Man tager en hue ved at gå hen til den. På Udsigten drejer man rundt, til man ser den.
 - Ved hver hue står en nisse. Man kan sige hej og høre en kort historie, der faktisk er sket på stedet. Man behøver ikke. Kilderne står i `dev/NISSEHUER.md`.
 - Øverst til venstre står, hvor den næste hue er, og en pil med afstanden viser vejen med det samme. Over den næste hue udenfor står en lysstribe.
 - Sneen ligger altid, og der kommer lette byger. Det bliver mørkere, jo flere lys der brænder.

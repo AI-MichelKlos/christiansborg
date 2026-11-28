@@ -9,7 +9,7 @@ Julesporet (`?spor=jul`) er en kort nissehuejagt på telefonen. Der er otte huer
 
 Ruten er den rækkefølge, vejvisningen foreslår. Man kan tage huerne i hvilken som helst rækkefølge.
 
-1. **Højbro.** Huen ligger på gelænderet midt på broen, lige over havmanden og hans syv sønner på kanalbunden. Den kan ses fra startstedet på Højbro Plads, cirka 50 m væk, og der står en lysstribe over den. Når man tager den, står man ved havmanden med Slotskirken foran sig. Værten er Kontorchef Pind.
+1. **Højbro.** Huen ligger på gelænderet midt på broen, og under broen padler en nisse i kajak frem og tilbage. Havmanden er fjernet fra julespillet (den er stadig i mordgåden). Den kan ses fra startstedet på Højbro Plads, cirka 50 m væk, og der står en lysstribe over den. Når man tager den, står man midt på broen med Slotskirken foran sig. Værten er Kontorchef Pind.
 2. **Riddersalen.** Huen ligger for enden af det lange gallabord. Man går hele salen igennem langs bordet, lysekronerne og vægtæpperne. Værten er Hofdame Thyra.
 3. **Marmorbroen.** Huen ligger på balustraden midt på broen. Man ser pavillonerne, Ridebanen og slottet bag dem. Værten er Brovogter Knud.
 4. **De Kongelige Stalde.** Huen ligger på skillevæggen ind til en bås, lige ved en af de hvide heste. Når man går ind ad staldporten, ser man den skråt fremme til højre og samtidig ned ad hele staldgangen med marmorsøjlerne. Værten er Staldmester Gerda.
@@ -44,7 +44,7 @@ Når alle otte huer er fundet, står der "Gå til juletræet". 16 m fra træet g
 
 ## Kilder til nissernes historier
 
-- Højbro og havmanden: Wikipedia, "Agnete and the Merman" (https://en.wikipedia.org/wiki/Agnete_and_the_Merman). Skulpturen er af Suste Bonnén fra 1992 og forestiller en havmand og hans syv sønner på kanalbunden ved Højbro.
+- Højbro: Wikipedia, "Højbro" (https://en.wikipedia.org/wiki/H%C3%B8jbro) og "Slotsholmen" (https://en.wikipedia.org/wiki/Slotsholmen). Højbro var den første bro til Slotsholmen, oprindelig en klapbro af træ, som har givet navnet. Den nuværende bro er fra 1878 og tegnet af Vilhelm Dahlerup.
 - Riddersalen og vægtæpperne: Kongehuset, "Vægtæpper på de kongelige slotte" (https://kongehuset.dk/foto-video/vaegtaepper-paa-de-kongelige-slotte). De 17 gobeliner er af Bjørn Nørgaard. De var en gave til Dronningens 50-års fødselsdag i 1990, blev vævet af cirka 30 vævere i næsten ti år og hængt op til hendes 60-års fødselsdag i 2000. At repræsentationslokalerne blev taget i brug i januar 1928 står i Store norske leksikon, "Christiansborg - slott i København".
 - Marmorbroen: lex.dk, "Marmorbroen" (https://lex.dk/Marmorbroen), og lex.dk, "Christiansborg Slot" (https://lex.dk/Christiansborg_Slot). Broen er tegnet af Nicolai Eigtved og bygget 1739-1745. Ridebaneanlægget med Marmorbroen er fra det første Christiansborg, som brændte i 1794. Slottet brændte igen i 1884.
 - Staldene: Slots- og Kulturstyrelsen, kongeligeslotte.dk, "The royal residence in flames" (kun staldanlægget overlevede branden i 1794). Den Kongelige Stald-Etat, jubilæumshæfte 2015 (https://kongehuset.dk/sites/default/files/filer/den_kongelige_stald_etat_.pdf), om de hvide kladrubere fra 1994. At kongefamilien flyttede til Amalienborg efter branden: Kongernes Samling, Amalienborg.

@@ -45,14 +45,14 @@ export const KALENDER = {
   huer: [
     {
       id: "hoejbro", navn: "Huen på Højbro", sted: "Højbro",
-      hvor: "Ude på Højbro, på gelænderet over havmanden.",
-      ude: { x: -12.3, z: -166.7, y: 1.15, stor: 1.3 },   // på gelænderet midt på broen, lige over havmanden (y over broens dæk)
+      hvor: "Ude på Højbro, på gelænderet midt på broen.",
+      ude: { x: -12.3, z: -166.7, y: 1.15, stor: 1.3 },   // på gelænderet midt på broen (y over broens dæk); nissen i kajakken padler forbi nedenunder
       farve: "#c8262d", kant: "#f4f1ea",
       nisse: "pind", vaert: { x: -10.2, z: -169.4, face: 250 },
       historie: [
-        ["Pind", "Kig ned i vandet ved broen. Dernede ligger en havmand og hans syv sønner af bronze."],
-        ["Pind", "Billedhuggeren Suste Bonnén lagde dem på bunden af kanalen i 1992. De rækker armene op efter Agnete fra folkevisen, som forlod dem og gik op på land."],
-        ["Pind", "Jeg har spurgt, om de kunne flyttes op til et budgetår med bedre lys. De svarede ikke. Det tager jeg som et nej."],
+        ["Pind", "Højbro var den første bro ud til Slotsholmen. Dengang var den af træ og kunne klappes op, så skibene kunne sejle igennem."],
+        ["Pind", "Navnet har broen arvet fra den gamle træbro. Den bro, du står på nu, er fra 1878 og tegnet af arkitekten Vilhelm Dahlerup. Høj er den ikke rigtig."],
+        ["Pind", "Kig ned i kanalen. Dernede padler min nabo i kajak hver dag i december. Han kalder det motion. Jeg har noteret det som en ikke-budgetteret aktivitet."],
       ],
     },
     {

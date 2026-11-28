@@ -9,6 +9,7 @@
 //   7. Tøjhusgade: cyklister, der kører frem og tilbage i højre side af vejen, og tre parkerede cykler ved en husmur
 //   8. Bibliotekshaven: H.C. Andersen går en tur om bassinet med høj hat og stok og letter på hatten for Ida
 //   9. Højbro Plads: en skøjtebane med lyskæder, hvor fem løber rundt, og en pige laver piruetter
+//  10. Slotsholmskanalen: en nisse padler frem og tilbage i en rød kajak under Højbro og vinker til Ida
 //
 // index.html kalder episoder(...) én gang i KALENDER-blokken og derefter update(dt, t, pos, ude) i hver frame.
 // Ydelse: alle figurer er bagt til få meshes (menneske() i index.html), geometri og materialer deles, hver scene vises
@@ -807,6 +808,101 @@ export function episoder(H) {
       lyskaede.material.opacity = 0.85 + Math.sin(t * 1.7) * 0.1;
     };
   });
+
+  // ---------------------------------------------------------------- 10. Nissen i kajakken (Slotsholmskanalen, under Højbro)
+  // En nisse i en rød kajak padler frem og tilbage ad kanalen fra Ved Stranden, under Højbro og videre langs Slotsholmen.
+  // Han padler med en lang dobbeltpagaj, kajakken vugger, vandet sprøjter ved hvert tag og et kølvand af skum følger efter.
+  // På fordækket ligger en lille krans, og bag ham en gave og en lygte. Når Ida er tæt på, holder han en pause og vinker.
+  if (H.KANAL) {
+    const HV = '#f4f1ea', WL = H.WL, g = new THREE.Group(); gruppe.add(g);
+    const kurve = new THREE.CatmullRomCurve3(H.KANAL.slice(5, 12).map(([x, z]) => new THREE.Vector3(x, 0, z))), L = kurve.getLength();
+    // kajakken: et smalt skrog med spidse ender, rødt dæk, sort cockpitkant og hvide dækliner
+    const km = (c, o) => { const m = tm(c).clone(); if (o) { m.emissive = new THREE.Color(o.emissive); m.emissiveIntensity = o.emissiveIntensity; } m.userData.sne = true; return m; };   // no snow on the kayak: it would hide the red deck
+    const kajak = new THREE.Group(); g.add(kajak);
+    const skrogProfil = []; for (let i = 0; i <= 20; i++) { const t = i / 20; skrogProfil.push(new THREE.Vector2(Math.max(0.002, 0.33 * Math.pow(Math.sin(Math.PI * t), 0.75)), (t - 0.5) * 3.6)); }
+    const skrogG = new THREE.LatheGeometry(skrogProfil, 18); skrogG.rotateX(Math.PI / 2);
+    const skrog = new THREE.Mesh(skrogG, km('#b3262a')); skrog.scale.set(1, 0.55, 1); skrog.position.y = 0.05; kajak.add(skrog);
+    const koel = new THREE.Mesh(skrogG, km('#e8e2d6')); koel.scale.set(1.01, 0.3, 1.0); koel.position.y = -0.02; kajak.add(koel);
+    const kant = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.035, 6, 22), km('#1a1412')); kant.rotation.x = Math.PI / 2; kant.scale.set(1, 1.6, 1); kant.position.set(0, 0.22, -0.1); kajak.add(kant);
+    const hul = new THREE.Mesh(new THREE.CircleGeometry(0.26, 18), km('#2a1d14')); hul.rotation.x = -Math.PI / 2; hul.scale.set(1, 1.55, 1); hul.position.set(0, 0.215, -0.1); kajak.add(hul);
+    for (const sd of [-1, 1]) for (const [z0, z1] of [[0.45, 1.5], [-0.65, -1.5]]) { const lin = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, Math.abs(z1 - z0), 4), km(HV)); lin.rotation.x = Math.PI / 2; lin.position.set(sd * 0.11, 0.2, (z0 + z1) / 2); kajak.add(lin); }
+    // en lille krans med rødt bånd på fordækket, og en gave og en lygte på bagdækket
+    const krans = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.04, 6, 16), km('#2f5f3a')); krans.rotation.x = Math.PI / 2; krans.position.set(0, 0.21, 0.95); kajak.add(krans);
+    for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2, b = new THREE.Mesh(new THREE.SphereGeometry(0.022, 6, 5), km('#c0392b')); b.position.set(Math.cos(a) * 0.11, 0.25, 0.95 + Math.sin(a) * 0.11); kajak.add(b); }
+    const gave = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.22), km('#2f5fa8')); gave.position.set(0, 0.29, -0.95); gave.rotation.y = 0.3; kajak.add(gave);
+    for (const ry of [0.3, 0.3 + Math.PI / 2]) { const bd = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.165, 0.035), km('#e0a63a')); bd.position.copy(gave.position); bd.rotation.y = ry; kajak.add(bd); }
+    const stang = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.55, 5), km('#3a2a20')); stang.position.set(0, 0.47, -1.3); kajak.add(stang);
+    const lygte = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.11, 8), km('#ffd27a', { emissive: '#ffb347', emissiveIntensity: 0.9 })); lygte.position.set(0, 0.78, -1.3); kajak.add(lygte);
+    const lysG = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.glow, color: '#ffcf7a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8 })); lysG.position.set(0, 0.78, -1.3); lysG.scale.setScalar(0.7); lysG.userData.fri = true; kajak.add(lysG);
+    saml(kajak);
+    // nissen: grå vadmel, rødt halstørklæde, hvidt skæg og en lang, rød nissehue med kvast
+    const nissehue = (farve, kant) => (g2, head, part, m) => {
+      const r = part(new THREE.TorusGeometry(0.15, 0.04, 6, 18), m(kant), head, 0, 0.11, -0.01); r.rotation.x = Math.PI / 2;
+      const k = new THREE.Group(); k.position.set(0, 0.12, -0.01); k.rotation.x = -0.45; head.add(k);
+      part(new THREE.ConeGeometry(0.15, 0.34, 16), m(farve), k, 0, 0.17, 0);
+      const spids = new THREE.Group(); spids.position.set(0, 0.32, 0); spids.rotation.x = -0.9; k.add(spids);
+      part(new THREE.ConeGeometry(0.06, 0.22, 10), m(farve), spids, 0, 0.1, 0);
+      part(new THREE.SphereGeometry(0.055, 10, 8), m(kant), spids, 0, 0.22, 0);
+    };
+    const nisse = demonstrant({ coat: '#7c838a', trousers: '#5a4a3a', skin: '#f2c6a4', hair: HV, bryn: '#e8e4da', hairStyle: 'kort', scale: 0.66, ben: -1,
+      grupper: f => [f.g, f.head, ...f.arms],
+      hue: [nissehue('#c22a2f', HV)], ansigt: [skaeg(HV), kinder('#e98a80')], toej: [halstoerklaede('#c22a2f', HV), baelte('#3a2a20', '#d9b25a', 1.08), knapper('#3a2a20', [0.98, 1.13, 1.28])],
+      vanter: ['#c22a2f', HV], boej: [0.7, 0.7],
+      foer2: f => { for (const l of f.legs) l.hip.rotation.x = -1.45; } });   // the legs go forward inside the kayak
+    placer(nisse, kajak, 0, 0, -0.1); nisse.root.position.y = 0.2 - 0.62 * 0.66;   // he sits with his hips down in the cockpit
+    // pagajen: en lang skaft med et blad i hver ende (i nissens egen ramme, så hænderne kan gribe den)
+    const aare = new THREE.Group(); nisse.g.add(aare); aare.userData.fri = true;
+    const skaft = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 3.2, 6), tm('#c9a26a')); skaft.rotation.z = Math.PI / 2; aare.add(skaft);
+    for (const sd of [-1, 1]) { const bl = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 6), tm('#e0a63a')); bl.scale.set(1.35, 0.85, 0.12); bl.position.x = sd * 1.65; bl.rotation.x = sd * 0.5; aare.add(bl); }
+    saml(aare);
+    const va = new THREE.Vector3(), vb = new THREE.Vector3(), vg = new THREE.Vector3(), vw = new THREE.Vector3();
+    function grib(f, i, p) { const sh = f.arms[i], phi = -f.elbows[i].rotation.x, A = 0.3, B = 0.3; vb.set(0, -A - B * Math.cos(phi), B * Math.sin(phi)).normalize(); sh.quaternion.setFromUnitVectors(vb, va.copy(p).sub(sh.position).normalize()); }
+    // skum: kølvand og sprøjt
+    const NS = 60, sp = new Float32Array(NS * 3), sl = new Float32Array(NS), sv = new Float32Array(NS * 3);
+    for (let i = 0; i < NS; i++) sp[i * 3 + 1] = -99;
+    const sG = new THREE.BufferGeometry(); sG.setAttribute('position', new THREE.BufferAttribute(sp, 3));
+    const skum = new THREE.Points(sG, new THREE.PointsMaterial({ color: '#ffffff', size: 0.22, map: TX.glow, transparent: true, opacity: 0.85, depthWrite: false })); skum.frustumCulled = false; gruppe.add(skum);
+    let ni = 0; const skumUd = (x, y, z, vx, vy, vz, liv) => { sp.set([x, y, z], ni * 3); sv.set([vx, vy, vz], ni * 3); sl[ni] = liv; ni = (ni + 1) % NS; };
+    let hilst = false, s = 40, ret = 1, vend = 0, faseP = 0, vinkT = 9, varNaer = false, sidsteDyp = 0, kurs = 0;
+    const e = { navn: 'kajak', x: 0, z: 0, g, t: 0, kurve, L, sæt: v => { s = v; }, afst: p => { const q = kurve.getPointAt(s / L, v3); return Math.hypot(p.x - q.x, p.z - q.z); }, upd: null };   // he only paddles on while Ida is within sight
+    e.upd = (t, dt, pos) => {
+      // frem og tilbage ad kanalen; for enden vender han langsomt rundt
+      if (vend > 0) { vend -= dt; if (vend <= 0) ret = -ret; }
+      else { s += ret * 1.5 * dt; if (s > L - 8 || s < 8) { s = Math.max(8, Math.min(L - 8, s)); vend = 3.5; } }
+      const u = s / L, p = kurve.getPointAt(u), tg = kurve.getTangentAt(u), sideX = -tg.z, sideZ = tg.x;
+      const side = 4.2 * ret * (vend > 0 ? 1 - 2 * sm(1 - vend / 3.5) : 1);   // keeps to the right of the big boats' line; crosses over while he turns
+      g.position.set(p.x + sideX * side, WL, p.z + sideZ * side);
+      const maal = Math.atan2(tg.x * ret, tg.z * ret) + (vend > 0 ? (1 - vend / 3.5) * Math.PI : 0);
+      kurs += Math.atan2(Math.sin(maal - kurs), Math.cos(maal - kurs)) * Math.min(1, dt * 2); kajak.rotation.y = kurs;
+      // Ida close by: he stops paddling and waves for a few seconds, once per pass
+      const dI = Math.hypot(pos.x - g.position.x, pos.z - g.position.z), naer = dI < 12;
+      if (naer && !varNaer) { vinkT = 0; if (!hilst) { hilst = true; H.toast?.('Nissen i kajakken: Glædelig jul fra kanalen!'); } } varNaer = naer; vinkT += dt;
+      const vinker = vinkT < 3;
+      faseP += dt * (vinker || vend > 0 ? 1.2 : 4.0);
+      const roll = vinker ? 0.05 : Math.sin(faseP) * 0.55, yaw = vinker ? 0 : Math.cos(faseP) * 0.3;
+      kajak.rotation.z = Math.sin(faseP) * 0.05 + Math.sin(t * 1.3) * 0.02; kajak.position.y = Math.sin(t * 1.7) * 0.03;
+      aare.position.set(0, 1.08, 0.36); aare.rotation.set(0, yaw, roll);
+      // the hands hold the shaft a little inside the blades
+      for (const [i, sd] of [[0, -1], [1, 1]]) {
+        if (vinker && i === 1) { const w = Math.sin(vinkT * 9); grib(nisse, 1, vg.set(0.45, 1.85 + w * 0.04, 0.12 + w * 0.06)); continue; }
+        vg.set(sd * 0.36, 0, 0).applyEuler(aare.rotation).add(aare.position); grib(nisse, i, vg);
+      }
+      nisse.head.rotation.set(-0.08, vinker ? Math.max(-0.9, Math.min(0.9, Math.atan2(pos.x - g.position.x, pos.z - g.position.z) - kurs)) : Math.sin(t * 0.5) * 0.25, 0);
+      // a splash where the blade dips, and the wake behind the stern
+      const dyp = roll > 0.42 ? 1 : roll < -0.42 ? -1 : 0;
+      if (dyp && dyp !== sidsteDyp && !vinker && vend <= 0) {
+        aare.updateMatrixWorld(true); vw.set(-dyp * 1.65, 0, 0).applyMatrix4(aare.matrixWorld);
+        for (let k = 0; k < 6; k++) skumUd(vw.x, WL + 0.05, vw.z, (Math.random() - 0.5) * 0.8, 0.8 + Math.random() * 0.6, (Math.random() - 0.5) * 0.8, 0.7);
+        if (H.sus && dI < 25) H.sus(0.28, 0.02 * Math.max(0, 1 - dI / 25) ** 1.5, 900, 0.8, 600);
+      }
+      sidsteDyp = dyp;
+      if (Math.random() < dt * 14 && vend <= 0) { const bx = g.position.x - Math.sin(kurs) * 1.8, bz = g.position.z - Math.cos(kurs) * 1.8; skumUd(bx + (Math.random() - 0.5) * 0.4, WL + 0.02, bz + (Math.random() - 0.5) * 0.4, -Math.cos(kurs) * (Math.random() - 0.5) * 0.3, 0, Math.sin(kurs) * (Math.random() - 0.5) * 0.3, 2.2); }
+      for (let i = 0; i < NS; i++) { if (sl[i] <= 0) { sp[i * 3 + 1] = -99; continue; } sl[i] -= dt; sp[i * 3] += sv[i * 3] * dt; sp[i * 3 + 2] += sv[i * 3 + 2] * dt; if (sv[i * 3 + 1]) { sv[i * 3 + 1] -= 4 * dt; sp[i * 3 + 1] = Math.max(WL + 0.02, sp[i * 3 + 1] + sv[i * 3 + 1] * dt); } }
+      sG.attributes.position.needsUpdate = true; skum.visible = true;
+      lysG.material.opacity = 0.7 + Math.sin(t * 6) * 0.08;
+    };
+    g.visible = false; EP.push(e);
+  }
 
   // ---------------------------------------------------------------- 7. Cyklister i Tøjhusgade
   // Den lange, lige gade fra porten ved Rigsdagsgården mod broen over Frederiksholms Kanal. Nogle cyklister kører frem
