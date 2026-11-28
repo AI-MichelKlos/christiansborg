@@ -121,7 +121,7 @@ export function historiskeGaester({ THREE, menneske, ctex, dyn, I, groundAt, hor
       lines:['“Jeg havde hellere set mig portrætteret på en fyrig hest. Jeg er jo gammel husar.”'], btn:'Tilbage til turen', efter:()=>{ankerHilst=true;}});
   }};
 
-  function update(dt, pos, ude, aktiv) {
+  function update(dt, pos, ude, aktiv, karet) {
     const afstand = Math.hypot(pos.x-I.x-ramme.position.x,pos.z-ramme.position.z);
     ramme.visible=I.on && I.place==='folketing' && afstand<46;
     const iHallen = ramme.visible && I.roomAt(pos.x-I.x,pos.z)==='hall';
@@ -139,9 +139,10 @@ export function historiskeGaester({ THREE, menneske, ctex, dyn, I, groundAt, hor
     anker.root.visible=ude && d<64;
     if(d>4.8 || !ude) ankerHilst=false;
     if(!anker.root.visible) return;
-    const besoeg=d<3.5 && !ankerHilst;
+    const besoeg=d<3.5 && !ankerHilst && !karet;
     const retning=besoeg ? Math.atan2(pos.x-p.x,pos.z-p.z) : modBanen;
-    const forskel=retning-anker.root.rotation.y;
+    const oensket=karet ? Math.atan2(karet.x-p.x,karet.z-p.z) : retning;
+    const forskel=oensket-anker.root.rotation.y;
     const kortDrej=Math.atan2(Math.sin(forskel),Math.cos(forskel));
     anker.root.rotation.y+=kortDrej*(reduceMotion ? 1 : 1-Math.exp(-3.5*dt));
     // Attend to the nearest passing horse; keep the turn comfortable and continuous.
@@ -152,7 +153,7 @@ export function historiskeGaester({ THREE, menneske, ctex, dyn, I, groundAt, hor
     }
     if(hest && !reduceMotion){
       const vinkel=Math.atan2(hest.x-p.x,hest.z-p.z)-modBanen;
-      const blik=besoeg ? 0 : THREE.MathUtils.clamp(Math.atan2(Math.sin(vinkel),Math.cos(vinkel)),-.7,.7);
+      const blik=besoeg || karet ? 0 : THREE.MathUtils.clamp(Math.atan2(Math.sin(vinkel),Math.cos(vinkel)),-.7,.7);
       anker.head.rotation.y=THREE.MathUtils.damp(anker.head.rotation.y,blik,2,dt);
     }
     if(aktiv && !ankerHilst && d<3.2) offerAction(moedAnker);
