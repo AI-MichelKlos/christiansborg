@@ -84,7 +84,7 @@ export const KALENDER = {
       id: "stald", navn: "Huen i stalden", sted: "De Kongelige Stalde",
       hvor: "De Kongelige Stalde ved Ridebanen. Gå ind ad den åbne staldport.",
       indgang: "stables",
-      inde: { place: "stables", x: 304.6, z: 12, y: 1.43, rot: 90, r: 4.3 },   // på skillevæggen til en bås, lige ved den hvide hest
+      inde: { place: "stables", x: 304.6, z: 12, y: 1.43, rot: 90, r: 5.2 },   // på skillevæggen til en bås, lige ved den hvide hest
       farve: "#b3262a", kant: "#f4f1ea", striber: "#2b2f36",
       nisse: "hov", vaert: { x: 297.6, z: 14.6, face: 90, balle: true },
       historie: [

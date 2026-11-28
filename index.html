@@ -5231,7 +5231,7 @@ const TOUR = { T: 16, kurve: null, look: null, hint: null,
     this.kurve = new THREE.CatmullRomCurve3([camera.position.clone(), V(215, 50, 25), V(100, 40, -62), V(60, 30, 108), V(-55, 54, 10), V(-26, 26, -150), V(-8, 13, -246), camPos.clone()], false, 'centripetal');
     this.look = new THREE.CatmullRomCurve3([orbitC.clone(), V(25, 45, -14), V(81, 9, -51), V(17, 8, 75), V(10, 28, -14), V(-5, 3, -167), V(-5, 1.5, -214), camLook.clone()], false, 'centripetal');
     const h = document.createElement('div'); h.id = 'tourHint'; h.textContent = isTouch ? 'Tryk for at springe over' : 'Klik eller tryk på en tast for at springe over'; document.body.append(h); this.hint = h;
-    this.spring = () => { if (startBlend >= 0 && startBlend < 1) startBlend = 1; };
+    this.spring = () => { if (startBlend >= 0 && startBlend < 1) { startBlend = 1; TOUR.slut(); } };
     addEventListener('pointerdown', this.spring); addEventListener('keydown', this.spring);
   },
   slut() { this.kurve = this.look = null; this.hint?.remove(); this.hint = null; removeEventListener('pointerdown', this.spring); removeEventListener('keydown', this.spring); } };
