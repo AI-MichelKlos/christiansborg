@@ -207,7 +207,7 @@ export const KALENDER = {
 
   nisser: {
     pind: { navn: "Kontorchef Pind", kort: "Pind", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
-    kendelse: { navn: "Hofdame Thyra", kort: "Thyra", pige: true, haar: "#5a3a26", rolle: "Taffelnisse i De Kongelige Repræsentationslokaler. Har dækket op til 117 gallamiddage", hue: "#7a1f24", toej: "#2b3a6a" },
+    kendelse: { navn: "Hofdame Thyra", kort: "Thyra", pige: true, haar: "#5a3a26", rolle: "Taffelnisse i De Kongelige Repræsentationslokaler. Har dækket op til 117 gallamiddage", hue: "#7a1f24", toej: "#b52a2e", skoert: "#2e6446", bukser: "#2b2326", krave: "#f6f1e6", knapper: "#d9b25a", broche: "#c8262d" },
     bro: { navn: "Brovogter Knud", kort: "Knud", rolle: "Nisse på Marmorbroen. Har holdt øje med pavillonerne i mere end 280 år", hue: "#2f5fa8", toej: "#5a4a3a", bukser: "#3a3a3a" },
     hov: { navn: "Staldmester Gerda", kort: "Gerda", pige: true, hoetyv: true, haar: "#b8743a", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },
     bog: { navn: "Bibliotekar Ellen", kort: "Ellen", pige: true, haar: "#d9d2c4", rolle: "Nisse i Det Kongelige Bibliotek. Har læst alle bøgerne og er begyndt forfra", hue: "#7a3f8f", toej: "#3f5a4a" },

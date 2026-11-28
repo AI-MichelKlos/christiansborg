@@ -803,7 +803,7 @@ function menneske(o = {}) {
       if (kv && !lav) part(kasse(0.017, 0.004, 0.004), m('#231a22'), head, s * 0.063, 0.029, 0.12, 0).rotation.set(0, s * 0.35, -s * 0.55);   // a lash at the outer corner
     }
     part(KP(0.0052, 0.028, 6), m(bryn), head, s * 0.047, 0.05, 0.124, 0).rotation.set(0, s * 0.3, Math.PI / 2 + s * (o.alvor ? -0.12 : 0.15));
-    if (kv && !lav) { const c = part(K(0.021, 8, 6), m('#f0a59b'), head, s * 0.074, -0.037, 0.106, 0); c.scale.set(1, 0.6, 0.3); c.rotation.y = s * 0.62; }   // rosy cheeks
+    if (kv && !lav && o.kinder !== false) { const c = part(K(0.021, 8, 6), m('#f0a59b'), head, s * 0.074, -0.037, 0.106, 0); c.scale.set(1, 0.6, 0.3); c.rotation.y = s * 0.62; }   // rosy cheeks (kinder: false when the figure paints its own)
   }
   part(K(kv ? 0.015 : 0.018, 8, 6), m(nuance(skin, -0.05)), head, 0, -0.02, 0.137, 0).scale.set(0.85, 1, 1);   // nose
   const mund = part(new THREE.TorusGeometry(kv ? 0.019 : 0.021, 0.0045, 5, 10, Math.PI), m(o.mund || (kv ? '#a8473f' : '#7a3e34')), head, 0, -0.064, 0.127, 0);
@@ -6765,7 +6765,13 @@ const INTERIOR = (() => {
     },{wrap:false});
     const ceil=new THREE.Mesh(new THREE.PlaneGeometry(L-.6,2*Z-.6),new THREE.MeshBasicMaterial({map:ceilTex}));ceil.rotation.x=Math.PI/2;ceil.position.set(cx,H-.03,0);g.add(ceil);
     // walls with a panelled dado and a gilded cornice
-    b(L,H,.3,wall,cx,0,Z);b(L,H,.3,wall,cx,0,-Z);b(.3,H,2*Z,wall,X1,0,0);
+    b(L,H,.3,wall,cx,0,Z);
+    if(KAL){   // the Christmas games: the window wall has seven arched openings, and through the glass Ida sees Slotsholmen (I.udsigt)
+      const ws=new THREE.Shape();ws.moveTo(X0,0);ws.lineTo(X1,0);ws.lineTo(X1,H);ws.lineTo(X0,H);ws.closePath();
+      for(let i=0;i<7;i++){const x=X0+3.3+i*5.57,hul=new THREE.Path();hul.moveTo(x-1.3,1.4);hul.lineTo(x-1.3,6);hul.absarc(x,6,1.3,Math.PI,0,true);hul.lineTo(x+1.3,1.4);hul.closePath();ws.holes.push(hul);}
+      const vm=new THREE.Mesh(new THREE.ExtrudeGeometry(ws,{depth:.3,bevelEnabled:false,curveSegments:14}),wall);vm.position.z=-Z-.15;vm.receiveShadow=true;g.add(vm);
+    }else b(L,H,.3,wall,cx,0,-Z);
+    b(.3,H,2*Z,wall,X1,0,0);
     for(const [a,c2] of [[-Z,-1.5],[1.5,Z]])b(.3,H,c2-a,wall,X0,0,(a+c2)/2);
     b(.3,H-3.4,3,wall,X0,3.4,0);
     for(const z of [-1,1]){b(L,1.05,.08,dado,cx,0,z*(Z-.19));b(L,.06,.12,gold,cx,1.05,z*(Z-.2));b(L,.4,.5,cream,cx,H-.7,z*(Z-.3));b(L,.07,.52,gold,cx,H-.78,z*(Z-.3));}
@@ -6790,9 +6796,14 @@ const INTERIOR = (() => {
     let n=0;
     for(let i=0;i<7;i++){const x=X0+3.3+i*5.57;gobelin(x,Z-.17,Math.PI,4,5.4,1.3,n++);   // seven on the inner wall
       if(i<6){b(.5,H-1.9,.24,cream,x+2.785,1.1,Z-.2);b(.66,.2,.34,gold,x+2.785,H-.98,Z-.24);}}
+    // in the Christmas games the panes are clear glass with a little frost in the lower corners
+    const rude=KAL?new THREE.MeshBasicMaterial({transparent:true,depthWrite:false,map:(()=>{const t=ctex(128,256,(c,W,Hh)=>{
+        c.fillStyle='rgba(225,238,242,.07)';c.fillRect(0,0,W,Hh);
+        for(const [fx,fy,r] of [[0,Hh,70],[W,Hh,64],[W*.5,Hh,40],[0,Hh*.72,26],[W,Hh*.8,30]]){const gr=c.createRadialGradient(fx,fy,0,fx,fy,r);gr.addColorStop(0,'rgba(255,255,255,.5)');gr.addColorStop(.6,'rgba(240,248,252,.18)');gr.addColorStop(1,'rgba(240,248,252,0)');c.fillStyle=gr;c.fillRect(0,0,W,Hh);}
+      },{wrap:false});t.repeat.set(1/2.6,1/5.9);t.offset.set(.5,0);return t;})()}):glass;
     for(let i=0;i<7;i++){const x=X0+3.3+i*5.57;   // seven tall windows, six woven pictures between them
       const sh=new THREE.Shape();sh.moveTo(-1.3,0);sh.lineTo(1.3,0);sh.lineTo(1.3,4.6);sh.absarc(0,4.6,1.3,0,Math.PI,false);sh.lineTo(-1.3,0);
-      const win=new THREE.Mesh(new THREE.ShapeGeometry(sh),glass);win.position.set(x,1.4,-Z+.16);g.add(win);
+      const win=new THREE.Mesh(new THREE.ShapeGeometry(sh),rude);win.position.set(x,1.4,-Z+.16);g.add(win);
       for(const dx of [-1.3,0,1.3])b(.07,4.6,.1,cream,x+dx,1.4,-Z+.2);for(let j=1;j<6;j++)b(2.6,.05,.1,cream,x,1.4+j*.8,-Z+.2);
       b(2.9,.12,.4,cream,x,1.28,-Z+.3);
       if(i<6)gobelin(x+2.785,-Z+.17,0,2.3,4.2,1.8,n++);}
@@ -7478,7 +7489,7 @@ const INTERIOR = (() => {
     if(I.on||MYBOAT.on||TOWER.on||TOWER.busy)return;
     if(I.mayEnter&&!I.mayEnter(place))return;   // a building that is closed in the story
     build(); I.place=place; I.on=true;g.visible=true;world.visible=false;dyn.visible=false;
-    I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=new THREE.Color('#ddd1b4');
+    I.fog=scene.fog;scene.fog=new THREE.Fog('#ddd1b4',10000,20000);I.bg=scene.background;scene.background=(KAL&&I.udsigt&&I.udsigt(place))||new THREE.Color('#ddd1b4');
     P.pos.set(I.x+(place==='towerLobby'?400:place==='towerRestaurant'?440:place==='courtEntry'?540:place==='pmEntry'?500:place==='riddersal'?607:place==='finance'?100:place==='stables'?300:place==='reform'?(side?212:200):0),0,place==='towerLobby'?7:place==='towerRestaurant'?11:place==='folketing'?21:place==='courtEntry'?3:place==='pmEntry'?2:place==='riddersal'?0:place==='stables'?18:side?-16:8);P.face=side?-Math.PI/2:place==='riddersal'?Math.PI/2:Math.PI;cam.yaw=P.face+Math.PI;cam.pitch=.12;P.vel.set(0,0,0);keys.clear();
     document.body.classList.add('inFolketing');document.body.classList.toggle('inTowerRooms',place.startsWith('tower'));$('indoorExit').textContent=place==='towerRestaurant'?'Til elevatorhallen':place==='folketing'?'Ud i gården':'Gå udenfor';showPoi(null);if(!KAL||place.startsWith('tower'))toast(place==='towerLobby'?'Gå hen til elevatoren eller vælg en etage.':place==='towerRestaurant'?'Udforsk restauranten. Trappen og etagevalget fører til Udsigten.':place==='stables'?'Følg den brede staldgang mellem marmorsøjlerne.':place==='courtEntry'?'Du er i spillets forenklede vindfang. Udgangen fører tilbage gennem søjleportalen.':place==='pmEntry'?'Du er i spillets forenklede forhal. Udgangen fører til Prins Jørgens Gård.':place==='riddersal'?'Riddersalen er ved at blive dækket op til aftenens gallamiddag.':place==='finance'?'Garderoben er til venstre. Forhandlingsrummet ligger lige fremme.':place==='reform'?'Udforsk kontoret, printerområdet og gangen til sidedøren.':'Snapstinget er til venstre og betjentstuen til højre. Kompaspartiet ligger ved Vandrehallen.');
   }
@@ -9602,9 +9613,25 @@ const KALENDER = (() => {
     f.head.rotation.y = Math.sin(t * 0.55) * 0.25 * (naer ? 0.3 : 1);
     if (naer && f.arms?.[0] && f.presence?.arms?.[0]?.free) { const v = Math.max(0, Math.sin(t * 0.9)); f.arms[0].rotation.x = -v * 2.4; f.arms[0].rotation.z = -0.1 - Math.sin(t * 8) * 0.25 * v; }   // a wave with the left hand
   }
+  // a soft blush on a cheek: six thin layers that lie on the round of the face, each a little smaller and pinker than the
+  // one under it, and without the dark outline, so the cheek looks warm instead of having a bump on it
+  const HOVED = [0.133, 0.1484, 0.14];   // the head's radii in menneske (a sphere of 0.14 scaled 0.95, 1.06, 1)
+  function kind(part, m, head, sx, hud, roed) {
+    const [a, b, c] = HOVED, cx = sx * 0.078, cy = -0.03;
+    [[0.042, 0.12], [0.036, 0.26], [0.03, 0.4], [0.024, 0.52], [0.018, 0.63], [0.012, 0.72]].forEach(([r, t], k) => {
+      const geo = new THREE.RingGeometry(0, r, 20, 3), p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const x = cx + p.getX(i) * 0.82, y = cy + p.getY(i) * 0.8;   // a little narrower across, where the face turns away
+        p.setXYZ(i, x, y, c * Math.sqrt(Math.max(0, 1 - (x / a) ** 2 - (y / b) ** 2)) + 0.0012 * (k + 1));
+      }
+      geo.deleteAttribute('normal'); geo.computeVertexNormals();
+      part(geo, m('#' + new THREE.Color(hud).lerp(new THREE.Color(roed), t).getHexString()), head, 0, 0, 0, 0);
+    });
+  }
   function nisseFigur(n) {
-    const hueF = n.hue || '#a8252b', pels = '#f4f1ea';
-    return PERSONER.figur({ coat: n.toej || '#6f7780', trousers: n.bukser || nuance(n.toej || '#6f7780', -0.1), shoes: '#2a1d14', hair: n.pige ? (n.haar || '#c9a46a') : '#f1eee6', hairStyle: n.pige ? 'bob' : 'kort', bryn: n.pige ? nuance(n.haar || '#c9a46a', -0.15) : '#e4e0d6', skin: '#f0c9ab', scale: 0.6, ingenKrave: true,
+    const hueF = n.hue || '#a8252b', pels = '#f4f1ea', hud = '#f0c9ab', pige = !!n.pige;
+    return PERSONER.figur({ coat: n.toej || '#6f7780', trousers: n.bukser || nuance(n.toej || '#6f7780', -0.1), shoes: '#2a1d14', hair: pige ? (n.haar || '#c9a46a') : '#f1eee6', hairStyle: pige ? 'bob' : 'kort', bryn: pige ? nuance(n.haar || '#c9a46a', -0.15) : '#e4e0d6', skin: hud, scale: 0.6, ingenKrave: true,
+      kvinde: pige, kinder: false,   // the girls get lashes and a softer face; the cheeks are painted below
       extra: (g, head, part, m, foran) => {
         // the cap: a fur brim, a soft cone that flops to the side, and a pom-pom at the tip
         const brem = part(new THREE.TorusGeometry(0.15, 0.04, 8, 20), m(pels), head, 0, 0.075, -0.01); brem.rotation.x = Math.PI / 2 - 0.12;
@@ -9613,9 +9640,10 @@ const KALENDER = (() => {
         const top = new THREE.Group(); top.position.set(0, 0.22, 0); top.rotation.set(-0.5, 0, 0.75); hue.add(top);
         part(new THREE.ConeGeometry(0.075, 0.26, 12), m(hueF), top, 0, 0.11, 0);
         part(new THREE.SphereGeometry(0.055, 10, 8), m(pels), top, 0, 0.25, 0);
-        // the face: a round nose and red cheeks
-        part(new THREE.SphereGeometry(0.035, 10, 8), m('#e8a08a'), head, 0, -0.005, 0.15);
-        for (const sx of [-1, 1]) part(new THREE.SphereGeometry(0.035, 8, 6), m('#ef9a92'), head, sx * 0.075, -0.02, 0.115).scale.set(1, 0.7, 0.4);
+        // the face: a round nose (a small button nose for the girls) and soft red cheeks
+        if (pige) part(new THREE.SphereGeometry(0.024, 12, 10), m('#eaa68f'), head, 0, -0.012, 0.14, 0).scale.set(1, 0.9, 0.85);
+        else part(new THREE.SphereGeometry(0.035, 10, 8), m('#e8a08a'), head, 0, -0.005, 0.15);
+        for (const sx of [-1, 1]) kind(part, m, head, sx, hud, pige ? '#e9837c' : '#e88a80');
         if (!n.pige) {   // a full beard in three tufts and a moustache
           part(new THREE.SphereGeometry(0.13, 12, 10), m('#f4f1ea'), head, 0, -0.13, 0.06).scale.set(1.05, 1.2, 0.72);
           for (const sx of [-1, 1]) part(new THREE.SphereGeometry(0.08, 10, 8), m('#eceae2'), head, sx * 0.08, -0.1, 0.07).scale.set(1, 1.1, 0.75);
@@ -9625,6 +9653,22 @@ const KALENDER = (() => {
           for (let k = 0; k < 3; k++) part(new THREE.SphereGeometry(0.042 - k * 0.004, 10, 8), m(n.haar || '#c9a46a'), head, sx * (0.145 + k * 0.01), -0.08 - k * 0.075, -0.02 + k * 0.01).scale.set(1, 1.25, 1);
           part(new THREE.SphereGeometry(0.03, 8, 6), m('#b3262a'), head, sx * 0.17, -0.3, 0.0).scale.set(1.4, 0.8, 1);
         }
+        if (n.skoert) {   // a wide skirt from the waist to below the knee, with a fur edge like the cap's
+          part(drej([[0.3, 0.6], [0.29, 0.66], [0.255, 0.84], [0.215, 1.0], [0.19, 1.1]], 28), m(n.skoert), g, 0, 0, 0).scale.set(1, 1, 0.94);
+          part(new THREE.TorusGeometry(0.297, 0.026, 8, 32), m(pels), g, 0, 0.605, 0).rotation.x = Math.PI / 2;
+        }
+        if (n.krave) {   // a lace collar: a soft roll round the neck and a ring of small scallops on the shoulders
+          const k = part(new THREE.TorusGeometry(0.083, 0.02, 8, 22), m(n.krave), g, 0, 1.6, 0.004, 0); k.rotation.x = Math.PI / 2; k.scale.set(1.05, 0.9, 1);
+          for (let i = 0; i < 11; i++) {
+            const a = -1.75 + i * 0.35, r = 0.146;   // on the slope of the shoulders, tilted to lie flat on it
+            const s_ = part(new THREE.SphereGeometry(0.032, 10, 6), m(n.krave), g, Math.sin(a) * r, 1.562, Math.cos(a) * r * 0.92, 0); s_.scale.set(1, 0.36, 1); s_.rotation.set(0.75 * Math.cos(a), 0, -0.75 * Math.sin(a));
+          }
+          if (n.broche) {   // a holly brooch at the throat: two leaves and three berries
+            for (const sx of [-1, 1]) { const l = part(new THREE.SphereGeometry(0.02, 8, 6), m('#2f6b3a'), g, sx * 0.018, 1.55, foran(1.55) + 0.008, 0); l.scale.set(1.3, 0.55, 0.35); l.rotation.z = sx * 0.5; }
+            for (const [bx, by] of [[0, 1.552], [-0.008, 1.543], [0.008, 1.543]]) part(new THREE.SphereGeometry(0.0085, 8, 6), m(n.broche), g, bx, by, foran(1.55) + 0.016, 0);
+          }
+        }
+        if (n.knapper) for (const y of [1.44, 1.33, 1.22]) part(new THREE.SphereGeometry(0.014, 10, 8), m(n.knapper), g, 0, y, foran(y) + 0.003, 0).scale.set(1, 1, 0.55);   // a row of small buttons
         // a belt with a brass buckle
         part(new THREE.CylinderGeometry(0.205, 0.205, 0.06, 20, 1, true), m('#3a2618'), g, 0, 1.08, 0).scale.set(1, 1, 0.92);
         part(new THREE.BoxGeometry(0.08, 0.07, 0.02), m('#d9b25a'), g, 0, 1.08, foran(1.08) + 0.02);
@@ -10451,6 +10495,57 @@ const KALENDER = (() => {
     body.append(ol);
   }
 
+  // ---- the view from the windows of Riddersalen. When Ida comes in, the town outside is drawn once into a cube from a
+  // spot in the air in front of the palace, over Slotspladsen, and the hall uses the cube as its background. So the
+  // windows show the real snowy Slotsholmen in the light of the moment. It costs six drawings of the town at the door
+  // (none when the light and the snow are as last time) and nothing after that. The hall in the game has no real place
+  // in the palace; the view is chosen to show Slotspladsen.
+  let udsigtRT = null, udsigtKam = null, udsigtNoegle = null;
+  I.udsigt = place => {
+    if (place !== 'riddersal') return null;
+    const noegle = Math.round(ev * 20) + ':' + Math.round((sneNu || 0) * 20);   // the light and the snow on the ground: draw again only when they have changed
+    if (udsigtRT && noegle === udsigtNoegle) return udsigtRT.texture;
+    if (!udsigtRT) {
+      udsigtRT = new THREE.WebGLCubeRenderTarget(GFX.lav ? 768 : 1024, { colorSpace: THREE.SRGBColorSpace });
+      udsigtKam = new THREE.CubeCamera(0.5, 900, udsigtRT);
+      const [dx, dz] = TOWER.door, [ox, oz] = TOWER.OUT;   // out from the tower door, and a little along the front towards the middle of the palace
+      udsigtKam.position.set(dx + ox * 3 - oz * 14, 8, dz + oz * 3 + ox * 14);
+      udsigtKam.rotation.y = Math.atan2(-ox, -oz);   // the hall's windows face -z: turn the cube so that is out over the square
+    }
+    const vis = [world.visible, dyn.visible, I.group.visible, sne?.visible, scene.fog, scene.background, sky.visible, sunSprite.visible], skyP = sky.position.clone(), solP = sunSprite.position.clone(), skygge = renderer.shadowMap.autoUpdate;
+    try {
+      world.visible = dyn.visible = sky.visible = sunSprite.visible = true; I.group.visible = false; if (sne) sne.visible = false; scene.fog = I.fog; scene.background = I.bg;
+      sky.position.copy(udsigtKam.position); sunSprite.position.copy(sunOff).normalize().multiplyScalar(420).add(udsigtKam.position);
+      renderer.shadowMap.autoUpdate = false;   // the shadows from the last frame will do
+      udsigtKam.updateMatrixWorld(true); udsigtKam.update(renderer, scene);
+      udsigtNoegle = noegle; return udsigtRT.texture;
+    } catch (e) { console.warn('udsigt', e); udsigtNoegle = null; return null; }
+    finally {
+      renderer.shadowMap.autoUpdate = skygge; renderer.setRenderTarget(null);
+      [world.visible, dyn.visible, I.group.visible] = vis; if (sne) sne.visible = vis[3]; scene.fog = vis[4]; scene.background = vis[5]; sky.visible = vis[6]; sunSprite.visible = vis[7];
+      sky.position.copy(skyP); sunSprite.position.copy(solP);
+    }
+  };
+  // the snow that falls past the windows of Riddersalen, as thick as the snow outdoors
+  const vSne = reduceMotion ? null : (() => {
+    const n = isTouch ? 260 : 520, pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { pos[i * 3] = 603 + Math.random() * 44; pos[i * 3 + 1] = -4 + Math.random() * 16; pos[i * 3 + 2] = -9 - Math.random() * 7; }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const p = new THREE.Points(geo, new THREE.PointsMaterial({ color: '#ffffff', size: 0.16, transparent: true, depthWrite: false, map: TX.glow, fog: false }));
+    p.frustumCulled = false; p.visible = false; inde.add(p); return p;
+  })();
+  HOOKS.frame.push(dt => {
+    const ud = I.on && I.place === 'riddersal' && !!udsigtRT && scene.background === udsigtRT.texture;
+    sky.visible = sunSprite.visible = !ud;   // the sky (with the stars) and the sun follow the camera: in the hall they would hide the view
+    if (!vSne) return;
+    vSne.visible = ud && faldNu > 0.01; if (!vSne.visible) return;
+    const n = Math.round(vSne.geometry.attributes.position.count * Math.min(1, faldNu)); vSne.geometry.setDrawRange(0, n);
+    if (paused) return;
+    const a = vSne.geometry.attributes.position, p = a.array;
+    for (let i = 0; i < n * 3; i += 3) { p[i + 1] -= dt * (0.9 + (i % 7) * 0.08); p[i] += Math.sin(tid * 0.7 + i) * dt * 0.2; if (p[i + 1] < -4) p[i + 1] += 16; }
+    a.needsUpdate = true;
+  });
+
   // ---- every frame: the doors swing, the next one glows, and the button offers what Ida can do
   let posT = 0, gemT = 20, tid = 0;
   HOOKS.frame.push(dt => {
@@ -10534,7 +10629,7 @@ const KALENDER = (() => {
     gemT -= dt; if (gemT < 0) { gemT = 20; gem(); }
   });
 
-  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, lur: () => LUR && { x: LUR.x, z: LUR.z, vis: LUR.f.root.visible, flugt: LUR.flugt, skala: LUR.skala, nr: LUR.nr }, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, sne: () => ({ fnug: !!sne, vis: !!sne && sne.visible, tegnet: sne ? sne.geometry.drawRange.count : 0, u: SNE_U.value, fald: +faldNu.toFixed(3), byge: KR || HU ? { ...byge } : null, inde: I.on }), vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); }, HUO, VAERTER, TRAENISSER, trae: () => trae, cer: () => cer && { t: +cer.t.toFixed(2) }, tag: id => { const o = HUO.find(o => o.h.id === id); if (o) tagHue(o); }, gem, vink: () => ({ ...vink, tid }) };
+  const test = { get S() { return S; }, DOERE, NISSER, FEST, mandel: () => mandel, lur: () => LUR && { x: LUR.x, z: LUR.z, vis: LUR.f.root.visible, flugt: LUR.flugt, skala: LUR.skala, nr: LUR.nr }, fyrInfo: () => ({ vis: fyr.visible, raketter: raketter.length, levende: Array.from(fLiv).filter(v => v > 0).length, festTid: +festTid.toFixed(1) }), md: MINISTRY_DOORS, taarn: FX.tower, fest: s => { festTid = s; }, vejr: () => { vejr(0, true); ev = lysNu(); return [sneNu, faldNu, ev]; }, sne: () => ({ fnug: !!sne, vis: !!sne && sne.visible, tegnet: sne ? sne.geometry.drawRange.count : 0, u: SNE_U.value, fald: +faldNu.toFixed(3), byge: KR || HU ? { ...byge } : null, inde: I.on }), vaeg: (x, z, retning) => vaeg({ ved: [x, z], retning }), aabn: nr => stempl(L[nr]), taend, krans: () => krans_, til: nr => { const d = DOERE.find(d => d.l.nr === nr); P.pos.set(d.staa[0], 0, d.staa[1]); camInit = false; }, nulstil: () => { try { localStorage.removeItem(GEM); } catch (e) {} gemt = null; valg = 'nyt'; S = ny(); startKnapper(); }, HUO, VAERTER, TRAENISSER, trae: () => trae, cer: () => cer && { t: +cer.t.toFixed(2) }, tag: id => { const o = HUO.find(o => o.h.id === id); if (o) tagHue(o); }, gem, udsigt: () => udsigtRT, vink: () => ({ ...vink, tid }) };
   const kal = { begynd, efterStart, startKnapper, aabnKort, maal, lys: lysNu, morgenNu: () => !!S.morgen && faerdig(S), hjaelp: K.hjaelp, titel: K.titel, test };
   FX.kal = kal; startKnapper();
   return kal;
