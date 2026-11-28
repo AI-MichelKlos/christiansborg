@@ -85,197 +85,7 @@ export function episoder(H) {
   }
   const placer = (f, parent, x, z, ry) => { f.root.position.set(x, 0, z); f.root.rotation.y = ry; parent.add(f.root); return f; };
 
-  // ---------------------------------------------------------------- 1. Mandelboden på Højbro Plads
-  // Boden vender mod vejen fra Højbro. Sælgeren rører i panden, gløden blafrer, dampen stiger, og der står tre i kø.
-  scene(9.5, -196, -Math.PI / 2, (g, e) => {
-    // boden: disk, to stolper, et rød-hvidt tag og en lille lyskæde
-    stk(G.kasse, M.trae, g, 0, 0.5, 0, 1.0, 1.0, 2.0);
-    stk(G.kasse, M.moerktTrae, g, 0, 1.02, 0, 1.1, 0.06, 2.1);
-    for (const s of [-1, 1]) for (const k of [-1, 1]) stk(G.cyl, M.moerktTrae, g, -0.45 * k + 0.0, 1.55, s * 0.98, 0.04, 1.1, 0.04);
-    for (let i = 0; i < 5; i++) stk(G.kasse, i % 2 ? M.hvid : M.roed, g, -0.1, 2.15 + (i - 2) * 0.0, -0.84 + i * 0.42, 1.5, 0.12, 0.42).rotation.z = -0.22;   // taget, striber på tværs
-    const pande = stk(G.cyl, M.kobber, g, -0.15, 1.1, -0.4, 0.34, 0.1, 0.34);
-    for (let i = 0; i < 9; i++) { const a = i * 2.4, r = 0.08 + (i % 3) * 0.07; stk(G.lilleKugle, M.mandel, g, -0.15 + Math.cos(a) * r, 1.16, -0.4 + Math.sin(a) * r, 0.035, 0.025, 0.045, false); }
-    for (let i = 0; i < 4; i++) stk(G.kegle, M.hvid, g, -0.3, 1.13, 0.25 + i * 0.13, 0.05, 0.16, 0.05, false).rotation.z = Math.PI;   // poser med mandler, klar til at sælge
-    const glod = new THREE.Sprite(glodMat('#ff9a3c', 0.7)); glod.position.set(-0.15, 1.05, -0.4); glod.scale.setScalar(1.3); g.add(glod);
-    const lyskaede = [];
-    for (let i = 0; i < 6; i++) { const s = new THREE.Sprite(glodMat(['#ffd27a', '#ff6b5e', '#ffd27a'][i % 3], 0.9)); s.position.set(-0.85, 1.93 + Math.sin(i * 1.3) * 0.03, -1.0 + i * 0.4); s.scale.setScalar(0.28); g.add(s); lyskaede.push(s); }
-    const damp = [0, 1, 2, 3].map(i => { const s = new THREE.Sprite(dampMat()); g.add(s); return { s, f: i / 4 }; });
-    colCirc(...e.ver(0, 0), 1.15, 2.2);
-    // sælgeren bag disken med en træske
-    const saelger = placer(person({ coat: '#7a2a24', trousers: '#2b2a30', hair: '#6b4a2f', kvinde: true, hairStyle: 'knold', toerklaede: '#e0a63a',
-      extra: hue('#2f5f3a'),
-      arm: [null, (sh, part, m, el) => { part(new THREE.CylinderGeometry(0.012, 0.016, 0.5, 6), m('#a8794c'), el, 0, -0.5, 0.06, 0); }],
-      foer: f => { f.elbows[1].rotation.x = -0.9; f.elbows[0].rotation.x = -0.6; } }), g, 0.75, -0.3, -Math.PI / 2);
-    // kunderne: en mand, der gnider hænderne, en mor og et barn, der ikke kan stå stille
-    const mand = placer(person({ coat: '#3a4a5a', trousers: '#2d3340', hair: '#3b2a20', hairStyle: 'kort', toerklaede: '#c0392b',
-      foer: f => { for (const el of f.elbows) el.rotation.x = -1.3; } }), g, -1.0, -0.2, Math.PI / 2);
-    const mor = placer(person({ coat: '#6a3a5a', trousers: '#2b2a30', hair: '#a8794c', kvinde: true, long: true, hairStyle: 'bob', statisk: true, extra: hue('#d9d2c2', '#b3262a') }), g, -2.0, 0.6, Math.PI / 2 - 0.3);
-    const barn = placer(person({ coat: '#e0a63a', trousers: '#2f5fa8', hair: '#d9c08a', barn: true, hairStyle: 'hestehale', kvinde: true, extra: hue('#b3262a') }), g, -1.55, 1.15, Math.PI / 2 - 0.6);
-    mand.arms[0].rotation.x = mand.arms[1].rotation.x = -0.7; mand.arms[0].rotation.z = 0.3; mand.arms[1].rotation.z = -0.3;
-    return (t) => {
-      // røre i panden
-      saelger.arms[1].rotation.x = -0.75 + Math.sin(t * 3.2) * 0.18; saelger.arms[1].rotation.z = 0.25 + Math.cos(t * 3.2) * 0.12;
-      saelger.g.rotation.x = 0.12 + Math.sin(t * 0.6) * 0.03;
-      glod.material.opacity = 0.55 + Math.sin(t * 7.1) * 0.08 + Math.sin(t * 12.7) * 0.06; glod.scale.setScalar(1.2 + Math.sin(t * 5.3) * 0.08);
-      for (const d of damp) { const k = (t * 0.35 + d.f) % 1; d.s.position.set(-0.15 + Math.sin(k * 6 + d.f * 9) * 0.08, 1.2 + k * 1.1, -0.4 + k * 0.1); d.s.scale.setScalar(0.25 + k * 0.6); d.s.material.opacity = Math.sin(k * Math.PI) * 0.32; }
-      lyskaede.forEach((s, i) => { s.material.opacity = 0.65 + Math.sin(t * 2 + i * 1.7) * 0.25; });
-      // manden gnider hænderne i kulden
-      mand.arms[0].rotation.x = -0.7 + Math.sin(t * 9) * 0.08; mand.arms[1].rotation.x = -0.7 - Math.sin(t * 9) * 0.08;
-      mand.g.rotation.z = Math.sin(t * 1.1) * 0.03;
-      // moren kigger rundt, og barnet hopper
-      mor.g.rotation.z = Math.sin(t * 0.7 + 1) * 0.025; mor.root.rotation.y = Math.PI / 2 - 0.3 + Math.sin(t * 0.4) * 0.25;
-      const hop = Math.max(0, Math.sin(t * 6.5)); barn.g.position.y = hop * hop * 0.12; barn.arms[0].rotation.z = -0.3 - hop * 0.6; barn.arms[1].rotation.z = 0.3 + hop * 0.6;
-    };
-  });
-
-  // ---------------------------------------------------------------- 2. Far og det alt for store juletræ (Slotspladsen)
-  // Træet ligger på pladsen. Far tager fat i stammen, læner sig bagud og trækker. Det flytter sig næsten ikke.
-  // Så glipper grebet, og han sætter sig i sneen. Børnene griner. Han rejser sig, tørrer panden og prøver igen.
-  scene(89, -44, 0, (g, e) => {
-    const trae = new THREE.Group(); g.add(trae);
-    stk(G.cyl, M.moerktTrae, trae, 0, 0.2, 0.55, 0.1, 0.7, 0.1).rotation.x = Math.PI / 2;
-    for (let i = 0; i < 5; i++) {
-      const r = 1.05 - i * 0.17, h = 1.5, z = 1.35 + i * 0.68;
-      const k = stk(G.kegle, M.groen, trae, 0, r * 0.72, z, r, h, r); k.rotation.x = Math.PI / 2; k.scale.set(r, h, r * 0.72);
-    }
-    for (const lz of [1.2, 2.4, 3.6]) colCirc(...e.ver(0, lz), 0.8, 0.9);
-    const far = placer(person({ coat: '#2f5f3a', trousers: '#2b2f36', hair: '#6b4a2f', hairStyle: 'kort', toerklaede: '#b3262a', extra: hue('#b3262a'),
-      foer: f => { for (const el of f.elbows) el.rotation.x = -0.15; } }), g, 0, -0.3, 0);
-    const pige = placer(person({ coat: '#c0392b', trousers: '#24303a', hair: '#3b2a20', barn: true, kvinde: true, hairStyle: 'hestehale', extra: hue('#f1e3c0', '#2f5fa8') }), g, 1.7, -2.3, Math.atan2(-1.7, 1.9));
-    const dreng = placer(person({ coat: '#2f5fa8', trousers: '#24303a', hair: '#a8794c', barn: true, hairStyle: 'kort', extra: hue('#e0a63a') }), g, 2.5, -1.3, Math.atan2(-2.5, 0.9));
-    const T = 8.5;
-    return (tt) => {
-      const t = tt % T;
-      const traek = ramp(t, 0.2, 1.2) * (1 - ramp(t, 3.0, 3.2));     // læner sig bagud og trækker
-      const fald = ramp(t, 3.0, 3.55) * (1 - ramp(t, 5.6, 6.5));      // glider og sidder i sneen
-      const ryst = traek * Math.sin(tt * 23) * 0.025;
-      const ryk = traek * Math.max(0, Math.sin(tt * 3.1)) * 0.06;        // træet flytter sig en lille smule, når han rykker
-      trae.position.z = -ryk;
-      // stående: hænderne på stammen. Siddende: lidt bagud, benene frem
-      far.root.position.z = -0.3 - traek * 0.12 - fald * 0.55;
-      far.g.rotation.x = lerp(-traek * 0.42 + ryst, -0.15, fald);
-      far.g.position.y = -fald * 0.72;
-      far.hips[0].rotation.x = lerp(-traek * 0.45, -1.5, fald); far.hips[1].rotation.x = lerp(traek * 0.15, -1.45, fald);
-      const tor = ramp(t, 7.0, 7.4) * (1 - ramp(t, 8.0, 8.4));          // tørrer panden
-      far.arms[0].rotation.x = lerp(lerp(-1.25 + traek * 0.35, -0.4, fald), -2.6, tor);
-      far.arms[1].rotation.x = lerp(-1.25 + traek * 0.35, 0.3, fald);
-      far.arms[0].rotation.z = -0.08 - fald * 0.5 + tor * 0.5 + Math.sin(tt * 8) * 0.15 * tor; far.arms[1].rotation.z = 0.08 + fald * 0.5;
-      far.g.rotation.z = fald * Math.sin(tt * 2.2) * 0.06;
-      // børnene: lidt spændte, mens han trækker, og flade af grin, når han sidder
-      const grin = ramp(t, 3.2, 3.6) * (1 - ramp(t, 6.0, 7.0));
-      for (const [b, ph] of [[pige, 0], [dreng, 1.3]]) {
-        const hop = Math.max(0, Math.sin(tt * (6 + grin * 4) + ph));
-        b.g.position.y = hop * (0.03 + grin * 0.1);
-        b.g.rotation.x = grin * (0.35 + Math.sin(tt * 11 + ph) * 0.12);
-        b.arms[0].rotation.x = -grin * 0.4 - (1 - grin) * 0.3; b.arms[1].rotation.x = lerp(-0.3, -1.5, grin);   // peger på far
-        b.arms[0].rotation.z = -0.15 - (1 - grin) * Math.max(0, Math.sin(tt * 5 + ph)) * 0.4;
-      }
-    };
-  });
-
-  // ---------------------------------------------------------------- 4. Embedsmanden og ringbindene (Prins Jørgens Gård)
-  // En embedsmand bærer en stak ringbind over gården. Det øverste glider ned i sneen. Han bukker sig efter det,
-  // og så glider det næste ned på den anden side. Han samler dem op, retter stakken til og står lidt. Så igen.
-  scene(-39, -65.5, Math.PI / 4, (g, e) => {
-    const mand = placer(person({ coat: '#2b2f36', trousers: '#2b2f36', hair: '#8c8c88', hairStyle: 'skaldet', toerklaede: '#6f7780', alvor: true,
-      extra: (g2, head, part, m) => { for (const s of [-1, 1]) part(new THREE.TorusGeometry(0.03, 0.006, 4, 12), m('#1d1a1c'), head, s * 0.048, 0.012, 0.142, 0); },
-      foer: f => { for (const el of f.elbows) el.rotation.x = -1.35; for (const [k, a] of f.arms.entries()) { a.rotation.x = -0.35; a.rotation.z = (k ? 1 : -1) * 0.05; } } }), g, 0, 0, 0);
-    // stakken sidder på kroppen, så den følger med, når han bukker sig
-    const stak = new THREE.Group(); stak.position.set(0, 1.12, 0.36); stak.userData.fri = true; mand.g.add(stak);
-    const bind = M.ringbind.map((mat, i) => { const b = stk(G.kasse, mat, stak, (i % 2 ? 0.015 : -0.01), i * 0.075, 0, 0.32, 0.07, 0.28); b.rotation.y = (i % 3 - 1) * 0.05; return b; });
-    const loese = [0, 1].map(i => { const b = stk(G.kasse, M.ringbind[5 - i], g, 0, 0, 0, 0.32, 0.07, 0.28); b.visible = false; b.userData.fri = true; return b; });
-    colCirc(...e.ver(0, 0), 0.35, 1.8);
-    const T = 10, start = [new THREE.Vector3(), new THREE.Vector3()], slut = [new THREE.Vector3(0.75, 0.035, 0.75), new THREE.Vector3(-0.7, 0.035, 0.45)];
-    let sidste = -1;
-    return (tt) => {
-      const t = tt % T;
-      if (t < sidste) { for (const b of bind) b.visible = true; for (const l of loese) l.visible = false; }
-      sidste = t;
-      const buk = ramp(t, 3.3, 4.2) * (1 - ramp(t, 6.3, 7.2));
-      mand.g.rotation.x = buk * 0.75 + Math.sin(tt * 0.9) * 0.015;
-      mand.hips[0].rotation.x = mand.hips[1].rotation.x = -buk * 0.5; mand.g.position.y = -buk * 0.05;
-      mand.g.rotation.z = (1 - buk) * Math.sin(tt * 1.3) * 0.02;
-      // de to ringbind, der glider af: nummer 5 (øverst) efter 2 sekunder, nummer 4, mens han bukker sig
-      for (let i = 0; i < 2; i++) {
-        const b0 = bind[5 - i], l = loese[i], t0 = i ? 4.0 : 2.0, t1 = t0 + 0.65, op = ramp(t, 6.4, 7.2);
-        if (t >= t0 && !l.visible && t < 7.2) { b0.updateWorldMatrix(true, false); start[i].copy(g.worldToLocal(b0.getWorldPosition(v3))); b0.visible = false; l.visible = true; }
-        if (!l.visible) continue;
-        if (t >= 7.2) { l.visible = false; b0.visible = true; continue; }
-        const k = ramp(t, t0, t1), s = start[i], e2 = slut[i];
-        if (op > 0) {   // han samler dem op: tilbage op i stakken
-          l.position.set(lerp(e2.x, s.x, op), lerp(e2.y, s.y, op) + Math.sin(op * Math.PI) * 0.2, lerp(e2.z, s.z, op)); l.rotation.set(0, 0, lerp(i ? 0.25 : -0.3, 0, op));
-        } else {
-          l.position.set(lerp(s.x, e2.x, k), lerp(s.y, e2.y, k * k) + Math.sin(k * Math.PI) * 0.15, lerp(s.z, e2.z, k));
-          l.rotation.set(k * (i ? -1.2 : 1.4) * (1 - ramp(t, t1 - 0.1, t1)), 0, (i ? 0.25 : -0.3) * k);
-        }
-      }
-      // han kigger ned efter dem og retter stakken til bagefter
-      const ret = ramp(t, 7.6, 8.0) * (1 - ramp(t, 8.6, 9.0));
-      stak.rotation.z = ret * Math.sin(tt * 14) * 0.05 + (ramp(t, 1.5, 2.0) - ramp(t, 2.0, 2.4)) * 0.12;
-    };
-  });
-
-  // ---------------------------------------------------------------- 5. Snemanden med slips (Ridebanen)
-  // En snemand med hat, slips og en mappe ved foden. To børn kaster snebolde efter ham på skift. Når en bold rammer,
-  // pudser sneen, og hatten vipper.
-  scene(-138, 116.5, 0, (g, e) => {
-    const sm_ = new THREE.Group(); g.add(sm_);
-    stk(G.kugle, M.sne, sm_, 0, 0.42, 0, 0.5, 0.44, 0.5); stk(G.kugle, M.sne, sm_, 0, 1.02, 0, 0.36, 0.33, 0.36);
-    const hoved = new THREE.Group(); hoved.position.set(0, 1.5, 0); sm_.add(hoved);
-    stk(G.kugle, M.sne, hoved, 0, 0, 0, 0.25);
-    for (const s of [-1, 1]) stk(G.lilleKugle, M.kul, hoved, s * 0.085, 0.06, 0.22, 0.03, 0.03, 0.03, false);
-    stk(G.kegle, M.gulerod, hoved, 0, 0, 0.3, 0.035, 0.2, 0.035, false).rotation.x = Math.PI / 2;
-    for (let i = 0; i < 5; i++) stk(G.lilleKugle, M.kul, hoved, (i - 2) * 0.045, -0.1 - Math.abs(i - 2) * -0.015 - 0.02, 0.22, 0.018, 0.018, 0.018, false);
-    const hat = new THREE.Group(); hat.position.set(0, 0.2, 0); hoved.add(hat);
-    stk(G.cyl, M.kul, hat, 0, 0.02, 0, 0.26, 0.03, 0.26); stk(G.cyl, M.kul, hat, 0, 0.16, 0, 0.17, 0.26, 0.17);
-    // slipset og knapperne
-    stk(G.kasse, M.roed, sm_, 0, 1.3, 0.33, 0.07, 0.06, 0.04, false);
-    const slips = stk(G.kasse, M.roed, sm_, 0, 1.12, 0.36, 0.08, 0.32, 0.03, false); slips.rotation.x = -0.35;
-    for (const y of [0.9, 0.55, 0.35]) stk(G.lilleKugle, M.kul, sm_, 0, y, (y > 0.7 ? 0.355 : 0.49), 0.035, 0.035, 0.035, false);
-    for (const s of [-1, 1]) { const arm = stk(G.cyl, M.moerktTrae, sm_, s * 0.5, 1.12, 0, 0.018, 0.55, 0.018, false); arm.rotation.z = s * 1.0; }
-    const mappe = stk(G.kasse, M.moerktTrae, g, 0.45, 0.18, 0.5, 0.36, 0.28, 0.08); mappe.rotation.set(-0.2, -0.3, 0);
-    colCirc(...e.ver(0, 0), 0.55, 1.9);
-    // børnene står til hver side og kaster ind mod ham
-    const boern = [[-3.6, 0.9, '#3e7d4a', '#e0a63a', false, 'kort', '#6b4a2f'], [3.4, 1.4, '#7d4f8a', '#f1e3c0', true, 'hestehale', '#b4612f']].map(([lx, lz, coat, h, kv, stil, hair]) => {
-      const f = placer(person({ coat, trousers: '#24303a', hair, barn: true, kvinde: kv, hairStyle: stil, extra: hue(h) }), g, lx, lz, Math.atan2(-lx, -lz));
-      const bold = stk(G.kugle, M.sne, g, 0, 0, 0, 0.07, 0.07, 0.07, false); bold.visible = false; bold.userData.fri = true;
-      return { f, lx, lz, bold };
-    });
-    const pust = new THREE.Sprite(dampMat()); pust.scale.setScalar(0.6); g.add(pust); let pustT = 9;
-    const T = 4.4;
-    return (tt, dt) => {
-      let ramt = 0;
-      boern.forEach((b, i) => {
-        const t = (tt + i * T / 2) % T, f = b.f;
-        // 0-1: bukker sig og samler sne, 1-1.6: tager tilløb, 1.6-1.8: kaster, 1.8-2.4: bolden flyver
-        const buk = ramp(t, 0.1, 0.5) * (1 - ramp(t, 0.9, 1.2));
-        f.g.rotation.x = buk * 0.7 - ramp(t, 1.2, 1.6) * 0.15 * (1 - ramp(t, 1.6, 1.75));
-        f.arms[1].rotation.x = lerp(lerp(-0.2, -1.0, buk), 2.2, ramp(t, 1.15, 1.6)) * (1 - ramp(t, 1.6, 1.78)) + ramp(t, 1.6, 1.78) * -1.6 * (1 - ramp(t, 2.2, 2.8));
-        f.arms[0].rotation.x = lerp(-0.2, -1.0, buk) - ramp(t, 1.2, 1.6) * 0.6 * (1 - ramp(t, 1.8, 2.4));
-        f.g.position.y = t > 2.4 && t < 3.6 ? Math.max(0, Math.sin((t - 2.4) * 12)) * 0.06 : 0;   // et lille hop af glæde
-        const k = (t - 1.75) / 0.6;
-        b.bold.visible = k > 0 && k < 1;
-        if (b.bold.visible) {
-          const sx = b.lx * 0.9, sz = b.lz * 0.9, mx = (i ? 0.12 : -0.1), my = i ? 1.55 : 1.05, mz = 0.15;
-          b.bold.position.set(lerp(sx, mx, k), lerp(0.75, my, k) + Math.sin(k * Math.PI) * 0.7, lerp(sz, mz, k));
-        }
-        if (t >= 2.35 && t - dt < 2.35) { ramt = i ? 2 : 1; }
-      });
-      if (ramt) { pustT = 0; pust.position.set(ramt === 2 ? 0.12 : -0.1, ramt === 2 ? 1.55 : 1.05, 0.25); }
-      pustT += dt;
-      pust.material.opacity = Math.max(0, 0.7 - pustT * 1.6); pust.scale.setScalar(0.4 + pustT * 1.4);
-      const vip = Math.exp(-pustT * 3) * Math.sin(pustT * 18);
-      hat.rotation.z = vip * 0.25; hat.rotation.x = -0.05; hoved.rotation.z = vip * 0.05;
-    };
-  });
-
-  // ---------------------------------------------------------------- 6. Demonstrationen (Slotspladsen, ved porten ind til Rigsdagsgården)
-  // Ti venlige mennesker i alle aldre i varmt vintertøj. De to ved stængerne holder banneret og løfter det lidt, to snakker
-  // sammen, en drikker kaffe af et krus, to har små skilte, en klapper, en vinker, og et barn sidder på sin fars skuldre.
-  // De skifter vægt, trækker vejret (med lidt damp i kulden) og kigger rundt, hver i sin egen takt. Når Ida kommer tæt på,
-  // kigger de på hende, nikker og vinker.
-  // Ydelse: hver person er fire bagte dele (krop med ben, hoved og to arme), og alt tøjet er bagt ind i dem. Dampen er ét
-  // punktsæt, og skiltene deler ét lærred.
+  // ---------------------------------------------------------------- fælles tøj og ansigter til folkene i alle optrin
   const ZF = 0.92;   // the body in menneske() is a little flatter front to back
   const SG = (r, w = 12, h = 9, ...a) => new THREE.SphereGeometry(r, w, h, ...a);
   const TG = (R, r, a = 6, b = 18, arc = Math.PI * 2) => new THREE.TorusGeometry(R, r, a, b, arc);
@@ -351,6 +161,16 @@ export function episoder(H) {
       for (let k = 0; k < 4; k++) part(new THREE.CylinderGeometry(0.006, 0.004, 0.035, 4), m(stribe || farve), e2, -0.03 + k * 0.02, -l - 0.02, 0, 0);
     }
   };
+  const forklaede = (farve, baand) => (g, head, part, m, foran) => {   // an apron with a strap round the neck
+    part(BG(0.3, 0.46, 0.012), m(farve), g, 0, 1.02, foran(1.02) + 0.012, 0);
+    part(BG(0.3, 0.03, 0.014), m(baand || farve), g, 0, 1.24, foran(1.24) + 0.016, 0);
+    for (const sd of [-1, 1]) { const st_ = part(BG(0.025, 0.36, 0.01), m(baand || farve), g, sd * 0.06, 1.42, foran(1.42) + 0.01, 0); st_.rotation.z = sd * 0.12; }
+  };
+  const hat = (farve, baand) => (g, head, part, m) => {   // a felt hat with a brim and a band
+    part(new THREE.CylinderGeometry(0.205, 0.205, 0.014, 22), m(farve), head, 0, 0.115, -0.01);
+    part(new THREE.CylinderGeometry(0.128, 0.142, 0.13, 20), m(farve), head, 0, 0.185, -0.01);
+    part(new THREE.CylinderGeometry(0.144, 0.145, 0.03, 20), m(baand || '#1a1412'), head, 0, 0.135, -0.01);
+  };
   // vanter (arm-funktioner), støvler (bliver sat på i foer) og et hvilende ben
   const vante = (s, farve, kant) => (sh, part, m, el) => {
     part(SG(0.056, 10, 8), m(farve), el, 0, -0.312, 0.006).scale.set(0.92, 1.12, 0.76);
@@ -388,7 +208,8 @@ export function episoder(H) {
     stk(new THREE.CylinderGeometry(0.036, 0.03, 0.11, 14), tm(farve), h, 0, 0.03, 0.045, 1, 1, 1, false).userData.fri = true;
   };
 
-  // en demonstrant: o går videre til menneske(). hue, ansigt, toej: lister af extra-funktioner. vanter: [farve, kant].
+  // en person med tøj (først lavet til demonstrationen, nu brugt i alle optrin): o går videre til menneske().
+  // grupper(f) vælger, hvilke dele der kan bevæge sig (standard: krop, hoved og arme). hue, ansigt, toej: lister af extra-funktioner. vanter: [farve, kant].
   // arm: [venstre, højre] for det, de holder. stoevle: [farve, kant]. ben: -1 eller 1 for det ben, de hviler på.
   function demonstrant(o) {
     let P = null;
@@ -396,7 +217,7 @@ export function episoder(H) {
     const vanter = o.vanter || ['#b3262a'];
     const ae = o.dyneaerme ? dyneaerme(o.coat) : null;
     return menneske(Object.assign({}, o, {
-      enkel: false, skygge, detalje: GFX.lav ? 'lav' : undefined, grupper: f => [f.g, f.head, ...f.arms], hue: undefined,   // fewer corners on low graphics
+      enkel: false, skygge, detalje: GFX.lav ? 'lav' : undefined, grupper: o.grupper || (f => [f.g, f.head, ...f.arms]), hue: undefined,   // fewer corners on low graphics
       extra: (g, head, part, m, foran) => { P = { part, m }; for (const fn of fl) fn(g, head, part, m, foran); },
       arm: [-1, 1].map((s, i) => flere(vante(s, ...vanter), ae, arm[i])),
       foer: f => {
@@ -410,6 +231,210 @@ export function episoder(H) {
     }));
   }
 
+  // ---------------------------------------------------------------- 1. Mandelboden på Højbro Plads
+  // Boden vender mod vejen fra Højbro. Sælgeren rører i panden, gløden blafrer, dampen stiger, og der står tre i kø.
+  scene(9.5, -196, -Math.PI / 2, (g, e) => {
+    // boden: disk, to stolper, et rød-hvidt tag og en lille lyskæde
+    stk(G.kasse, M.trae, g, 0, 0.5, 0, 1.0, 1.0, 2.0);
+    stk(G.kasse, M.moerktTrae, g, 0, 1.02, 0, 1.1, 0.06, 2.1);
+    for (const s of [-1, 1]) for (const k of [-1, 1]) stk(G.cyl, M.moerktTrae, g, -0.45 * k + 0.0, 1.55, s * 0.98, 0.04, 1.1, 0.04);
+    for (let i = 0; i < 5; i++) stk(G.kasse, i % 2 ? M.hvid : M.roed, g, -0.1, 2.15 + (i - 2) * 0.0, -0.84 + i * 0.42, 1.5, 0.12, 0.42).rotation.z = -0.22;   // taget, striber på tværs
+    const pande = stk(G.cyl, M.kobber, g, -0.15, 1.1, -0.4, 0.34, 0.1, 0.34);
+    for (let i = 0; i < 9; i++) { const a = i * 2.4, r = 0.08 + (i % 3) * 0.07; stk(G.lilleKugle, M.mandel, g, -0.15 + Math.cos(a) * r, 1.16, -0.4 + Math.sin(a) * r, 0.035, 0.025, 0.045, false); }
+    for (let i = 0; i < 4; i++) stk(G.kegle, M.hvid, g, -0.3, 1.13, 0.25 + i * 0.13, 0.05, 0.16, 0.05, false).rotation.z = Math.PI;   // poser med mandler, klar til at sælge
+    const glod = new THREE.Sprite(glodMat('#ff9a3c', 0.7)); glod.position.set(-0.15, 1.05, -0.4); glod.scale.setScalar(1.3); g.add(glod);
+    const lyskaede = [];
+    for (let i = 0; i < 6; i++) { const s = new THREE.Sprite(glodMat(['#ffd27a', '#ff6b5e', '#ffd27a'][i % 3], 0.9)); s.position.set(-0.85, 1.93 + Math.sin(i * 1.3) * 0.03, -1.0 + i * 0.4); s.scale.setScalar(0.28); g.add(s); lyskaede.push(s); }
+    const damp = [0, 1, 2, 3].map(i => { const s = new THREE.Sprite(dampMat()); g.add(s); return { s, f: i / 4 }; });
+    colCirc(...e.ver(0, 0), 1.15, 2.2);
+    // sælgeren bag disken med en træske
+    const HV = '#f4f1ea';
+    const saelger = placer(demonstrant({ coat: '#7a2a24', trousers: '#2b2a30', skin: '#f2c6a4', hair: '#6b4a2f', kvinde: true, hairStyle: 'knold', scale: 0.98,
+      hue: [strikhue('#2f5f3a', '#2f5f3a', HV, '#e0a63a')], ansigt: [kinder()], toej: [forklaede('#f1e6d6', '#b3262a'), halstoerklaede('#e0a63a', '#7a2a24')],
+      vanter: ['#e0a63a'], stoevle: ['#3a2a20'],
+      arm: [null, (sh, part, m, el) => { part(new THREE.CylinderGeometry(0.012, 0.016, 0.5, 6), m('#a8794c'), el, 0, -0.5, 0.06, 0); }], boej: [0.6, 0.9] }), g, 0.75, -0.3, -Math.PI / 2);
+    // kunderne: en mand, der gnider hænderne, en mor og et barn, der ikke kan stå stille
+    const mand = placer(demonstrant({ coat: '#3a4a5a', trousers: '#2d3340', skin: '#e9bd99', hair: '#3b2a20', hairStyle: 'kort', scale: 1.04,
+      hue: [pelshue('#5b4636', '#d9cdb6')], ansigt: [skaeg('#3b2a20', false), kinder()], toej: [knapper('#c9c4b8', [0.95, 1.1, 1.25, 1.4], [-0.06, 0.06]), lommer('#30404e', 1.0), halstoerklaede('#c0392b', HV)],
+      vanter: ['#2b2f36'], stoevle: ['#2a1d14'], boej: [1.3, 1.3] }), g, -1.0, -0.2, Math.PI / 2);
+    const mor = placer(demonstrant({ coat: '#6a3a5a', trousers: '#2b2a30', skin: '#f4d2b8', hair: '#a8794c', kvinde: true, long: true, hairStyle: 'bob', scale: 0.96, ben: 1,
+      hue: [strikhue('#d9d2c2', '#d9d2c2', '#b3262a', '#b3262a')], toej: [knapper('#e8dcc6', [0.9, 1.05, 1.2, 1.35]), baelte('#4a2a40', '#d9b25a', 1.1), halstoerklaede('#e0a63a', '#6a3a5a')],
+      vanter: ['#b3262a', HV], stoevle: ['#2a1d14', '#e8dcc6'] }), g, -2.0, 0.6, Math.PI / 2 - 0.3);
+    const barn = placer(demonstrant({ coat: '#e0a63a', trousers: '#2f5fa8', skin: '#f4d2b8', hair: '#d9c08a', barn: true, hairStyle: 'hestehale', kvinde: true, dyneaerme: true,
+      hue: [strikhue('#b3262a', HV, HV, HV)], toej: [dyne('#e0a63a', [0.98, 1.12, 1.26, 1.4]), lynlaas('#2f5fa8', 0.9, 1.58, 0.024)], vanter: ['#2f5fa8', HV], stoevle: ['#b3262a', HV] }), g, -1.55, 1.15, Math.PI / 2 - 0.6);
+    mand.arms[0].rotation.x = mand.arms[1].rotation.x = -0.7; mand.arms[0].rotation.z = 0.3; mand.arms[1].rotation.z = -0.3;
+    return (t) => {
+      // røre i panden
+      saelger.arms[1].rotation.x = -0.75 + Math.sin(t * 3.2) * 0.18; saelger.arms[1].rotation.z = 0.25 + Math.cos(t * 3.2) * 0.12;
+      saelger.g.rotation.x = 0.12 + Math.sin(t * 0.6) * 0.03;
+      glod.material.opacity = 0.55 + Math.sin(t * 7.1) * 0.08 + Math.sin(t * 12.7) * 0.06; glod.scale.setScalar(1.2 + Math.sin(t * 5.3) * 0.08);
+      for (const d of damp) { const k = (t * 0.35 + d.f) % 1; d.s.position.set(-0.15 + Math.sin(k * 6 + d.f * 9) * 0.08, 1.2 + k * 1.1, -0.4 + k * 0.1); d.s.scale.setScalar(0.25 + k * 0.6); d.s.material.opacity = Math.sin(k * Math.PI) * 0.32; }
+      lyskaede.forEach((s, i) => { s.material.opacity = 0.65 + Math.sin(t * 2 + i * 1.7) * 0.25; });
+      // manden gnider hænderne i kulden
+      mand.arms[0].rotation.x = -0.7 + Math.sin(t * 9) * 0.08; mand.arms[1].rotation.x = -0.7 - Math.sin(t * 9) * 0.08;
+      mand.g.rotation.z = Math.sin(t * 1.1) * 0.03;
+      // moren kigger rundt, og barnet hopper
+      mor.g.rotation.z = Math.sin(t * 0.7 + 1) * 0.025; mor.root.rotation.y = Math.PI / 2 - 0.3 + Math.sin(t * 0.4) * 0.25;
+      const hop = Math.max(0, Math.sin(t * 6.5)); barn.g.position.y = hop * hop * 0.12; barn.arms[0].rotation.z = -0.3 - hop * 0.6; barn.arms[1].rotation.z = 0.3 + hop * 0.6;
+    };
+  });
+
+  // ---------------------------------------------------------------- 2. Far og det alt for store juletræ (Slotspladsen)
+  // Træet ligger på pladsen. Far tager fat i stammen, læner sig bagud og trækker. Det flytter sig næsten ikke.
+  // Så glipper grebet, og han sætter sig i sneen. Børnene griner. Han rejser sig, tørrer panden og prøver igen.
+  scene(89, -44, 0, (g, e) => {
+    const trae = new THREE.Group(); g.add(trae);
+    stk(G.cyl, M.moerktTrae, trae, 0, 0.2, 0.55, 0.1, 0.7, 0.1).rotation.x = Math.PI / 2;
+    for (let i = 0; i < 5; i++) {
+      const r = 1.05 - i * 0.17, h = 1.5, z = 1.35 + i * 0.68;
+      const k = stk(G.kegle, M.groen, trae, 0, r * 0.72, z, r, h, r); k.rotation.x = Math.PI / 2; k.scale.set(r, h, r * 0.72);
+    }
+    for (const lz of [1.2, 2.4, 3.6]) colCirc(...e.ver(0, lz), 0.8, 0.9);
+    const HV = '#f4f1ea';
+    const far = placer(demonstrant({ coat: '#2f5f3a', trousers: '#2b2f36', skin: '#e9bd99', hair: '#6b4a2f', hairStyle: 'kort', scale: 1.03, grupper: f => [f.g, f.head, ...f.arms, ...f.hips],
+      hue: [strikhue('#b3262a', HV, HV)], ansigt: [skaeg('#6b4a2f'), kinder()], toej: [haette('#2f5f3a', '#cbb89a'), lynlaas('#1e3a24', 0.9, 1.6), lommer('#284e30', 1.0), halstoerklaede('#b3262a', HV)],
+      vanter: ['#e0a63a', '#b3262a'], stoevle: ['#5a3a24', '#e8dcc6'], boej: [0.15, 0.15] }), g, 0, -0.3, 0);
+    const pige = placer(demonstrant({ coat: '#c0392b', trousers: '#24303a', skin: '#f4d2b8', hair: '#3b2a20', barn: true, kvinde: true, hairStyle: 'hestehale', dyneaerme: true,
+      hue: [strikhue('#f1e3c0', '#f1e3c0', '#2f5fa8', '#2f5fa8')], toej: [dyne('#c0392b', [0.98, 1.12, 1.26, 1.4]), lynlaas(HV, 0.9, 1.58, 0.024)], vanter: ['#2f5fa8'], stoevle: ['#2f5fa8', HV] }), g, 1.7, -2.3, Math.atan2(-1.7, 1.9));
+    const dreng = placer(demonstrant({ coat: '#2f5fa8', trousers: '#24303a', skin: '#c98d62', hair: '#2b2420', barn: true, hairStyle: 'kort', dyneaerme: true,
+      hue: [strikhue('#e0a63a', '#e0a63a', HV, '#b3262a')], toej: [dyne('#2f5fa8', [0.98, 1.12, 1.26, 1.4]), lynlaas('#e0a63a', 0.9, 1.58, 0.024), halstoerklaede('#b3262a', HV)], vanter: ['#b3262a'], stoevle: ['#3a2a20'] }), g, 2.5, -1.3, Math.atan2(-2.5, 0.9));
+    const T = 8.5;
+    return (tt) => {
+      const t = tt % T;
+      const traek = ramp(t, 0.2, 1.2) * (1 - ramp(t, 3.0, 3.2));     // læner sig bagud og trækker
+      const fald = ramp(t, 3.0, 3.55) * (1 - ramp(t, 5.6, 6.5));      // glider og sidder i sneen
+      const ryst = traek * Math.sin(tt * 23) * 0.025;
+      const ryk = traek * Math.max(0, Math.sin(tt * 3.1)) * 0.06;        // træet flytter sig en lille smule, når han rykker
+      trae.position.z = -ryk;
+      // stående: hænderne på stammen. Siddende: lidt bagud, benene frem
+      far.root.position.z = -0.3 - traek * 0.12 - fald * 0.55;
+      far.g.rotation.x = lerp(-traek * 0.42 + ryst, -0.15, fald);
+      far.g.position.y = -fald * 0.72;
+      far.hips[0].rotation.x = lerp(-traek * 0.45, -1.5, fald); far.hips[1].rotation.x = lerp(traek * 0.15, -1.45, fald);
+      const tor = ramp(t, 7.0, 7.4) * (1 - ramp(t, 8.0, 8.4));          // tørrer panden
+      far.arms[0].rotation.x = lerp(lerp(-1.25 + traek * 0.35, -0.4, fald), -2.6, tor);
+      far.arms[1].rotation.x = lerp(-1.25 + traek * 0.35, 0.3, fald);
+      far.arms[0].rotation.z = -0.08 - fald * 0.5 + tor * 0.5 + Math.sin(tt * 8) * 0.15 * tor; far.arms[1].rotation.z = 0.08 + fald * 0.5;
+      far.g.rotation.z = fald * Math.sin(tt * 2.2) * 0.06;
+      // børnene: lidt spændte, mens han trækker, og flade af grin, når han sidder
+      const grin = ramp(t, 3.2, 3.6) * (1 - ramp(t, 6.0, 7.0));
+      for (const [b, ph] of [[pige, 0], [dreng, 1.3]]) {
+        const hop = Math.max(0, Math.sin(tt * (6 + grin * 4) + ph));
+        b.g.position.y = hop * (0.03 + grin * 0.1);
+        b.g.rotation.x = grin * (0.35 + Math.sin(tt * 11 + ph) * 0.12);
+        b.arms[0].rotation.x = -grin * 0.4 - (1 - grin) * 0.3; b.arms[1].rotation.x = lerp(-0.3, -1.5, grin);   // peger på far
+        b.arms[0].rotation.z = -0.15 - (1 - grin) * Math.max(0, Math.sin(tt * 5 + ph)) * 0.4;
+      }
+    };
+  });
+
+  // ---------------------------------------------------------------- 4. Embedsmanden og ringbindene (Prins Jørgens Gård)
+  // En embedsmand bærer en stak ringbind over gården. Det øverste glider ned i sneen. Han bukker sig efter det,
+  // og så glider det næste ned på den anden side. Han samler dem op, retter stakken til og står lidt. Så igen.
+  scene(-39, -65.5, Math.PI / 4, (g, e) => {
+    const mand = placer(demonstrant({ coat: '#2b2f36', trousers: '#2b2f36', skin: '#f0c9ab', hair: '#8c8c88', bryn: '#8c8c88', hairStyle: 'skaldet', alvor: true, scale: 1.02,
+      grupper: f => [f.g, f.head, ...f.arms, ...f.hips],
+      hue: [hat('#3a3d44', '#1a1412')], ansigt: [briller('#1d1a1c'), skaeg('#9a9a96', false)], toej: [knapper('#1d1a1c', [0.92, 1.07, 1.22, 1.37], [-0.06, 0.06]), lommer('#25292f', 0.98), halstoerklaede('#6f7780', '#2b2f36')],
+      vanter: ['#3a2a20'], stoevle: ['#1a1412'], boej: [1.35, 1.35],
+      foer2: f => { for (const [k, a] of f.arms.entries()) { a.rotation.x = -0.35; a.rotation.z = (k ? 1 : -1) * 0.05; } } }), g, 0, 0, 0);
+    // stakken sidder på kroppen, så den følger med, når han bukker sig
+    const stak = new THREE.Group(); stak.position.set(0, 1.12, 0.36); stak.userData.fri = true; mand.g.add(stak);
+    const bind = M.ringbind.map((mat, i) => { const b = stk(G.kasse, mat, stak, (i % 2 ? 0.015 : -0.01), i * 0.075, 0, 0.32, 0.07, 0.28); b.rotation.y = (i % 3 - 1) * 0.05; return b; });
+    const loese = [0, 1].map(i => { const b = stk(G.kasse, M.ringbind[5 - i], g, 0, 0, 0, 0.32, 0.07, 0.28); b.visible = false; b.userData.fri = true; return b; });
+    colCirc(...e.ver(0, 0), 0.35, 1.8);
+    const T = 10, start = [new THREE.Vector3(), new THREE.Vector3()], slut = [new THREE.Vector3(0.75, 0.035, 0.75), new THREE.Vector3(-0.7, 0.035, 0.45)];
+    let sidste = -1;
+    return (tt) => {
+      const t = tt % T;
+      if (t < sidste) { for (const b of bind) b.visible = true; for (const l of loese) l.visible = false; }
+      sidste = t;
+      const buk = ramp(t, 3.3, 4.2) * (1 - ramp(t, 6.3, 7.2));
+      mand.g.rotation.x = buk * 0.75 + Math.sin(tt * 0.9) * 0.015;
+      mand.hips[0].rotation.x = mand.hips[1].rotation.x = -buk * 0.5; mand.g.position.y = -buk * 0.05;
+      mand.g.rotation.z = (1 - buk) * Math.sin(tt * 1.3) * 0.02;
+      // de to ringbind, der glider af: nummer 5 (øverst) efter 2 sekunder, nummer 4, mens han bukker sig
+      for (let i = 0; i < 2; i++) {
+        const b0 = bind[5 - i], l = loese[i], t0 = i ? 4.0 : 2.0, t1 = t0 + 0.65, op = ramp(t, 6.4, 7.2);
+        if (t >= t0 && !l.visible && t < 7.2) { b0.updateWorldMatrix(true, false); start[i].copy(g.worldToLocal(b0.getWorldPosition(v3))); b0.visible = false; l.visible = true; }
+        if (!l.visible) continue;
+        if (t >= 7.2) { l.visible = false; b0.visible = true; continue; }
+        const k = ramp(t, t0, t1), s = start[i], e2 = slut[i];
+        if (op > 0) {   // han samler dem op: tilbage op i stakken
+          l.position.set(lerp(e2.x, s.x, op), lerp(e2.y, s.y, op) + Math.sin(op * Math.PI) * 0.2, lerp(e2.z, s.z, op)); l.rotation.set(0, 0, lerp(i ? 0.25 : -0.3, 0, op));
+        } else {
+          l.position.set(lerp(s.x, e2.x, k), lerp(s.y, e2.y, k * k) + Math.sin(k * Math.PI) * 0.15, lerp(s.z, e2.z, k));
+          l.rotation.set(k * (i ? -1.2 : 1.4) * (1 - ramp(t, t1 - 0.1, t1)), 0, (i ? 0.25 : -0.3) * k);
+        }
+      }
+      // han kigger ned efter dem og retter stakken til bagefter
+      const ret = ramp(t, 7.6, 8.0) * (1 - ramp(t, 8.6, 9.0));
+      stak.rotation.z = ret * Math.sin(tt * 14) * 0.05 + (ramp(t, 1.5, 2.0) - ramp(t, 2.0, 2.4)) * 0.12;
+    };
+  });
+
+  // ---------------------------------------------------------------- 5. Snemanden med slips (Ridebanen)
+  // En snemand med hat, slips og en mappe ved foden. To børn kaster snebolde efter ham på skift. Når en bold rammer,
+  // pudser sneen, og hatten vipper.
+  scene(-138, 116.5, 0, (g, e) => {
+    const sm_ = new THREE.Group(); g.add(sm_);
+    stk(G.kugle, M.sne, sm_, 0, 0.42, 0, 0.5, 0.44, 0.5); stk(G.kugle, M.sne, sm_, 0, 1.02, 0, 0.36, 0.33, 0.36);
+    const hoved = new THREE.Group(); hoved.position.set(0, 1.5, 0); sm_.add(hoved);
+    stk(G.kugle, M.sne, hoved, 0, 0, 0, 0.25);
+    for (const s of [-1, 1]) stk(G.lilleKugle, M.kul, hoved, s * 0.085, 0.06, 0.22, 0.03, 0.03, 0.03, false);
+    stk(G.kegle, M.gulerod, hoved, 0, 0, 0.3, 0.035, 0.2, 0.035, false).rotation.x = Math.PI / 2;
+    for (let i = 0; i < 5; i++) stk(G.lilleKugle, M.kul, hoved, (i - 2) * 0.045, -0.1 - Math.abs(i - 2) * -0.015 - 0.02, 0.22, 0.018, 0.018, 0.018, false);
+    const hat = new THREE.Group(); hat.position.set(0, 0.2, 0); hoved.add(hat);
+    stk(G.cyl, M.kul, hat, 0, 0.02, 0, 0.26, 0.03, 0.26); stk(G.cyl, M.kul, hat, 0, 0.16, 0, 0.17, 0.26, 0.17);
+    // slipset og knapperne
+    stk(G.kasse, M.roed, sm_, 0, 1.3, 0.33, 0.07, 0.06, 0.04, false);
+    const slips = stk(G.kasse, M.roed, sm_, 0, 1.12, 0.36, 0.08, 0.32, 0.03, false); slips.rotation.x = -0.35;
+    for (const y of [0.9, 0.55, 0.35]) stk(G.lilleKugle, M.kul, sm_, 0, y, (y > 0.7 ? 0.355 : 0.49), 0.035, 0.035, 0.035, false);
+    for (const s of [-1, 1]) { const arm = stk(G.cyl, M.moerktTrae, sm_, s * 0.5, 1.12, 0, 0.018, 0.55, 0.018, false); arm.rotation.z = s * 1.0; }
+    const mappe = stk(G.kasse, M.moerktTrae, g, 0.45, 0.18, 0.5, 0.36, 0.28, 0.08); mappe.rotation.set(-0.2, -0.3, 0);
+    colCirc(...e.ver(0, 0), 0.55, 1.9);
+    // børnene står til hver side og kaster ind mod ham
+    const HV = '#f4f1ea';
+    const boern = [[-3.6, 0.9, '#3e7d4a', '#e0a63a', false, 'kort', '#6b4a2f', '#f2c6a4'], [3.4, 1.4, '#7d4f8a', '#f1e3c0', true, 'hestehale', '#b4612f', '#f4d2b8']].map(([lx, lz, coat, h, kv, stil, hair, skin]) => {
+      const f = placer(demonstrant({ coat, trousers: '#24303a', skin, hair, barn: true, kvinde: kv, hairStyle: stil, dyneaerme: true,
+        hue: [strikhue(h, h, HV, '#b3262a')], ansigt: [kinder()], toej: [dyne(coat, [0.98, 1.12, 1.26, 1.4]), lynlaas(HV, 0.9, 1.58, 0.024), halstoerklaede(h, coat)], vanter: [h, coat], stoevle: ['#3a2a20', HV] }), g, lx, lz, Math.atan2(-lx, -lz));
+      const bold = stk(G.kugle, M.sne, g, 0, 0, 0, 0.07, 0.07, 0.07, false); bold.visible = false; bold.userData.fri = true;
+      return { f, lx, lz, bold };
+    });
+    const pust = new THREE.Sprite(dampMat()); pust.scale.setScalar(0.6); g.add(pust); let pustT = 9;
+    const T = 4.4;
+    return (tt, dt) => {
+      let ramt = 0;
+      boern.forEach((b, i) => {
+        const t = (tt + i * T / 2) % T, f = b.f;
+        // 0-1: bukker sig og samler sne, 1-1.6: tager tilløb, 1.6-1.8: kaster, 1.8-2.4: bolden flyver
+        const buk = ramp(t, 0.1, 0.5) * (1 - ramp(t, 0.9, 1.2));
+        f.g.rotation.x = buk * 0.7 - ramp(t, 1.2, 1.6) * 0.15 * (1 - ramp(t, 1.6, 1.75));
+        f.arms[1].rotation.x = lerp(lerp(-0.2, -1.0, buk), 2.2, ramp(t, 1.15, 1.6)) * (1 - ramp(t, 1.6, 1.78)) + ramp(t, 1.6, 1.78) * -1.6 * (1 - ramp(t, 2.2, 2.8));
+        f.arms[0].rotation.x = lerp(-0.2, -1.0, buk) - ramp(t, 1.2, 1.6) * 0.6 * (1 - ramp(t, 1.8, 2.4));
+        f.g.position.y = t > 2.4 && t < 3.6 ? Math.max(0, Math.sin((t - 2.4) * 12)) * 0.06 : 0;   // et lille hop af glæde
+        const k = (t - 1.75) / 0.6;
+        b.bold.visible = k > 0 && k < 1;
+        if (b.bold.visible) {
+          const sx = b.lx * 0.9, sz = b.lz * 0.9, mx = (i ? 0.12 : -0.1), my = i ? 1.55 : 1.05, mz = 0.15;
+          b.bold.position.set(lerp(sx, mx, k), lerp(0.75, my, k) + Math.sin(k * Math.PI) * 0.7, lerp(sz, mz, k));
+        }
+        if (t >= 2.35 && t - dt < 2.35) { ramt = i ? 2 : 1; }
+      });
+      if (ramt) { pustT = 0; pust.position.set(ramt === 2 ? 0.12 : -0.1, ramt === 2 ? 1.55 : 1.05, 0.25); }
+      pustT += dt;
+      pust.material.opacity = Math.max(0, 0.7 - pustT * 1.6); pust.scale.setScalar(0.4 + pustT * 1.4);
+      const vip = Math.exp(-pustT * 3) * Math.sin(pustT * 18);
+      hat.rotation.z = vip * 0.25; hat.rotation.x = -0.05; hoved.rotation.z = vip * 0.05;
+    };
+  });
+
+  // ---------------------------------------------------------------- 6. Demonstrationen (Slotspladsen, ved porten ind til Rigsdagsgården)
+  // Ti venlige mennesker i alle aldre i varmt vintertøj. De to ved stængerne holder banneret og løfter det lidt, to snakker
+  // sammen, en drikker kaffe af et krus, to har små skilte, en klapper, en vinker, og et barn sidder på sin fars skuldre.
+  // De skifter vægt, trækker vejret (med lidt damp i kulden) og kigger rundt, hver i sin egen takt. Når Ida kommer tæt på,
+  // kigger de på hende, nikker og vinker.
+  // Ydelse: hver person er fire bagte dele (krop med ben, hoved og to arme), og alt tøjet er bagt ind i dem. Dampen er ét
+  // punktsæt, og skiltene deler ét lærred.
   function stangGreb(lx, lz, ry, sc, kv, a, tx, ty, tz) {   // the elbow bend that lets arm a reach (tx, ty, tz) in the scene
     const dx = tx - lx, dz = tz - lz, x = (dx * Math.cos(ry) - dz * Math.sin(ry)) / sc, z = (dx * Math.sin(ry) + dz * Math.cos(ry)) / sc;
     const d = Math.min(0.595, Math.hypot(x - (a ? 1 : -1) * (kv ? 0.252 : 0.265), (ty + 0.03) / sc - 1.53, z));
@@ -835,7 +860,8 @@ export function episoder(H) {
     const skulder = [rodY + 1.53 * Math.cos(LAEN), rodZ + 1.53 * Math.sin(LAEN)];
     const ARM = -Math.atan2(STYR[1] - skulder[1], skulder[0] - STYR[0]) - LAEN;
     function rytter(o) {
-      const f = person(Object.assign({ gang: true }, o, { foer: f2 => { f2.g.rotation.x = LAEN; for (const [k, a] of f2.arms.entries()) { a.rotation.x = ARM; a.rotation.z = (k ? 1 : -1) * 0.03; } for (const el of f2.elbows) el.rotation.x = -0.08; f2.arms.length = 0; } }));   // armene står stille og bages ind i kroppen (færre ting at tegne)
+      const f = demonstrant(Object.assign({ gang: true }, o, { grupper: f2 => [f2.g, f2.head, ...f2.hips, ...f2.legs.map(l => l.knee)], boej: [0.08, 0.08],   // armene står stille og bages ind i kroppen (færre ting at tegne)
+        foer2: f2 => { f2.g.rotation.x = LAEN; for (const [k, a] of f2.arms.entries()) { a.rotation.x = ARM; a.rotation.z = (k ? 1 : -1) * 0.03; } for (const l of f2.legs) l.hip.rotation.z = 0; } }));
       f.root.position.set(0, rodY, rodZ); return f;
     }
     // benene følger pedalerne: to led (lår og skinneben, 0,42 m hver)
@@ -849,10 +875,10 @@ export function episoder(H) {
       leg.hip.rotation.x = th; leg.knee.rotation.x = Math.atan2(-(dz - kz), -(dy - ky)) - th;
     }
     const FOLK = [
-      { cyk: ['#2f5fa8', { lygte: true }], o: { coat: '#2f5f3a', trousers: '#2b2f36', hair: '#3b2a20', hairStyle: 'kort', toerklaede: '#e0a63a', extra: hue('#b3262a') }, v: 4.2, s: 40, dir: 1 },
-      { cyk: ['#e6dcc4', { dame: true, trae: true }], o: { coat: '#b3262a', trousers: '#24303a', hair: '#a8794c', kvinde: true, hairStyle: 'lang', extra: hue('#eef0ee', '#b3262a') }, v: 3.4, s: 125, dir: -1 },
-      { cyk: ['#24221f', { pakker: true }], o: { coat: '#4a5a6a', trousers: '#2d3340', hair: '#8c8c88', hairStyle: 'skaldet', toerklaede: '#b3262a', extra: hue('#2f5fa8', '#eef0ee') }, v: 3.8, s: 95, dir: 1 },
-      { cyk: ['#8a2a2e', { dame: true, kurv: true }], o: { coat: '#7d4f8a', trousers: '#2b2a30', hair: '#1f1a18', kvinde: true, hairStyle: 'knold', toerklaede: '#eef0ee' }, v: 4.6, s: 15, dir: -1 },
+      { cyk: ['#2f5fa8', { lygte: true }], o: { coat: '#2f5f3a', trousers: '#2b2f36', skin: '#e9bd99', hair: '#3b2a20', hairStyle: 'kort', dyneaerme: true, hue: [strikhue('#b3262a', '#b3262a', '#f4f1ea', '#f4f1ea')], ansigt: [skaeg('#3b2a20', false)], toej: [dyne('#2f5f3a', [0.95, 1.08, 1.21, 1.34]), lynlaas('#1e3a24', 0.9, 1.6, 0.024), halstoerklaede('#e0a63a', '#2f5f3a')], vanter: ['#2b2f36'], stoevle: ['#2a1d14'] }, v: 4.2, s: 40, dir: 1 },
+      { cyk: ['#e6dcc4', { dame: true, trae: true }], o: { coat: '#b3262a', trousers: '#24303a', skin: '#f4d2b8', hair: '#a8794c', kvinde: true, long: true, hairStyle: 'lang', hue: [oerevarmere('#eef0ee')], toej: [knapper('#e8dcc6', [0.9, 1.05, 1.2, 1.35]), baelte('#6a1a1e', '#d9b25a', 1.1), halstoerklaede('#eef0ee', '#b3262a')], vanter: ['#eef0ee', '#b3262a'], stoevle: ['#1f1b1a', '#e8dcc6'] }, v: 3.4, s: 125, dir: -1 },
+      { cyk: ['#24221f', { pakker: true }], o: { coat: '#4a5a6a', trousers: '#2d3340', skin: '#f0c9ab', hair: '#8c8c88', hairStyle: 'skaldet', hue: [strikhue('#2f5fa8', '#2f5fa8', '#eef0ee', '#eef0ee')], ansigt: [briller('#5a4a3a'), skaeg('#bdbab4')], toej: [haette('#4a5a6a', '#cbb89a'), lynlaas('#2d3a46', 0.9, 1.6), halstoerklaede('#b3262a', '#eef0ee')], vanter: ['#8a5a33'], stoevle: ['#2a1d14'] }, v: 3.8, s: 95, dir: 1 },
+      { cyk: ['#8a2a2e', { dame: true, kurv: true }], o: { coat: '#7d4f8a', trousers: '#2b2a30', skin: '#7d4f36', hair: '#1f1a18', kvinde: true, hairStyle: 'knold', dyneaerme: true, hue: [strikhue('#eef0ee', '#eef0ee', '#7d4f8a')], toej: [dyne('#7d4f8a', [0.95, 1.08, 1.21, 1.34]), lynlaas('#4a2a54', 0.9, 1.58, 0.024), halstoerklaede('#e0a63a', '#7d4f8a')], vanter: ['#e0a63a'], stoevle: ['#3a2a20', '#efe4cf'] }, v: 4.6, s: 15, dir: -1 },
     ].slice(0, lav ? 3 : 4);
     const CY = FOLK.map(F_ => {
       const b = cykel(...F_.cyk), f = rytter(F_.o); b.c.add(f.root); g.add(b.c);
