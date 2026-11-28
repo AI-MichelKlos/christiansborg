@@ -163,7 +163,7 @@ export function bygGuldkaret({ THREE, menneske, buildHorse, figKit }) {
     kvinde:true,detalje:'lav',levende:true,skin:'#f3cdb9',coat:'#764f42',trousers:'#483332',hair:'#d7d5ce',
     hairStyle:'knold',bryn:'#82736b',mund:'#9d4a4a',sidder:true,scale:1.07,
     grupper:f=>[f.g,f.head,f.arms[1],f.elbows[1]],
-    foer(f){f.head.scale.set(.94,1.10,1);for(const eye of f.eyes)eye.scale.set(.82,.70,1);f.arms[0].rotation.x=-.43;f.elbows[0].rotation.x=-.83;},
+    foer(f){for(const hip of f.hips)hip.removeFromParent();f.head.scale.set(.94,1.10,1);for(const eye of f.eyes)eye.scale.set(.82,.70,1);f.arms[0].rotation.x=-.43;f.elbows[0].rotation.x=-.83;},
     extra(g,head,part,m,foran){
       // Silver chignon, profile, cheekbones and pearls remain visible over the sill.
       const o=(parent,c,x,y,z,a,b,d)=>{
