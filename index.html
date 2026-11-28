@@ -130,6 +130,7 @@ body.touch #poi{bottom:calc(222px + env(safe-area-inset-bottom,0px));max-height:
 
 #towerViewBadge{display:none;position:fixed;left:18px;top:18px;max-width:calc(100% - 180px);padding:12px 15px;background:#26372f;color:#f4e9c9;border:1px solid #bda66d;pointer-events:none;flex-direction:column;gap:5px}
 .inTowerView #towerViewBadge{display:flex}
+#tourHint{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);padding:7px 14px;border-radius:999px;background:rgba(20,26,24,.55);color:#f4f1ea;font:600 13px/1.2 var(--body,system-ui);pointer-events:none;z-index:30;animation:tourInd .8s 1.5s both}@keyframes tourInd{from{opacity:0}to{opacity:1}}
 .inTowerView #maal{top:calc(122px + env(safe-area-inset-top,0px))!important}
 #bNotes{position:relative}.traeTal{position:absolute;right:-6px;top:-7px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:#f3d98a;color:#3a2a10;font:800 11px/20px var(--body,system-ui);text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none}
 #towerFloors{display:none;position:fixed;right:14px;top:168px;width:210px;max-width:55vw;background:#eee5cf}
@@ -5222,6 +5223,18 @@ function rayHit(a, b) {
   return rayPoly(a, b, best);
 }
 let startBlend = -1;
+// The Christmas games' opening tour: in from the harbour by Børsen, past the Tower and the king on Slotspladsen, over
+// Rigsdagsgården and the Christmas tree, across the palace to Højbro, and down over the skating rink behind Ida.
+const TOUR = { T: 16, kurve: null, look: null, hint: null,
+  start() {
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+    this.kurve = new THREE.CatmullRomCurve3([camera.position.clone(), V(215, 50, 25), V(100, 40, -62), V(60, 30, 108), V(-55, 54, 10), V(-26, 26, -150), V(-8, 13, -246), camPos.clone()], false, 'centripetal');
+    this.look = new THREE.CatmullRomCurve3([orbitC.clone(), V(25, 45, -14), V(81, 9, -51), V(17, 8, 75), V(10, 28, -14), V(-5, 3, -167), V(-5, 1.5, -214), camLook.clone()], false, 'centripetal');
+    const h = document.createElement('div'); h.id = 'tourHint'; h.textContent = isTouch ? 'Tryk for at springe over' : 'Klik eller tryk på en tast for at springe over'; document.body.append(h); this.hint = h;
+    this.spring = () => { if (startBlend >= 0 && startBlend < 1) startBlend = 1; };
+    addEventListener('pointerdown', this.spring); addEventListener('keydown', this.spring);
+  },
+  slut() { this.kurve = this.look = null; this.hint?.remove(); this.hint = null; removeEventListener('pointerdown', this.spring); removeEventListener('keydown', this.spring); } };
 const orbitC = new THREE.Vector3(20, 0, 40);
 // The opening shot of a new game: Marmorbroen and Ridebanen at dawn, seen while the first cards are open. When the last
 // card closes (INTRO.slip), the camera glides over the roofs to Ida at the gate in Tøjhusgade, where she starts.
@@ -5261,8 +5274,14 @@ function updCamera(dt, t) {
   }
   if (startBlend >= 0 && startBlend < 1) {
     const fra = INTRO.fraPos;   // from the opening shot over the roofs, or from the circling view on the start screen
-    // the Christmas games fly in slowly from the circling view, so there is time to see Slotsholmen in the snow
-    startBlend = Math.min(1, startBlend + dt / (fra ? 3.4 : KAL ? 7 : 2.2)); const u_ = startBlend, e = KAL && !fra ? u_ * u_ * u_ * (u_ * (u_ * 6 - 15) + 10) : u_ * u_ * (3 - 2 * u_);
+    // the Christmas games take a short tour over Slotsholmen in the snow before landing behind Ida (tap to skip)
+    startBlend = Math.min(1, startBlend + dt / (fra ? 3.4 : KAL ? TOUR.T : 2.2)); const u_ = startBlend, e = KAL && !fra ? u_ * u_ * u_ * (u_ * (u_ * 6 - 15) + 10) : u_ * u_ * (3 - 2 * u_);
+    if (KAL && !fra) {
+      if (!TOUR.kurve) TOUR.start();
+      camera.position.copy(TOUR.kurve.getPointAt(e)); camera.lookAt(TOUR.look.getPointAt(e));
+      if (startBlend >= 1) TOUR.slut();
+      kid.root.visible = camera.position.distanceTo(camLook) > 1.05; return;
+    }
     if (fra) { const k = INTRO.bue, u = 1 - e; camera.position.set(u * u * fra.x + 2 * u * e * k.x + e * e * camPos.x, u * u * fra.y + 2 * u * e * k.y + e * e * camPos.y, u * u * fra.z + 2 * u * e * k.z + e * e * camPos.z); }
     else camera.position.lerpVectors(orbitPos, camPos, e);
     tmpA.lerpVectors(INTRO.fraLook || orbitC, camLook, fra ? Math.min(1, e * 2) : e);   // in the glide she looks ahead toward Ida early
