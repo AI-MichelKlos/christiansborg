@@ -26,8 +26,8 @@ export const KALENDER = {
     titel: "Otte huer og et træ",
     replikker: [
       ["fortaeller", "Det sner på Slotsholmen. Juletræet i Rigsdagsgården har 24 lys, og de er alle sammen slukket."],
-      ["Pind", "Nisserne har gemt otte nissehuer på deres yndlingssteder. For hver hue, du finder, tænder vi tre lys på træet."],
-      ["Pind", "Den første kan du se herfra. Den lyser ude på Højbro."],
+      ["Hr. Kirk", "Nisserne har gemt otte nissehuer på deres yndlingssteder. For hver hue, du finder, tænder vi tre lys på træet."],
+      ["Hr. Kirk", "Den første kan du se herfra. Den lyser ude på Højbro."],
     ],
   },
 
@@ -50,9 +50,9 @@ export const KALENDER = {
       farve: "#c8262d", kant: "#f4f1ea",
       nisse: "pind", vaert: { x: -10.2, z: -169.4, face: 250 },
       historie: [
-        ["Pind", "Højbro var den første bro ud til Slotsholmen. Dengang var den af træ og kunne klappes op, så skibene kunne sejle igennem."],
-        ["Pind", "Navnet har broen arvet fra den gamle træbro. Den bro, du står på nu, er fra 1878 og tegnet af arkitekten Vilhelm Dahlerup. Høj er den ikke rigtig."],
-        ["Pind", "Kig ned i kanalen. Dernede padler min nabo i kajak hver dag i december. Han kalder det motion. Jeg har noteret det som en ikke-budgetteret aktivitet."],
+        ["Hr. Kirk", "Højbro var den første bro ud til Slotsholmen. Dengang var den af træ og kunne klappes op, så skibene kunne sejle igennem."],
+        ["Hr. Kirk", "Navnet har broen arvet fra den gamle træbro. Den bro, du står på nu, er fra 1878 og tegnet af arkitekten Vilhelm Dahlerup. Høj er den ikke rigtig."],
+        ["Hr. Kirk", "Kig ned i kanalen. Dernede padler min nabo i kajak hver dag i december. Han kalder det motion. Jeg har noteret det som en ikke-budgetteret aktivitet."],
       ],
     },
     {
@@ -171,12 +171,12 @@ export const KALENDER = {
       at: [440, 3.2],
       knap: "Tag en skål risalamande",
       forbi: [
-        [["fortaeller", "Risalamanden er kold og god. Der er ingen mandel."], ["Pind", "Det var forventet. Chancen var en ud af tre. Nu er den en ud af to."]],
+        [["fortaeller", "Risalamanden er kold og god. Der er ingen mandel."], ["Hr. Kirk", "Det var forventet. Chancen var en ud af tre. Nu er den en ud af to."]],
         [["fortaeller", "Heller ingen mandel i den skål."], ["Knud", "Jeg har holdt øje med skålene hele aftenen. Ingen har flyttet mandlen. Tror jeg."]],
       ],
       fundet: [
         ["fortaeller", "Der er noget hårdt i risalamanden. Det er mandlen."],
-        ["Anker", "Så er det dig, der får mandelgaven. Pind har allerede godkendt udgiften."],
+        ["Anker", "Så er det dig, der får mandelgaven. Hr. Kirk har allerede godkendt udgiften."],
         ["Bilag", "Jeg foreslog at dele mandlen i otte lige store stykker. Det blev ikke vedtaget."],
       ],
       igen: [["Anker", "Mandlen er fundet. Resten er bare risalamande. Der er nok til alle."]],
@@ -206,7 +206,7 @@ export const KALENDER = {
   },
 
   nisser: {
-    pind: { navn: "Kontorchef Pind", kort: "Pind", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
+    pind: { navn: "Hr. Kirk", kort: "Hr. Kirk", rolle: "Kontornisse i Finansministeriet siden 1849", hue: "#a8252b", toej: "#6f7780" },
     kendelse: { navn: "Hofdame Thyra", kort: "Thyra", pige: true, haar: "#5a3a26", rolle: "Taffelnisse i De Kongelige Repræsentationslokaler. Har dækket op til 117 gallamiddage", hue: "#7a1f24", toej: "#b52a2e", skoert: "#2e6446", bukser: "#2b2326", krave: "#f6f1e6", knapper: "#d9b25a", broche: "#c8262d" },
     bro: { navn: "Brovogter Knud", kort: "Knud", rolle: "Nisse på Marmorbroen. Har holdt øje med pavillonerne i mere end 280 år", hue: "#2f5fa8", toej: "#5a4a3a", bukser: "#3a3a3a" },
     hov: { navn: "Staldmester Gerda", kort: "Gerda", pige: true, hoetyv: true, haar: "#b8743a", rolle: "Staldnisse i De Kongelige Stalde. Har aldrig haft fri en juleaften", hue: "#a8252b", toej: "#7a5a3a" },

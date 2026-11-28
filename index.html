@@ -4837,6 +4837,12 @@ function updPlayer(dt) {
     P.pos.x = ox; P.pos.z = oz; P.vel.x = P.vel.z = 0;
   }
   resolveQuays(P.pos,ox,oz);
+  // Christmas games: she cannot step through the railing on the side of a bridge (at the ends it was possible onto the quay)
+  if (KAL) for (const F of ARCHES) {
+    const side = (x, z) => { const dx = x - F.cx, dz = z - F.cz; return [Math.abs(dx * F.ux + dz * F.uz), Math.abs(dx * F.vx + dz * F.vz)]; };
+    const [u0, v0] = side(ox, oz), [u1, v1] = side(P.pos.x, P.pos.z), R = F.W / 2 - 0.25;
+    if (Math.max(u0, u1) < F.L / 2 + 0.6 && (v0 < R) !== (v1 < R)) { P.pos.x = ox; P.pos.z = oz; P.vel.x = P.vel.z = 0; break; }
+  }
   // the water stops her (she can still walk along the quay)
   if (waterAt(P.pos.x, P.pos.z)) {
     if (!waterAt(P.pos.x, oz)) P.pos.z = oz; else if (!waterAt(ox, P.pos.z)) P.pos.x = ox; else { P.pos.x = ox; P.pos.z = oz; }

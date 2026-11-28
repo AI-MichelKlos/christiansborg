@@ -9,7 +9,7 @@ Julesporet (`?spor=jul`) er en kort nissehuejagt på telefonen. Der er otte huer
 
 Ruten er den rækkefølge, vejvisningen foreslår. Man kan tage huerne i hvilken som helst rækkefølge.
 
-1. **Højbro.** Huen ligger på gelænderet midt på broen, og under broen padler en nisse i kajak frem og tilbage. Havmanden er fjernet fra julespillet (den er stadig i mordgåden). Den kan ses fra startstedet på Højbro Plads, cirka 50 m væk, og der står en lysstribe over den. Når man tager den, står man midt på broen med Slotskirken foran sig. Værten er Kontorchef Pind.
+1. **Højbro.** Huen ligger på gelænderet midt på broen, og under broen padler en nisse i kajak frem og tilbage. Havmanden er fjernet fra julespillet (den er stadig i mordgåden). Den kan ses fra startstedet på Højbro Plads, cirka 50 m væk, og der står en lysstribe over den. Når man tager den, står man midt på broen med Slotskirken foran sig. Værten er Hr. Kirk.
 2. **Riddersalen.** Huen ligger for enden af det lange gallabord. Man går hele salen igennem langs bordet, lysekronerne og vægtæpperne. Værten er Hofdame Thyra.
 3. **Marmorbroen.** Huen ligger på balustraden midt på broen. Man ser pavillonerne, Ridebanen og slottet bag dem. Værten er Brovogter Knud.
 4. **De Kongelige Stalde.** Huen ligger på skillevæggen ind til en bås, lige ved en af de hvide heste. Når man går ind ad staldporten, ser man den skråt fremme til højre og samtidig ned ad hele staldgangen med marmorsøjlerne. Værten er Staldmester Gerda.
