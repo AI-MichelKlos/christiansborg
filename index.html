@@ -4277,9 +4277,11 @@ const FT_CARS = [0, 1, 2].map(() => ministerCar());
     // In the calendar Ida comes from Højbro Plads round the far end of the yard. The cars start a little earlier and are
     // already turning in at the gate when she gets there, so she does not have to wait for them, and nothing is said.
     const [ex, ez] = FT.at(0, 6), near = started && !paused && !MYBOAT.on && !AAR_ON && Math.hypot(P.pos.x - ex, P.pos.z - ez) < (KAL ? 72 : 45);
+    // In the Christmas game the cars come every time Ida steps into Rigsdagsgården (not only once per game)
+    const iGaard = KAL && started && !paused && !MYBOAT.on && Math.hypot(P.pos.x - 36, P.pos.z - 72) < 26, indGaard = iGaard && !S.varIGaard; if (KAL) S.varIGaard = iGaard;
     if (S.phase === 'idle') {
-      if (S.cool > 0) S.cool -= dt;
-      else if (near && !GAADE.G.flag.some(f => f === 'biler_kom' || f === 'beg_statsministeren') && !PERSONER.i1942()) { GAADE.G.flag.push('biler_kom'); S.phase = 'in'; S.s = KAL ? carGateS : GAP + 0.5; S.v = 6; S.ev = {}; FT_CARS.forEach(c => { c.g.visible = true; c.fresh = true; c.want = [0, 0]; c.doors.forEach(d => { d.userData.a = 0; d.rotation.y = 0; }); }); if (!KAL) toast('Tre sorte biler kører ind i Rigsdagsgården.'); }
+      if (S.cool > 0 && !indGaard) S.cool -= dt;
+      else if (KAL ? indGaard : near && !GAADE.G.flag.some(f => f === 'biler_kom' || f === 'beg_statsministeren') && !PERSONER.i1942()) { GAADE.G.flag.push('biler_kom'); S.phase = 'in'; S.s = KAL ? carGateS : GAP + 0.5; S.v = 6; S.ev = {}; FT_CARS.forEach(c => { c.g.visible = true; c.fresh = true; c.want = [0, 0]; c.doors.forEach(d => { d.userData.a = 0; d.rotation.y = 0; }); }); if (!KAL) toast('Tre sorte biler kører ind i Rigsdagsgården.'); }
     }
     const v0 = S.v;
     if (S.phase === 'in' || S.phase === 'out') {
