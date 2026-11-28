@@ -9,6 +9,7 @@
 //   6. Slotspladsen ved porten til Rigsdagsgården: ti venlige demonstranter med et banner: Nej tak til dagpengeforringelser
 //   7. Tøjhusgade: cyklister, der kører frem og tilbage i højre side af vejen, og tre parkerede cykler ved en husmur
 //   8. Bibliotekshaven: H.C. Andersen går en tur om bassinet med høj hat og stok og letter på hatten for Ida
+//   9. Højbro Plads: en skøjtebane med lyskæder, hvor fem løber rundt, og en pige laver piruetter
 //
 // index.html kalder episoder(...) én gang i KALENDER-blokken og derefter update(dt, t, pos, ude) i hver frame.
 // Ydelse: alle figurer er bagt til få meshes (menneske() i index.html), geometri og materialer deles, hver scene vises
@@ -226,7 +227,7 @@ export function episoder(H) {
         for (const [i, l] of f.legs.entries()) l.hip.rotation.z = (i ? 1 : -1) * 0.03;   // feet a little apart
         if (o.ben) { const s = o.ben, l = f.legs[s > 0 ? 1 : 0]; l.hip.rotation.set(-0.07, s * 0.28, s * 0.08); l.knee.rotation.x = 0.18; }
         if (o.boej) for (const [i, el] of f.elbows.entries()) el.rotation.set(-o.boej[i], 0, 0);   // the elbows are baked into the arms, so the bend is fixed
-        if (o.foer2) o.foer2(f);
+        if (o.foer2) o.foer2(f, P);
       },
     }));
   }
@@ -263,7 +264,16 @@ export function episoder(H) {
     const barn = placer(demonstrant({ coat: '#e0a63a', trousers: '#2f5fa8', skin: '#f4d2b8', hair: '#d9c08a', barn: true, hairStyle: 'hestehale', kvinde: true, dyneaerme: true,
       hue: [strikhue('#b3262a', HV, HV, HV)], toej: [dyne('#e0a63a', [0.98, 1.12, 1.26, 1.4]), lynlaas('#2f5fa8', 0.9, 1.58, 0.024)], vanter: ['#2f5fa8', HV], stoevle: ['#b3262a', HV] }), g, -1.55, 1.15, Math.PI / 2 - 0.6);
     mand.arms[0].rotation.x = mand.arms[1].rotation.x = -0.7; mand.arms[0].rotation.z = 0.3; mand.arms[1].rotation.z = -0.3;
-    return (t) => {
+    // lyden: panden syder, mandlerne knitrer, og sælgeren råber, når Ida kommer hen
+    let sydT = 0, knitT = 0, raabt = false;
+    return (t, dt, pos) => {
+      const dI = Math.hypot(pos.x - e.x, pos.z - e.z), vol = Math.max(0, 1 - dI / 16) ** 1.6;
+      if (vol > 0.03 && H.sus) {
+        sydT -= dt; if (sydT <= 0) { sydT = 0.55 + Math.random() * 0.3; H.sus(0.9, 0.012 * vol, 5200, 0.6, 4200); }
+        knitT -= dt; if (knitT <= 0) { knitT = 0.15 + Math.random() * 0.7; H.sus(0.03, 0.03 * vol, 2600 + Math.random() * 2000, 2); }
+      }
+      if (dI < 6 && !raabt) { raabt = true; H.toast?.('Brændte mandler! Varme, brændte mandler! En pose for 30 kroner.'); }
+      if (dI > 14) raabt = false;
       // røre i panden
       saelger.arms[1].rotation.x = -0.75 + Math.sin(t * 3.2) * 0.18; saelger.arms[1].rotation.z = 0.25 + Math.cos(t * 3.2) * 0.12;
       saelger.g.rotation.x = 0.12 + Math.sin(t * 0.6) * 0.03;
@@ -764,6 +774,84 @@ export function episoder(H) {
       ringT -= dt;
       if (ringT <= 0) { ringT = BEAT * 2; const vol = Math.max(0, 1 - dI / 20) ** 2; if (vol > 0.02 && H.tone) H.tone(2093, 2080, 0, 0.35, 0.02 * vol, 'sine'); }
       gryde.rotation.y = Math.sin(t * 0.8) * 0.2;
+    };
+  });
+
+  // ---------------------------------------------------------------- 9. Skøjtebanen på Højbro Plads
+  // En lille skøjtebane med hvid bande, et rødt håndlistebånd og lyskæder mellem fire lygtepæle. Fem løber rundt mod uret:
+  // to med hænderne på ryggen, en far med sin datter i hånden, og en nybegynder, der vakler langs banden med armene ude.
+  // I midten står en pige, der en gang imellem laver en piruet. Skøjterne skraber på isen, når Ida er tæt på.
+  // Banden er lukket, så Ida kan stå ved den og kigge, men ikke gå ud på isen.
+  scene(-5, -227, 0, (g, e) => {
+    const HV = '#f4f1ea', A = 7, B = 5, R = 2.2;   // the rink: half length, half width and corner radius
+    const form = new THREE.Shape();
+    form.moveTo(-A + R, -B); form.lineTo(A - R, -B); form.quadraticCurveTo(A, -B, A, -B + R); form.lineTo(A, B - R); form.quadraticCurveTo(A, B, A - R, B);
+    form.lineTo(-A + R, B); form.quadraticCurveTo(-A, B, -A, B - R); form.lineTo(-A, -B + R); form.quadraticCurveTo(-A, -B, -A + R, -B);
+    const isMat = new THREE.MeshStandardMaterial({ color: '#d7e8f0', roughness: 0.08, metalness: 0.25 }); isMat.userData.sne = true;
+    const is = new THREE.Mesh(new THREE.ShapeGeometry(form, 12), isMat); is.rotation.x = -Math.PI / 2; is.position.y = 0.035; is.receiveShadow = true; is.userData.fri = true; g.add(is);
+    // the board round the edge: short white planks with a red rail, and the posts for the lights at the corners
+    const kant = form.getSpacedPoints(64);
+    for (let i = 0; i < kant.length - 1; i++) {
+      const p0 = kant[i], p1 = kant[i + 1], mx = (p0.x + p1.x) / 2, mz = -(p0.y + p1.y) / 2, L = Math.hypot(p1.x - p0.x, p1.y - p0.y), ry = Math.atan2(p1.x - p0.x, -(p1.y - p0.y)) + Math.PI / 2;
+      const b = stk(G.kasse, M.hvid, g, mx, 0.5, mz, 0.08, 1.0, L + 0.04); b.rotation.y = ry - Math.PI / 2;
+      const r = stk(G.kasse, M.roed, g, mx, 1.03, mz, 0.16, 0.07, L + 0.04); r.rotation.y = ry - Math.PI / 2;
+      if (i % 2 === 0) colCirc(...e.ver(mx, mz), 0.45, 1.1);
+    }
+    const pael = [[-A - 0.6, -B - 0.6], [A + 0.6, -B - 0.6], [A + 0.6, B + 0.6], [-A - 0.6, B + 0.6]];
+    for (const [x, z] of pael) { stk(G.cyl, M.jern, g, x, 1.8, z, 0.05, 3.6, 0.05); stk(G.kugle, M.jern, g, x, 3.62, z, 0.08, 0.08, 0.08); colCirc(...e.ver(x, z), 0.2, 3.6); }
+    // lyskæderne hænger i en bue mellem pælene
+    const lys = [];
+    for (let k = 0; k < 4; k++) { const [x0, z0] = pael[k], [x1, z1] = pael[(k + 1) % 4]; for (let i = 1; i < 14; i++) { const u = i / 14; lys.push([x0 + (x1 - x0) * u, 3.5 - Math.sin(u * Math.PI) * 0.9, z0 + (z1 - z0) * u]); } }
+    const lp = new Float32Array(lys.length * 3), lc = new Float32Array(lys.length * 3), FARVER = [[1, 0.82, 0.48], [1, 0.42, 0.37], [0.56, 0.85, 1], [0.65, 0.91, 0.56]];
+    lys.forEach((p, i) => { lp.set(p, i * 3); lc.set(FARVER[i % 4], i * 3); });
+    const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(lp, 3)); lg.setAttribute('color', new THREE.BufferAttribute(lc, 3));
+    const lyskaede = new THREE.Points(lg, new THREE.PointsMaterial({ size: 0.45, map: TX.glow, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    lyskaede.userData.fri = true; g.add(lyskaede);
+    // skøjter: en hvid eller sort støvle og en blank klinge, på skinnebenet
+    const skoejte = (farve) => (f, P) => { for (const l of f.legs) { P.part(new THREE.CylinderGeometry(0.072, 0.07, 0.2, 12), P.m(farve), l.knee, 0, -0.35, 0.006); P.part(BG(0.1, 0.07, 0.26), P.m(farve), l.knee, 0, -0.43, 0.05); P.part(BG(0.012, 0.05, 0.36), P.m('#c9ced4'), l.knee, 0, -0.49, 0.05); } };
+    const loeber = (o, arme) => demonstrant(Object.assign({ grupper: f => [f.g, ...f.hips], boej: arme.boej }, o, {
+      foer2: (f, P) => { skoejte(o.skoejte || '#f4f1ea')(f, P); f.g.rotation.x = 0.22; for (const [k, a] of f.arms.entries()) { a.rotation.x = arme.x[k]; a.rotation.z = arme.z[k]; } for (const l of f.legs) l.knee.rotation.x = 0.3; } }));
+    const RYG = { x: [0.55, 0.55], z: [-0.15, 0.15], boej: [1.3, 1.3] }, UD = { x: [-0.1, -0.1], z: [-1.2, 1.2], boej: [0.25, 0.25] };
+    const folk = [
+      { o: { coat: '#2f3a4a', trousers: '#24303a', skin: '#f0c9ab', hair: '#d8d4ca', hairStyle: 'skaldet', scale: 1.02, hue: [strikhue('#b3262a', '#b3262a', HV, HV)], ansigt: [skaeg('#e4e0d6'), kinder()], toej: [halstoerklaede('#b3262a', HV), knapper('#c9c4b8', [0.95, 1.1, 1.25, 1.4])], vanter: ['#3a2a20'], skoejte: '#1a1412' }, arme: RYG, a: 5.2, b: 3.3, v: 1.9, th: 0 },
+      { o: { coat: '#c0392b', trousers: '#2b2a30', skin: '#f4d2b8', hair: '#b4612f', kvinde: true, long: true, hairStyle: 'lang', scale: 0.97, hue: [oerevarmere(HV)], toej: [halstoerklaede(HV, '#c0392b'), baelte('#6a1a1e', '#d9b25a', 1.1)], vanter: [HV] }, arme: RYG, a: 5.2, b: 3.3, v: 2.3, th: 2.6 },
+      { o: { coat: '#2f5f3a', trousers: '#2b2f36', skin: '#c98d62', hair: '#2b2420', hairStyle: 'kort', scale: 1.04, dyneaerme: true, hue: [strikhue('#e0a63a', '#e0a63a', HV, '#2f5f3a')], toej: [dyne('#2f5f3a', [0.95, 1.1, 1.25, 1.4]), lynlaas('#1e3a24', 0.9, 1.6, 0.024)], vanter: ['#e0a63a'], skoejte: '#1a1412' }, arme: { x: [0, 0], z: [-0.12, 0.55], boej: [0.35, 0.2] }, a: 4.2, b: 2.4, v: 1.3, th: 4.2, par: 0 },
+      { o: { coat: '#e0a63a', trousers: '#2f5fa8', skin: '#c98d62', hair: '#2b2420', barn: true, kvinde: true, hairStyle: 'hestehale', dyneaerme: true, hue: [strikhue('#b3262a', HV, HV, HV)], toej: [dyne('#e0a63a', [0.98, 1.12, 1.26, 1.4])], vanter: ['#b3262a'] }, arme: { x: [-0.1, 0], z: [-1.0, 0.12], boej: [0.2, 0.3] }, a: 4.2, b: 2.4, v: 1.3, th: 4.2, par: 1 },
+      { o: { coat: '#4a5a6a', trousers: '#2d3340', skin: '#f2c6a4', hair: '#6b4a2f', hairStyle: 'kort', scale: 1.0, hue: [pelshue('#3a2a20', '#d9cdb6')], ansigt: [briller('#5a4a3a')], toej: [halstoerklaede('#3e7d4a', HV), lommer('#3a4a58', 1.0)], vanter: ['#3e7d4a'], skoejte: '#1a1412' }, arme: UD, a: 6.1, b: 4.1, v: 0.55, th: 1.2, ny: true },
+      { o: { coat: '#7a3f8f', trousers: '#2b2a30', skin: '#f4d2b8', hair: '#e8c98a', barn: true, kvinde: true, hairStyle: 'knold', dyneaerme: true, hue: [strikhue(HV, HV, '#7a3f8f', '#7a3f8f')], toej: [dyne('#7a3f8f', [0.98, 1.12, 1.26, 1.4])], vanter: [HV] }, arme: { x: [-0.2, -0.2], z: [-0.9, 0.9], boej: [0.3, 0.3] }, a: 0.9, b: 0.6, v: 0.5, th: 0, piruet: true },
+    ].slice(0, GFX.lav ? 5 : 6);
+    for (const d of folk) { d.f = placer(loeber(d.o, d.arme), g, 0, 0, 0); d.f.g.position.y = -0.03; d.fase = Math.random() * 6.3; d.skr = 0; }
+    let piruetT = 0;
+    return (t, dt, pos) => {
+      const dI = Math.hypot(pos.x - e.x, pos.z - e.z), vol = H.sus ? Math.max(0, 1 - dI / 22) ** 1.5 : 0;
+      piruetT = (piruetT + dt) % 14;
+      for (const d of folk) {
+        const f = d.f;
+        if (d.piruet) {   // stands still, then spins for two and a half seconds with the arms pulled in
+          const spin = piruetT > 10 && piruetT < 12.5, k = spin ? Math.sin((piruetT - 10) / 2.5 * Math.PI) : 0;
+          d.rot = (d.rot || 0) + dt * k * 14; f.root.position.set(Math.cos(t * 0.25) * d.a, 0, Math.sin(t * 0.25) * d.b); f.root.rotation.y = d.rot + t * 0.25;
+          f.arms[0] && (f.arms[0].rotation.z = -0.9 + k * 0.8); f.arms[1] && (f.arms[1].rotation.z = 0.9 - k * 0.8);
+          f.g.rotation.x = 0.05; f.hips[0].rotation.x = -k * 0.6; f.hips[1].rotation.x = 0;
+          if (spin && !d.lyd && vol > 0.03) { d.lyd = true; H.sus(2.5, 0.025 * vol, 3400, 1.5, 2600); } if (!spin) d.lyd = false;
+          continue;
+        }
+        // round the rink against the clock; the speed rises and falls with each stroke
+        const fase = t * (d.ny ? 1.4 : 2.6) * (d.v / 2) + d.fase, slag = Math.sin(fase);
+        d.th += dt * d.v * (1 + slag * 0.12) / Math.hypot(d.a * Math.sin(d.th), d.b * Math.cos(d.th));
+        const x = Math.cos(d.th) * d.a, z = -Math.sin(d.th) * d.b, tx = -Math.sin(d.th) * d.a, tz = -Math.cos(d.th) * d.b;
+        const sideX = -tz / Math.hypot(tx, tz), sideZ = tx / Math.hypot(tx, tz), side = d.par === 1 ? 0.75 : d.par === 0 ? -0.0 : 0;
+        f.root.position.set(x + sideX * side, 0, z + sideZ * side); f.root.rotation.y = Math.atan2(tx, tz);
+        // the push: one leg goes out and back while the body leans over the other
+        const v = Math.max(0, slag), h = Math.max(0, -slag);
+        f.hips[0].rotation.set(0.35 * v, 0, -0.03 - 0.32 * v); f.hips[1].rotation.set(0.35 * h, 0, 0.03 + 0.32 * h);
+        f.g.rotation.z = slag * (d.ny ? 0.05 : 0.11); f.g.rotation.x = d.ny ? 0.08 + Math.sin(t * 3.1 + d.fase) * 0.08 : 0.22;
+        f.g.position.y = -0.03 - (d.ny ? 0 : 0.03 * (1 - Math.abs(slag)));
+        if (d.ny) { f.g.rotation.z += Math.sin(t * 4.3 + d.fase) * 0.06; }   // the beginner wobbles
+        // a scrape for each stroke
+        const s_ = slag > 0 ? 1 : -1;
+        if (s_ !== d.skr) { d.skr = s_; if (vol > 0.03) H.sus(d.ny ? 0.2 : 0.38, (d.ny ? 0.008 : 0.016) * vol, 2400, 1.1, 1500); }
+      }
+      lyskaede.material.opacity = 0.85 + Math.sin(t * 1.7) * 0.1;
     };
   });
 

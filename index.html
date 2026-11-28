@@ -4932,6 +4932,16 @@ function tone(f0, f1, start, dur, vol = 0.16, type = 'sine') {
   o.connect(g); g.connect(soundBus); o.start(t); o.stop(t + dur + 0.05);
   o.onended=()=>{o.disconnect();g.disconnect();};
 }
+let susBuf = null;
+function sus(dur, vol = 0.02, frek = 2000, q = 1, frek1 = frek, start = 0) {   // a short burst of filtered noise: skates on ice, a sizzling pan
+  const a = audio(); if (!a || !soundOn) return; const t = a.currentTime + start;
+  if (!susBuf) { susBuf = a.createBuffer(1, a.sampleRate, a.sampleRate); const d = susBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(); src.buffer = susBuf; src.loop = true;
+  f.type = 'bandpass'; f.Q.value = q; f.frequency.setValueAtTime(frek, t); f.frequency.exponentialRampToValueAtTime(frek1, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.05, dur * 0.3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(f); f.connect(g); g.connect(soundBus); src.start(t, Math.random() * 0.5); src.stop(t + dur + 0.05);
+  src.onended = () => { src.disconnect(); f.disconnect(); g.disconnect(); };
+}
 function sparkleSound() { [1320, 1760, 2093].forEach((f, i) => tone(f, f * 1.01, 0.08 + i * 0.07, 0.3, 0.045)); }
 function hop() { tone(300, 520, 0, 0.12, 0.05, 'triangle'); }
 function footstep() {   // a soft step outside, a clear tap on the marble and parquet indoors
@@ -10031,7 +10041,7 @@ const KALENDER = (() => {
   }
   for (const g of [world, dyn]) g.traverse(o => { if (o.material) for (const m of Array.isArray(o.material) ? o.material : [o.material]) sneMat(m); });
   // small Christmas scenes along the ways (episoder.js): shown and moving only outdoors and near Ida
-  const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch, GARDEN, toast, tone }) : { gruppe: new THREE.Group(), update() {} };
+  const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch, GARDEN, toast, tone, sus }) : { gruppe: new THREE.Group(), update() {} };
   EPI.gruppe.traverse(o => { if (o.material) sneMat(o.material); });
   HOOKS.frame.push((dt, t) => EPI.update(dt, t, P.pos, ude()));
   if (EPI.slaede) EPI.slaede({ fald: () => faldNu, inde: () => I.on, aktiv: () => started && !paused, camera, tone, toast, loft, drej, slange, rundKasse, nuance });   // Santa's sleigh flies over when it snows (slaede.js)
