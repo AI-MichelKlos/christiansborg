@@ -10522,6 +10522,19 @@ const KALENDER = (() => {
   return kal;
 })();
 
+if (SPOR_ID === 'jul') {
+  const { historiskeGaester } = await import('./historiske-gaester.js');
+  const { nytaarsoptog } = await import('./nytaarsoptog.js');
+  const optog = nytaarsoptog({ THREE, menneske, buildHorse, figKit, dyn, groundAt, tone, toast, offerAction, scene:GAADE.scene, renderer, verden:scene, reduceMotion });
+  const updateGaester = historiskeGaester({ THREE, menneske, ctex, dyn, I: INTERIOR, groundAt, horses: HORSES, offerAction, scene: GAADE.scene, reduceMotion });
+  HOOKS.frame.push(dt => {
+    const ude = !INTERIOR.on && !TOWER.on && !TOWER.busy && !MYBOAT.on;
+    const aktiv = started && !paused;
+    const karet = optog(dt, P.pos, ude, aktiv);
+    updateGaester(dt, P.pos, ude, aktiv, karet);
+  });
+}
+
 window.__cb = { kal: KALENDER, info: () => ({ calls: renderer.info.render.calls, tris: renderer.info.render.triangles, geo: renderer.info.memory.geometries }), INTRO, MAAL, TIPS, lys: () => ev, MAPVIEW, PAV, WAYFIND, COURT_ENTRY, PM_ENTRY, PRESS, GARDEN, STABLE_ENTRY, QUAYS, quaySurfaceAt, groundAt, landSpot, INTERIOR, TOWER, SWANS, FOUNTAIN, FT, PM, GUARDS, FT_CARS, MYBOAT, boatFits, lowAt, rawWater, P, cam, kid, POIS, HORSES, BOATS, VEHICLES, FAMILIES, TOURISTS, START_WALKERS, ACT, ARCHES, setEvening, renderer, waterAt, gaade: GAADE.test, laas: LAAS, personer: PERSONER, aar: AAR1942, start: () => goBtn.click(), tp: (x, z, f = P.face) => { P.pos.set(x, 0, z); P.face = f; cam.yaw = f + Math.PI; camInit = false; startBlend = 1; }, peek: (y) => { cam.yaw = y; lastDragEnd = clockT + 30; }, keys, spot: (x, z) => groundAt(x, z, 99) - archH(x, z) + (inBuilding(x, z) ? 100 : 0), bigMap: (w) => { mapCv.width = w; mapCv.height = Math.round(w * (MZ1 - MZ0) / (MX1 - MX0)); buildMapBase(); return mapBase; }, frames: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) for (const hk of HOOKS.frame) hk(dt, clockT + i * dt); }, step: (n, dt = 1 / 30) => { for (let i = 0; i < n; i++) updPlayer(dt); return P.pos.toArray().map(v => +v.toFixed(1)); } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 
