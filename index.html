@@ -9645,22 +9645,48 @@ const KALENDER = (() => {
     return PERSONER.figur({ coat: n.toej || '#6f7780', trousers: n.bukser || nuance(n.toej || '#6f7780', -0.1), shoes: '#2a1d14', hair: pige ? (n.haar || '#c9a46a') : '#f1eee6', hairStyle: pige ? 'bob' : 'kort', bryn: pige ? nuance(n.haar || '#c9a46a', -0.15) : '#e4e0d6', skin: hud, scale: 0.6, ingenKrave: true,
       kvinde: pige, kinder: false,   // the girls get lashes and a softer face; the cheeks are painted below
       extra: (g, head, part, m, foran) => {
-        // the cap: a fur brim, a soft cone that flops to the side, and a pom-pom at the tip
+        // the cap: a fur brim, a soft cone, and a tip that bends over in four soft steps down to a pom-pom
         const brem = part(new THREE.TorusGeometry(0.15, 0.04, 8, 20), m(pels), head, 0, 0.075, -0.01); brem.rotation.x = Math.PI / 2 - 0.12;
         const hue = new THREE.Group(); hue.position.set(0, 0.09, -0.02); hue.rotation.x = -0.12; head.add(hue);
         part(new THREE.ConeGeometry(0.16, 0.24, 16, 1, true), m(hueF), hue, 0, 0.12, 0);
-        const top = new THREE.Group(); top.position.set(0, 0.22, 0); top.rotation.set(-0.5, 0, 0.75); hue.add(top);
-        part(new THREE.ConeGeometry(0.075, 0.26, 12), m(hueF), top, 0, 0.11, 0);
-        part(new THREE.SphereGeometry(0.055, 10, 8), m(pels), top, 0, 0.25, 0);
+        let led = new THREE.Group(); led.position.set(0, 0.17, 0); led.rotation.set(-0.12, 0, 0.18); hue.add(led);
+        [[0.104, 0.083, 0.1], [0.083, 0.062, 0.09], [0.062, 0.042, 0.085], [0.042, 0.024, 0.08]].forEach(([r0, r1, l], i) => {   // each step a little thinner and bent a little more
+          part(new THREE.CylinderGeometry(r1, r0, l, 14, 1, true), m(hueF), led, 0, l / 2, 0, 0);
+          part(new THREE.SphereGeometry(r1, 12, 8), m(hueF), led, 0, l, 0, 0);   // a soft joint
+          const nx = new THREE.Group(); nx.position.set(0, l, 0); nx.rotation.set(-0.18, 0, 0.42 + i * 0.08); led.add(nx); led = nx;
+        });
+        part(new THREE.SphereGeometry(0.052, 12, 10), m(pels), led, 0, 0.04, 0);
         // the face: a round nose (a small button nose for the girls) and soft red cheeks
         if (pige) part(new THREE.SphereGeometry(0.024, 12, 10), m('#eaa68f'), head, 0, -0.012, 0.14, 0).scale.set(1, 0.9, 0.85);
         else part(new THREE.SphereGeometry(0.035, 10, 8), m('#e8a08a'), head, 0, -0.005, 0.15);
         for (const sx of [-1, 1]) kind(part, m, head, sx, hud, pige ? '#e9837c' : '#e88a80');
-        if (!n.pige) {   // a full beard in three tufts and a moustache
-          part(new THREE.SphereGeometry(0.13, 12, 10), m('#f4f1ea'), head, 0, -0.13, 0.06).scale.set(1.05, 1.2, 0.72);
-          for (const sx of [-1, 1]) part(new THREE.SphereGeometry(0.08, 10, 8), m('#eceae2'), head, sx * 0.08, -0.1, 0.07).scale.set(1, 1.1, 0.75);
-          part(new THREE.SphereGeometry(0.06, 10, 8), m('#f4f1ea'), head, 0, -0.27, 0.075).scale.set(1, 1.3, 0.7);
-          for (const sx of [-1, 1]) { const ms = part(new THREE.SphereGeometry(0.045, 10, 8), m('#ffffff'), head, sx * 0.042, -0.045, 0.14); ms.scale.set(1.3, 0.55, 0.6); ms.rotation.z = sx * 0.35; }
+        if (!n.pige) {   // a full, soft beard in layers of tufts, a moustache that curls up and bushy brows
+          const hv = ['#f6f4ee', '#eceae2', '#e2dfd6'];
+          part(new THREE.SphereGeometry(0.13, 14, 12), m(hv[0]), head, 0, -0.13, 0.055).scale.set(1.05, 1.15, 0.72);
+          for (const sx of [-1, 1]) {
+            part(new THREE.SphereGeometry(0.075, 12, 10), m(hv[1]), head, sx * 0.095, -0.07, 0.06).scale.set(0.9, 1.15, 0.8);   // along the jaw up to the ears
+            part(new THREE.SphereGeometry(0.07, 12, 10), m(hv[0]), head, sx * 0.07, -0.17, 0.08).scale.set(1, 1.1, 0.75);
+            part(new THREE.SphereGeometry(0.05, 10, 8), m(hv[2]), head, sx * 0.045, -0.25, 0.08).scale.set(1, 1.2, 0.75);
+          }
+          part(new THREE.SphereGeometry(0.06, 12, 10), m(hv[0]), head, 0, -0.27, 0.085).scale.set(1, 1.3, 0.7);
+          part(new THREE.ConeGeometry(0.035, 0.08, 10), m(hv[1]), head, 0, -0.34, 0.085).rotation.x = Math.PI;   // a soft point
+          for (const sx of [-1, 1]) {
+            const ms = part(new THREE.SphereGeometry(0.042, 12, 8), m('#ffffff'), head, sx * 0.04, -0.045, 0.142); ms.scale.set(1.25, 0.55, 0.6); ms.rotation.z = sx * 0.3;
+            const kr = part(new THREE.SphereGeometry(0.024, 10, 8), m('#ffffff'), head, sx * 0.085, -0.03, 0.125); kr.scale.set(1.2, 0.6, 0.6); kr.rotation.z = -sx * 0.5;   // the ends curl up
+            const br = part(new THREE.CapsuleGeometry(0.011, 0.034, 3, 8), m('#f6f4ee'), head, sx * 0.05, 0.058, 0.126); br.rotation.set(0, sx * 0.3, Math.PI / 2 + sx * 0.2);   // bushy brows
+          }
+          if (n.kontor) {   // Hr. Kirk: small round glasses on the nose and a pen behind the ear
+            const guld = m('#c9a24a');
+            for (const sx of [-1, 1]) {
+              part(new THREE.TorusGeometry(0.027, 0.0032, 6, 20), guld, head, sx * 0.048, 0.01, 0.142, 0);
+              part(new THREE.TorusGeometry(0.0255, 0.001, 4, 20), m('#e8f0f4'), head, sx * 0.048, 0.01, 0.141, 0);
+              const st = part(new THREE.CylinderGeometry(0.0028, 0.0028, 0.1, 5), guld, head, sx * 0.1, 0.015, 0.09, 0); st.rotation.set(Math.PI / 2, 0, 0); st.rotation.y = sx * 0.45;
+            }
+            part(new THREE.TorusGeometry(0.012, 0.0028, 5, 10, Math.PI), guld, head, 0, 0.012, 0.15, 0);   // the bridge
+            const pen = new THREE.Group(); pen.position.set(0.14, 0.03, 0.0); pen.rotation.set(0.2, 0, -1.15); head.add(pen);
+            part(new THREE.CylinderGeometry(0.008, 0.008, 0.13, 8), m('#2a4a6a'), pen, 0, 0, 0, 0);
+            part(new THREE.ConeGeometry(0.008, 0.025, 8), m('#e3c78a'), pen, 0, -0.077, 0, 0).rotation.x = Math.PI;
+          }
         } else for (const sx of [-1, 1]) {   // the girls get two braids instead of a beard
           for (let k = 0; k < 3; k++) part(new THREE.SphereGeometry(0.042 - k * 0.004, 10, 8), m(n.haar || '#c9a46a'), head, sx * (0.145 + k * 0.01), -0.08 - k * 0.075, -0.02 + k * 0.01).scale.set(1, 1.25, 1);
           part(new THREE.SphereGeometry(0.03, 8, 6), m('#b3262a'), head, sx * 0.17, -0.3, 0.0).scale.set(1.4, 0.8, 1);
@@ -9681,9 +9707,23 @@ const KALENDER = (() => {
           }
         }
         if (n.knapper) for (const y of [1.44, 1.33, 1.22]) part(new THREE.SphereGeometry(0.014, 10, 8), m(n.knapper), g, 0, y, foran(y) + 0.003, 0).scale.set(1, 1, 0.55);   // a row of small buttons
-        // a belt with a brass buckle
-        part(new THREE.CylinderGeometry(0.205, 0.205, 0.06, 20, 1, true), m('#3a2618'), g, 0, 1.08, 0).scale.set(1, 1, 0.92);
-        part(new THREE.BoxGeometry(0.08, 0.07, 0.02), m('#d9b25a'), g, 0, 1.08, foran(1.08) + 0.02);
+        if (n.kontor) {   // Hr. Kirk's office clothes: a white shirt, a red bow tie, a waistcoat with brass buttons and a watch chain
+          const vest = m(n.kontor.vest), guld = m('#d9b25a');
+          part(new THREE.CylinderGeometry(0.075, 0.13, 0.13, 16, 1, true, -0.7, 1.4), m('#f4f1ea'), g, 0, 1.53, 0.01).scale.set(1, 1, 0.92);   // the shirt front
+          const kr = part(new THREE.TorusGeometry(0.075, 0.02, 8, 22), m('#f4f1ea'), g, 0, 1.6, 0.004); kr.rotation.x = Math.PI / 2; kr.scale.set(1.05, 0.9, 1);
+          part(drej([[0.198, 1.06], [0.212, 1.12], [0.222, 1.25], [0.224, 1.36], [0.219, 1.44], [0.2, 1.5]], 26), vest, g, 0, 0, 0, 1.05).scale.set(1, 1, 0.94);
+          for (const sx of [-1, 1]) {   // the points at the bottom and the bow tie's two loops
+            const sp = part(new THREE.ConeGeometry(0.05, 0.07, 3), vest, g, sx * 0.05, 1.04, foran(1.08) + 0.01); sp.rotation.set(0.15, 0, Math.PI);
+            const s_ = part(new THREE.ConeGeometry(0.03, 0.06, 10), m(n.kontor.sloejfe), g, sx * 0.03, 1.585, foran(1.58) + 0.035, 0); s_.rotation.z = -sx * Math.PI / 2; s_.scale.set(1, 1, 0.5);
+          }
+          part(new THREE.SphereGeometry(0.015, 10, 8), m(n.kontor.sloejfe), g, 0, 1.585, foran(1.58) + 0.038, 0);
+          for (const y of [1.42, 1.33, 1.24, 1.15]) part(new THREE.SphereGeometry(0.013, 10, 8), guld, g, 0, y, foran(y) + 0.016, 0).scale.set(1, 1, 0.55);
+          part(slange([[0, 1.24, foran(1.24) + 0.018], [0.05, 1.19, foran(1.19) + 0.02], [0.1, 1.2, foran(1.2) + 0.012], [0.13, 1.25, foran(1.25) + 0.004]], 0.0035, 12, 4), guld, g, 0, 0, 0, 0);
+          part(new THREE.CylinderGeometry(0.018, 0.018, 0.008, 12), guld, g, 0.135, 1.27, foran(1.27) + 0.002, 0).rotation.x = Math.PI / 2;   // the watch peeps out of the pocket
+        } else {   // a belt with a brass buckle
+          part(new THREE.CylinderGeometry(0.205, 0.205, 0.06, 20, 1, true), m('#3a2618'), g, 0, 1.08, 0).scale.set(1, 1, 0.92);
+          part(new THREE.BoxGeometry(0.08, 0.07, 0.02), m('#d9b25a'), g, 0, 1.08, foran(1.08) + 0.02);
+        }
         if (n.forklaede) {   // the cook's apron: a bib, a skirt with a red edge and a pocket
           part(new THREE.BoxGeometry(0.22, 0.24, 0.015), m(n.forklaede), g, 0, 1.3, foran(1.3) + 0.012).rotation.x = -0.12;
           const sk = part(new THREE.CylinderGeometry(0.215, 0.26, 0.42, 20, 1, true, -0.95, 1.9), m(n.forklaede), g, 0, 0.86, 0); sk.scale.set(1, 1, 0.95);
@@ -9692,7 +9732,14 @@ const KALENDER = (() => {
           for (const sx of [-1, 1]) part(new THREE.CylinderGeometry(0.012, 0.012, 0.2, 6), m(n.forklaede), g, sx * 0.1, 1.5, foran(1.5) - 0.01).rotation.z = sx * 0.35;
         }
       },
-      arm: n.slev ? [null, (sh, part, m, el) => {   // Anker holds up his big wooden ladle
+      foer: n.kontor ? f => { f.elbows[0].rotation.x = -0.6; f.elbows[0].rotation.z = 0.15; f.arms[0].rotation.z = -0.12; } : undefined,   // a soft elbow on the waving arm
+      arm: n.kontor ? [null, (sh, part, m, el) => {   // Hr. Kirk holds his protocol under the arm
+        sh.rotation.set(0.08, 0, 0.2); el.rotation.set(-1.15, 0, -0.35);
+        const b = new THREE.Group(); b.position.set(-0.07, -0.2, 0.04); b.rotation.set(0.25, 0.2, 0.1); el.add(b);
+        part(new THREE.BoxGeometry(0.05, 0.3, 0.23), m('#6b2a22'), b, 0, 0, 0);
+        part(new THREE.BoxGeometry(0.044, 0.285, 0.222), m('#efe6cf'), b, 0.004, 0, 0.006, 0);   // the pages
+        part(new THREE.BoxGeometry(0.053, 0.05, 0.234), m('#c9a24a'), b, 0, 0.09, 0, 0);   // a gold band on the spine
+      }] : n.slev ? [null, (sh, part, m, el) => {   // Anker holds up his big wooden ladle
         sh.rotation.x = -0.35; el.rotation.x = -1.25;
         const h = new THREE.Group(); h.position.set(0, -0.3, 0.02); h.rotation.x = 1.6; el.add(h);
         const trae = m('#a0703f');
