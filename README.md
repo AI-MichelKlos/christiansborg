@@ -39,6 +39,7 @@ En kort tur på telefonen, cirka 10 minutter. Nisserne har gemt otte nissehuer p
 - Ved hver hue står en nisse. Man kan sige hej og høre en kort historie, der faktisk er sket på stedet. Man behøver ikke. Kilderne står i `dev/NISSEHUER.md`.
 - Øverst til venstre står, hvor den næste hue er, og en pil med afstanden viser vejen med det samme. Over den næste hue udenfor står en lysstribe.
 - Sneen ligger altid, og der kommer lette byger. Det bliver mørkere, jo flere lys der brænder.
+- På pladsen mellem Vindebrogade og Christiansborg, hvor der i mordgåden ligger en vandpyt, er der julemarked: 14 boder med sne på tagene, et juletræ, ståborde med gløgg og masser af mennesker, der står i kø, drikker gløgg og slentrer op og ned ad gangen. Det står i `episoder.js` (optrin 11).
 - Alt indhold står i `nissehuer.js`. Rammen er afsnittet JULEKALENDER i `index.html` (spil: "huer"). Kør `node dev/tjek-nissehuer.js` efter en rettelse.
 
 Sidste udgave, Nissernes adventskrans med fire lys, ligger i `arkiv/adventskrans-4-lys.js` og kan spilles på `?spor=krans`. Tjek den med `node dev/tjek-kalender.js`.

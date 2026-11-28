@@ -748,14 +748,14 @@ const HUD = ['#f2c6a4', '#e9bd99', '#f4d2b8', '#d9a984', '#c98d62', '#a86f4c', '
 
 // A grown-up (or a child) in the same style as Ida. o: coat, trousers, shoes, skin, hair, hairStyle ('kort', 'skaldet',
 // 'knold', 'hestehale', 'bob' or 'lang'), kvinde, long (a long coat), toerklaede (scarf colour), solbriller, taske (a bag
-// across the body), barn, scale, alvor (a serious face), lukket (closed eyes), detalje: 'lav' for people far away,
+// across the body), barn, scale, alvor (a serious face), lukket (closed eyes), detalje: 'lav' for people far away ('fjern' for a crowd),
 // sidder, extra(g, head, part, m, foran) and arm: [left, right] (sh, part, m, el) for things they wear or hold (el: the elbow),
 // foer(f) to set a pose before the parts are merged, statisk (one group), enkel (head on the body, knees on the thighs),
 // bag: false to merge later (several people as one), skygge: false for no shadow, grupper(f) to choose the moving groups
 // yourself (for example [f.g, f.head, ...f.arms]: legs merged into the body, but the head can still turn).
 // Returns { root, g, head, legs: [{ hip, knee }], hips, arms, grupper }.
 function menneske(o = {}) {
-  const lav = o.detalje === 'lav', kv = !!o.kvinde, seg = n => Math.max(5, Math.round(n * (lav ? 0.6 : 1)));
+  const fjern = o.detalje === 'fjern', lav = o.detalje === 'lav' || fjern, kv = !!o.kvinde, seg = n => Math.max(fjern ? 4 : 5, Math.round(n * (fjern ? 0.42 : lav ? 0.6 : 1)));   // 'fjern': even fewer corners (a crowd)
   const mats = new Map(), m = c => { c = c || '#888888'; if (!mats.has(c)) mats.set(c, new THREE.MeshBasicMaterial({ color: c })); return mats.get(c); };
   const part = (geo, mat, parent, x = 0, y = 0, z = 0, ol = 1.05) => { const p = new THREE.Mesh(geo, mat); p.position.set(x, y, z); p.userData.fig = true; p.userData.ol = ol ? -1 : 0; parent.add(p); return p; };
   const K = (r, w, h, ...a) => kugle(r, seg(w), seg(h), ...a), KP = (r, l, w = 12) => new THREE.CapsuleGeometry(r, l, lav ? 2 : 3, seg(w));
@@ -1558,6 +1558,9 @@ for (const ln of OSM.split('\n')) {
   else if (f[0] === 'R') DATA.R.push({ n: f[1], k: f[2], bridge: f[3] === '1', pts: decRing(f[4]) });
   else if (f[0] === 'A') DATA.A.push({ k: f[1], n: f[2], ring: decRing(f[3]) });
 }
+// The Christmas editions have a Christmas market on the square between Vindebrogade and Christiansborg (episoder.js,
+// scene 11), so the small pond there is left out of them. The murder mystery keeps it.
+if (KAL) DATA.W = DATA.W.filter(w => !(w.ring[0][0] === -184 && w.ring[0][1] === -7));
 
 // ---------------- polygon helpers
 function ptIn(ring, x, z) { let c = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const xi = ring[i][0], zi = ring[i][1], xj = ring[j][0], zj = ring[j][1]; if ((zi > z) !== (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) c = !c; } return c; }
@@ -10061,7 +10064,7 @@ const KALENDER = (() => {
   }
   for (const g of [world, dyn]) g.traverse(o => { if (o.material) for (const m of Array.isArray(o.material) ? o.material : [o.material]) sneMat(m); });
   // small Christmas scenes along the ways (episoder.js): shown and moving only outdoors and near Ida
-  const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, tm, TX, groundAt, colCirc, GFX, isTouch, GARDEN, toast, tone, sus, KANAL: CANAL_ROUTE, WL }) : { gruppe: new THREE.Group(), update() {} };
+  const EPI = EPISODER ? EPISODER({ THREE, dyn, menneske, bagFigur, camBox: c => camCols.push(c), tm, TX, groundAt, colCirc, GFX, isTouch, GARDEN, toast, tone, sus, KANAL: CANAL_ROUTE, WL }) : { gruppe: new THREE.Group(), update() {} };
   EPI.gruppe.traverse(o => { if (o.material) sneMat(o.material); });
   HOOKS.frame.push((dt, t) => EPI.update(dt, t, P.pos, ude()));
   if (EPI.slaede) EPI.slaede({ fald: () => faldNu, inde: () => I.on, aktiv: () => started && !paused, camera, tone, toast, loft, drej, slange, rundKasse, nuance });   // Santa's sleigh flies over when it snows (slaede.js)

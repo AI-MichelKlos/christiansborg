@@ -10,6 +10,7 @@
 //   8. Bibliotekshaven: H.C. Andersen går en tur om bassinet med høj hat og stok og letter på hatten for Ida
 //   9. Højbro Plads: en skøjtebane med lyskæder, hvor fem løber rundt, og en pige laver piruetter
 //  10. Slotsholmskanalen: en nisse padler frem og tilbage i en rød kajak under Højbro og vinker til Ida
+//  11. Pladsen ved Thorvaldsens Museum: et julemarked med 14 boder, et juletræ, ståborde med gløgg og masser af mennesker
 //
 // index.html kalder episoder(...) én gang i KALENDER-blokken og derefter update(dt, t, pos, ude) i hver frame.
 // Ydelse: alle figurer er bagt til få meshes (menneske() i index.html), geometri og materialer deles, hver scene vises
@@ -176,6 +177,7 @@ export function episoder(H) {
     const tu = part(CG(0.019, 0.032, 6), m(farve), el, -s * 0.038, -0.283, 0.026); tu.rotation.z = s * 0.55;
     ring(part, m, kant || farve, el, 0.046, 0.017, -0.252, 0.82, 5, 12);
   };
+  const enkelVante = (s, farve) => (sh, part, m, el) => { part(SG(0.056, 6, 5), m(farve), el, 0, -0.312, 0.006).scale.set(0.92, 1.12, 0.76); };   // til mange mennesker langt væk
   const dyneaerme = (farve) => (sh, part, m, el) => { for (const y of [-0.1, -0.2]) ring(part, m, farve, sh, 0.066, 0.016, y, 1, 4, 14); ring(part, m, farve, el, 0.06, 0.015, -0.08, 1, 4, 14); };
   const stoevler = (f, P, farve, kant) => { for (const l of f.legs) { P.part(new THREE.CylinderGeometry(0.075, 0.071, 0.2, 12), P.m(farve), l.knee, 0, -0.35, 0.006); if (kant) ring(P.part, P.m, kant, l.knee, 0.072, 0.024, -0.255, 1, 5, 14, 1); } };
   // krus og skilte i hånden: de sidder ved hånden, men bliver holdt lodrette hver frame (lodret() i scenen)
@@ -216,9 +218,9 @@ export function episoder(H) {
     const vanter = o.vanter || ['#b3262a'];
     const ae = o.dyneaerme ? dyneaerme(o.coat) : null;
     return menneske(Object.assign({}, o, {
-      enkel: false, skygge, detalje: GFX.lav ? 'lav' : undefined, grupper: o.grupper || (f => [f.g, f.head, ...f.arms]), hue: undefined,   // fewer corners on low graphics
+      enkel: false, skygge: o.skygge ?? skygge, detalje: o.detalje || (GFX.lav ? 'lav' : undefined), grupper: o.grupper || (f => [f.g, f.head, ...f.arms]), hue: undefined,   // fewer corners on low graphics
       extra: (g, head, part, m, foran) => { P = { part, m }; for (const fn of fl) fn(g, head, part, m, foran); },
-      arm: [-1, 1].map((s, i) => flere(vante(s, ...vanter), ae, arm[i])),
+      arm: [-1, 1].map((s, i) => flere((o.enkleVanter ? enkelVante : vante)(s, ...vanter), ae, arm[i])),
       foer: f => {
         f.head.rotation.order = 'YXZ';
         if (o.stoevle) stoevler(f, P, ...o.stoevle);
@@ -1346,6 +1348,257 @@ export function episoder(H) {
     };
     g.visible = false; EP.push(e);
   }
+
+  // ---------------------------------------------------------------- 11. Julemarkedet på pladsen ved Thorvaldsens Museum
+  // Pladsen mellem Vindebrogade og Christiansborg, hvor der i mordgåden ligger en vandpyt. To rækker træboder med sne på
+  // tagene og en lyskæde langs gavlen, et juletræ midt på markedet og ståborde ved gløggboden. Der er mange mennesker:
+  // kunder i kø ved boderne, venner med krus ved bordene, en familie ved træet, sælgere bag diskene, og folk, der slentrer
+  // op og ned ad gangen og standser ved en bod. De, der går, venter, hvis Ida står i vejen.
+  // Ydelse: alle boderne bliver lagt sammen til ét mesh pr. materiale, skiltene til ét mesh, lysene til to punktsæt, og alle
+  // de stående mennesker bliver bagt til ét mesh (bagFigur). Kun dem, der går, og tre sælgere bevæger sig.
+  if (H.bagFigur) scene(-177, -2, 0.63, (g, e) => {
+    const HV = '#f4f1ea', faa = lav || GFX.lav, R = 5.3, KOS = Math.cos(0.63), SIN = Math.sin(0.63);   // R: fra midten af gangen til boderne
+    let fr = 20261128; const rnd = () => (fr = (fr * 16807) % 2147483647) / 2147483647;   // samme marked hver gang
+    const valg = a => a[Math.floor(rnd() * a.length)];
+    const mork = (c, d = -0.08) => '#' + new THREE.Color(c).offsetHSL(0, 0, d).getHexString();
+    const renM = new Map(), ren = c => { if (!renM.has(c)) { const m = tm(c).clone(); m.userData.sne = true; renM.set(c, m); } return renM.get(c); };   // ingen sne under taget
+    const pkt = (lx, side, x, y, z) => [lx - side * x, y, side * (R - z)];   // et punkt i en bod -> markedets koordinater
+    const lysP = [], lysF = [], gloedP = [];
+    const FARVER = [[1, 0.82, 0.48], [1, 0.42, 0.37], [1, 0.9, 0.62], [0.65, 0.91, 0.56]];
+    const lyspaere = (p, k) => { lysP.push(...p); lysF.push(...FARVER[k % 4]); };
+
+    // ---- boderne: [plads langs gangen, side (-1: mod Vindebrogade, 1: mod Christiansborg), skilt, væg, varer]
+    const BODER = [
+      [-18.5, -1, 'ÆBLESKIVER', '#7a2a24', 'pande'], [-14, -1, 'JULEPYNT', '#2f4f3a', 'pynt'], [-9.5, -1, 'GLØGG', '#8a2a24', 'gryde'],
+      [9.5, -1, 'HONNINGHJERTER', '#7a4f2e', 'hjerter'], [14, -1, 'STRIK OG VANTER', '#2f4f3a', 'strik'], [18.5, -1, 'PEBERNØDDER', '#7a2a24', 'poser'], [23, -1, 'KRANSE', '#7a4f2e', 'kranse'],
+      [-18.5, 1, 'KAKAO', '#2f4f3a', 'gryde'], [-14, 1, 'LYS', '#7a4f2e', 'lys'], [-9.5, 1, 'RØDE PØLSER', '#7a2a24', 'poelser'],
+      [9.5, 1, 'KERAMIK', '#2f4f3a', 'skaale'], [14, 1, 'JULETRÆER', '#7a4f2e', 'traeer'], [18.5, 1, 'OST OG SPEGEPØLSE', '#8a2a24', 'ost'], [23, 1, 'KONFEKT', '#2f4f3a', 'konfekt'],
+    ];
+    // skiltene: ét lærred med en linje til hver bod
+    const NS = 16, cv = document.createElement('canvas'); cv.width = 512; cv.height = 64 * NS; const c = cv.getContext('2d');
+    BODER.forEach(([, , navn], k) => {
+      const y0 = k * 64; c.fillStyle = '#3a2618'; c.fillRect(0, y0, 512, 64); c.fillStyle = '#f3e8c6'; c.fillRect(6, y0 + 6, 500, 52);
+      c.strokeStyle = k % 2 ? '#2f5f3a' : '#9a2a26'; c.lineWidth = 4; c.strokeRect(12, y0 + 12, 488, 40);
+      c.fillStyle = k % 2 ? '#24502f' : '#9a2a26'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '700 34px Georgia, serif'; c.fillText(navn, 256, y0 + 34, 460);
+    });
+    const sTex = new THREE.CanvasTexture(cv); sTex.anisotropy = 4; if ('colorSpace' in sTex) sTex.colorSpace = THREE.SRGBColorSpace;
+    const sMat = new THREE.MeshBasicMaterial({ map: sTex }); sMat.userData.sne = true;
+    const skiltPos = [], skiltUV = [], skiltIdx = [];
+    const boder = new THREE.Group(); g.add(boder);
+    const tri = (() => { const s = new THREE.Shape(); s.moveTo(-1.62, 0); s.lineTo(1.62, 0); s.lineTo(0, 0.86); s.closePath(); return new THREE.ExtrudeGeometry(s, { depth: 0.08, bevelEnabled: false }); })();
+    const lysTrae = tm('#c9a26a'), moerk = tm('#3a2618'), tag = tm('#4a3323'), gran = tm('#2f5f3a');
+    BODER.forEach(([lx, side, , vaeg, varer], k) => {
+      const b = new THREE.Group(); b.position.set(lx, 0, side * R); b.rotation.y = side > 0 ? Math.PI : 0; boder.add(b);
+      const V = tm(vaeg), V2 = tm(mork(vaeg, -0.06));
+      stk(G.kasse, moerk, b, 0, 0.06, 0, 3.2, 0.12, 2.0);
+      stk(G.kasse, V, b, 0, 1.15, -0.95, 3.2, 2.3, 0.1);
+      for (const s of [-1, 1]) { stk(G.kasse, V, b, s * 1.55, 1.15, 0, 0.1, 2.3, 2.0); stk(G.kasse, lysTrae, b, s * 1.6, 1.15, 0.98, 0.14, 2.3, 0.14); }
+      for (let i = 0; i < 5; i++) stk(G.kasse, V2, b, -1.2 + i * 0.6, 0.48, 0.97, 0.04, 0.9, 0.03);   // brædderne i disken
+      stk(G.kasse, V, b, 0, 0.48, 0.92, 3.0, 0.95, 0.1);
+      stk(G.kasse, ren('#b08a5a'), b, 0, 0.99, 0.85, 3.3, 0.07, 0.6);
+      stk(G.kasse, V, b, 0, 2.2, 0.98, 3.3, 0.25, 0.12);
+      // saddeltaget med gavlen ud mod gangen. Sneen lægger sig selv på tagfladerne
+      for (const s of [-1, 1]) { const t = stk(G.kasse, tag, b, s * 0.9, 2.77, 0.1, 2.02, 0.09, 2.8); t.rotation.z = -s * 0.441; }
+      stk(G.kasse, moerk, b, 0, 3.17, 0.1, 0.14, 0.12, 2.82);
+      for (const z of [0.96, -1.02]) { const m = new THREE.Mesh(tri, V); m.position.set(0, 2.3, z); b.add(m); }
+      for (const s of [-1, 1]) { const gl = stk(G.kasse, gran, b, s * 0.88, 2.74, 1.47, 2.0, 0.13, 0.13); gl.rotation.z = -s * 0.441; }   // en grangirlande langs gavlen
+      for (let i = 0; i < 5; i++) for (const s of [-1, 1]) stk(G.lilleKugle, M.roed, b, s * (0.2 + i * 0.38), 3.13 - (0.2 + i * 0.38) * 0.472, 1.53, 0.06, 0.06, 0.06, false);
+      // hylder med varer på bagvæggen
+      for (const y of [1.45, 1.9]) { stk(G.kasse, ren('#b08a5a'), b, 0, y, -0.75, 2.8, 0.05, 0.36); for (let i = 0; i < 7; i++) stk(G.kasse, ren(valg(['#b3262a', '#e0a63a', HV, '#2f5fa8', '#3e7d4a', '#8a5a33'])), b, -1.2 + i * 0.4 + rnd() * 0.1, y + 0.1, -0.75, 0.22, 0.16 + rnd() * 0.1, 0.2, false); }
+      // varerne på disken
+      const D = (geo, farve, x, y, z, sx, sy = sx, sz = sx) => stk(geo, ren(farve), b, x, y, z, sx, sy, sz, false);
+      if (varer === 'pande') { D(G.cyl, '#2a2422', -0.6, 1.08, 0.8, 0.42, 0.08, 0.42); for (let i = 0; i < 12; i++) D(G.lilleKugle, '#c98d4a', -0.6 + Math.cos(i * 0.52) * (i % 2 ? 0.26 : 0.13), 1.15, 0.8 + Math.sin(i * 0.52) * (i % 2 ? 0.26 : 0.13), 0.07); D(G.kasse, HV, 0.6, 1.06, 0.8, 0.5, 0.06, 0.35); }
+      if (varer === 'gryde') { D(G.cyl, '#8a3a2a', -0.55, 1.2, 0.75, 0.3, 0.36, 0.3); D(G.cyl, '#5a1a22', -0.55, 1.385, 0.75, 0.27, 0.02, 0.27); for (let i = 0; i < 6; i++) D(G.cyl, i % 2 ? HV : '#b3262a', 0.2 + (i % 3) * 0.28, 1.08, 0.7 + Math.floor(i / 3) * 0.25, 0.06, 0.12, 0.06); }
+      if (varer === 'pynt') for (let i = 0; i < 9; i++) { const x = -1.3 + i * 0.32; D(G.cyl, '#d9b25a', x, 1.95 - (i % 3) * 0.12, 0.95, 0.006, 0.4, 0.006); D(G.lilleKugle, ['#b3262a', '#d9b25a', '#2f5fa8', HV][i % 4], x, 1.7 - (i % 3) * 0.12, 0.95, 0.08); }
+      if (varer === 'hjerter') for (let i = 0; i < 8; i++) { const x = -1.3 + i * 0.37; D(G.cyl, HV, x, 1.95, 0.95, 0.006, 0.35, 0.006); const h = D(G.kasse, '#8a4a22', x, 1.68, 0.95, 0.22, 0.22, 0.03); h.rotation.z = Math.PI / 4; D(G.kasse, HV, x, 1.68, 0.97, 0.12, 0.03, 0.01); }
+      if (varer === 'strik') for (let i = 0; i < 7; i++) D(G.kasse, ['#b3262a', HV, '#2f5fa8', '#e0a63a', '#3e7d4a'][i % 5], -1.2 + i * 0.4, 1.07, 0.8, 0.3, 0.1, 0.3);
+      if (varer === 'poser') for (let i = 0; i < 8; i++) D(G.kegle, i % 2 ? HV : '#e8dcc6', -1.2 + i * 0.34, 1.14, 0.8, 0.08, 0.22, 0.08).rotation.z = Math.PI;
+      if (varer === 'kranse') for (let i = 0; i < 4; i++) { const t = D(new THREE.TorusGeometry(1, 0.35, 6, 14), '#2f5f3a', -1.05 + i * 0.7, 1.66, 0.97, 0.24); D(G.lilleKugle, '#b3262a', -1.05 + i * 0.7, 1.43, 0.99, 0.06); t.rotation.y = 0; }
+      if (varer === 'lys') for (let i = 0; i < 10; i++) D(G.cyl, ['#f4f1ea', '#b3262a', '#e8dcc6'][i % 3], -1.25 + i * 0.27, 1.12 + (i % 3) * 0.04, 0.8, 0.05, 0.2 + (i % 3) * 0.08, 0.05);
+      if (varer === 'poelser') { D(G.kasse, '#3a3c40', -0.4, 1.12, 0.78, 1.2, 0.18, 0.45); for (let i = 0; i < 6; i++) { const p = D(G.cyl, '#c0392b', -0.85 + i * 0.18, 1.23, 0.78, 0.035, 0.34, 0.035); p.rotation.x = Math.PI / 2; } }
+      if (varer === 'skaale') for (let i = 0; i < 6; i++) D(G.kugle, ['#3f6f8f', '#c9b48a', '#7a3f2a'][i % 3], -1.1 + i * 0.44, 1.05, 0.8, 0.17, 0.09, 0.17);
+      if (varer === 'ost') for (let i = 0; i < 5; i++) D(G.cyl, i % 2 ? '#a82a2a' : '#e8c25a', -1.1 + i * 0.55, 1.1, 0.8, 0.18, 0.15, 0.18);
+      if (varer === 'konfekt') for (let i = 0; i < 6; i++) { D(G.kasse, ['#b3262a', '#2f5fa8', '#e0a63a'][i % 3], -1.1 + i * 0.44, 1.08, 0.8, 0.3, 0.11, 0.3); D(G.kasse, HV, -1.1 + i * 0.44, 1.09, 0.8, 0.31, 0.112, 0.05); }
+      if (varer === 'traeer') for (let i = 0; i < 4; i++) { const t = stk(G.kegle, gran, b, 2.0 + (i % 2) * 0.45, 0.85, -0.6 + i * 0.4, 0.38, 1.6, 0.38); t.rotation.z = -0.18; }
+      // skiltet på gavlen (lægges sammen med de andre skilte til sidst)
+      const [sx, sy, sz] = pkt(lx, side, 0, 2.56, 1.08), ux = -side, nz = -side, v0 = 1 - (k + 1) / NS, v1 = 1 - k / NS, n0 = skiltPos.length / 3;
+      for (const [a, h, u, v] of [[-1, -1, 0, v0], [1, -1, 1, v0], [1, 1, 1, v1], [-1, 1, 0, v1]]) { skiltPos.push(sx + ux * a * 1.0, sy + h * 0.16, sz + nz * 0.0); skiltUV.push(u, v); }
+      skiltIdx.push(n0, n0 + 1, n0 + 2, n0, n0 + 2, n0 + 3);
+      // lyskæden langs gavlen og en varm glød inde i boden
+      for (let i = 0; i <= 10; i++) { const u = i / 10, x = -1.8 + u * 3.6, y = 3.2 - Math.abs(x) * 0.472 - 0.02; lyspaere(pkt(lx, side, x, y, 1.56), i + k); }
+      gloedP.push(...pkt(lx, side, 0, 1.6, 0.1));
+      for (const x of [-0.85, 0.85]) colCirc(...e.ver(...[pkt(lx, side, x, 0, 0)[0], pkt(lx, side, x, 0, 0)[2]]), 1.12, 3.2);
+      if (H.camBox) {   // kameraet bliver foran boden i stedet for at gå ind i den (en kasse for hver halvdel)
+        for (const [xa, xb] of [[-1.6, 0], [0, 1.6]]) { const hj = [[xa, -1.0], [xb, -1.0], [xa, 0.9], [xb, 0.9]].map(([x, z]) => { const q = pkt(lx, side, x, 0, z); return e.ver(q[0], q[2]); });
+          H.camBox({ t: 'b', x0: Math.min(...hj.map(p => p[0])), x1: Math.max(...hj.map(p => p[0])), z0: Math.min(...hj.map(p => p[1])), z1: Math.max(...hj.map(p => p[1])), bot: -1, top: 3.2 + g.position.y }); }
+      }
+    });
+    for (const b of [...boder.children]) { b.updateMatrix(); for (const ch of [...b.children]) { ch.applyMatrix4(b.matrix); boder.add(ch); } boder.remove(b); }
+    { const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(skiltPos, 3)); sg.setAttribute('uv', new THREE.Float32BufferAttribute(skiltUV, 2)); sg.setIndex(skiltIdx);
+      const sm_ = new THREE.Mesh(sg, sMat); sm_.userData.fri = true; g.add(sm_); }
+    // lyskæder på tværs af gangen mellem boderne overfor hinanden
+    for (const lx of [-18.5, -14, -9.5, 9.5, 14, 18.5, 23]) for (let i = 1; i < 14; i++) { const u = i / 14; lyspaere([lx + Math.sin(u * 9) * 0.05, 3.25 - Math.sin(u * Math.PI) * 0.7, -R + 1.5 + u * (2 * R - 3)], i); }
+
+    // ---- juletræet midt på markedet med pakker under og en stjerne i toppen
+    const fast = boder;   // alt det faste bliver lagt sammen med boderne
+    stk(G.cyl, M.moerktTrae, fast, 0, 0.5, 0, 0.16, 1.0, 0.16);
+    for (let i = 0; i < 4; i++) { const r = 1.85 - i * 0.42; stk(G.kegle, gran, fast, 0, 1.55 + i * 1.0, 0, r, 1.9 - i * 0.15, r); }
+    stk(new THREE.OctahedronGeometry(1, 0), ren('#e8c25a'), fast, 0, 5.45, 0, 0.22, 0.3, 0.08);
+    for (let i = 0; i < 70; i++) { const u = i / 70, a = u * Math.PI * 13, rr_ = 1.85 * (1 - u * 0.85) + 0.05; lyspaere([Math.cos(a) * rr_, 0.75 + u * 4.2, Math.sin(a) * rr_], i); }
+    for (let i = 0; i < 7; i++) { const a = i * 0.9 + 0.3, r_ = 1.25 + (i % 2) * 0.35, s = 0.32 + (i % 3) * 0.1; stk(G.kasse, ren(['#b3262a', '#2f5fa8', '#e0a63a', HV][i % 4]), fast, Math.cos(a) * r_, s / 2, Math.sin(a) * r_, s, s * 0.8, s).rotation.y = a; }
+    gloedP.push(0, 5.45, 0);
+    colCirc(...e.ver(0, 0), 1.9, 5.5);
+    // ståbordene ved gløggboden og overfor
+    const BORDE = [[-5.6, -3.4], [-5.2, 3.3], [5.4, -3.3], [5.8, 3.4]];
+    for (const [x, z] of BORDE) {
+      stk(G.cyl, M.jern, fast, x, 0.03, z, 0.32, 0.06, 0.32); stk(G.cyl, M.jern, fast, x, 0.55, z, 0.04, 1.05, 0.04); stk(G.cyl, ren('#8a5a33'), fast, x, 1.1, z, 0.42, 0.05, 0.42);
+      stk(G.cyl, ren(HV), fast, x + 0.1, 1.16, z - 0.05, 0.05, 0.08, 0.05, false); lysP.push(x + 0.1, 1.24, z - 0.05); lysF.push(1, 0.75, 0.4);   // et fyrfadslys
+      colCirc(...e.ver(x, z), 0.45, 1.15);
+    }
+    // boderne, træet og bordene bliver to mesh med farverne i hjørnerne: et, hvor sneen lægger sig, og et under tagene uden sne
+    {
+      fast.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(fast.matrixWorld).invert(), dele = { sne: [], ren: [] };
+      const renSet = new Set(renM.values()); fast.traverse(m => { if (m.isMesh) dele[renSet.has(m.material) ? 'ren' : 'sne'].push(m); });
+      for (const [k, liste] of Object.entries(dele)) {
+        let n = 0; const geos = liste.map(m => { const g2 = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); g2.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, m.matrixWorld)); g2.userData.c = m.material.color; n += g2.attributes.position.count; return g2; });
+        const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3); let i = 0;
+        for (const d of geos) { const cnt = d.attributes.position.count, c_ = d.userData.c; pos.set(d.attributes.position.array, i * 3); nor.set(d.attributes.normal.array, i * 3); for (let j = 0; j < cnt; j++) col.set([c_.r, c_.g, c_.b], (i + j) * 3); i += cnt; d.dispose(); }
+        const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); bg.setAttribute('color', new THREE.BufferAttribute(col, 3)); bg.computeBoundingSphere();
+        const mat = tm('#ffffff').clone(); mat.vertexColors = true; mat.userData = k === 'ren' ? { sne: true } : {};   // tm-materialet kan allerede have fået sne: kopien skal have sin egen
+        const mm = new THREE.Mesh(bg, mat); mm.castShadow = skygge; mm.receiveShadow = true; mm.userData.fri = true; g.add(mm);
+      }
+      g.remove(fast);
+    }
+    // lysene: små pærer i kæderne og en varm glød i hver bod
+    const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lysP, 3)); lg.setAttribute('color', new THREE.Float32BufferAttribute(lysF, 3));
+    const lysMat = new THREE.PointsMaterial({ size: 0.34, map: TX.glow, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+    const lyskaede = new THREE.Points(lg, lysMat); lyskaede.userData.fri = true; g.add(lyskaede);
+    const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(gloedP, 3));
+    const gloedMat = new THREE.PointsMaterial({ size: 2.6, map: TX.glow, color: '#ffb35a', transparent: true, opacity: 0.45, depthWrite: false, blending: THREE.AdditiveBlending });
+    const gloed = new THREE.Points(gg, gloedMat); gloed.userData.fri = true; g.add(gloed);
+
+    // ---- menneskene. gaest() finder på en person i vintertøj; o kan bestemme noget af det
+    const FRAKKER = ['#2f3a4a', '#7a2a24', '#2f5f3a', '#3a4a5a', '#6a3a5a', '#c0392b', '#24304a', '#8a5a33', '#4a5a6a', '#2f6f6a', '#e0a63a', '#5b4636', '#6a3a7a', '#d9622b', '#3e5e3a', '#9a8a78'];
+    const BUKSER = ['#2b2a30', '#2d3340', '#24303a', '#3a3a40', '#2b2f36', '#3b4f70'];
+    const HUDE = ['#f2c6a4', '#e9bd99', '#f4d2b8', '#d9a984', '#c98d62', '#a86f4c', '#7d4f36'];
+    const HAAR = ['#3b2a20', '#6b4a2f', '#a8794c', '#d9c08a', '#2b2420', '#8c5a3c', '#1f1a18', '#b4612f', '#d8d4ca'];
+    const PYNT = ['#b3262a', HV, '#e0a63a', '#2f5fa8', '#3e7d4a', '#d9cdb6', '#6f7780', '#7a3f8f'];
+    // let: lettere tøj til de mange (en enkel hue, menneskets eget halstørklæde og knapper)
+    function gaest(o = {}) {
+      const let_ = !!o.let, barn = !!o.barn, kv = o.kvinde ?? rnd() < 0.5, coat = o.coat || valg(FRAKKER), p1 = valg(PYNT), p2 = valg(PYNT.filter(x => x !== p1));
+      const hair = barn ? valg(HAAR.slice(0, 8)) : valg(HAAR), hk = rnd(), dj = barn || rnd() < 0.35;
+      const hue = let_ ? (hk < 0.55 || barn ? [hue_(p1, rnd() < 0.5 ? p1 : HV)] : hk < 0.7 ? [pelshue(valg(['#5b4636', '#3a2a20', '#e8dcc6']), '#d9cdb6', false)] : hk < 0.8 && !kv ? [hat(valg(['#2b2420', '#3a3f48', '#5b4636']))] : [])
+        : hk < 0.45 || barn ? [strikhue(p1, rnd() < 0.5 ? p1 : HV, rnd() < 0.7 ? p2 : null, rnd() < 0.5 ? p2 : null)] : hk < 0.6 ? [pelshue(valg(['#5b4636', '#3a2a20', '#e8dcc6']), '#d9cdb6', rnd() < 0.6)]
+        : hk < 0.72 && kv ? [oerevarmere(p1)] : hk < 0.82 && !kv ? [hat(valg(['#2b2420', '#3a3f48', '#5b4636']))] : [];
+      const ansigt = kv ? [] : [kinder()];
+      if (!kv && !barn && rnd() < 0.35) ansigt.push(skaeg(hair, rnd() < 0.6));
+      if (!barn && rnd() < 0.25) ansigt.push(briller(valg(['#5a4a3a', '#24221f', '#8a2a2a'])));
+      const toej = let_ ? [knapper('#d9cdb6', [1.0, 1.2, 1.4])] : dj ? [dyne(coat, [0.95, 1.08, 1.21, 1.34]), lynlaas(mork(coat, -0.15), 0.9, 1.58, 0.024)] : [knapper('#d9cdb6', [0.95, 1.1, 1.25, 1.4], rnd() < 0.5 ? [0] : [-0.06, 0.06]), lommer(mork(coat), 1.0)];
+      const tk = rnd() < 0.6 ? p2 : null;
+      if (tk && !let_) toej.push(halstoerklaede(p2, rnd() < 0.5 ? p1 : null));
+      return Object.assign({ coat, trousers: valg(BUKSER), skin: valg(HUDE), hair, kvinde: kv, long: kv && !barn && !dj && rnd() < 0.5, barn, dyneaerme: dj && !let_, toerklaede: let_ ? tk : undefined, ingenKrave: !!(let_ && !tk), scale: barn ? 1 : 0.93 + rnd() * 0.13,
+        hairStyle: barn ? (kv ? 'hestehale' : 'kort') : kv ? valg(['bob', 'lang', 'hestehale', 'knold']) : valg(['kort', 'kort', 'skaldet']),
+        hue, ansigt, toej, vanter: [p1, p2], enkleVanter: let_, stoevle: [valg(['#2a1d14', '#3a2a20', '#1f1b1a', '#5a3a24'])], ben: rnd() < 0.5 ? valg([-1, 1]) : 0 }, o);
+    }
+    // et krus i hånden: det holdes lodret, selv om armen er bøjet
+    const hue_ = (farve, kant) => (g2, head, part, m) => {   // en strikhue med få hjørner
+      part(new THREE.SphereGeometry(0.16, 10, 5, 0, Math.PI * 2, 0, Math.PI * 0.52), m(farve), head, 0, 0.03, -0.004).scale.set(1, 1.08, 1.04);
+      part(new THREE.TorusGeometry(0.148, 0.03, 4, 12), m(kant), head, 0, 0.045, -0.004).rotation.x = Math.PI / 2;
+      part(new THREE.SphereGeometry(0.05, 6, 4), m(kant), head, 0, 0.21, -0.01);
+    };
+    const KRUS = ['#b3262a', HV, '#2f5fa8', '#e0a63a'];
+    const krusH = (vinkel) => (sh, part, m, el) => { const h = new THREE.Group(); h.position.set(0, -0.33, 0.03); h.rotation.x = vinkel; el.add(h); part(new THREE.CylinderGeometry(0.038, 0.032, 0.1, 10), m(valg(KRUS)), h, 0, 0.04, 0.05, 0); };
+    const MED_KRUS = (o, arm = 1) => { const ax = -0.4, bj = 1.45; o.boej = arm ? [0.25, bj] : [bj, 0.25]; o.arm = arm ? [null, krusH(bj - ax)] : [krusH(bj - ax), null];
+      o.foer2 = f => { f.arms[arm].rotation.x = ax; f.arms[arm].rotation.z = (arm ? 1 : -1) * 0.12; }; return o; };
+
+    // de stående: én gruppe, der bliver bagt til ét mesh til sidst
+    const folk = new THREE.Group(); folk.userData.fri = true; g.add(folk);
+    const staa = (lx, lz, ry, o) => { const f = demonstrant(Object.assign({ bag: false, detalje: faa ? 'fjern' : 'lav', skygge: false }, o)); placer(f, folk, lx, lz, ry); if (!o.barn) colCirc(...e.ver(lx, lz), 0.3, 1.8); return f; };
+    const mod = side => side > 0 ? 0 : Math.PI;   // vender mod boderne i den side
+    // sælgerne bag diskene (tre af dem bevæger sig og bliver lavet for sig nedenfor)
+    const LEVENDE = ['GLØGG', 'ÆBLESKIVER', 'JULEPYNT'];
+    for (const [lx, side, navn] of BODER) if (!LEVENDE.includes(navn) && (!faa || rnd() < 0.7)) staa(lx + (rnd() - 0.5) * 0.8, side * (R + 0.15), mod(-side), gaest({ let: true, boej: [0.5, 0.5], foer2: f => { f.g.rotation.x = 0.08; } }));
+    // kunder ved boderne: én eller to i kø, nogle med et barn
+    for (const [lx, side] of BODER) {
+      const n = faa ? (rnd() < 0.6 ? 1 : 0) : 1 + (rnd() < 0.55 ? 1 : 0);
+      for (let i = 0; i < n; i++) {
+        const x = lx + (i ? (rnd() < 0.5 ? -0.75 : 0.75) : (rnd() - 0.5) * 0.6), z = side * (R - 1.55 - i * 0.55);
+        staa(x, z, mod(side) + (rnd() - 0.5) * 0.5, gaest(rnd() < 0.3 ? MED_KRUS({ let: true }) : { let: true }));
+        if (!faa && i === 0 && rnd() < 0.25) staa(x + 0.5, z - side * 0.1, mod(side) + 0.2, gaest({ let: true, barn: true }));
+      }
+    }
+    // venner med krus ved ståbordene
+    for (const [bx, bz] of BORDE) {
+      const n = faa ? 2 : 3, a0 = rnd() * 6.3;
+      for (let i = 0; i < n; i++) { const a = a0 + i * (Math.PI * 2 / n) + (rnd() - 0.5) * 0.4, x = bx + Math.sin(a) * 0.72, z = bz + Math.cos(a) * 0.72; staa(x, z, a + Math.PI, MED_KRUS(gaest({ let: true }), i % 2)); }
+    }
+    // en familie, der kigger op i juletræet, og et par, der står og snakker
+    for (const [x, z, o] of [[-2.2, -4.3, {}], [-1.3, -4.5, { barn: true }], [-0.4, -4.45, { barn: true }], [0.5, -4.3, {}]].slice(0, faa ? 3 : 4)) { const f = staa(x, z, Math.atan2(-x, -z), gaest(Object.assign({ let: true }, o))); f.head.rotation.x = -0.35; }
+    if (!faa) { staa(2.6, 4.45, 2.2, gaest({ let: true, kvinde: true })); staa(3.4, 3.95, -1.0, MED_KRUS(gaest({ let: true, kvinde: false }))); }
+    folk.updateMatrixWorld(true); H.bagFigur([folk], { skygge: !faa });
+    if (faa) for (const m of [...folk.children]) if (m.material && m.material.side === THREE.BackSide) folk.remove(m);   // uden den mørke kant på telefonen: halvt så mange trekanter
+
+    // tre sælgere, der bevæger sig: gløgg i krus med en øse, æbleskiver, der vendes med en pind, og en, der vinker
+    const saelger = (navn, o) => { const [lx, side] = BODER.find(b => b[2] === navn); return placer(demonstrant(gaest(Object.assign({ grupper: f => [f.g, f.head, ...f.arms], boej: [0.6, 1.0] }, o))), g, lx, side * (R + 0.15), mod(-side)); };
+    const oese = (sh, part, m, el) => { part(new THREE.CylinderGeometry(0.012, 0.012, 0.5, 6), m('#9aa0a6'), el, 0, -0.5, 0.08, 0); part(new THREE.SphereGeometry(0.06, 8, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), m('#9aa0a6'), el, 0, -0.75, 0.08, 0); };
+    const pind = (sh, part, m, el) => { part(new THREE.CylinderGeometry(0.006, 0.006, 0.3, 4), m('#c9a26a'), el, 0, -0.42, 0.06, 0); };
+    const S1 = saelger('GLØGG', { arm: [null, oese], toej: [forklaede('#f1e6d6', '#b3262a')] });
+    const S2 = saelger('ÆBLESKIVER', { arm: [null, pind], hue: [strikhue('#b3262a', HV, HV)] });
+    const S3 = saelger('JULEPYNT', {});
+    S1.g.rotation.x = S2.g.rotation.x = 0.1;
+
+    // ---- dem, der går: en runde op ad den ene side af gangen og ned ad den anden, uden om juletræet
+    const A = -21, B = 25.5, bane = lx => 1.45 + 1.4 * Math.exp(-((lx / 3.6) ** 2));
+    const rute = []; for (let x = A; x <= B; x += 1.5) rute.push(new THREE.Vector3(x, 0, -bane(x)));
+    for (let i = 1; i < 6; i++) { const a = -Math.PI / 2 + i * Math.PI / 6; rute.push(new THREE.Vector3(B + Math.cos(a) * 1.45, 0, Math.sin(a) * 1.45)); }
+    for (let x = B; x >= A; x -= 1.5) rute.push(new THREE.Vector3(x, 0, bane(x)));
+    for (let i = 1; i < 6; i++) { const a = Math.PI / 2 + i * Math.PI / 6; rute.push(new THREE.Vector3(A + Math.cos(a) * 1.45, 0, Math.sin(a) * 1.45)); }
+    const kurve = new THREE.CatmullRomCurve3(rute, true), LK = kurve.getLength();
+    const gaar = (o) => demonstrant(Object.assign(gaest(Object.assign({ let: true }, o)), { grupper: f => [f.g, ...f.hips], boej: [0.2, 0.2], ben: 0,
+      foer2: f => { for (const [k, a] of f.arms.entries()) { a.rotation.x = 0.05; a.rotation.z = (k ? 1 : -1) * 0.1; } } }));
+    const GAAR = [{}, { foelge: { barn: true } }, {}, { foelge: {} }, {}, {}, { foelge: { barn: true } }, {}].slice(0, faa ? 5 : 8).map((w, i) => {
+      const f = placer(gaar({}), g, 0, 0, 0), d = { f, s: (i / (faa ? 5 : 8)) * LK + rnd() * 3, v0: 0.95 + rnd() * 0.35, v: 1, fase: rnd() * 6.3, pause: 0, kold: 2 + rnd() * 6, vend: 0 };
+      if (w.foelge) d.med = placer(gaar(w.foelge), g, 0, 0, 0);
+      return d;
+    });
+    const fod = (f, ph, amp, bob) => { const s = Math.sin(ph); f.hips[0].rotation.x = s * amp; f.hips[1].rotation.x = -s * amp; f.g.position.y = Math.abs(Math.cos(ph)) * bob; f.g.rotation.z = s * 0.025; };
+    const tp = new THREE.Vector3(), tt = new THREE.Vector3();
+    let sagt = false;
+    e.afst = p => { const dx = p.x - e.x, dz = p.z - e.z, lx = dx * KOS - dz * SIN, lz = dx * SIN + dz * KOS; return Math.hypot(Math.max(0, A - 2 - lx, lx - B - 2), Math.max(0, Math.abs(lz) - R - 1)); };
+    return (t, dt, pos) => {
+      const dx = pos.x - e.x, dz = pos.z - e.z, ix = dx * KOS - dz * SIN, iz = dx * SIN + dz * KOS;   // Ida i markedets koordinater
+      if (!sagt && ix > A && ix < B && Math.abs(iz) < R) { sagt = true; H.toast?.('Julemarked! Det dufter af gløgg og æbleskiver.'); }
+      if (sagt && e.afst(pos) > 30) sagt = false;
+      lysMat.opacity = 0.85 + Math.sin(t * 1.6) * 0.1; gloedMat.opacity = 0.42 + Math.sin(t * 5.3) * 0.03 + Math.sin(t * 8.1) * 0.02;
+      // sælgerne
+      S1.arms[1].rotation.x = -0.6 + Math.sin(t * 1.8) * 0.35; S1.arms[1].rotation.z = 0.2 + Math.sin(t * 0.9) * 0.15;
+      S2.arms[1].rotation.x = -0.7 + Math.sin(t * 4.5) * 0.12; S2.arms[1].rotation.z = 0.3 + Math.cos(t * 4.5) * 0.1; S2.head.rotation.x = 0.3;
+      const vink = Math.max(0, Math.sin(t * 0.5)) ** 4; S3.arms[1].rotation.x = -vink * 2.6; S3.arms[1].rotation.z = 0.08 + Math.sin(t * 9) * 0.35 * vink; S3.head.rotation.y = Math.sin(t * 0.37) * 0.4;
+      for (const w of GAAR) {
+        const u = (w.s % LK + LK) % LK / LK; kurve.getPointAt(u, tp); kurve.getTangentAt(u, tt);
+        // venter, hvis Ida står lige foran
+        const ax = ix - tp.x, az = iz - tp.z, frem = ax * tt.x + az * tt.z, ud = Math.abs(ax * tt.z - az * tt.x);
+        let vM = w.v0; if (frem > -0.3 && frem < 1.8 && ud < 0.9) vM = 0;
+        for (const o of GAAR) if (o !== w) { const gap = ((o.s - w.s) % LK + LK) % LK; if (gap < 1.4) vM = Math.min(vM, gap < 0.9 ? 0 : o.v); }
+        // standser en gang imellem ved en bod og kigger
+        w.kold -= dt;
+        if (w.pause > 0) { w.pause -= dt; vM = 0; }
+        else if (w.kold <= 0 && Math.abs(tp.x) > 8 && BODER.some(b => Math.abs(b[0] - tp.x) < 0.25 && b[1] === Math.sign(tp.z))) { w.pause = 2.5 + rnd() * 4; w.kold = 9 + rnd() * 14; }
+        w.v += Math.max(-3 * dt, Math.min(1.5 * dt, vM - w.v)); if (w.v < 0.02) w.v = 0;
+        w.s += w.v * dt; w.fase += w.v * dt * 5.2;
+        const side = Math.sign(tp.z) || 1, vend = w.pause > 0 ? 1 : 0; w.vend += (vend - w.vend) * Math.min(1, dt * 3);
+        const ry = Math.atan2(tt.x, tt.z), kig = side > 0 ? 0 : Math.PI;
+        const dr = Math.atan2(Math.sin(kig - ry), Math.cos(kig - ry));
+        const fl = [[w.f, 0]]; if (w.med) fl.push([w.med, 0.62]);
+        for (const [f, off] of fl) {
+          f.root.position.set(tp.x, 0, tp.z + Math.max(-1, Math.min(1, tp.z / 1.45)) * off);
+          f.root.rotation.y = ry + dr * w.vend * 0.85;
+          const k = Math.min(1, w.v / 0.6); fod(f, w.fase + (off ? 1.3 : 0), 0.34 * k, 0.025 * k);
+          if (k < 0.1) { f.hips[0].rotation.x *= 0.5; f.hips[1].rotation.x *= 0.5; }
+        }
+      }
+    };
+  });
 
   // ---------------------------------------------------------------- hver frame
   // pos: Idas plads. ude: hun er udenfor (ikke inde i en bygning, i Tårnet eller i båden)
